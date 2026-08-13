@@ -1,0 +1,13 @@
+:root{
+--paper:#F5F4F1;--paper-2:#EFEDE8;--paper-3:#E6E3DC;--white:#FFFFFF;
+--ink:#101215;--ink-2:#2C3037;--ink-3:#5A6069;--ink-4:#8B9199;
+--line:#D6D2C9;--line-strong:#B8B3A8;--line-ink:rgba(16,18,21,.12);
+--orange:#FF4D14;--orange-press:#D93C08;--orange-tint:#FFE9E1;
+--steel:#3C4A5A;--steel-tint:#E3E7EC;
+--blueprint:#1B4DFF;--ok:#0F8F6B;--warn:#C98A00;--danger:#C42B1C;
+--surface-page:var(--paper);--surface-card:var(--white);--surface-sunken:var(--paper-2);--surface-inverse:var(--ink);
+--text-body:var(--ink-2);--text-strong:var(--ink);--text-muted:var(--ink-3);--text-faint:var(--ink-4);--text-inverse:var(--paper);--text-accent:var(--orange);
+--border-subtle:var(--line);--border-strong:var(--line-strong);--border-accent:var(--orange);
+--accent:var(--orange);--accent-press:var(--orange-press);--accent-tint:var(--orange-tint);
+--grid-line:rgba(16,18,21,.06) /* @kind color */;--grid-line-strong:rgba(16,18,21,.11) /* @kind color */;
+--focus-ring:rgba(255,77,20,.45) /* @kind color */}

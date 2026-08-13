@@ -1,0 +1,167 @@
+INTERNAL BRIEF
+Website Redesign Plan — ubcbim.com
+A short overview of why we are redesigning our website and what the new site needs to deliver.
+For internal review and discussion.
+1. Why We Are Doing This
+Our website holds strong content — our services, client testimonials, the machines and software
+we support, and our track record across all the countries we serve and hundreds of projects.
+The issue is presentation. The current site looks like a traditional brochure rather than a
+technology company, and it gives visitors only one way to reach us: a single contact form.
+Competitors in our space are setting a higher bar. As a reference point, NexGen Steel runs an
+interactive 3D Virtual Lab where a visitor can pick a project, rotate the 3D model in their
+browser, read its specifications and the machines used, and request a quote — all on one page.
+It immediately signals a serious, modern engineering business. We offer a broader range of
+services; we need to present them with the same level of polish.
+Our goal
+Keep our proven content, redesign it into a modern technology brand, add an
+interactive 3D project showcase and sample files, and make it effortless for clients to
+reach us — with every enquiry captured automatically in our CRM.
+What the new site must achieve
+1. Look and feel like a technology company, not a contractor brochure.
+2. Prove our capability visually — an interactive 3D model showcase plus downloadable
+sample files.
+3. Give clients several easy ways to reach us: live chat, online call booking, and quote
+buttons throughout.
+4. Capture every lead automatically into our CRM, and use social media to bring in more
+visitors.
+
+-- 1 of 6 --
+
+2. Where We Stand Today
+A simple comparison of our current site against the interactive benchmark helps make the
+priorities clear.
+Area 	Our site today 	What strong sites do 	Priority
+First impression 	Photo slideshow with text Live, interactive 3D showcase High
+Showing our work Static images 	Spin-and-zoom 3D models 	High
+Project detail 	None shown 	Specs: size, type, machines
+used
+High
+Turning interest
+into a lead
+One contact page 	Quote button on every project High
+Talking to us 	Phone, email, form 	Live chat + online booking 	High
+Sample files 	Not offered 	Downloadable, gated samples Medium
+Look & feel 	Light, stock photos,
+carousels
+Modern, deliberate design
+system
+Medium
+Social media 	Small footer links 	Prominent icons + embedded
+feeds
+Medium
+Worth noting
+We already maintain the assets that make a company look credible online — named client
+testimonials, the roll-forming machines and software we support, association memberships,
+and global reach. The redesign is largely about presenting these inside a modern,
+interactive experience.
+
+-- 2 of 6 --
+
+3. The Key Priorities
+3.1 An interactive 3D Project Lab (our centerpiece)
+This is the feature that will most change how the site feels. We can export finished Revit models
+to a web 3D viewer (for example, Sketchfab, which has a free Revit plug-in) and embed them on
+our pages, so visitors can rotate and zoom with no software to install.
+Each project should show:
+• The 3D model (rotate, zoom, fullscreen).
+• A specs panel: size, units, location, building type.
+• Capability tags: the machine(s) and software used, and what we delivered (model, BOM,
+CSV, permit set).
+• Two actions: “Download sample files” and “Request a similar quote.”
+• Filters by Residential / Commercial / Multifamily / Light-Gauge Steel / Wood.
+Recommended start: 8–12 of our best wood and light-gauge steel projects for launch, then
+grow the library over time.
+3.2 Easy ways for clients to reach us
+• Live AI chat widget on every page, logged into our CRM.
+• “Book a 15-minute call” scheduler so clients pick a time directly — helpful across time
+zones.
+• WhatsApp / quick-call button for messaging-first clients.
+• A sticky “Request a Quote” button that stays visible while scrolling, plus quote buttons
+inside the 3D Lab.
+3.3 Capturing every lead in our CRM
+Every contact form, quote request, chat, and file download should land in our CRM
+automatically — assigned to the necessary team members and tagged with where it came from.
+The simplest reliable method is embedding web-to-lead forms built inside the CRM(we already
+have it on out current site), with auto-assignment and lead-source tagging turned on. Live chat
+and online booking feed the same records, so nothing is missed.
+Note: We have already connected CRM with our current website, and have recently connected
+our Meta account with the CRM. We have to further connect it with LinkedIn and any other
+lead-generating forms or ways we do it - including the live AI chatbot that we will be integrating
+into our website.
+3.4 Sample files and capability information
+Clients evaluate a partner by looking at real deliverables and checking compatibility. A
+“Resources” hub should offer downloadable, watermarked samples — a sample 3D model, a Bill
+of Materials, machine CSV files, and a permit set — behind a short form that creates a tagged
+
+-- 3 of 6 --
+
+lead. A clear capability matrix (machines and software we support, and the file outputs clients
+receive) answers their main questions at a glance.
+3.5 Social media that brings in clients
+• Prominent social icons in the header and footer, with our latest LinkedIn and YouTube
+content embedded near the footer.
+• Project walkthrough videos embedded on the 3D Lab and service pages; short model
+clips posted to social media linking back to the site.
+• Trackable links so we can see in our CRM which platform brings each lead and focus
+effort where it pays off. LinkedIn is our priority channel for B2B clients.
+3.6 A modern look and feel
+• One deliberate design system — consistent colors, fonts and spacing across every
+page.
+• Real 3D models and renders instead of stock photos; subtle, purposeful motion rather
+than carousels.
+• Fast and mobile-first, with SEO basics (clear headings, page descriptions, image alt text)
+on every page.
+
+-- 4 of 6 --
+
+4. How We Can Roll It Out?
+The work is phased so we get quick wins early and tackle the larger 3D showcase in parallel —
+no need to do everything at once.
+Phase 	Focus 	What gets done
+1 — Quick wins 	Engagement +
+CRM
+Live chat & online booking
+WhatsApp / call button
+Forms wired to CRM
+Sticky quote button
+Bigger social icons
+2 — Core
+redesign
+Look & structure New design system
+Rebuilt homepage & services
+Capability matrix
+Speed + SEO basics
+3 — 3D Project
+Lab
+Differentiator 	8–12 interactive models
+Specs & analysis panels
+Per-model quote to CRM
+Filters by building type
+4 — Resources &
+growth
+Lead generation Sample-files hub
+Embedded social & video
+Email follow-up
+Analytics & tracking
+1) Turn on live chat and online booking. 2) Connect every form to our CRM. 3)
+Launch a small 3D Project Lab with 8–12 models.
+5. Decisions We Need to Make
+5. Design direction — a modern dark “engineering” theme, or a clean light theme with one
+bold accent colour.
+6. Which 8–12 projects to feature first in the 3D Lab.
+7. Which sample files we are comfortable sharing (watermarked).
+8. Who owns incoming leads, chats and booked calls day to day.
+Key questions for whoever that will design the new Website
+• Can they implement our CRM web-to-lead forms, live AI chat and online booking, with
+lead-source tagging and auto-assignment?
+• Can they build interactive 3D models with custom specs panels and quote buttons?
+
+-- 5 of 6 --
+
+• Will the new build be modern, fast and mobile-first, with a documented design system?
+• Can they set up gated sample-file downloads that create tagged leads, plus analytics and
+link tracking?
+Internal discussion document for the ubcbim.com redesign. Prepared June 2026.
+
+-- 6 of 6 --
+

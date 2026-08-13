@@ -1,0 +1,10 @@
+:root{
+--fs-display-1:76px;--fs-display-2:56px;--fs-h1:40px;--fs-h2:30px;--fs-h3:22px;--fs-h4:18px;
+--fs-body-lg:18px;--fs-body:16px;--fs-body-sm:14px;--fs-caption:13px;--fs-label:11px;
+--lh-tight:1.04 /* @kind other */;--lh-snug:1.18 /* @kind other */;--lh-normal:1.5 /* @kind other */;--lh-relaxed:1.65 /* @kind other */;
+--ls-display:-0.03em /* @kind other */;--ls-heading:-0.018em /* @kind other */;--ls-body:0 /* @kind other */;--ls-label:0.14em /* @kind other */;--ls-mono:0.02em /* @kind other */;
+--fw-regular:400 /* @kind other */;--fw-medium:500 /* @kind other */;--fw-semibold:600 /* @kind other */;--fw-bold:700 /* @kind other */;
+--type-display:var(--fw-bold) var(--fs-display-1)/var(--lh-tight) var(--font-display) /* @kind font */;
+--type-h2:var(--fw-semibold) var(--fs-h2)/var(--lh-snug) var(--font-display) /* @kind font */;
+--type-body:var(--fw-regular) var(--fs-body)/var(--lh-relaxed) var(--font-body) /* @kind font */;
+--type-label:var(--fw-medium) var(--fs-label)/1.2 var(--font-mono) /* @kind font */}
