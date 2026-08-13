@@ -47,3 +47,27 @@ window.UBC_DATA = {
     { title: 'Architectural draftsperson', place: 'Remote', type: 'Contract' }
   ]
 };
+
+/* Scroll-scrubbed construction walkthrough.
+   videoSrc: one continuous 16:9 clip (foundation -> pool). When present it is
+   scrubbed by scroll. Until it exists, the 9 stage stills crossfade; until
+   those exist, each stage shows a labelled placeholder. bellX/bellY position
+   the doorbell hotspot over the front door on the finished-facade frame.
+   `t` is each frame's normalized position (0..1) along the timeline. */
+window.UBC_DATA.walkthrough = {
+  videoSrc: 'assets/walkthrough.mp4',
+  poster: 'assets/frames/05-facade.jpg',
+  bellX: '56%',
+  bellY: '60%',
+  frames: [
+    { id: '03_17_02', t: 0.000, section: 'Foundation poured',   file: '01-foundation.jpg', img: 'assets/frames/01-foundation.jpg', note: 'Slab and footings set out to survey control.' },
+    { id: '03_17_08', t: 0.125, section: 'Steel framing begins', file: '02-steel-begins.jpg', img: 'assets/frames/02-steel-begins.jpg', note: 'First light-gauge steel walls rise off the slab.' },
+    { id: '03_17_13', t: 0.250, section: 'Full steel skeleton',  file: '03-steel-skeleton.jpg', img: 'assets/frames/03-steel-skeleton.jpg', note: 'Complete galvanized frame — walls, trusses, bracing.' },
+    { id: '03_17_20', t: 0.375, section: 'Sheathing + roof',     file: '04-sheathing.jpg', img: 'assets/frames/04-sheathing.jpg', note: 'Walls wrapped, roof decked and felted.' },
+    { id: '03_41_14', t: 0.500, section: 'Finished facade',      file: '05-facade.jpg', img: 'assets/frames/05-facade.jpg', bell: true, note: 'The finished home at dusk. Ring the bell at the door.' },
+    { id: '03_19_34', t: 0.625, section: 'Living room',          file: '06-living-room.jpg', img: 'assets/frames/06-living-room.jpg', note: 'Through the door: vaulted living room and fireplace.' },
+    { id: '03_19_41', t: 0.750, section: 'Kitchen / dining',     file: '07-kitchen.jpg', img: 'assets/frames/07-kitchen.jpg', note: 'Open kitchen and dining under exposed beams.' },
+    { id: '03_22_10', t: 0.875, section: 'Open doors to pool',   file: '08-open-doors.jpg', img: 'assets/frames/08-open-doors.jpg', note: 'Bifold doors fold back to the patio at sunset.' },
+    { id: '03_23_22', t: 1.000, section: 'Backyard / pool',      file: '09-backyard.jpg', img: 'assets/frames/09-backyard.jpg', note: 'Pool, patio and the valley beyond.' }
+  ]
+};

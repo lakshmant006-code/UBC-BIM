@@ -30,7 +30,7 @@ function Hero({ onQuote, onGo }) {
               Walk the framing model
             </h1>
             <p style={{ fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '52ch', margin: 'var(--s-5) 0 var(--s-7)' }}>
-              We model wall panels, roof and floor trusses, MEP and permit sets, and produce the machine files your line runs on. Scroll to assemble a house layer by layer, then open any layer for the detail.
+              We model wall panels, roof and floor trusses, MEP and permit sets, and produce the machine files your line runs on. Scroll to build a house from poured foundation to finished home, and ring the bell at the door on the way in.
             </p>
             <div style={{ display: 'flex', gap: 'var(--s-3)', flexWrap: 'wrap' }}>
               <Button size="lg" onClick={onQuote}>Request a quote</Button>
@@ -141,10 +141,11 @@ function ProofBand() {
 }
 
 function Home({ onGo, onQuote }) {
+  const VideoWalkthrough = window.VideoWalkthrough;
   return (
     <div>
       <Hero onQuote={onQuote} onGo={onGo} />
-      <Walkthrough />
+      {VideoWalkthrough ? <VideoWalkthrough /> : <Walkthrough />}
       <Services onGo={onGo} />
       <ProofBand />
       <Capability />
