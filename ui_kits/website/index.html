@@ -1,0 +1,94 @@
+<!-- @dsCard group="Website" viewport="1320x900" name="Website — interactive kit" subtitle="Home walkthrough, 3D Project Lab, About, Contact, Careers" -->
+<!-- @startingPoint section="Website" subtitle="Full click-through site: walkthrough home, project lab, about, contact, careers" viewport="1320x900" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>UBC BIM — website UI kit</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="data.js"></script>
+<style>@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="FramingSchematic.jsx"></script>
+<script type="text/babel" src="Home.jsx"></script>
+<script type="text/babel" src="Portfolio.jsx"></script>
+<script type="text/babel" src="About.jsx"></script>
+<script type="text/babel" src="Contact.jsx"></script>
+<script type="text/babel" src="Careers.jsx"></script>
+<script type="text/babel">
+const { Header, Footer, StickyQuote, Button, FormField, Input, Select, Textarea, Icon, SectionHeading } = window.UBCBIMDesignSystem_353af8;
+
+function QuoteDrawer({ open, onClose }) {
+  const [sent, setSent] = React.useState(false);
+  if (!open) return null;
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(16,18,21,.44)', display: 'flex', justifyContent: 'flex-end' }}>
+      <div onClick={(e) => e.stopPropagation()} style={{
+        width: 460, maxWidth: '100%', height: '100%', background: 'var(--surface-card)', boxShadow: 'var(--shadow-3)',
+        padding: 'var(--s-7)', overflow: 'auto',
+        animation: 'none', borderLeft: 'var(--bw-hair) solid var(--border-subtle)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--s-4)' }}>
+          <SectionHeading eyebrow="Request a quote" title="Tell us about the project" size="sm" />
+          <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}><Icon name="x" size={20} /></button>
+        </div>
+        {sent ? (
+          <div style={{ marginTop: 'var(--s-8)' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)' }}>Quote request received</div>
+            <p style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>
+              Logged to the CRM and tagged Website · Sticky quote. We reply within one working day.
+            </p>
+            <Button variant="secondary" size="sm" style={{ marginTop: 'var(--s-5)' }} onClick={onClose}>Close</Button>
+          </div>
+        ) : (
+          <form onSubmit={(e) => { e.preventDefault(); setSent(true); }} style={{ display: 'grid', gap: 'var(--s-4)', marginTop: 'var(--s-6)' }}>
+            <FormField label="Name" required><Input placeholder="Your name" required /></FormField>
+            <FormField label="Work email" required><Input type="email" placeholder="you@company.com" required /></FormField>
+            <FormField label="Building type"><Select placeholder="Select building type" options={['Residential', 'Commercial', 'Multifamily', 'Light-gauge steel', 'Wood']} /></FormField>
+            <FormField label="Service"><Select placeholder="Select a service" options={window.UBC_DATA.services.map((s) => s.title)} /></FormField>
+            <FormField label="Scope" hint="Square footage, unit count, what you need modelled."><Textarea rows={4} placeholder="Building type, square footage, what you need modelled." /></FormField>
+            <Button type="submit" full>Request a quote</Button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [page, setPage] = React.useState('home');
+  const [scrolled, setScrolled] = React.useState(false);
+  const [quote, setQuote] = React.useState(false);
+  React.useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 24);
+    window.addEventListener('scroll', on, { passive: true }); on();
+    return () => window.removeEventListener('scroll', on);
+  }, []);
+  const go = (id) => { setPage(id); window.scrollTo(0, 0); };
+  const nav = [
+    { label: 'Services', id: 'services' },
+    { label: 'Projects', id: 'projects' },
+    { label: 'About', id: 'about' },
+    { label: 'Careers', id: 'careers' },
+    { label: 'Contact', id: 'contact' }
+  ];
+  const body = {
+    home: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
+    services: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
+    projects: <window.Portfolio onQuote={() => setQuote(true)} />,
+    about: <window.About />,
+    careers: <window.Careers onQuote={() => setQuote(true)} />,
+    contact: <window.Contact />
+  }[page];
+  return (
+    <div>
+      <Header items={nav} active={page} scrolled={scrolled} onNavigate={go} onQuote={() => setQuote(true)} />
+      {body}
+      <Footer onNavigate={() => go('contact')} />
+      <StickyQuote onQuote={() => setQuote(true)} onChat={() => setQuote(true)} />
+      <QuoteDrawer open={quote} onClose={() => setQuote(false)} />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script></body></html>
