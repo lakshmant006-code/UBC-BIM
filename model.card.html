@@ -1,0 +1,36 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Model" subtitle="ModelStage, Hotspot, SpecPanel, LayerRail, CapabilityMatrix" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>html,body{margin:0;background:var(--paper)}#root{padding:24px}</style></head>
+<body><div id="root"></div>
+<script type="text/babel">
+const { ModelStage, Hotspot, SpecPanel, LayerRail, CapabilityMatrix, Tag, Button } = window.UBCBIMDesignSystem_353af8;
+const L = ({children}) => <div style={{fontFamily:'var(--font-mono)',fontSize:10,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--text-faint)',margin:'0 0 8px'}}>{children}</div>;
+function Demo(){const [a,setA]=React.useState(1);
+return (<div style={{display:'flex',flexDirection:'column',gap:20}}>
+<div style={{display:'grid',gridTemplateColumns:'1.5fr 1fr',gap:20,alignItems:'start'}}>
+<div><L>ModelStage + Hotspot</L>
+<ModelStage height={210} caption="Maple Ridge duplex · wall panel layer">
+<Hotspot x="26%" y="40%" label="Wall panel · 2×6"/>
+<Hotspot x="62%" y="66%" label="Floor truss" active/>
+</ModelStage></div>
+<div><L>SpecPanel</L>
+<SpecPanel eyebrow="Wall detailing" title="Exterior wall panel" style={{width:'100%'}}
+ specs={[{label:'Stud',value:'2×6 at 16" O.C.'},{label:'Sheathing',value:'7/16" OSB'},{label:'Delivered',value:'Model · CSV'}]}
+ tags={<><Tag tone="steel">Revit</Tag><Tag>Machine CSV</Tag></>}
+ actions={<Button full size="sm">Request a similar quote</Button>} onClose={()=>{}}/></div>
+</div>
+<div style={{display:'grid',gridTemplateColumns:'1fr 1.35fr',gap:24,alignItems:'start'}}>
+<div><L>LayerRail</L><LayerRail active={a} onSelect={setA} layers={[
+{label:'Slab & foundation',note:'Setting out, anchor layout'},
+{label:'Wall panels',note:'Studs, openings, sheathing'},
+{label:'Roof & floor trusses',note:'Spans, bracing, hangers'},
+{label:'MEP & clash detection',note:'Services against the frame'}]}/></div>
+<div><L>CapabilityMatrix</L><CapabilityMatrix columns={['Machine / software','Type','File output']} rows={[
+['Revit','Software','RVT · IFC · DWG'],['Vertex BD','Software','CSV · shop drawings'],['Roll-forming line','Machine','Machine CSV']]}/></div>
+</div></div>);}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script></body></html>

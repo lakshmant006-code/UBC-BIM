@@ -1,0 +1,21 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Navigation" subtitle="Header, FilterBar, StickyQuote, Footer" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>html,body{margin:0;background:var(--paper)}#root{padding:24px}</style></head>
+<body><div id="root"></div>
+<script type="text/babel">
+const { Header, FilterBar, StickyQuote, Footer } = window.UBCBIMDesignSystem_353af8;
+const L = ({children}) => <div style={{fontFamily:'var(--font-mono)',fontSize:10,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--text-faint)',margin:'0 0 8px'}}>{children}</div>;
+function Demo(){const [f,setF]=React.useState('Residential');
+return (<div style={{display:'flex',flexDirection:'column',gap:20}}>
+<div><L>Header — rest state</L><div style={{border:'1px solid var(--line)',background:'var(--paper)',transform:'scale(.62)',transformOrigin:'top left',width:'161%'}}><Header active="projects"/></div></div>
+<div style={{marginTop:-34}}><L>Header — scrolled (translucent, blurred)</L><div style={{border:'1px solid var(--line)',background:'var(--paper-3)',transform:'scale(.62)',transformOrigin:'top left',width:'161%'}}><Header active="projects" scrolled/></div></div>
+<div style={{marginTop:-30,display:'grid',gridTemplateColumns:'1.7fr 1fr',gap:24,alignItems:'start'}}>
+<div><L>FilterBar</L><FilterBar value={f} onChange={setF} count={12}/></div>
+<div><L>StickyQuote</L><div style={{position:'relative',height:70}}><StickyQuote style={{position:'absolute',right:0,bottom:0}} onQuote={()=>{}} onChat={()=>{}}/></div></div>
+</div></div>);}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script></body></html>
