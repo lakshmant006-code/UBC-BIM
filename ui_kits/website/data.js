@@ -57,8 +57,8 @@ window.UBC_DATA = {
 window.UBC_DATA.walkthrough = {
   videoSrc: 'assets/walkthrough.mp4',
   poster: 'assets/frames/05-facade.jpg',
-  bellX: '56%',
-  bellY: '60%',
+  bellX: '50%',
+  bellY: '57%',
   frames: [
     { id: '03_17_02', t: 0.000, section: 'Foundation poured',   file: '01-foundation.jpg', img: 'assets/frames/01-foundation.jpg', note: 'Slab and footings set out to survey control.' },
     { id: '03_17_08', t: 0.125, section: 'Steel framing begins', file: '02-steel-begins.jpg', img: 'assets/frames/02-steel-begins.jpg', note: 'First light-gauge steel walls rise off the slab.' },
