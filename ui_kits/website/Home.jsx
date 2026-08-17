@@ -227,8 +227,7 @@ function Home({ onGo, onQuote }) {
   const VideoWalkthrough = window.VideoWalkthrough;
   return (
     <div>
-      <CinematicHero onQuote={onQuote} onGo={onGo} />
-      {VideoWalkthrough ? <VideoWalkthrough /> : <Walkthrough />}
+      {VideoWalkthrough ? <VideoWalkthrough onQuote={onQuote} onGo={onGo} /> : <Walkthrough />}
       <WhoWeAre onQuote={onQuote} />
       <Services onGo={onGo} />
       <RecentProjects onGo={onGo} />

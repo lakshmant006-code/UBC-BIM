@@ -56,30 +56,18 @@ window.UBC_DATA = {
    `t` is each frame's normalized position (0..1) along the timeline. */
 window.UBC_DATA.walkthrough = {
   videoSrc: 'assets/walkthrough.mp4',
+  videoWebm: 'assets/walkthrough.webm',
   poster: 'assets/frames/05-facade.jpg',
+  autoplay: true,
   bellX: '50%',
   bellY: '57%',
-  // Crisp AI keyframe-interpolation clips (Kling 3.0 pro), one per stage transition
-  // (segment i animates frame i -> frame i+1). Scroll scrubs across all eight.
-  clips: [
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_459d113b-1ea7-4273-9947-db3d05421c35.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_8585a581-72e8-42a5-ac91-4ce89e0d537d.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_988fcd49-0961-4cb7-a53f-ab57ccbd6ab4.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_35717af7-318c-4a0b-9584-41d4dc7731b6.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_2772308c-775a-4b5e-aaef-43b4991634b0.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_726901d5-b522-419c-bc75-8c7cdf24a548.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_21bfb718-ffe1-4011-b00c-d6c45e981361.mp4',
-    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_32dd73b2-1b57-4747-80f0-7e3ab8a1a396.mp4'
-  ],
+  // Stitched exterior build video (three clips: foundation -> steel -> sheathing ->
+  // finished facade), scrubbed by scroll. Stages map to points along the 15s timeline.
   frames: [
-    { id: '03_17_02', t: 0.000, section: 'Foundation poured',   file: '01-foundation.jpg', img: 'assets/frames/01-foundation.jpg', note: 'Slab and footings set out to survey control.' },
-    { id: '03_17_08', t: 0.125, section: 'Steel framing begins', file: '02-steel-begins.jpg', img: 'assets/frames/02-steel-begins.jpg', note: 'First light-gauge steel walls rise off the slab.' },
-    { id: '03_17_13', t: 0.250, section: 'Full steel skeleton',  file: '03-steel-skeleton.jpg', img: 'assets/frames/03-steel-skeleton.jpg', note: 'Complete galvanized frame — walls, trusses, bracing.' },
-    { id: '03_17_20', t: 0.375, section: 'Sheathing + roof',     file: '04-sheathing.jpg', img: 'assets/frames/04-sheathing.jpg', note: 'Walls wrapped, roof decked and felted.' },
-    { id: '03_41_14', t: 0.500, section: 'Finished facade',      file: '05-facade.jpg', img: 'assets/frames/05-facade.jpg', bell: true, note: 'The finished home at dusk. Ring the bell at the door.' },
-    { id: '03_19_34', t: 0.625, section: 'Living room',          file: '06-living-room.jpg', img: 'assets/frames/06-living-room.jpg', note: 'Through the door: vaulted living room and fireplace.' },
-    { id: '03_19_41', t: 0.750, section: 'Kitchen / dining',     file: '07-kitchen.jpg', img: 'assets/frames/07-kitchen.jpg', note: 'Open kitchen and dining under exposed beams.' },
-    { id: '03_22_10', t: 0.875, section: 'Open doors to pool',   file: '08-open-doors.jpg', img: 'assets/frames/08-open-doors.jpg', note: 'Bifold doors fold back to the patio at sunset.' },
-    { id: '03_23_22', t: 1.000, section: 'Backyard / pool',      file: '09-backyard.jpg', img: 'assets/frames/09-backyard.jpg', note: 'Pool, patio and the valley beyond.' }
+    { id: '03_17_02', t: 0.00, section: 'Foundation poured',   file: '01-foundation.jpg', img: 'assets/frames/01-foundation.jpg', note: 'Slab and footings set out to survey control.' },
+    { id: '03_17_08', t: 0.30, section: 'Steel framing begins', file: '02-steel-begins.jpg', img: 'assets/frames/02-steel-begins.jpg', note: 'Light-gauge steel walls rise off the slab.' },
+    { id: '03_17_13', t: 0.42, section: 'Full steel skeleton',  file: '03-steel-skeleton.jpg', img: 'assets/frames/03-steel-skeleton.jpg', note: 'Complete galvanized frame — walls, trusses, bracing.' },
+    { id: '03_17_20', t: 0.66, section: 'Sheathing + roof',     file: '04-sheathing.jpg', img: 'assets/frames/04-sheathing.jpg', note: 'Walls wrapped, roof decked and felted.' },
+    { id: '03_41_14', t: 0.90, section: 'Finished facade',      file: '05-facade.jpg', img: 'assets/frames/05-facade.jpg', bell: true, note: 'The finished home at dusk. Ring the bell at the door.' }
   ]
 };
