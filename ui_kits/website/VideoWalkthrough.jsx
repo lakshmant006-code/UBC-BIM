@@ -17,6 +17,8 @@ const { Hotspot, Button, Icon } = window.UBCBIMDesignSystem_353af8;
 
 const DW = (window.UBC_DATA && window.UBC_DATA.walkthrough) || { frames: [] };
 const FRAMES = DW.frames || [];
+// Optional per-transition video clips (segment i = frame i -> frame i+1). Scroll scrubs across all of them.
+const CLIPS = (DW.clips && DW.clips.length) ? DW.clips : null;
 
 // A short two-note bell chime via Web Audio — no asset, no autoplay policy issues.
 function ringChime() {
@@ -98,6 +100,7 @@ function VideoWalkthrough() {
   const videoRef = React.useRef(null);
   const targetRef = React.useRef(0);
   const rafRef = React.useRef(0);
+  const vidRefs = React.useRef([]);
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
   const [videoOk, setVideoOk] = React.useState(false);
@@ -142,6 +145,25 @@ function VideoWalkthrough() {
     return () => cancelAnimationFrame(rafRef.current);
   }, [videoOk, reduce]);
 
+  // Multi-clip scrub: map scroll progress to (segment, local time) and drive that clip's currentTime.
+  React.useEffect(() => {
+    if (!CLIPS) return;
+    const loop = () => {
+      const t = targetRef.current;
+      const count = CLIPS.length;
+      const idx = Math.min(count - 1, Math.floor(t * count));
+      const localT = Math.min(1, Math.max(0, t * count - idx));
+      const v = vidRefs.current[idx];
+      if (v && v.duration) {
+        const want = localT * v.duration;
+        v.currentTime = reduce ? want : v.currentTime + (want - v.currentTime) * 0.25;
+      }
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [reduce]);
+
   const ring = () => { setRinging(false); requestAnimationFrame(() => { setRinging(true); ringChime(); }); window.clearTimeout(ring._t); ring._t = window.setTimeout(() => setRinging(false), 1300); };
 
   const active = FRAMES[stage] || {};
@@ -151,27 +173,40 @@ function VideoWalkthrough() {
     <div ref={wrapRef} style={{ height: (Math.max(2, n) * 55) + 'vh', position: 'relative', background: 'var(--surface-inverse)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {/* Media layer: real video, else crossfading stills / placeholders */}
+        {/* Media layer: AI clips (scrubbed), else single video, else crossfading stills / placeholders */}
         <div style={{ position: 'absolute', inset: 0, background: 'var(--surface-inverse)' }}>
-          {DW.videoSrc && (
-            <video
-              ref={videoRef}
-              src={DW.videoSrc}
-              poster={DW.poster}
-              muted
-              playsInline
-              preload="auto"
-              onLoadedMetadata={(e) => { e.currentTarget.pause(); setVideoOk(true); }}
-              onError={() => setVideoOk(false)}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: videoOk ? 'block' : 'none', filter: 'saturate(.92)' }}
-            />
+          {CLIPS ? (
+            CLIPS.map((url, i) => {
+              const activeSeg = Math.min(CLIPS.length - 1, Math.floor(progress * CLIPS.length));
+              const on = i === activeSeg;
+              return (
+                <video key={i} ref={(el) => { vidRefs.current[i] = el; }} src={url} muted playsInline preload="auto"
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: on ? 1 : 0, transition: 'opacity 140ms linear', filter: 'saturate(.92)' }} />
+              );
+            })
+          ) : (
+            <>
+              {DW.videoSrc && (
+                <video
+                  ref={videoRef}
+                  src={DW.videoSrc}
+                  poster={DW.poster}
+                  muted
+                  playsInline
+                  preload="auto"
+                  onLoadedMetadata={(e) => { e.currentTarget.pause(); setVideoOk(true); }}
+                  onError={() => setVideoOk(false)}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: videoOk ? 'block' : 'none', filter: 'saturate(.92)' }}
+                />
+              )}
+              {!videoOk && FRAMES.map((f, i) => {
+                const d = Math.abs(progress - segT(i));
+                const op = Math.max(0, 1 - d / (seg * 1.08));
+                const sc = reduce ? 1 : 1.06 - 0.06 * op; // slow camera push-in as it becomes active
+                return <FrameLayer key={f.id || i} frame={f} opacity={op} scale={sc} />;
+              })}
+            </>
           )}
-          {!videoOk && FRAMES.map((f, i) => {
-            const d = Math.abs(progress - segT(i));
-            const op = Math.max(0, 1 - d / (seg * 1.08));
-            const sc = reduce ? 1 : 1.06 - 0.06 * op; // slow camera push-in as it becomes active
-            return <FrameLayer key={f.id || i} frame={f} opacity={op} scale={sc} />;
-          })}
         </div>
 
         {/* Bottom scrim for text legibility over imagery (the allowed gradient) */}

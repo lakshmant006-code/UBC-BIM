@@ -59,6 +59,18 @@ window.UBC_DATA.walkthrough = {
   poster: 'assets/frames/05-facade.jpg',
   bellX: '50%',
   bellY: '57%',
+  // Crisp AI keyframe-interpolation clips (Kling 3.0 pro), one per stage transition
+  // (segment i animates frame i -> frame i+1). Scroll scrubs across all eight.
+  clips: [
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_459d113b-1ea7-4273-9947-db3d05421c35.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_8585a581-72e8-42a5-ac91-4ce89e0d537d.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_988fcd49-0961-4cb7-a53f-ab57ccbd6ab4.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_35717af7-318c-4a0b-9584-41d4dc7731b6.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_2772308c-775a-4b5e-aaef-43b4991634b0.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_726901d5-b522-419c-bc75-8c7cdf24a548.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_21bfb718-ffe1-4011-b00c-d6c45e981361.mp4',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3GFmncZe4D9HFyvJNDOWg5v154c/hf_20260817_031132_32dd73b2-1b57-4747-80f0-7e3ab8a1a396.mp4'
+  ],
   frames: [
     { id: '03_17_02', t: 0.000, section: 'Foundation poured',   file: '01-foundation.jpg', img: 'assets/frames/01-foundation.jpg', note: 'Slab and footings set out to survey control.' },
     { id: '03_17_08', t: 0.125, section: 'Steel framing begins', file: '02-steel-begins.jpg', img: 'assets/frames/02-steel-begins.jpg', note: 'First light-gauge steel walls rise off the slab.' },
