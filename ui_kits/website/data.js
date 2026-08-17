@@ -59,8 +59,8 @@ window.UBC_DATA.walkthrough = {
   videoWebm: 'assets/walkthrough.webm',
   poster: 'assets/frames/05-facade.jpg',
   autoplay: true,
-  bellX: '50%',
-  bellY: '57%',
+  bellX: '49%',
+  bellY: '64%',
   // Stitched exterior build video (three clips: foundation -> steel -> sheathing ->
   // finished facade), scrubbed by scroll. Stages map to points along the 15s timeline.
   frames: [

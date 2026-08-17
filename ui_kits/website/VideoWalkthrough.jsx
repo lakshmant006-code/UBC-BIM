@@ -38,11 +38,11 @@ function ringChime() {
   } catch (e) { /* audio is a nicety, never a blocker */ }
 }
 
-function Doorbell({ onRing, ringing }) {
-  const x = DW.bellX || '50%';
-  const y = DW.bellY || '57%';
+function Doorbell({ onRing, ringing, visible }) {
+  const x = DW.bellX || '49%';
+  const y = DW.bellY || '64%';
   return (
-    <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 3 }}>
+    <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 3, opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none', transition: 'opacity var(--dur-4) var(--ease-out)' }}>
       {ringing && <span style={{ position: 'absolute', left: '50%', top: 6, width: 34, height: 34, marginLeft: -17, borderRadius: 999, border: '2px solid var(--accent)', animation: 'ubcPulse var(--dur-cine) var(--ease-out) forwards' }} />}
       <button onClick={onRing} aria-label="Ring the doorbell"
         style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
@@ -84,6 +84,7 @@ function VideoWalkthrough({ onQuote, onGo }) {
         playsInline
         preload="auto"
         autoPlay={!reduce}
+        loop={!reduce}
         onLoadedMetadata={(e) => { if (!reduce) e.currentTarget.play().catch(() => {}); }}
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.92)' }}
       >
@@ -94,8 +95,8 @@ function VideoWalkthrough({ onQuote, onGo }) {
       {/* Legibility scrim for the overlaid text (the one allowed gradient) */}
       <div style={{ position: 'absolute', inset: 0, background: 'var(--scrim-bottom)', pointerEvents: 'none' }} />
 
-      {/* Doorbell — shown when the finished home is on screen */}
-      {showBell && HAS_BELL && <Doorbell onRing={ring} ringing={ringing} />}
+      {/* Doorbell — fades in when the finished home is on screen (each loop) */}
+      {HAS_BELL && <Doorbell onRing={ring} ringing={ringing} visible={showBell} />}
 
       {/* Headline overlay */}
       <div style={{ position: 'relative', height: '100%', maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter) var(--s-10)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
