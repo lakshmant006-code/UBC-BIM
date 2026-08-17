@@ -140,13 +140,98 @@ function ProofBand() {
   );
 }
 
+// Cinematic full-bleed hero — headline over the finished-home photo (Arcadia style).
+function CinematicHero({ onQuote, onGo }) {
+  return (
+    <section style={{ position: 'relative', height: '92vh', minHeight: 560, overflow: 'hidden', background: 'var(--surface-inverse)' }}>
+      <img src="assets/frames/05-facade.jpg" alt="A finished UBC BIM home at dusk" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.92)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'var(--scrim-bottom)', pointerEvents: 'none' }} />
+      <Page style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: 'var(--s-10)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'rgba(245,244,241,.72)' }}>
+          <span style={{ width: 24, height: 2, background: 'var(--accent)' }} />
+          BIM services · wood frame and light-gauge steel
+        </div>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-display-1)', fontWeight: 'var(--fw-bold)', letterSpacing: 'var(--ls-display)', lineHeight: 'var(--lh-tight)', color: 'var(--paper)', margin: 'var(--s-5) 0 0', maxWidth: '16ch' }}>
+          We model the whole build
+        </h1>
+        <p style={{ fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.84)', maxWidth: '54ch', margin: 'var(--s-5) 0 var(--s-7)' }}>
+          Wall panels, roof and floor trusses, MEP and permit sets, and the machine files your line runs on — from poured foundation to finished home. Scroll to build it.
+        </p>
+        <div style={{ display: 'flex', gap: 'var(--s-3)', flexWrap: 'wrap' }}>
+          <Button size="lg" onClick={onQuote}>Request a quote</Button>
+          <Button size="lg" variant="inverse" onClick={() => onGo('projects')} iconRight={<Icon name="arrow-right" size={17} />}>See the projects</Button>
+        </div>
+      </Page>
+      <div style={{ position: 'absolute', left: '50%', bottom: 'var(--s-5)', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, color: 'rgba(245,244,241,.6)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase' }}>
+        Scroll<Icon name="chevron-down" size={18} />
+      </div>
+    </section>
+  );
+}
+
+// Centered editorial band (Arcadia "Who We Are").
+function WhoWeAre({ onQuote }) {
+  return (
+    <Section>
+      <Page style={{ maxWidth: 840, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>
+        <Reveal>
+          <div className="ubc-label" style={{ display: 'inline-block' }}>Who we are</div>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h1)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-strong)', margin: 'var(--s-4) 0 0' }}>
+            One coordinated model behind every deliverable
+          </h2>
+          <p style={{ fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-5) auto 0', maxWidth: '62ch' }}>
+            We partner with builders, fabricators and engineers across 11 countries to detail wood-frame and light-gauge steel structures — turning drawings into panels, trusses, permit sets and the machine files that cut them.
+          </p>
+          <div style={{ marginTop: 'var(--s-7)' }}>
+            <Button variant="secondary" onClick={onQuote} iconRight={<Icon name="arrow-right" size={16} />}>Schedule a strategy call</Button>
+          </div>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+// Recent projects gallery (Arcadia project cards) — real frames as project imagery.
+function RecentProjects({ onGo }) {
+  const imgs = ['05-facade', '03-steel-skeleton', '04-sheathing', '09-backyard', '06-living-room', '08-open-doors'];
+  return (
+    <Section sunken>
+      <Page>
+        <Reveal>
+          <SectionHeading eyebrow="Recent projects" title="Built from the model" size="lg"
+            standfirst="A selection of wood and light-gauge steel projects delivered from one coordinated framing model."
+            action={<Button variant="ghost" iconRight={<Icon name="arrow-right" size={16} />} onClick={() => onGo('projects')}>All projects</Button>} />
+        </Reveal>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-8)' }}>
+          {D.projects.map((p, i) => (
+            <Reveal key={p.id} delay={i * 70}>
+              <a onClick={() => onGo('projects')} style={{ display: 'block', cursor: 'pointer', textDecoration: 'none', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)', borderRadius: 'var(--r-2)', overflow: 'hidden' }}>
+                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden' }}>
+                  <img src={'assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                </div>
+                <div style={{ padding: 'var(--s-4) var(--s-5) var(--s-5)' }}>
+                  <div className="ubc-label">{p.type} · {p.system}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 var(--s-1)' }}>{p.name}</div>
+                  <div style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>{p.location} · {p.size}</div>
+                </div>
+              </a>
+            </Reveal>
+          ))}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
 function Home({ onGo, onQuote }) {
   const VideoWalkthrough = window.VideoWalkthrough;
   return (
     <div>
-      <Hero onQuote={onQuote} onGo={onGo} />
+      <CinematicHero onQuote={onQuote} onGo={onGo} />
       {VideoWalkthrough ? <VideoWalkthrough /> : <Walkthrough />}
+      <WhoWeAre onQuote={onQuote} />
       <Services onGo={onGo} />
+      <RecentProjects onGo={onGo} />
       <ProofBand />
       <Capability />
     </div>
