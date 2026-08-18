@@ -3,7 +3,7 @@ const D = window.UBC_DATA;
 
 const Page = ({ children, style }) => <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', ...style }}>{children}</div>;
 const Section = ({ children, sunken, tight, style }) => (
-  <section style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
+  <section className="ubc-section" style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
 );
 function Reveal({ children, delay = 0, style }) {
   const ref = React.useRef(null);
@@ -132,10 +132,12 @@ function BeforeAfterSlider() {
         <Reveal style={{ textAlign: 'center' }}>
           {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
           {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
+          {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) auto 0', maxWidth: '58ch' }}>{BA.standfirst}</p>}
         </Reveal>
         <Reveal delay={80} style={{ marginTop: 'var(--s-8)' }}>
           <div
             ref={sliderRef}
+            className="ubc-ba"
             role="slider"
             tabIndex={0}
             aria-label="Compare before and after"
@@ -148,8 +150,8 @@ function BeforeAfterSlider() {
             onPointerCancel={onUp}
             onKeyDown={onKeyDown}
             style={{
-              position: 'relative', width: '100%', maxWidth: 860, margin: '0 auto',
-              aspectRatio: '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
+              position: 'relative', width: '100%', maxWidth: 760, margin: '0 auto',
+              aspectRatio: BA.aspect || '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
               borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
               background: 'var(--surface-sunken)'
             }}>
@@ -159,7 +161,7 @@ function BeforeAfterSlider() {
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             {BA.beforeLabel && label(BA.beforeLabel, 'left')}
             {BA.afterLabel && label(BA.afterLabel, 'right')}
-            <div ref={handleRef} style={{ position: 'absolute', top: 0, left: '50%', width: 40, height: '100%', transform: 'translateX(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+            <div ref={handleRef} className="ubc-ba-handle" style={{ position: 'absolute', top: 0, left: '50%', width: 40, height: '100%', transform: 'translateX(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
               <span style={{ position: 'absolute', width: 2, height: '100%', background: 'var(--paper)', boxShadow: '0 0 8px rgba(16,18,21,.5)' }} />
               <span ref={circleRef} style={{ display: 'grid', placeItems: 'center', width: 36, height: 36, borderRadius: '50%', background: 'var(--paper)', color: 'var(--ink)', fontSize: 13, boxShadow: 'var(--shadow-2)' }}>↔</span>
             </div>
@@ -183,7 +185,7 @@ function ProjectsGrid({ onGo }) {
           </div>
           <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
         </Reveal>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--s-9)' }}>
           {D.projects.map((p, i) => (
             <Reveal key={p.id} delay={(i % 2) * 80}>
               <a onClick={() => onGo && onGo('projects')} style={{ display: 'block', cursor: 'pointer', textDecoration: 'none' }}>
@@ -227,7 +229,7 @@ function WhatWeDeliver({ onQuote }) {
                   <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
                 </button>
                 <div style={{ overflow: 'hidden', maxHeight: isOpen ? 180 : 0, transition: 'max-height var(--dur-3) var(--ease-out)' }}>
-                  <div style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
+                  <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
                     <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
                     <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
                   </div>
