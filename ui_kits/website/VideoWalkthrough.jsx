@@ -15,7 +15,6 @@ const { Icon } = window.UBCBIMDesignSystem_353af8;
 
 const DW = (window.UBC_DATA && window.UBC_DATA.walkthrough) || { stages: [] };
 const STAGES = DW.stages || [];
-const HAS_BELL = STAGES.some((s) => s.bell);
 const SEQ = DW.seq || null;
 
 function frameUrl(i) {
@@ -159,21 +158,21 @@ function VideoWalkthrough({ onQuote, onGo }) {
   const active = STAGES[stage] || {};
   const introOp = Math.max(0, 1 - progress / 0.09);
   const introOn = progress < 0.12;
-  const showBell = HAS_BELL && progress >= 0.9;
-  // The LGSF tab shows for a set number of frames around one frame of the
-  // sequence (frame 30 = bare steel walls on the slab).
-  const showLgsf = (() => {
-    const cfg = DW.lgsfTab; if (!cfg || !SEQ || count < 2) return false;
-    // Round the same way the canvas picks its frame, so the tab is tied to the
-    // frame actually on screen (and sub-pixel scroll rounding can't clip the window).
+  // An overlay is shown for a set number of frames around one frame of the
+  // sequence. The index is rounded the same way the canvas picks its frame, so
+  // the overlay is tied to the frame actually on screen and sub-pixel scroll
+  // rounding cannot clip an edge frame. The span counts whole frames, so an
+  // even span yields exactly that many (a symmetric +/- half lands one short).
+  const inFrameWindow = (cfg) => {
+    if (!cfg || !SEQ || count < 2) return false;
     const idx = Math.round(progress * (count - 1)); // current frame, 0-based
-    const centre = (cfg.frame || 30) - 1;           // config is 1-based (f_030)
-    // Span counted as whole frames, so an even span yields exactly that many
-    // (a symmetric +/- half would land one short).
+    const centre = (cfg.frame || 1) - 1;            // config is 1-based (f_030)
     const span = Math.max(1, cfg.span || 5);
     const lo = centre - Math.floor((span - 1) / 2);
     return idx >= lo && idx <= lo + span - 1;
-  })();
+  };
+  const showLgsf = inFrameWindow(DW.lgsfTab);
+  const showBell = !!DW.bellTab && inFrameWindow(DW.bellTab);
 
   return (
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-inverse)' }}>

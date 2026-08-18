@@ -71,18 +71,22 @@ window.UBC_DATA.beforeAfter = {
 window.UBC_DATA.walkthrough = {
   // Frame sequence extracted from the landing build video (24 fps). Scroll
   // scrubs through the frames on a canvas — no video element, no seek quirks.
-  seq: { prefix: 'assets/seq/f_', count: 121, pad: 3, ext: '.jpg' },
-  // Glassmorphic LGSF tab: centred while the structural frame is still open
-  // and legible, visible for `span` frames of the sequence.
-  lgsfTab: { frame: 25, span: 10 },
+  seq: { prefix: 'assets/seq/f_', count: 202, pad: 3, ext: '.jpg' },
+  // Glassmorphic LGSF tab: held while the structural frame is still open
+  // and legible, for `span` frames of the sequence.
+  lgsfTab: { frame: 8, span: 12 },
+  // Doorbell: pinned to the front entrance shot, on the wall panel beside the door.
+  bellTab: { frame: 125, span: 24 },
+  bellX: '41.5%',
+  bellY: '62%',
   poster: 'assets/seq/f_001.jpg',
-  bellX: '49%',
-  bellY: '64%',
-  // The three stages map to points along the sequence
-  // (open frame -> wall panels going in -> enclosed).
+  // Stages map to points along the sequence: open frame -> panels -> clad ->
+  // handover at the entrance -> inside the finished home.
   stages: [
     { n: '01', t: 0.00, title: 'Frame and floor plates', note: 'Posts, floor plates and roof framing set out to the model.' },
-    { n: '02', t: 0.34, title: 'Wall panels installed',  note: 'Panel layouts, openings and sheathing, cut from the machine files.' },
-    { n: '03', t: 0.68, title: 'Enclosed and clad',      note: 'The envelope closed, ready for services and fit-out.' }
+    { n: '02', t: 0.13, title: 'Wall panels installed',  note: 'Panel layouts, openings and sheathing, cut from the machine files.' },
+    { n: '03', t: 0.33, title: 'Enclosed and clad',      note: 'The envelope closed, glazing and cladding to the detail set.' },
+    { n: '04', t: 0.55, title: 'Finished and handed over', note: 'The completed home at dusk. Ring the bell at the door.' },
+    { n: '05', t: 0.72, title: 'Inside the finished home', note: 'Living space, stair and kitchen — the frame you never see again.' }
   ]
 };
