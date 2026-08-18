@@ -15,7 +15,12 @@ const { Icon } = window.UBCBIMDesignSystem_353af8;
 
 const DW = (window.UBC_DATA && window.UBC_DATA.walkthrough) || { stages: [] };
 const STAGES = DW.stages || [];
-const SEQ = DW.seq || null;
+// Phones get the half-width frame set — same frames, less than half the bytes.
+// Chosen once at load: the sequence is preloaded, so swapping it mid-session
+// would re-download everything for no visible gain.
+const NARROW = typeof window !== 'undefined' && window.matchMedia
+  && window.matchMedia('(max-width: 700px)').matches;
+const SEQ = (NARROW && DW.seqMobile) ? DW.seqMobile : (DW.seq || null);
 
 function frameUrl(i) {
   // i is 1-based
@@ -45,9 +50,13 @@ function ringChime() {
   } catch (e) { /* audio is a nicety */ }
 }
 
-function Doorbell({ onRing, ringing, visible }) {
-  const x = DW.bellX || '49%';
-  const y = DW.bellY || '64%';
+function Doorbell({ onRing, ringing, visible, box }) {
+  const px = parseFloat(DW.bellX || '49') / 100;
+  const py = parseFloat(DW.bellY || '64') / 100;
+  // Anchor to the drawn image when its geometry is known, so the bell stays on
+  // the door whatever the viewport crops; fall back to container percentages.
+  const x = box ? (box.x + box.w * px) + 'px' : (DW.bellX || '49%');
+  const y = box ? (box.y + box.h * py) + 'px' : (DW.bellY || '64%');
   return (
     <div style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 4, opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none', transition: 'opacity var(--dur-4) var(--ease-out)' }}>
       {ringing && <span style={{ position: 'absolute', left: '50%', top: 6, width: 34, height: 34, marginLeft: -17, borderRadius: 999, border: '2px solid var(--accent)', animation: 'ubcPulse var(--dur-cine) var(--ease-out) forwards' }} />}
@@ -73,29 +82,42 @@ function VideoWalkthrough({ onQuote, onGo }) {
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
   const [ringing, setRinging] = React.useState(false);
+  const [imgBox, setImgBox] = React.useState(null);   // drawn image rect in CSS px
+  const [drew, setDrew] = React.useState(false);      // a sequence frame has been painted
 
   const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = SEQ ? SEQ.count : 0;
   const n = Math.max(1, STAGES.length);
 
-  // Preload the sequence: first frame immediately, then every 4th frame, then the rest.
+  // Preload the sequence. A coarse pass first so any scroll position has
+  // something near it to draw, then fill in — always starting from the frame
+  // the viewer is currently on, so jumping into the middle of the page loads
+  // that part next instead of waiting for everything before it.
   React.useEffect(() => {
     if (!SEQ) return;
     const imgs = imagesRef.current;
-    const load = (i) => { if (imgs[i]) return; const im = new Image(); im.src = frameUrl(i + 1); imgs[i] = im; };
+    const load = (i) => { if (imgs[i]) return false; const im = new Image(); im.src = frameUrl(i + 1); imgs[i] = im; return true; };
     load(0);
-    let k = 0;
-    const passes = [4, 1]; // stride passes
+    let stop = false;
+    const CONCURRENT = 6;
     const tick = () => {
-      let loadedAny = false;
-      for (const stride of passes) {
-        for (let i = 0; i < count; i += stride) {
-          if (!imgs[i]) { load(i); loadedAny = true; k++; if (k % 10 === 0) { setTimeout(tick, 60); return; } }
+      if (stop) return;
+      // Coarse skeleton first: every 8th frame.
+      let issued = 0;
+      for (let i = 0; i < count && issued < CONCURRENT; i += 8) if (load(i)) issued++;
+      if (issued === 0) {
+        // Then fill outward from wherever the viewer is.
+        const here = Math.round(targetRef.current * (count - 1));
+        for (let d = 0; d < count && issued < CONCURRENT; d++) {
+          const lo = here - d, hi = here + d;
+          if (lo >= 0 && load(lo)) issued++;
+          if (issued < CONCURRENT && hi < count && load(hi)) issued++;
         }
       }
-      if (loadedAny) setTimeout(tick, 60);
+      if (issued > 0) setTimeout(tick, 40);
     };
     tick();
+    return () => { stop = true; };
   }, [count]);
 
   // Scroll -> target progress + active stage.
@@ -118,14 +140,37 @@ function VideoWalkthrough({ onQuote, onGo }) {
     return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
   }, []);
 
-  // rAF draw loop: ease toward the target and draw the nearest loaded frame, cover-fit.
+  // How a frame is placed in the stage. Cover-fitting a 16:9 frame into a tall
+  // phone viewport would crop away most of the building (only ~26% of the width
+  // survives at 390x844), so when the stage is narrower than the frame the image
+  // is fitted to the WIDTH instead and centred — the whole elevation stays
+  // visible and the dark stage letterboxes it. Returns CSS-pixel geometry, which
+  // the overlays are anchored to so they track the image, not the container.
+  const placement = (boxW, boxH, iw, ih) => {
+    const s = (boxW / boxH) < (iw / ih) ? (boxW / iw) : Math.max(boxW / iw, boxH / ih);
+    const w = iw * s, h = ih * s;
+    return { x: (boxW - w) / 2, y: (boxH - h) / 2, w, h };
+  };
+
+  // rAF draw loop: ease toward the target and draw the nearest loaded frame.
   React.useEffect(() => {
     if (!SEQ) return;
     const cvs = canvasRef.current; if (!cvs) return;
     const ctx = cvs.getContext('2d');
-    const fit = () => { cvs.width = cvs.clientWidth * (window.devicePixelRatio > 1 ? 1.5 : 1); cvs.height = cvs.clientHeight * (window.devicePixelRatio > 1 ? 1.5 : 1); drawnRef.current = -1; };
+    const dpr = () => (window.devicePixelRatio > 1 ? 1.5 : 1);
+    const fit = () => {
+      cvs.width = cvs.clientWidth * dpr();
+      cvs.height = cvs.clientHeight * dpr();
+      drawnRef.current = -1;
+      const im = imagesRef.current[0];
+      setImgBox(placement(cvs.clientWidth, cvs.clientHeight, (im && im.naturalWidth) || 1280, (im && im.naturalHeight) || 720));
+    };
     fit();
     window.addEventListener('resize', fit);
+    // The stage can change size without a window resize (orientation, URL bar,
+    // layout shifts), which would leave the backing store at the wrong size.
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
+    if (ro) ro.observe(cvs);
     const draw = () => {
       const t = targetRef.current;
       smoothRef.current = reduce ? t : smoothRef.current + (t - smoothRef.current) * 0.18;
@@ -141,16 +186,18 @@ function VideoWalkthrough({ onQuote, onGo }) {
       }
       if (use >= 0 && use !== drawnRef.current) {
         const im = imgs[use];
-        const cw = cvs.width, ch = cvs.height;
-        const s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
-        const w = im.naturalWidth * s, h = im.naturalHeight * s;
-        ctx.drawImage(im, (cw - w) / 2, (ch - h) / 2, w, h);
+        const r = placement(cvs.width, cvs.height, im.naturalWidth, im.naturalHeight);
+        // Always clear: when the frame is letterboxed, anything left from a
+        // previous draw would stay visible in the bands.
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        ctx.drawImage(im, r.x, r.y, r.w, r.h);
         drawnRef.current = use;
+        setDrew(true);
       }
       rafRef.current = requestAnimationFrame(draw);
     };
     rafRef.current = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', fit); };
+    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', fit); if (ro) ro.disconnect(); };
   }, [count, reduce]);
 
   const ring = () => { setRinging(false); requestAnimationFrame(() => { setRinging(true); ringChime(); }); window.clearTimeout(ring._t); ring._t = window.setTimeout(() => setRinging(false), 1300); };
@@ -179,13 +226,13 @@ function VideoWalkthrough({ onQuote, onGo }) {
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
         {/* Poster behind the canvas covers the first paint */}
-        {DW.poster && <img src={DW.poster} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.9) brightness(.9)' }} />}
+        {DW.poster && <img src={SEQ ? frameUrl(1) : DW.poster} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.9) brightness(.9)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
         <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'saturate(.9) brightness(.9)' }} />
 
         {/* Scrims: top for the header, bottom for the labels */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(16,18,21,.55), rgba(16,18,21,0) 22%, rgba(16,18,21,0) 55%, rgba(16,18,21,.72))', pointerEvents: 'none' }} />
 
-        {showBell && <Doorbell onRing={ring} ringing={ringing} visible={showBell} />}
+        {showBell && <Doorbell onRing={ring} ringing={ringing} visible={showBell} box={imgBox} />}
 
         {/* Glassmorphic LGSF tab — appears while the steel framing is on screen; links to LGSF projects */}
         <button

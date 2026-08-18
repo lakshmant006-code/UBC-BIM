@@ -71,12 +71,14 @@ window.UBC_DATA.beforeAfter = {
 window.UBC_DATA.walkthrough = {
   // Frame sequence extracted from the landing build video (24 fps). Scroll
   // scrubs through the frames on a canvas — no video element, no seek quirks.
-  seq: { prefix: 'assets/seq/f_', count: 202, pad: 3, ext: '.jpg' },
+  seq: { prefix: 'assets/seq/f_', count: 273, pad: 3, ext: '.jpg' },
+  // Half-width copies of the same frames for phones: 6.6MB instead of 14.3MB.
+  seqMobile: { prefix: 'assets/seq-m/f_', count: 273, pad: 3, ext: '.jpg' },
   // Glassmorphic LGSF tab: held while the structural frame is still open
   // and legible, for `span` frames of the sequence.
-  lgsfTab: { frame: 8, span: 12 },
+  lgsfTab: { frame: 9, span: 14 },
   // Doorbell: pinned to the front entrance shot, on the wall panel beside the door.
-  bellTab: { frame: 125, span: 24 },
+  bellTab: { frame: 181, span: 26 },
   bellX: '41.5%',
   bellY: '62%',
   poster: 'assets/seq/f_001.jpg',
@@ -84,9 +86,9 @@ window.UBC_DATA.walkthrough = {
   // handover at the entrance -> inside the finished home.
   stages: [
     { n: '01', t: 0.00, title: 'Frame and floor plates', note: 'Posts, floor plates and roof framing set out to the model.' },
-    { n: '02', t: 0.13, title: 'Wall panels installed',  note: 'Panel layouts, openings and sheathing, cut from the machine files.' },
-    { n: '03', t: 0.33, title: 'Enclosed and clad',      note: 'The envelope closed, glazing and cladding to the detail set.' },
-    { n: '04', t: 0.55, title: 'Finished and handed over', note: 'The completed home at dusk. Ring the bell at the door.' },
-    { n: '05', t: 0.72, title: 'Inside the finished home', note: 'Living space, stair and kitchen — the frame you never see again.' }
+    { n: '02', t: 0.114, title: 'Wall panels installed',  note: 'Panel layouts, openings and sheathing, cut from the machine files.' },
+    { n: '03', t: 0.360, title: 'Enclosed and clad',      note: 'The envelope closed, glazing and cladding to the detail set.' },
+    { n: '04', t: 0.599, title: 'Finished and handed over', note: 'The completed home at dusk. Ring the bell at the door.' },
+    { n: '05', t: 0.754, title: 'Inside the finished home', note: 'Living space, stair and kitchen — the frame you never see again.' }
   ]
 };
