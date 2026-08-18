@@ -160,8 +160,17 @@ function VideoWalkthrough({ onQuote, onGo }) {
   const introOp = Math.max(0, 1 - progress / 0.09);
   const introOn = progress < 0.12;
   const showBell = HAS_BELL && progress >= 0.9;
-  // The LGSF tab rides the steel-framing stretch of the sequence.
-  const showLgsf = progress >= 0.16 && progress <= 0.62;
+  // The LGSF tab shows for a set number of frames around one frame of the
+  // sequence (frame 30 = bare steel walls on the slab).
+  const showLgsf = (() => {
+    const cfg = DW.lgsfTab; if (!cfg || !SEQ || count < 2) return false;
+    const half = ((cfg.span || 5) - 1) / 2;
+    // Round the same way the canvas picks its frame, so the tab is tied to the
+    // frame actually on screen (and sub-pixel scroll rounding can't clip the window).
+    const idx = Math.round(progress * (count - 1)); // current frame, 0-based
+    const centre = (cfg.frame || 30) - 1;           // config is 1-based (f_030)
+    return Math.abs(idx - centre) <= half;
+  })();
 
   return (
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-inverse)' }}>
@@ -186,9 +195,10 @@ function VideoWalkthrough({ onQuote, onGo }) {
             background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
             border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)',
             padding: 'var(--s-5) var(--s-5) var(--s-4)',
-            opacity: showLgsf ? 1 : 0, transform: showLgsf ? 'none' : 'translateY(14px)',
+            opacity: showLgsf ? 1 : 0, transform: showLgsf ? 'none' : 'translateY(10px)',
             pointerEvents: showLgsf ? 'auto' : 'none',
-            transition: 'opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out)'
+            // Short fade: the window is only a few frames wide, so a long fade would never land.
+            transition: 'opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out)'
           }}>
           <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Light-gauge steel</span>
           <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--paper)', margin: 'var(--s-2) 0 0' }}>LGSF structures</span>

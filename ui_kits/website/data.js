@@ -58,6 +58,9 @@ window.UBC_DATA.walkthrough = {
   // Frame sequence extracted from the stitched build video (10 fps). Scroll
   // scrubs through the frames on a canvas — no video element, no seek quirks.
   seq: { prefix: 'assets/seq/f_', count: 140, pad: 3, ext: '.jpg' },
+  // Glassmorphic LGSF tab: centred on frame 30 (bare steel walls on the slab),
+  // visible for `span` frames of the sequence.
+  lgsfTab: { frame: 30, span: 5 },
   poster: 'assets/seq/f_001.jpg',
   bellX: '49%',
   bellY: '64%',
