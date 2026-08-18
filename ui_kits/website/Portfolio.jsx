@@ -61,7 +61,9 @@ function Portfolio({ onQuote }) {
   const { Card, Tag, FilterBar, SectionHeading } = window.UBCBIMDesignSystem_353af8;
   const { Page, Section, Reveal } = window;
   const D = window.UBC_DATA;
-  const [filter, setFilter] = React.useState('All');
+  // One-shot deep link: another page can set window.UBC_NAV_FILTER before
+  // navigating here (e.g. the LGSF tab on the build-sequence hero).
+  const [filter, setFilter] = React.useState(() => { const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null; return f || 'All'; });
   const [open, setOpen] = React.useState(null);
   const list = D.projects.filter((p) => filter === 'All' || p.type === filter || p.system === filter);
   if (open) return <ProjectDetail project={open} onBack={() => setOpen(null)} onQuote={onQuote} />;
