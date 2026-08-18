@@ -40,6 +40,30 @@ function WhoWeAre({ onGo }) {
   );
 }
 
+// BEFORE / AFTER — third-party slider embed, mounted just above Selected work.
+// The script is injected imperatively: React does not reliably execute <script>
+// tags declared in JSX, and the guard stops a double mount in StrictMode.
+const BEFORE_AFTER_SRC = 'https://cdn.transforms.onetype.ai/script/0c46b838ed7743a1a233483533a1d25e.js';
+function BeforeAfterSlider() {
+  const hostRef = React.useRef(null);
+  React.useEffect(() => {
+    const host = hostRef.current;
+    if (!host || host.dataset.otLoaded === '1') return;
+    host.dataset.otLoaded = '1';
+    const s = document.createElement('script');
+    s.src = BEFORE_AFTER_SRC;
+    s.async = true;
+    host.appendChild(s);
+  }, []);
+  return (
+    <Section>
+      <Page>
+        <div ref={hostRef} data-ot-before-after="" />
+      </Page>
+    </Section>
+  );
+}
+
 // SELECTED WORK — serif project grid using the real frames as imagery.
 function ProjectsGrid({ onGo }) {
   const imgs = ['05-facade', '03-steel-skeleton', '04-sheathing', '09-backyard', '06-living-room', '08-open-doors'];
@@ -120,6 +144,7 @@ function Home({ onGo, onQuote }) {
     <div>
       {VideoWalkthrough && <VideoWalkthrough onQuote={onQuote} onGo={onGo} />}
       <WhoWeAre onGo={onGo} />
+      <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
       <WhatWeDeliver onQuote={onQuote} />
     </div>
