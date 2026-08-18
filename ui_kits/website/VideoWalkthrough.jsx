@@ -164,12 +164,15 @@ function VideoWalkthrough({ onQuote, onGo }) {
   // sequence (frame 30 = bare steel walls on the slab).
   const showLgsf = (() => {
     const cfg = DW.lgsfTab; if (!cfg || !SEQ || count < 2) return false;
-    const half = ((cfg.span || 5) - 1) / 2;
     // Round the same way the canvas picks its frame, so the tab is tied to the
     // frame actually on screen (and sub-pixel scroll rounding can't clip the window).
     const idx = Math.round(progress * (count - 1)); // current frame, 0-based
     const centre = (cfg.frame || 30) - 1;           // config is 1-based (f_030)
-    return Math.abs(idx - centre) <= half;
+    // Span counted as whole frames, so an even span yields exactly that many
+    // (a symmetric +/- half would land one short).
+    const span = Math.max(1, cfg.span || 5);
+    const lo = centre - Math.floor((span - 1) / 2);
+    return idx >= lo && idx <= lo + span - 1;
   })();
 
   return (
