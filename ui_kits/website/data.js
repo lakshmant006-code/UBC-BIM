@@ -54,6 +54,18 @@ window.UBC_DATA = {
    those exist, each stage shows a labelled placeholder. bellX/bellY position
    the doorbell hotspot over the front door on the finished-facade frame.
    `t` is each frame's normalized position (0..1) along the timeline. */
+/* Before / after comparison slider. Swap `before` and `after` for the real
+   images when they land — nothing else needs to change. */
+window.UBC_DATA.beforeAfter = {
+  eyebrow: 'Before / after',
+  title: 'From frame to finished home',
+  before: 'assets/frames/03-steel-skeleton.jpg',
+  after: 'assets/frames/05-facade.jpg',
+  beforeLabel: 'Steel frame',
+  afterLabel: 'Finished',
+  start: 50
+};
+
 window.UBC_DATA.walkthrough = {
   // Frame sequence extracted from the stitched build video (10 fps). Scroll
   // scrubs through the frames on a canvas — no video element, no seek quirks.

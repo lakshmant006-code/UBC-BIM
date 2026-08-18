@@ -40,25 +40,131 @@ function WhoWeAre({ onGo }) {
   );
 }
 
-// BEFORE / AFTER — third-party slider embed, mounted just above Selected work.
-// The script is injected imperatively: React does not reliably execute <script>
-// tags declared in JSX, and the guard stops a double mount in StrictMode.
-const BEFORE_AFTER_SRC = 'https://cdn.transforms.onetype.ai/script/0c46b838ed7743a1a233483533a1d25e.js';
+// BEFORE / AFTER — drag-to-compare slider, mounted just above Selected work.
+// The reveal is driven by clip-path on a full-size image (rather than shrinking
+// a wrapper), so the "before" image never squashes and the whole thing stays
+// responsive. Drag writes styles directly on rAF — no per-frame React renders.
+const BA = window.UBC_DATA.beforeAfter || {};
 function BeforeAfterSlider() {
-  const hostRef = React.useRef(null);
-  React.useEffect(() => {
-    const host = hostRef.current;
-    if (!host || host.dataset.otLoaded === '1') return;
-    host.dataset.otLoaded = '1';
-    const s = document.createElement('script');
-    s.src = BEFORE_AFTER_SRC;
-    s.async = true;
-    host.appendChild(s);
-  }, []);
+  const sliderRef = React.useRef(null);
+  const beforeRef = React.useRef(null);
+  const handleRef = React.useRef(null);
+  const circleRef = React.useRef(null);
+  const draggingRef = React.useRef(false);
+  const rafRef = React.useRef(0);
+  const xRef = React.useRef(0);
+  const [pct, setPct] = React.useState(typeof BA.start === 'number' ? BA.start : 50);
+
+  const apply = (p) => {
+    if (beforeRef.current) beforeRef.current.style.clipPath = 'inset(0 ' + (100 - p) + '% 0 0)';
+    if (handleRef.current) handleRef.current.style.left = p + '%';
+  };
+
+  const pctFromX = (clientX) => {
+    const el = sliderRef.current; if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const x = Math.max(0, Math.min(r.width, clientX - r.left));
+    return (x / r.width) * 100;
+  };
+
+  // Coalesce pointer moves into one write per frame.
+  const schedule = (clientX) => {
+    xRef.current = clientX;
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const p = pctFromX(xRef.current);
+      if (p != null) apply(p);
+    });
+  };
+
+  const onDown = (e) => {
+    draggingRef.current = true;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) { /* older browsers */ }
+    schedule(e.clientX);
+  };
+  const onMove = (e) => { if (draggingRef.current) schedule(e.clientX); };
+  const onUp = (e) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (err) { /* no-op */ }
+    const p = pctFromX(e.clientX);
+    if (p != null) { apply(p); setPct(p); }
+    // Spring finish on the knob.
+    const c = circleRef.current;
+    if (c) {
+      c.style.transition = 'none';
+      c.style.transform = 'scale(1.18)';
+      requestAnimationFrame(() => {
+        c.style.transition = 'transform 420ms cubic-bezier(.2,1.6,.4,1)';
+        c.style.transform = 'scale(1)';
+      });
+    }
+  };
+
+  const onKeyDown = (e) => {
+    const step = e.shiftKey ? 10 : 2;
+    let p = null;
+    if (e.key === 'ArrowLeft') p = Math.max(0, pct - step);
+    else if (e.key === 'ArrowRight') p = Math.min(100, pct + step);
+    else if (e.key === 'Home') p = 0;
+    else if (e.key === 'End') p = 100;
+    if (p == null) return;
+    e.preventDefault();
+    apply(p); setPct(p);
+  };
+
+  React.useEffect(() => { apply(pct); /* initial paint */ }, []);
+
+  const label = (text, side) => (
+    <span style={{
+      position: 'absolute', bottom: 'var(--s-4)', [side]: 'var(--s-4)', zIndex: 2,
+      fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)',
+      textTransform: 'uppercase', color: 'var(--paper)', background: 'rgba(16,18,21,.6)',
+      backdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.22)',
+      padding: '4px 9px', borderRadius: 'var(--r-1)', pointerEvents: 'none'
+    }}>{text}</span>
+  );
+
   return (
     <Section>
       <Page>
-        <div ref={hostRef} data-ot-before-after="" />
+        <Reveal style={{ textAlign: 'center' }}>
+          {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
+          {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
+        </Reveal>
+        <Reveal delay={80} style={{ marginTop: 'var(--s-8)' }}>
+          <div
+            ref={sliderRef}
+            role="slider"
+            tabIndex={0}
+            aria-label="Compare before and after"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(pct)}
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={onUp}
+            onPointerCancel={onUp}
+            onKeyDown={onKeyDown}
+            style={{
+              position: 'relative', width: '100%', maxWidth: 860, margin: '0 auto',
+              aspectRatio: '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
+              borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
+              background: 'var(--surface-sunken)'
+            }}>
+            <img src={BA.after} alt={BA.afterLabel || 'After'} draggable="false"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img ref={beforeRef} src={BA.before} alt={BA.beforeLabel || 'Before'} draggable="false"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            {BA.beforeLabel && label(BA.beforeLabel, 'left')}
+            {BA.afterLabel && label(BA.afterLabel, 'right')}
+            <div ref={handleRef} style={{ position: 'absolute', top: 0, left: '50%', width: 40, height: '100%', transform: 'translateX(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+              <span style={{ position: 'absolute', width: 2, height: '100%', background: 'var(--paper)', boxShadow: '0 0 8px rgba(16,18,21,.5)' }} />
+              <span ref={circleRef} style={{ display: 'grid', placeItems: 'center', width: 36, height: 36, borderRadius: '50%', background: 'var(--paper)', color: 'var(--ink)', fontSize: 13, boxShadow: 'var(--shadow-2)' }}>↔</span>
+            </div>
+          </div>
+        </Reveal>
       </Page>
     </Section>
   );
