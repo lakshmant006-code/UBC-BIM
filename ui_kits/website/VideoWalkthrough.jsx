@@ -160,6 +160,8 @@ function VideoWalkthrough({ onQuote, onGo }) {
   const introOp = Math.max(0, 1 - progress / 0.09);
   const introOn = progress < 0.12;
   const showBell = HAS_BELL && progress >= 0.9;
+  // The LGSF tab rides the steel-framing stretch of the sequence.
+  const showLgsf = progress >= 0.16 && progress <= 0.62;
 
   return (
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-inverse)' }}>
@@ -173,6 +175,30 @@ function VideoWalkthrough({ onQuote, onGo }) {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(16,18,21,.55), rgba(16,18,21,0) 22%, rgba(16,18,21,0) 55%, rgba(16,18,21,.72))', pointerEvents: 'none' }} />
 
         {showBell && <Doorbell onRing={ring} ringing={ringing} visible={showBell} />}
+
+        {/* Glassmorphic LGSF tab — appears while the steel framing is on screen; links to LGSF projects */}
+        <button
+          onClick={() => { window.UBC_NAV_FILTER = 'Light-gauge steel'; onGo && onGo('projects'); }}
+          aria-label="View light-gauge steel projects"
+          style={{
+            position: 'absolute', right: 'var(--gutter)', top: '30%', zIndex: 4, maxWidth: 340,
+            textAlign: 'left', cursor: 'pointer',
+            background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+            border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)',
+            padding: 'var(--s-5) var(--s-5) var(--s-4)',
+            opacity: showLgsf ? 1 : 0, transform: showLgsf ? 'none' : 'translateY(14px)',
+            pointerEvents: showLgsf ? 'auto' : 'none',
+            transition: 'opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out)'
+          }}>
+          <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Light-gauge steel</span>
+          <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--paper)', margin: 'var(--s-2) 0 0' }}>LGSF structures</span>
+          <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-3) 0 0' }}>
+            Cold-formed steel studs and trusses, roll-formed to the millimetre from the framing model — light, non-combustible, and erected in days, not weeks.
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid rgba(245,244,241,.4)', paddingBottom: 2 }}>
+            View LGSF projects <Icon name="arrow-right" size={13} />
+          </span>
+        </button>
 
         {/* Intro headline (fades out as you start scrolling) */}
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
