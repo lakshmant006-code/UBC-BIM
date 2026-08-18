@@ -1,0 +1,9 @@
+# Local verification scaffolding: a copy of the page with the CDN scripts
+# swapped for locally vendored ones, so the site can be rendered in a headless
+# browser that has no outbound network. Regenerated on demand, never shipped.
+ui_kits/website/_smoke.html
+ui_kits/website/_vendor/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
