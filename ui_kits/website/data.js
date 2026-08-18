@@ -57,12 +57,14 @@ window.UBC_DATA = {
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land — nothing else needs to change. */
 window.UBC_DATA.beforeAfter = {
-  eyebrow: 'Before / after',
-  title: 'From frame to finished home',
-  before: 'assets/frames/03-steel-skeleton.jpg',
-  after: 'assets/frames/05-facade.jpg',
-  beforeLabel: 'Steel frame',
-  afterLabel: 'Finished',
+  eyebrow: 'Compare systems',
+  title: 'The same house, framed both ways',
+  standfirst: 'Drag to compare a wood-frame structure with the same house in light-gauge steel — both detailed from one coordinated model.',
+  before: 'assets/frames/wood.jpg',
+  after: 'assets/frames/steel.jpg',
+  beforeLabel: 'Wood frame',
+  afterLabel: 'Light-gauge steel',
+  aspect: '5 / 4',
   start: 50
 };
 

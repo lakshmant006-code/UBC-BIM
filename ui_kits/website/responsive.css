@@ -1,0 +1,79 @@
+/* Responsive rules for the website kit.
+   The screens are built with inline styles, which cannot hold media queries,
+   so the breakpoint behaviour lives here and is hooked on by class name. */
+
+/* ---------- Tablet and below ---------- */
+@media (max-width: 900px) {
+  /* Selected work: two columns -> one */
+  .ubc-proj-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+
+  /* Build-sequence hero: keep the stage caption clear of the numbered rail */
+  .ubc-stage-label { max-width: 62vw !important; }
+
+  /* The LGSF card sits over the frame; narrow it so it never runs off-screen */
+  .ubc-lgsf-tab { max-width: 46vw !important; }
+}
+
+/* ---------- Header ----------
+   The header lays the wordmark, nav and actions out in one row, which runs
+   far wider than a phone. Below 820px drop the nav links (they are repeated
+   in the footer) and keep only the primary call to action. The header comes
+   from the design-system bundle and carries no class names, so it is targeted
+   structurally: header > div > [wordmark, nav, actions]. */
+@media (max-width: 820px) {
+  header > div > nav { display: none !important; }
+  header > div > div:last-child > *:not(:last-child) { display: none !important; }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  /* Section rhythm tightens up so the page is not endless on a small screen */
+  .ubc-section { padding: var(--s-9) 0 !important; }
+
+  /* Hero: the sticky stage runs full height, so pull the overlays in */
+  .ubc-stage-label {
+    max-width: none !important;
+    right: var(--gutter) !important;
+    bottom: var(--s-8) !important;
+  }
+  /* Numbered rail would collide with the caption on a narrow screen */
+  .ubc-stage-rail { display: none !important; }
+
+  /* LGSF card: full width under the caption rather than floating right */
+  .ubc-lgsf-tab {
+    left: var(--gutter) !important;
+    right: var(--gutter) !important;
+    top: auto !important;
+    bottom: 38vh !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+
+  /* Comparison slider: taller crop reads better in portrait */
+  .ubc-ba { aspect-ratio: 4 / 5 !important; }
+
+  /* Services accordion: drop the leading number gutter */
+  .ubc-acc-row { padding-left: 0 !important; }
+}
+
+/* ---------- Footer ----------
+   The footer link columns are a fixed multi-column grid that overruns a phone.
+   Like the header it comes from the bundle with no class names, so the inline
+   grid template is overridden by attribute selector. */
+@media (max-width: 640px) {
+  footer div[style*="grid-template-columns"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: var(--s-6) var(--s-5) !important;
+  }
+}
+
+/* ---------- Pointer-coarse (touch) niceties ---------- */
+@media (pointer: coarse) {
+  /* Bigger grab target for the comparison handle */
+  .ubc-ba-handle { width: 56px !important; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ubc-ba img, .ubc-ba-handle, .ubc-lgsf-tab { transition: none !important; }
+}

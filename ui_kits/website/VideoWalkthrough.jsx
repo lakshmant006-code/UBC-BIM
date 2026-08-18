@@ -189,6 +189,7 @@ function VideoWalkthrough({ onQuote, onGo }) {
         <button
           onClick={() => { window.UBC_NAV_FILTER = 'Light-gauge steel'; onGo && onGo('projects'); }}
           aria-label="View light-gauge steel projects"
+          className="ubc-lgsf-tab"
           style={{
             position: 'absolute', right: 'var(--gutter)', top: '30%', zIndex: 4, maxWidth: 340,
             textAlign: 'left', cursor: 'pointer',
@@ -223,14 +224,14 @@ function VideoWalkthrough({ onQuote, onGo }) {
         </div>
 
         {/* Stage label (bottom-left) */}
-        <div style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '40ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
+        <div className="ubc-stage-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '40ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Stage {active.n}</div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.05, color: 'var(--paper)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
           {active.note && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.7)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>{active.note}</p>}
         </div>
 
         {/* Numbered rail (right) */}
-        <div style={{ position: 'absolute', right: 'var(--gutter)', bottom: 'var(--s-9)', display: 'flex', flexDirection: 'column', gap: 'var(--s-3)', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
+        <div className="ubc-stage-rail" style={{ position: 'absolute', right: 'var(--gutter)', bottom: 'var(--s-9)', display: 'flex', flexDirection: 'column', gap: 'var(--s-3)', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
           {STAGES.map((s, i) => {
             const on = i === stage;
             return (

@@ -1,7 +1,29 @@
 <!-- @dsCard group="Website" viewport="1320x900" name="Website — interactive kit" subtitle="Home walkthrough, 3D Project Lab, About, Contact, Careers" -->
 <!-- @startingPoint section="Website" subtitle="Full click-through site: walkthrough home, project lab, about, contact, careers" viewport="1320x900" -->
-<!doctype html><html lang="en"><head><meta charset="utf-8"><title>UBC BIM — website UI kit</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UBC BIM — BIM detailing for wood frame and light-gauge steel</title>
+<meta name="description" content="UBC BIM detail wall panels, roof and floor trusses, MEP coordination and permit sets from one coordinated framing model — delivered as the machine files your line runs on. 340 projects across 11 countries.">
+<link rel="canonical" href="https://ubc-bim.vercel.app/">
+<meta name="theme-color" content="#F5F4F1">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UBC BIM">
+<meta property="og:title" content="UBC BIM — BIM detailing for wood frame and light-gauge steel">
+<meta property="og:description" content="Wall panels, roof and floor trusses, MEP coordination and permit sets — produced from one coordinated model, delivered as the machine files your line runs on.">
+<meta property="og:url" content="https://ubc-bim.vercel.app/">
+<meta property="og:image" content="https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg">
+<meta property="og:image:alt" content="A completed UBC BIM home at dusk">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="UBC BIM — BIM detailing for wood frame and light-gauge steel">
+<meta name="twitter:description" content="Wall panels, roof and floor trusses, MEP coordination and permit sets, produced from one coordinated framing model.">
+<meta name="twitter:image" content="https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg">
+<link rel="preload" as="image" href="assets/seq/f_001.jpg" fetchpriority="high">
 <link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="responsive.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"UBC BIM","description":"BIM detailing for wood-frame and light-gauge-steel construction: wall panels, roof and floor trusses, MEP coordination, permit sets and machine files.","url":"https://ubc-bim.vercel.app/","image":"https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg","areaServed":"Worldwide","knowsAbout":["Building Information Modelling","Light-gauge steel framing","Wood frame construction","Roof and floor trusses","MEP clash detection","Permit documentation"],"serviceType":["Wall panel detailing","Roof and floor trusses","Engineering of walls and trusses","MEP detailing and clash detection","Permit documents","Bill of Materials and machine CSV","Architectural drafting"]}
+</script>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
@@ -9,6 +31,23 @@
 <script src="data.js"></script>
 <style>@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}</style>
 </head><body><div id="root"></div>
+<noscript>
+  <main style="max-width:760px;margin:0 auto;padding:48px 24px;font-family:Georgia,serif;color:#101215">
+    <h1>UBC BIM — framing models built right the first time</h1>
+    <p>We detail wall panels, roof and floor trusses, MEP coordination and permit sets for wood-frame and light-gauge-steel construction. Every drawing comes out of one coordinated model, delivered as the machine files your line runs on.</p>
+    <h2>What we deliver</h2>
+    <ul>
+      <li>Wall panel detailing — panel layouts, stud and opening detail, sheathing schedules, machine files</li>
+      <li>Roof and floor trusses — layouts, spans, bracing and hanger detail</li>
+      <li>Engineering of walls and trusses — load paths, member sizing, connection detail</li>
+      <li>MEP detailing and clash detection — services modelled against the frame</li>
+      <li>Permit documents — coordinated permit sets drawn from the same model</li>
+      <li>Bill of Materials and CSV — quantified takeoffs and machine CSV output</li>
+      <li>Architectural drafting — plans, elevations and sections to your standards</li>
+    </ul>
+    <p>340 projects delivered across 11 countries. Typical turnaround 3–5 days.</p>
+  </main>
+</noscript>
 <script type="text/babel" src="FramingSchematic.jsx"></script>
 <script type="text/babel" src="VideoWalkthrough.jsx"></script>
 <script type="text/babel" src="Home.jsx"></script>
