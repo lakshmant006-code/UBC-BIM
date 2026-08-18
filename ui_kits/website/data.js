@@ -69,19 +69,20 @@ window.UBC_DATA.beforeAfter = {
 };
 
 window.UBC_DATA.walkthrough = {
-  // Frame sequence extracted from the stitched build video (10 fps). Scroll
+  // Frame sequence extracted from the landing build video (24 fps). Scroll
   // scrubs through the frames on a canvas — no video element, no seek quirks.
-  seq: { prefix: 'assets/seq/f_', count: 140, pad: 3, ext: '.jpg' },
-  // Glassmorphic LGSF tab: centred on frame 30 (bare steel walls on the slab),
-  // visible for `span` frames of the sequence.
-  lgsfTab: { frame: 30, span: 10 },
+  seq: { prefix: 'assets/seq/f_', count: 121, pad: 3, ext: '.jpg' },
+  // Glassmorphic LGSF tab: centred while the structural frame is still open
+  // and legible, visible for `span` frames of the sequence.
+  lgsfTab: { frame: 25, span: 10 },
   poster: 'assets/seq/f_001.jpg',
   bellX: '49%',
   bellY: '64%',
-  // The three stages map to points along the sequence (foundation -> steel -> handover).
+  // The three stages map to points along the sequence
+  // (open frame -> wall panels going in -> enclosed).
   stages: [
-    { n: '01', t: 0.00, title: 'Foundation and setting out', note: 'Gridlines to survey control, anchor layout, panel takeoff.' },
-    { n: '02', t: 0.34, title: 'Steel frame and trusses',    note: 'Wall panels, roof and floor trusses, bracing to the model.' },
-    { n: '03', t: 0.68, title: 'Sheathing and handover',     note: 'Sheathing schedule, roof, and the permit set that got it there.', bell: true }
+    { n: '01', t: 0.00, title: 'Frame and floor plates', note: 'Posts, floor plates and roof framing set out to the model.' },
+    { n: '02', t: 0.34, title: 'Wall panels installed',  note: 'Panel layouts, openings and sheathing, cut from the machine files.' },
+    { n: '03', t: 0.68, title: 'Enclosed and clad',      note: 'The envelope closed, ready for services and fit-out.' }
   ]
 };
