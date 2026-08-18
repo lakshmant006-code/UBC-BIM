@@ -55,19 +55,16 @@ window.UBC_DATA = {
    the doorbell hotspot over the front door on the finished-facade frame.
    `t` is each frame's normalized position (0..1) along the timeline. */
 window.UBC_DATA.walkthrough = {
-  videoSrc: 'assets/walkthrough.mp4',
-  videoWebm: 'assets/walkthrough.webm',
-  poster: 'assets/frames/05-facade.jpg',
-  autoplay: true,
+  // Frame sequence extracted from the stitched build video (10 fps). Scroll
+  // scrubs through the frames on a canvas — no video element, no seek quirks.
+  seq: { prefix: 'assets/seq/f_', count: 140, pad: 3, ext: '.jpg' },
+  poster: 'assets/seq/f_001.jpg',
   bellX: '49%',
   bellY: '64%',
-  // Stitched exterior build video (three clips: foundation -> steel -> sheathing ->
-  // finished facade), scrubbed by scroll. Stages map to points along the 15s timeline.
-  frames: [
-    { id: '03_17_02', t: 0.00, section: 'Foundation poured',   file: '01-foundation.jpg', img: 'assets/frames/01-foundation.jpg', note: 'Slab and footings set out to survey control.' },
-    { id: '03_17_08', t: 0.30, section: 'Steel framing begins', file: '02-steel-begins.jpg', img: 'assets/frames/02-steel-begins.jpg', note: 'Light-gauge steel walls rise off the slab.' },
-    { id: '03_17_13', t: 0.42, section: 'Full steel skeleton',  file: '03-steel-skeleton.jpg', img: 'assets/frames/03-steel-skeleton.jpg', note: 'Complete galvanized frame — walls, trusses, bracing.' },
-    { id: '03_17_20', t: 0.66, section: 'Sheathing + roof',     file: '04-sheathing.jpg', img: 'assets/frames/04-sheathing.jpg', note: 'Walls wrapped, roof decked and felted.' },
-    { id: '03_41_14', t: 0.90, section: 'Finished facade',      file: '05-facade.jpg', img: 'assets/frames/05-facade.jpg', bell: true, note: 'The finished home at dusk. Ring the bell at the door.' }
+  // The three stages map to points along the sequence (foundation -> steel -> handover).
+  stages: [
+    { n: '01', t: 0.00, title: 'Foundation and setting out', note: 'Gridlines to survey control, anchor layout, panel takeoff.' },
+    { n: '02', t: 0.34, title: 'Steel frame and trusses',    note: 'Wall panels, roof and floor trusses, bracing to the model.' },
+    { n: '03', t: 0.68, title: 'Sheathing and handover',     note: 'Sheathing schedule, roof, and the permit set that got it there.', bell: true }
   ]
 };
