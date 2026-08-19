@@ -21,6 +21,7 @@ const STAGES = DW.stages || [];
 const NARROW = typeof window !== 'undefined' && window.matchMedia
   && window.matchMedia('(max-width: 700px)').matches;
 const SEQ = (NARROW && DW.seqMobile) ? DW.seqMobile : (DW.seq || null);
+const CARDS = DW.cards || [];
 
 function frameUrl(i) {
   // i is 1-based
@@ -68,6 +69,45 @@ function Doorbell({ onRing, ringing, visible, box }) {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', background: 'rgba(16,18,21,.72)', backdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--accent)', padding: '5px 9px', borderRadius: 'var(--r-1)', whiteSpace: 'nowrap' }}>{ringing ? 'Ding — logged to CRM' : 'Ring the bell'}</span>
       </button>
     </div>
+  );
+}
+
+// Glassmorphic info card pinned to a stretch of frames. One action each:
+// `go` (with an optional Projects filter) navigates, `quote` opens the drawer.
+function InfoCard({ card, visible, onGo, onQuote }) {
+  const side = card.side === 'left' ? { left: 'var(--gutter)' } : { right: 'var(--gutter)' };
+  const act = () => {
+    if (card.quote) { onQuote && onQuote(); return; }
+    if (card.go) {
+      if (card.filter) window.UBC_NAV_FILTER = card.filter;
+      onGo && onGo(card.go);
+    }
+  };
+  return (
+    <button
+      onClick={act}
+      aria-label={card.cta || card.title}
+      className="ubc-lgsf-tab"
+      style={{
+        position: 'absolute', ...side, top: '28%', zIndex: 4, maxWidth: 340,
+        textAlign: 'left', cursor: 'pointer',
+        background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+        border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)',
+        padding: 'var(--s-5) var(--s-5) var(--s-4)',
+        opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(10px)',
+        pointerEvents: visible ? 'auto' : 'none',
+        // Short fade: the window is only a few frames wide, so a long fade would never land.
+        transition: 'opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out)'
+      }}>
+      {card.eyebrow && <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{card.eyebrow}</span>}
+      <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--paper)', margin: 'var(--s-2) 0 0' }}>{card.title}</span>
+      {card.body && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-3) 0 0' }}>{card.body}</span>}
+      {card.cta && (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid rgba(245,244,241,.4)', paddingBottom: 2 }}>
+          {card.cta} <Icon name="arrow-right" size={13} />
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -218,7 +258,7 @@ function VideoWalkthrough({ onQuote, onGo }) {
     const lo = centre - Math.floor((span - 1) / 2);
     return idx >= lo && idx <= lo + span - 1;
   };
-  const showLgsf = inFrameWindow(DW.lgsfTab);
+  const cardShown = CARDS.map((c) => inFrameWindow(c));
   const showBell = !!DW.bellTab && inFrameWindow(DW.bellTab);
 
   return (
@@ -234,31 +274,10 @@ function VideoWalkthrough({ onQuote, onGo }) {
 
         {showBell && <Doorbell onRing={ring} ringing={ringing} visible={showBell} box={imgBox} />}
 
-        {/* Glassmorphic LGSF tab — appears while the steel framing is on screen; links to LGSF projects */}
-        <button
-          onClick={() => { window.UBC_NAV_FILTER = 'Light-gauge steel'; onGo && onGo('projects'); }}
-          aria-label="View light-gauge steel projects"
-          className="ubc-lgsf-tab"
-          style={{
-            position: 'absolute', right: 'var(--gutter)', top: '30%', zIndex: 4, maxWidth: 340,
-            textAlign: 'left', cursor: 'pointer',
-            background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-            border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)',
-            padding: 'var(--s-5) var(--s-5) var(--s-4)',
-            opacity: showLgsf ? 1 : 0, transform: showLgsf ? 'none' : 'translateY(10px)',
-            pointerEvents: showLgsf ? 'auto' : 'none',
-            // Short fade: the window is only a few frames wide, so a long fade would never land.
-            transition: 'opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out)'
-          }}>
-          <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Light-gauge steel</span>
-          <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--paper)', margin: 'var(--s-2) 0 0' }}>LGSF structures</span>
-          <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-3) 0 0' }}>
-            Cold-formed steel studs and trusses, roll-formed to the millimetre from the framing model — light, non-combustible, and erected in days, not weeks.
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid rgba(245,244,241,.4)', paddingBottom: 2 }}>
-            View LGSF projects <Icon name="arrow-right" size={13} />
-          </span>
-        </button>
+        {/* Glassmorphic info cards — each appears over its own frames and links on */}
+        {CARDS.map((c, i) => (
+          <InfoCard key={i} card={c} visible={cardShown[i]} onGo={onGo} onQuote={onQuote} />
+        ))}
 
         {/* Intro headline (fades out as you start scrolling) */}
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
