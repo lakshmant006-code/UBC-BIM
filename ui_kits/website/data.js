@@ -74,9 +74,31 @@ window.UBC_DATA.walkthrough = {
   seq: { prefix: 'assets/seq/f_', count: 273, pad: 3, ext: '.jpg' },
   // Half-width copies of the same frames for phones: 6.6MB instead of 14.3MB.
   seqMobile: { prefix: 'assets/seq-m/f_', count: 273, pad: 3, ext: '.jpg' },
-  // Glassmorphic LGSF tab: held while the structural frame is still open
-  // and legible, for `span` frames of the sequence.
-  lgsfTab: { frame: 9, span: 14 },
+  // Glassmorphic info cards pinned to frames of the sequence. Each shows for
+  // `span` frames around `frame`, sits on the given side, and carries one
+  // action: `go` (+ optional `filter`) navigates, or `quote: true` opens the
+  // quote drawer.
+  cards: [
+    { frame: 9, span: 16, side: 'right',
+      eyebrow: 'Light-gauge steel', title: 'LGSF structures',
+      body: 'Cold-formed steel studs and trusses, roll-formed to the millimetre from the framing model — light, non-combustible, and erected in days, not weeks.',
+      cta: 'View LGSF projects', go: 'projects', filter: 'Light-gauge steel' },
+
+    { frame: 62, span: 16, side: 'left',
+      eyebrow: 'Wall panels', title: 'Panels cut from the model',
+      body: 'Panel layouts, stud and opening detail and sheathing schedules come out of the same model as the machine files, so what arrives on site is what was drawn.',
+      cta: 'See wood-frame projects', go: 'projects', filter: 'Wood' },
+
+    { frame: 128, span: 16, side: 'right',
+      eyebrow: 'Envelope', title: 'Permit-ready detail',
+      body: 'Cladding, glazing and the coordinated permit set are drawn from the frame itself, so a change to the structure reaches the submission drawings with it.',
+      cta: 'Request a quote', quote: true },
+
+    { frame: 235, span: 18, side: 'left',
+      eyebrow: 'Handover', title: 'Straight into fit-out',
+      body: 'Services were modelled against the frame and every clash cleared before anything was cut — the interior goes in without the frame being touched again.',
+      cta: 'See residential projects', go: 'projects', filter: 'Residential' }
+  ],
   // Doorbell: pinned to the front entrance shot, on the wall panel beside the door.
   bellTab: { frame: 181, span: 26 },
   bellX: '41.5%',
