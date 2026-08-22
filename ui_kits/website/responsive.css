@@ -67,6 +67,41 @@
   .ubc-route-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ---------- Contact welcome scene ----------
+   Its own hooks rather than the home hero's, so the two scenes can be tuned
+   independently. On a phone the frames take a band across the top of the
+   stage (see MEDIA_BOX in ContactScene.jsx) and the caption sits below it,
+   so nothing is stacked on top of the people in the shot. */
+@media (max-width: 900px) {
+  .ubc-cs-label { max-width: 62vw !important; }
+  .ubc-cs-tab { max-width: 46vw !important; }
+}
+
+@media (max-width: 640px) {
+  .ubc-cs-rail { display: none !important; }
+  /* Caption sits at the foot of the stage, on the dark ground below the frame */
+  .ubc-cs-label {
+    max-width: none !important;
+    left: var(--gutter) !important;
+    right: var(--gutter) !important;
+    top: auto !important;
+    bottom: var(--s-9) !important;
+  }
+  /* Cards sit directly under the frame band (56.25vw is 16:9 at full width) */
+  .ubc-cs-tab {
+    left: var(--gutter) !important;
+    right: var(--gutter) !important;
+    top: calc(56.25vw + var(--s-5)) !important;
+    bottom: auto !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ubc-cs-tab { transition: none !important; }
+}
+
 /* ---------- Footer ----------
    The footer link columns are a fixed multi-column grid that overruns a phone.
    Like the header it comes from the bundle with no class names, so the inline

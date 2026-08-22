@@ -24,6 +24,17 @@ const CS_NARROW = typeof window !== 'undefined' && window.matchMedia
   && window.matchMedia('(max-width: 700px)').matches;
 const CS_SEQ = CS ? ((CS_NARROW && CS.seqMobile) ? CS.seqMobile : CS.seq) : null;
 
+// Where the frames are drawn inside the sticky stage. On a wide screen the
+// media fills it; on a phone a 16:9 frame fitted to the width would occupy
+// barely a quarter of a tall stage, so it takes a band at the top and the
+// caption sits beneath it on the stage's own dark ground.
+// 56.25vw is 16:9 at full width, so on a phone the canvas is exactly the size
+// of the frame drawn in it — no letterbox bands inside the element, and the
+// overlays below can be offset from the same number.
+const MEDIA_BOX = CS_NARROW
+  ? { position: 'absolute', left: 0, right: 0, top: 0, height: '56.25vw' }
+  : { position: 'absolute', inset: 0, height: '100%' };
+
 function csFrameUrl(i) {
   return CS_SEQ.prefix + String(i).padStart(CS_SEQ.pad || 3, '0') + (CS_SEQ.ext || '.jpg');
 }
@@ -36,7 +47,7 @@ function SceneCard({ card, visible, onRoute }) {
     <button
       onClick={() => onRoute && onRoute(card.route)}
       aria-label={card.cta || card.title}
-      className="ubc-lgsf-tab"
+      className="ubc-cs-tab"
       style={{
         position: 'absolute', ...side, top: '26%', zIndex: 4, maxWidth: 340,
         textAlign: 'left', cursor: 'pointer',
@@ -206,10 +217,10 @@ function ContactScene({ onRoute, onQuote }) {
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-inverse)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {CS.poster && <img src={csFrameUrl(1)} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.95) brightness(.92)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
-        <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'saturate(.95) brightness(.92)' }} />
+        {CS.poster && <img src={csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95) brightness(.92)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
+        <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95) brightness(.92)' }} />
 
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(16,18,21,.55), rgba(16,18,21,0) 22%, rgba(16,18,21,0) 55%, rgba(16,18,21,.74))', pointerEvents: 'none' }} />
+        <div style={{ ...MEDIA_BOX, background: 'linear-gradient(180deg, rgba(16,18,21,.55), rgba(16,18,21,0) 22%, rgba(16,18,21,0) 55%, rgba(16,18,21,.74))', pointerEvents: 'none' }} />
 
         {CS_CARDS.map((c, i) => (
           <SceneCard key={i} card={c} visible={cardShown[i]} onRoute={onRoute} />
@@ -230,14 +241,14 @@ function ContactScene({ onRoute, onQuote }) {
         </div>
 
         {/* Stage caption */}
-        <div className="ubc-stage-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '40ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
+        <div className="ubc-cs-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '40ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{active.n}</div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.05, color: 'var(--paper)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
           {active.note && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.7)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>{active.note}</p>}
         </div>
 
         {/* Numbered rail */}
-        <div className="ubc-stage-rail" style={{ position: 'absolute', right: 'var(--gutter)', bottom: 'var(--s-9)', display: 'flex', flexDirection: 'column', gap: 'var(--s-3)', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
+        <div className="ubc-cs-rail" style={{ position: 'absolute', right: 'var(--gutter)', bottom: 'var(--s-9)', display: 'flex', flexDirection: 'column', gap: 'var(--s-3)', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
           {CS_STAGES.map((s, i) => {
             const on = i === stage;
             return (
