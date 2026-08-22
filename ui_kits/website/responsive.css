@@ -56,6 +56,17 @@
   .ubc-acc-row { padding-left: 0 !important; }
 }
 
+/* ---------- Contact page ----------
+   The bell panel and the routes/form column sit side by side on a desktop and
+   stack on a tablet; the paired route cards and form fields go single column
+   on a phone. */
+@media (max-width: 900px) {
+  .ubc-contact-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+}
+@media (max-width: 560px) {
+  .ubc-route-grid { grid-template-columns: 1fr !important; }
+}
+
 /* ---------- Footer ----------
    The footer link columns are a fixed multi-column grid that overruns a phone.
    Like the header it comes from the bundle with no class names, so the inline

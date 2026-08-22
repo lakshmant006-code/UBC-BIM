@@ -63,7 +63,7 @@ function Doorbell({ onRing, ringing, visible, box }) {
       {ringing && <span style={{ position: 'absolute', left: '50%', top: 6, width: 34, height: 34, marginLeft: -17, borderRadius: 999, border: '2px solid var(--accent)', animation: 'ubcPulse var(--dur-cine) var(--ease-out) forwards' }} />}
       <button onClick={onRing} aria-label="Ring the doorbell"
         style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-        <span style={{ display: 'grid', placeItems: 'center', width: 40, height: 40, borderRadius: 999, background: 'var(--accent)', boxShadow: ringing ? '0 0 0 10px rgba(255,77,20,.22)' : 'var(--shadow-hotspot)', transition: 'box-shadow var(--dur-2) var(--ease-out)', color: 'var(--paper)', transformOrigin: '50% 4px', animation: ringing ? 'ubcRing var(--dur-cine) var(--ease-out)' : 'none' }}>
+        <span style={{ display: 'grid', placeItems: 'center', width: 40, height: 40, borderRadius: 999, background: 'var(--accent)', boxShadow: ringing ? '0 0 0 10px rgba(193,39,45,.22)' : 'var(--shadow-hotspot)', transition: 'box-shadow var(--dur-2) var(--ease-out)', color: 'var(--paper)', transformOrigin: '50% 4px', animation: ringing ? 'ubcRing var(--dur-cine) var(--ease-out)' : 'none' }}>
           <Icon name="bell" size={20} />
         </span>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', background: 'rgba(16,18,21,.72)', backdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--accent)', padding: '5px 9px', borderRadius: 'var(--r-1)', whiteSpace: 'nowrap' }}>{ringing ? 'Ding — logged to CRM' : 'Ring the bell'}</span>
@@ -288,7 +288,10 @@ function VideoWalkthrough({ onQuote, onGo }) {
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.72)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
             Wall panels, roof and floor trusses, MEP coordination and permit sets — produced from one coordinated model, delivered as the machine files your line runs on.
           </p>
-          <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--ink)', background: 'var(--paper)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer' }}>Request a quote</button>
+          {/* Brand call to action: UBC red on white type, as on the marketing site */}
+          <button onClick={onQuote} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-2)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
+            Start your project today <Icon name="arrow-right" size={16} />
+          </button>
         </div>
 
         {/* Stage label (bottom-left) */}

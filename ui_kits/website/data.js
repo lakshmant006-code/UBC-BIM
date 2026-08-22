@@ -68,6 +68,40 @@ window.UBC_DATA.beforeAfter = {
   start: 50
 };
 
+/* Contact page welcome scene. Two continuous shots — met at the door, then
+   walked into the studio — extracted to a frame sequence and scrubbed by
+   scroll, exactly like the home-page build sequence. `route` on a card is
+   handed back to the Contact page, which owns what each route does. */
+window.UBC_DATA.contactScene = {
+  seq: { prefix: 'assets/seq-contact/f_', count: 240, pad: 3, ext: '.jpg' },
+  seqMobile: { prefix: 'assets/seq-contact-m/f_', count: 240, pad: 3, ext: '.jpg' },
+  poster: 'assets/seq-contact/f_001.jpg',
+  stages: [
+    { n: '01', t: 0.00, title: 'Met at the door', note: 'You are met outside, not handed to a queue. One person owns the project from here on.' },
+    { n: '02', t: 0.26, title: 'Introductions', note: 'A short conversation about the building, the system and the deadline you are working to.' },
+    { n: '03', t: 0.50, title: 'Into the studio', note: 'Past the modellers and detailers who will actually draw your frame.' },
+    { n: '04', t: 0.78, title: 'Around the model', note: 'Drawings on the table, the model on the wall — and a scope you can price.' }
+  ],
+  cards: [
+    { frame: 34, span: 20, side: 'right', route: 'chat',
+      eyebrow: 'Live chat', title: 'Say hello first',
+      body: 'A modeller answers in minutes during working hours — no forms, no gatekeeping, no sales script.',
+      cta: 'Start a chat' },
+    { frame: 96, span: 20, side: 'left', route: 'call',
+      eyebrow: 'Book a call', title: 'Fifteen minutes, your time zone',
+      body: 'Bring a plan set or a sketch. We will tell you what we would model, in what order, and how long it takes.',
+      cta: 'Open the scheduler' },
+    { frame: 156, span: 20, side: 'right', route: 'email',
+      eyebrow: 'Email or WhatsApp', title: 'Send the drawings over',
+      body: 'Architectural PDFs, a Revit model or photos of a marked-up print — whatever you have is enough to start.',
+      cta: 'Email us' },
+    { frame: 214, span: 22, side: 'left', route: 'quote',
+      eyebrow: 'Request a quote', title: 'Tell us about the project',
+      body: 'Building type, square footage and what you need modelled. You get a scope and a price, not a call-back.',
+      cta: 'Request a quote' }
+  ]
+};
+
 window.UBC_DATA.walkthrough = {
   // Frame sequence extracted from the landing build video (24 fps). Scroll
   // scrubs through the frames on a canvas — no video element, no seek quirks.
