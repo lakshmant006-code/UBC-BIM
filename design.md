@@ -2,7 +2,7 @@
 
 Agent-readable rules. These are constraints, not suggestions. Each carries its reason so you can reason about edge cases instead of guessing — but the constraint wins over your judgement about what would look better.
 
-<brand-lock system="UBC BIM" theme="light-technical" accent="#FF4D14" motion="cinematic">
+<brand-lock system="UBC BIM" theme="light-technical" accent="#C1272D" motion="cinematic">
 
 <rule id="theme" enforce="absolute">
   <do>Light. Page background is --paper (#F5F4F1), a warm off-white. Ink is --ink (#101215), never pure black.</do>
@@ -12,8 +12,8 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="accent-scarcity" enforce="absolute">
-  <do>One orange moment per viewport: the primary action, or the active state, or the hotspot under discussion. --orange #FF4D14.</do>
-  <dont>No orange body text. No orange large-area backgrounds. No orange gradients. No second competing accent. No orange on orange.</dont>
+  <do>One red moment per viewport: the primary action, or the active state, or the hotspot under discussion. --ubc-red #C1272D, the red of the UBC "Start your project today" button. --ubc-navy #17295C is the wordmark navy and is available for type and quiet surfaces, never as a second call-to-action colour.</do>
+  <dont>No red body text. No red large-area backgrounds. No red gradients. No second competing accent — navy is type, not an accent. No red on red.</dont>
   <why>A single bold accent on neutral was the chosen direction. Scarcity is what makes it read as a marker on a drawing rather than as brand paint.</why>
 </rule>
 
@@ -62,7 +62,7 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="imagery" enforce="absolute">
-  <do>Real UBC BIM 3D models and renders, cool and desaturated, with orange only on the element under discussion. Until real assets exist, use labelled placeholders that say what belongs there.</do>
+  <do>Real UBC BIM 3D models and renders, cool and desaturated, with red only on the element under discussion. Until real assets exist, use labelled placeholders that say what belongs there.</do>
   <dont>No stock photography. No AI-generated imagery. No hand-drawn SVG illustration standing in for a render. No noise, grain or texture overlays.</dont>
   <why>The brief names stock photos as a current weakness and asks for real models instead. A fake illustration is worse than an honest empty slot because it ships into production unnoticed.</why>
 </rule>
