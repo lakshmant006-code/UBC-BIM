@@ -939,7 +939,7 @@ function Hotspot({
       borderRadius: 999,
       flex: '0 0 auto',
       background: 'var(--accent)',
-      boxShadow: on ? '0 0 0 9px rgba(255,77,20,.20)' : 'var(--shadow-hotspot)',
+      boxShadow: on ? '0 0 0 9px rgba(193,39,45,.20)' : 'var(--shadow-hotspot)',
       transition: 'box-shadow var(--dur-2) var(--ease-out)'
     }
   }), label && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {

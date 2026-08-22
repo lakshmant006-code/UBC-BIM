@@ -53,6 +53,7 @@
 <script type="text/babel" src="Home.jsx"></script>
 <script type="text/babel" src="Portfolio.jsx"></script>
 <script type="text/babel" src="About.jsx"></script>
+<script type="text/babel" src="ContactScene.jsx"></script>
 <script type="text/babel" src="Contact.jsx"></script>
 <script type="text/babel" src="Careers.jsx"></script>
 <script type="text/babel">
@@ -118,7 +119,7 @@ function App() {
     projects: <window.Portfolio onQuote={() => setQuote(true)} />,
     about: <window.About />,
     careers: <window.Careers onQuote={() => setQuote(true)} />,
-    contact: <window.Contact />
+    contact: <window.Contact onQuote={() => setQuote(true)} />
   }[page];
   return (
     <div>
