@@ -272,6 +272,11 @@ function ServicesExplorer({ onQuote }) {
     setActiveChip(null);
     if (!view || view.kind === 'whole' || view.kind === 'overlay') { api.reset(); return; }
     if (view.kind === 'class') {
+      // A view can hand-pick its own centre/radius (a real bounding box read
+      // off the model's own geometry — see the comments in data.js) rather
+      // than the whole class's, for a tighter shot of one specific detail
+      // within it; fall back to the class's own framing when it doesn't.
+      if (view.center) { api.flyTo({ center: view.center, radius: view.radius }); return; }
       const v = manifest.byClass && manifest.byClass[view.class];
       if (v) api.flyTo({ center: v.center, radius: v.radius }); else api.reset();
     }
@@ -293,6 +298,26 @@ function ServicesExplorer({ onQuote }) {
   const activeLabel = activeChipEntry
     ? activeChipEntry.label
     : (view && view.label) || (svc && svc.title) || 'Every drawing out of one model';
+
+  // A view can carry one sentence — naming and defining the specific detail
+  // the camera is now framing (a K-brace, a Fink truss) — typed out on the
+  // model rather than dropped in all at once, so it reads as being pointed
+  // out live rather than as another paragraph of copy.
+  const [typed, setTyped] = React.useState('');
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  React.useEffect(() => {
+    const text = (view && view.typewriter) || '';
+    setTyped(reduceMotion ? text : '');
+    if (!text || reduceMotion) return;
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      setTyped(text.slice(0, i));
+      if (i >= text.length) clearInterval(id);
+    }, 18);
+    return () => clearInterval(id);
+  }, [open]);
+  const typewriterDone = !!view && typed.length >= (view.typewriter || '').length;
 
   return (
     <Section>
@@ -395,6 +420,21 @@ function ServicesExplorer({ onQuote }) {
                       </p>
                     </>
                   )}
+                </div>
+              )}
+
+              {/* A view with a term to teach types its explanation out on
+                  the model rather than dropping it in all at once — a
+                  blinking cursor while it runs, an aria-live region so a
+                  screen reader gets the finished sentence once, not one
+                  character at a time. */}
+              {view && view.typewriter && (
+                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 360, marginLeft: 'auto', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)', padding: 'var(--s-5)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{view.label}</div>
+                  <p aria-live={typewriterDone ? 'off' : 'polite'} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.9)', margin: 'var(--s-2) 0 0', minHeight: '4.5em' }}>
+                    {typed}
+                    {!typewriterDone && <span aria-hidden="true" style={{ animation: 'ubcCaret .8s step-end infinite' }}>▌</span>}
+                  </p>
                 </div>
               )}
             </div>

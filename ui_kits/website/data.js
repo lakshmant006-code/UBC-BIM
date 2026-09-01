@@ -18,9 +18,24 @@ window.UBC_DATA = {
   // servicesModel below for one with more element variety to get that back.
   services: [
     { n: '01', title: 'Wall panel detailing', body: 'Panel layouts, stud and opening detail, sheathing schedules and the machine files your line runs on.', tags: ['Wood frame', 'Light-gauge steel'],
-      view: { kind: 'class', class: 'IfcColumn', label: 'Structural columns' } },
+      // A hand-picked close-up rather than the whole IfcColumn class: centre
+      // and radius are the real bounding box of one corner bay's studs and
+      // diagonal bracing (found by clustering element centres near a corner
+      // of the model, transformed through the same centre + axis rotation
+      // tools/ifc_to_glb.py applies to the mesh) — not an invented shot.
+      view: { kind: 'class', class: 'IfcColumn', label: 'K-brace stud detail',
+        center: [7.365, 0.336, -5.182], radius: 2.725,
+        typewriter: 'A K-brace ties two studs together in a K shape, carrying lateral wind and seismic load into the frame without interrupting either stud’s own load path.' } },
     { n: '02', title: 'Roof and floor trusses', body: 'Truss layouts, spans, bracing and hanger detail, engineered against the framing model.', tags: ['Truss design', 'Shop drawings'],
-      view: { kind: 'class', class: 'IfcBeam', label: 'Roof beams' } },
+      // Same approach as item 01: centre and radius are the real bounding
+      // box of a few bays around one truss's ridge (found by isolating the
+      // beams sharing one Y-station — one truss frame — then reading their
+      // member layout: two sloped top chords meeting at a ridge, with
+      // verticals and diagonals repeating in a W between them and the
+      // bottom chord, at every panel point along both slopes).
+      view: { kind: 'class', class: 'IfcBeam', label: 'Fink roof truss',
+        center: [0.17, 1.42, 6.032], radius: 5.661,
+        typewriter: 'This is a Fink truss: the diagonals and verticals repeat in a W between the two sloped top chords and the bottom chord, carrying roof load to the walls in the shortest, most direct path a truss of this span needs.' } },
     { n: '03', title: 'Engineering of walls and trusses', body: 'Load paths, member sizing and connection detail, stamped where your jurisdiction requires it.', tags: ['Calculations'],
       view: { kind: 'whole', label: 'The coordinated structure' } },
     { n: '04', title: 'MEP detailing and clash detection', body: 'Services modelled against the frame, with every clash reported before anything is cut.', tags: ['Clash report'],
