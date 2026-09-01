@@ -97,12 +97,6 @@ window.UBC_DATA = {
   ]
 };
 
-/* Scroll-scrubbed construction walkthrough.
-   videoSrc: one continuous 16:9 clip (foundation -> pool). When present it is
-   scrubbed by scroll. Until it exists, the 9 stage stills crossfade; until
-   those exist, each stage shows a labelled placeholder. bellX/bellY position
-   the doorbell hotspot over the front door on the finished-facade frame.
-   `t` is each frame's normalized position (0..1) along the timeline. */
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land — nothing else needs to change. */
 window.UBC_DATA.beforeAfter = {
@@ -155,49 +149,60 @@ window.UBC_DATA.contactScene = {
   ]
 };
 
-window.UBC_DATA.walkthrough = {
-  // Frame sequence extracted from the landing build video (24 fps). Scroll
-  // scrubs through the frames on a canvas — no video element, no seek quirks.
-  seq: { prefix: 'assets/seq/f_', count: 273, pad: 3, ext: '.jpg' },
-  // Half-width copies of the same frames for phones: 6.6MB instead of 14.3MB.
-  seqMobile: { prefix: 'assets/seq-m/f_', count: 273, pad: 3, ext: '.jpg' },
-  // Glassmorphic info cards pinned to frames of the sequence. Each shows for
-  // `span` frames around `frame`, sits on the given side, and carries one
-  // action: `go` (+ optional `filter`) navigates, or `quote: true` opens the
-  // quote drawer.
+/* Landing hero: a live three.js scene (SceneHero.jsx), not a video or a
+   frame sequence. Scroll moves the camera through camping-resort.glb — the
+   same steel-frame model used in the Services explorer and on Projects —
+   between the five [x,y,z] positions in `stages`, all looking at the origin
+   the model is centred on. `radius` is the converter's printed frame
+   radius, used to size the lighting and grid to the model.
+
+   The five stages walk the actual sequence an engineer works through on a
+   project like this one — setting out, load path, framing, connections,
+   fabrication — each pinned to a real term (`term`), defined in plain
+   English in `note` rather than left as jargon. The four info cards teach a
+   second, related term each, so scrolling through the hero once is a small
+   glossary of the words that show up on every drawing set after it. `t` is
+   the scroll position (0..1) each stage's angle and caption take over at;
+   the last stage is given real room (0.78-1.0) rather than a sliver, since
+   a stage whose `t` is 1.0 has no scroll left to actually show it. */
+window.UBC_DATA.hero = {
+  model: { src: 'assets/models/camping-resort.glb', radius: 11.2 },
+  stages: [
+    { n: '01', t: 0.00, pos: [17.9, 14.6, 21.3], term: null,
+      title: 'One coordinated model', note: 'Everything downstream — the panel layouts, the truss drawings, the permit set — is drawn from this single 3D model, not redrawn for each one.' },
+    { n: '02', t: 0.20, pos: [22.4, 3.9, 4.5], term: 'Setting out',
+      title: 'Setting out the grid', note: '“Setting out” is transferring the design gridlines from the model to the site, so every column base plate lands exactly where it was engineered.' },
+    { n: '03', t: 0.40, pos: [3.4, 21.3, -17.9], term: 'Load path',
+      title: 'Sizing the load path', note: 'The “load path” is the route a load travels — down through the roof beams, into the columns, and out to the foundation. Every member on it has to be sized for what passes through it.' },
+    { n: '04', t: 0.60, pos: [4.5, 3.8, 2.6], term: 'Moment connection',
+      title: 'Connections and bracing', note: 'Where a beam meets a column is a “connection” — pinned if it only carries load, a “moment connection” if it also has to resist the frame twisting under wind or seismic load.' },
+    { n: '05', t: 0.78, pos: [-19.0, 11.2, -15.7], term: 'Clash detection',
+      title: 'Clash-checked and fabrication-ready', note: '“Clash detection” catches two elements trying to occupy the same space — a beam through a duct run — in the model, before it is discovered on site with a torch.' }
+  ],
+  // Glassmorphic info cards, one per stage after the intro — each teaches a
+  // second term related to that stage's, so the pair reads as a two-word
+  // vocabulary beat rather than one word repeated. `t0`/`t1` match the stage
+  // windows above exactly, so the caption and the card change together
+  // instead of drifting in and out of sync with each other.
   cards: [
-    { frame: 9, span: 16, side: 'right',
-      eyebrow: 'Light-gauge steel', title: 'LGSF structures',
-      body: 'Cold-formed steel studs and trusses, roll-formed to the millimetre from the framing model — light, non-combustible, and erected in days, not weeks.',
-      cta: 'View LGSF projects', go: 'projects', filter: 'Light-gauge steel' },
+    { t0: 0.20, t1: 0.40, side: 'right',
+      eyebrow: 'Term · Base plate', title: 'Where a column meets the ground',
+      body: 'The steel plate a column stands on, anchor-bolted to the foundation — sized so the load path this column carries doesn’t punch through the concrete under it.',
+      cta: 'View structural steel projects', go: 'projects', filter: 'Structural steel' },
 
-    { frame: 62, span: 16, side: 'left',
-      eyebrow: 'Wall panels', title: 'Panels cut from the model',
-      body: 'Panel layouts, stud and opening detail and sheathing schedules come out of the same model as the machine files, so what arrives on site is what was drawn.',
-      cta: 'See wood-frame projects', go: 'projects', filter: 'Wood' },
-
-    { frame: 128, span: 16, side: 'right',
-      eyebrow: 'Envelope', title: 'Permit-ready detail',
-      body: 'Cladding, glazing and the coordinated permit set are drawn from the frame itself, so a change to the structure reaches the submission drawings with it.',
+    { t0: 0.40, t1: 0.60, side: 'left',
+      eyebrow: 'Term · Span', title: 'How far a beam can carry',
+      body: 'The unsupported distance a beam covers between supports. A longer span needs a deeper beam or closer bracing — decided here, in the model, not guessed on site.',
       cta: 'Request a quote', quote: true },
 
-    { frame: 235, span: 18, side: 'left',
-      eyebrow: 'Handover', title: 'Straight into fit-out',
-      body: 'Services were modelled against the frame and every clash cleared before anything was cut — the interior goes in without the frame being touched again.',
-      cta: 'See residential projects', go: 'projects', filter: 'Residential' }
-  ],
-  // Doorbell: pinned to the front entrance shot, on the wall panel beside the door.
-  bellTab: { frame: 181, span: 26 },
-  bellX: '41.5%',
-  bellY: '62%',
-  poster: 'assets/seq/f_001.jpg',
-  // Stages map to points along the sequence: open frame -> panels -> clad ->
-  // handover at the entrance -> inside the finished home.
-  stages: [
-    { n: '01', t: 0.00, title: 'Frame and floor plates', note: 'Posts, floor plates and roof framing set out to the model.' },
-    { n: '02', t: 0.114, title: 'Wall panels installed',  note: 'Panel layouts, openings and sheathing, cut from the machine files.' },
-    { n: '03', t: 0.360, title: 'Enclosed and clad',      note: 'The envelope closed, glazing and cladding to the detail set.' },
-    { n: '04', t: 0.599, title: 'Finished and handed over', note: 'The completed home at dusk. Ring the bell at the door.' },
-    { n: '05', t: 0.754, title: 'Inside the finished home', note: 'Living space, stair and kitchen — the frame you never see again.' }
+    { t0: 0.60, t1: 0.78, side: 'right',
+      eyebrow: 'Term · Bracing', title: 'What keeps the frame from racking',
+      body: 'Diagonal or cross members that stop a rectangular frame from leaning into a parallelogram under lateral load — wind, mostly, or seismic where it applies.',
+      cta: 'View structural steel projects', go: 'projects', filter: 'Structural steel' },
+
+    { t0: 0.78, t1: 1.001, side: 'left',
+      eyebrow: 'Term · Shop drawings', title: 'From model to machine file',
+      body: 'The fabrication-level drawings — and the machine CSV behind them — that a roll-forming line or a fabricator actually cuts from. Both come out of this same model.',
+      cta: 'See all projects', go: 'projects' }
   ]
 };

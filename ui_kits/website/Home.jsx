@@ -410,10 +410,10 @@ function ServicesExplorer({ onQuote }) {
 }
 
 function Home({ onGo, onQuote }) {
-  const VideoWalkthrough = window.VideoWalkthrough;
+  const SceneHero = window.SceneHero;
   return (
     <div>
-      {VideoWalkthrough && <VideoWalkthrough onQuote={onQuote} onGo={onGo} />}
+      {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
       <WhoWeAre onGo={onGo} />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
