@@ -24,6 +24,12 @@
     height   stage height in px
     compact  smaller chrome for a grid thumbnail: no caption/hint row, a
              small always-visible "3D" tag instead, Reset view only on hover
+    onReady  called once with { flyTo({ center, radius, duration }), reset() }
+             — flyTo eases the camera to a new centre + framing radius (both
+             in the model's own transformed space, e.g. from a .views.json
+             manifest); reset() is flyTo back to the whole model. A caller
+             (the Services explorer) drives the camera from outside this way
+             without reaching into three.js itself.
 */
 
 // three r147 is the last release that ships the plain-script builds, which is
@@ -57,7 +63,7 @@ function loadThree() {
   return loadThree._p;
 }
 
-function ModelViewer({ src, radius, title, height, compact }) {
+function ModelViewer({ src, radius, title, height, compact, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -141,6 +147,14 @@ function ModelViewer({ src, radius, title, height, compact }) {
       if (ro) ro.observe(host);
       window.addEventListener('resize', fit);
 
+      // A camera flight in progress: eases position + look-at target from
+      // wherever the camera currently is to a new centre + framing radius.
+      // Read and advanced inside the render loop rather than its own rAF, so
+      // it shares the same off-screen pause as everything else.
+      let flight = null;
+      const reduceMotion = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
       // The render loop only spends GPU time while this viewer is actually on
       // screen — a grid of live models must not keep rendering the ones the
       // visitor has scrolled past. Interaction still works instantly on
@@ -148,7 +162,17 @@ function ModelViewer({ src, radius, title, height, compact }) {
       // loop is paused, so nothing reloads.
       let raf = 0;
       const tick = () => {
-        if (visibleRef.current) { controls.update(); renderer.render(scene, camera); }
+        if (visibleRef.current) {
+          if (flight) {
+            const t = Math.min(1, (performance.now() - flight.start) / flight.duration);
+            const e = 1 - Math.pow(1 - t, 3);   // ease-out cubic
+            camera.position.lerpVectors(flight.fromPos, flight.toPos, e);
+            controls.target.lerpVectors(flight.fromTarget, flight.toTarget, e);
+            if (t >= 1) flight = null;
+          }
+          controls.update();
+          renderer.render(scene, camera);
+        }
         raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
@@ -172,13 +196,23 @@ function ModelViewer({ src, radius, title, height, compact }) {
         if (e && e.lengthComputable) setPct(Math.round((e.loaded / e.total) * 100));
       }, () => { if (!dead) setState('error'); });
 
-      apiRef.current = {
-        reset: () => {
-          camera.position.set(R * 1.5, R * 1.1, R * 1.9);
-          controls.target.set(0, 0, 0);
-          controls.update();
-        }
+      // Same offset direction and scale the initial framing uses (so a reset
+      // lands exactly where the model opened) — every preset looks from the
+      // same angle, so a cut from one part of the model to another reads as
+      // a move within one place rather than a different camera altogether.
+      const flyTo = (view) => {
+        const c = view && view.center;
+        const center = new THREE.Vector3(...(c || [0, 0, 0]));
+        const r = Math.max(0.3, (view && view.radius) || R);
+        const toPos = center.clone().add(new THREE.Vector3(1.5, 1.1, 1.9).multiplyScalar(r));
+        flight = {
+          fromPos: camera.position.clone(), fromTarget: controls.target.clone(),
+          toPos, toTarget: center,
+          start: performance.now(), duration: reduceMotion ? 1 : ((view && view.duration) || 900)
+        };
       };
+      apiRef.current = { flyTo, reset: () => flyTo({ center: [0, 0, 0], radius: R }) };
+      if (onReady) onReady(apiRef.current);
 
       cleanup = () => {
         cancelAnimationFrame(raf);
@@ -192,10 +226,17 @@ function ModelViewer({ src, radius, title, height, compact }) {
         });
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+        apiRef.current = null;
+        if (onReady) onReady(null);
       };
     }).catch(() => { if (!dead) setState('error'); });
 
     return () => { dead = true; cleanup(); };
+    // onReady deliberately left out: it is a fresh arrow function on every
+    // parent render, and this effect is the one that stands up the WebGL
+    // context — including it would tear the viewer down and reload the GLB
+    // on every unrelated re-render of the caller.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, src, radius]);
 
   const label = {

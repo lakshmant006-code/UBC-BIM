@@ -1,0 +1,270 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 10.041
+ },
+ "byClass": {
+  "IfcSpace": {
+   "center": [
+    2446.544,
+    -1.199,
+    1562.622
+   ],
+   "radius": 10.65,
+   "count": 4
+  },
+  "IfcWallStandardCase": {
+   "center": [
+    -0.773,
+    0.219,
+    -0.74
+   ],
+   "radius": 18.764,
+   "count": 68
+  },
+  "IfcOpeningElement": {
+   "center": [
+    -0.015,
+    0.001,
+    0.107
+   ],
+   "radius": 11.077,
+   "count": 43
+  },
+  "IfcWall": {
+   "center": [
+    -0.291,
+    0.187,
+    1.216
+   ],
+   "radius": 11.092,
+   "count": 13
+  },
+  "IfcDoor": {
+   "center": [
+    0.217,
+    -0.081,
+    -0.252
+   ],
+   "radius": 8.677,
+   "count": 17
+  },
+  "IfcWindow": {
+   "center": [
+    -0.232,
+    0.021,
+    0.13
+   ],
+   "radius": 11.029,
+   "count": 21
+  },
+  "IfcSlab": {
+   "center": [
+    -0.792,
+    0.211,
+    -0.564
+   ],
+   "radius": 18.594,
+   "count": 36
+  },
+  "IfcStairFlight": {
+   "center": [
+    3.062,
+    -1.174,
+    0.069
+   ],
+   "radius": 2.45,
+   "count": 2
+  },
+  "IfcMember": {
+   "center": [
+    3.062,
+    -1.261,
+    0.069
+   ],
+   "radius": 2.386,
+   "count": 2
+  },
+  "IfcBuildingElementProxy": {
+   "center": [
+    0.138,
+    0.454,
+    2.415
+   ],
+   "radius": 8.922,
+   "count": 59
+  },
+  "IfcFurnishingElement": {
+   "center": [
+    -0.09,
+    -0.859,
+    0.709
+   ],
+   "radius": 9.695,
+   "count": 13
+  },
+  "IfcFlowTerminal": {
+   "center": [
+    0.049,
+    0.282,
+    0.547
+   ],
+   "radius": 9.848,
+   "count": 56
+  },
+  "IfcCovering": {
+   "center": [
+    0.145,
+    1.201,
+    2.521
+   ],
+   "radius": 8.952,
+   "count": 16
+  },
+  "IfcRailing": {
+   "center": [
+    -1.173,
+    -0.71,
+    -3.957
+   ],
+   "radius": 7.783,
+   "count": 4
+  }
+ },
+ "byType": {
+  "M_Bed-Box": {
+   "center": [
+    0.098,
+    -1.033,
+    2.042
+   ],
+   "radius": 8.357,
+   "count": 5,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "Shower Tray (1)": {
+   "center": [
+    -1.008,
+    -1.089,
+    2.386
+   ],
+   "radius": 7.221,
+   "count": 4,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "M_Sofa": {
+   "center": [
+    1.152,
+    0.907,
+    4.975
+   ],
+   "radius": 1.167,
+   "count": 1,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "Sink - Bathroom (2)": {
+   "center": [
+    0.138,
+    -0.217,
+    2.509
+   ],
+   "radius": 7.669,
+   "count": 4,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "Bed_Aqua_11640": {
+   "center": [
+    5.248,
+    0.916,
+    4.214
+   ],
+   "radius": 2.04,
+   "count": 1,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "\u05d2\u05d5\u05e3 \u05ea\u05d0\u05d5\u05e8\u05d4 \u05ea\u05dc\u05d5\u05d9": {
+   "center": [
+    0.726,
+    0.863,
+    2.481
+   ],
+   "radius": 7.574,
+   "count": 19,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "\u05d2\u05d5\u05e3 \u05ea\u05d0\u05d5\u05e8\u05d4 \u05e7\u05d9\u05e8\u05d9": {
+   "center": [
+    -0.355,
+    0.901,
+    0.547
+   ],
+   "radius": 9.103,
+   "count": 23,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "\u05e1\u05e4\u05d5\u05d8 \u05ea\u05d0\u05d5\u05e8\u05d4 \u05d1\u05ea\u05e7\u05e8\u05d4": {
+   "center": [
+    0.471,
+    1.282,
+    3.169
+   ],
+   "radius": 3.307,
+   "count": 5,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "Couch_-_Diagonal_Divani_amp_Divani_9474": {
+   "center": [
+    -5.098,
+    -2.405,
+    -4.555
+   ],
+   "radius": 2.031,
+   "count": 1,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "IKEA_Lillberg_Chair_Armchair_Fotel_5191": {
+   "center": [
+    -4.01,
+    -2.366,
+    0.617
+   ],
+   "radius": 1.474,
+   "count": 2,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "\u05e9\u05d5\u05dc\u05d7\u05df \u05d0\u05d5\u05db\u05dc": {
+   "center": [
+    -1.029,
+    -2.317,
+    0.241
+   ],
+   "radius": 1.736,
+   "count": 1,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "Basin - Small": {
+   "center": [
+    1.888,
+    -2.218,
+    -0.87
+   ],
+   "radius": 0.373,
+   "count": 1,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "Dining_Table_and_Chairs_16033": {
+   "center": [
+    1.157,
+    -2.309,
+    -4.864
+   ],
+   "radius": 1.507,
+   "count": 2,
+   "ifcClass": "IfcFurnishingElement"
+  }
+ }
+}

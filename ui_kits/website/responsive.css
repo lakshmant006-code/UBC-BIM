@@ -77,6 +77,18 @@
   .ubc-spec-panel { position: static !important; width: auto !important; }
 }
 
+/* ---------- Services model explorer ----------
+   Two columns on desktop: the accordion on the left, a live model on the
+   right that stays in view (sticky, clear of the sticky header) as the
+   visitor works down the list. Below 900px there is no room for both side by
+   side, so it drops to one column and the model — no longer sticky — simply
+   sits above the accordion it explains. */
+.ubc-svc-model { position: sticky; top: 84px; }
+@media (max-width: 900px) {
+  .ubc-svc-grid { grid-template-columns: 1fr !important; }
+  .ubc-svc-model { position: static; order: -1; margin-bottom: var(--s-6); }
+}
+
 /* ---------- Contact welcome scene ----------
    Its own hooks rather than the home hero's, so the two scenes can be tuned
    independently. On a phone the frames take a band across the top of the

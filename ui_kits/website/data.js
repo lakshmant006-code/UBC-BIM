@@ -1,14 +1,42 @@
 /* Placeholder content in the brand's voice. Figures are illustrative — replace with real UBC BIM numbers. */
 window.UBC_DATA = {
+  // Each service can point the model explorer (Home, "What we deliver") at a
+  // real part of the hub model: `view.class` keys into that model's
+  // <name>.views.json, written by tools/ifc_to_glb.py from the model's own
+  // IFC classes — never invented coordinates. `view.kind: 'overlay'` is for
+  // services with nothing to zoom to (a permit set, a bill of materials);
+  // those get a small data card over the model instead. `chips` drills one
+  // level deeper, to individually named instances of that class — the actual
+  // bathroom fixtures placed in the model, e.g., not a generic MEP symbol.
   services: [
-    { n: '01', title: 'Wall panel detailing', body: 'Panel layouts, stud and opening detail, sheathing schedules and the machine files your line runs on.', tags: ['Wood frame', 'Light-gauge steel'] },
-    { n: '02', title: 'Roof and floor trusses', body: 'Truss layouts, spans, bracing and hanger detail, engineered against the framing model.', tags: ['Truss design', 'Shop drawings'] },
-    { n: '03', title: 'Engineering of walls and trusses', body: 'Load paths, member sizing and connection detail, stamped where your jurisdiction requires it.', tags: ['Calculations'] },
-    { n: '04', title: 'MEP detailing and clash detection', body: 'Services modelled against the frame, with every clash reported before anything is cut.', tags: ['Clash report'] },
-    { n: '05', title: 'Permit documents', body: 'Coordinated permit sets drawn from the same model, ready for submission.', tags: ['Permit set'] },
-    { n: '06', title: 'Bill of Materials and CSV', body: 'Quantified takeoffs and machine CSV output, tied to the model so revisions stay in step.', tags: ['BOM', 'Machine CSV'] },
-    { n: '07', title: 'Architectural drafting', body: 'Plans, elevations and sections produced to your standards and titleblocks.', tags: ['DWG', 'PDF'] }
+    { n: '01', title: 'Wall panel detailing', body: 'Panel layouts, stud and opening detail, sheathing schedules and the machine files your line runs on.', tags: ['Wood frame', 'Light-gauge steel'],
+      view: { kind: 'class', class: 'IfcWallStandardCase', label: 'Wall panels' } },
+    { n: '02', title: 'Roof and floor trusses', body: 'Truss layouts, spans, bracing and hanger detail, engineered against the framing model.', tags: ['Truss design', 'Shop drawings'],
+      view: { kind: 'class', class: 'IfcSlab', label: 'Floor plates and roof' } },
+    { n: '03', title: 'Engineering of walls and trusses', body: 'Load paths, member sizing and connection detail, stamped where your jurisdiction requires it.', tags: ['Calculations'],
+      view: { kind: 'whole', label: 'The coordinated structure' } },
+    { n: '04', title: 'MEP detailing and clash detection', body: 'Services modelled against the frame, with every clash reported before anything is cut.', tags: ['Clash report'],
+      view: { kind: 'class', class: 'IfcFlowTerminal', label: 'MEP fixtures' },
+      chips: [
+        { label: 'Bathroom sink', class: 'Sink - Bathroom (2)' },
+        { label: 'Shower tray', class: 'Shower Tray (1)' },
+        { label: 'Basin', class: 'Basin - Small' }
+      ] },
+    { n: '05', title: 'Permit documents', body: 'Coordinated permit sets drawn from the same model, ready for submission.', tags: ['Permit set'],
+      view: { kind: 'overlay', overlay: 'permit' } },
+    { n: '06', title: 'Bill of Materials and CSV', body: 'Quantified takeoffs and machine CSV output, tied to the model so revisions stay in step.', tags: ['BOM', 'Machine CSV'],
+      view: { kind: 'overlay', overlay: 'bom' } },
+    { n: '07', title: 'Architectural drafting', body: 'Plans, elevations and sections produced to your standards and titleblocks.', tags: ['DWG', 'PDF'],
+      view: { kind: 'class', class: 'IfcWindow', label: 'Openings and fenestration' } }
   ],
+  // The hub model behind "What we deliver": a coordinated architectural
+  // renovation with real walls, slabs, openings, MEP fixtures and furniture,
+  // converted by tools/ifc_to_glb.py alongside <src>.views.json.
+  servicesModel: {
+    src: 'assets/models/dael-4-0070.glb',
+    views: 'assets/models/dael-4-0070.views.json',
+    radius: 10.0
+  },
   layers: [
     { label: 'Slab and foundation', note: 'Setting out, anchor layout', spec: { eyebrow: 'Layer 01', title: 'Slab and foundation', specs: [{ label: 'Setting out', value: 'Gridlines to survey control' }, { label: 'Anchors', value: 'Bolt layout with panel takeoff' }, { label: 'Output', value: 'Foundation plan · DWG' }], tags: ['Revit'] } },
     { label: 'Wall panels', note: 'Studs, openings, sheathing', spec: { eyebrow: 'Layer 02', title: 'Wall panels', specs: [{ label: 'Stud', value: '2×6 at 16" O.C.' }, { label: 'Sheathing', value: '7/16" OSB' }, { label: 'Openings', value: 'Headers sized per opening' }, { label: 'Output', value: 'Panel layout · machine CSV' }], tags: ['Machine CSV', 'Shop drawings'] } },

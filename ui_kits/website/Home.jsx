@@ -217,36 +217,170 @@ function ProjectsGrid({ onGo }) {
   );
 }
 
-// WHAT WE DELIVER — serif heading + services accordion.
-function WhatWeDeliver({ onQuote }) {
+// WHAT WE DELIVER — the services accordion paired with a live model of the
+// hub project (window.UBC_DATA.servicesModel). Opening a service flies the
+// camera to the real part of that real model the service describes — the
+// actual walls, the actual floor and roof plates, the actual MEP fixtures —
+// read from tools/ifc_to_glb.py's <model>.views.json, not invented
+// coordinates. A service with nothing to point a camera at (a permit set, a
+// bill of materials) gets a data card over the model instead, its numbers
+// computed from that same manifest.
+function ServicesExplorer({ onQuote }) {
   const [open, setOpen] = React.useState(0);
+  const [activeChip, setActiveChip] = React.useState(null);
+  const [manifest, setManifest] = React.useState(null);
+  const [api, setApi] = React.useState(null);
+  const M = D.servicesModel;
+
+  React.useEffect(() => {
+    if (!M || !M.views) return;
+    let dead = false;
+    fetch(M.views).then((r) => r.json()).then((j) => { if (!dead) setManifest(j); }).catch(() => {});
+    return () => { dead = true; };
+  }, []);
+
+  const svc = open >= 0 ? D.services[open] : null;
+  const view = svc && svc.view;
+
+  // Fly the camera whenever the open service (or the manifest, or the viewer
+  // itself) becomes ready — covers both "clicked a new service" and "the
+  // model finished loading after a service was already selected".
+  React.useEffect(() => {
+    if (!api || !manifest) return;
+    setActiveChip(null);
+    if (!view || view.kind === 'whole' || view.kind === 'overlay') { api.reset(); return; }
+    if (view.kind === 'class') {
+      const v = manifest.byClass && manifest.byClass[view.class];
+      if (v) api.flyTo({ center: v.center, radius: v.radius }); else api.reset();
+    }
+  }, [open, api, manifest]);
+
+  const openChip = (chip) => {
+    if (!api || !manifest) return;
+    const v = manifest.byType && manifest.byType[chip.class];
+    setActiveChip(chip.class);
+    if (v) api.flyTo({ center: v.center, radius: v.radius });
+  };
+
+  // What the badge over the model reads right now. activeChip can be one
+  // render stale relative to `open` — the effect that clears it on a service
+  // switch hasn't run yet — so this has to tolerate a chip class that
+  // doesn't belong to the now-current service rather than assume svc.chips
+  // exists.
+  const activeChipEntry = activeChip && svc && svc.chips && svc.chips.find((c) => c.class === activeChip);
+  const activeLabel = activeChipEntry
+    ? activeChipEntry.label
+    : (view && view.label) || (svc && svc.title) || 'Every drawing out of one model';
+
   return (
     <Section>
-      <Page style={{ maxWidth: 980, marginLeft: 'auto', marginRight: 'auto' }}>
-        <Reveal style={{ textAlign: 'center' }}>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>What we deliver</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(30px, 4vw, 56px)', margin: 'var(--s-3) 0 0' }}>Every drawing out of one model</h2>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0' }}>
+            Open a service to see the real part of the model it comes from — this is one of our own coordinated projects, not a stock illustration.
+          </p>
         </Reveal>
-        <div style={{ marginTop: 'var(--s-9)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-          {D.services.map((s, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={s.n} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                <button onClick={() => setOpen(isOpen ? -1 : i)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
-                  <span style={{ ...serifH, fontSize: 'clamp(22px, 2.4vw, 32px)', flex: 1 }}>{s.title}</span>
-                  <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
-                </button>
-                <div style={{ overflow: 'hidden', maxHeight: isOpen ? 180 : 0, transition: 'max-height var(--dur-3) var(--ease-out)' }}>
-                  <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
-                    <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
+
+        <div className="ubc-svc-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-9)', alignItems: 'start' }}>
+          <div style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+            {D.services.map((s, i) => {
+              const isOpen = open === i;
+              const panelId = 'svc-panel-' + s.n;
+              return (
+                <div key={s.n} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
+                  <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen} aria-controls={panelId}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
+                    <span style={{ ...serifH, fontSize: 'clamp(20px, 2.1vw, 28px)', flex: 1 }}>{s.title}</span>
+                    <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
+                  </button>
+                  <div id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', maxHeight: isOpen ? 220 : 0, transition: 'max-height var(--dur-3) var(--ease-out)' }}>
+                    <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
+                      <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
+                      {isOpen && s.chips && (
+                        <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
+                          {s.chips.map((c) => {
+                            const has = manifest && manifest.byType && manifest.byType[c.class];
+                            const on = activeChip === c.class;
+                            return (
+                              <button key={c.class} onClick={() => openChip(c)} disabled={!has} aria-pressed={on}
+                                style={{
+                                  fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase',
+                                  padding: '7px 12px', borderRadius: 'var(--r-pill)', cursor: has ? 'pointer' : 'default',
+                                  background: on ? 'var(--ink)' : 'var(--surface-card)', color: on ? 'var(--paper)' : (has ? 'var(--text-strong)' : 'var(--text-faint)'),
+                                  border: 'var(--bw-1) solid ' + (on ? 'var(--ink)' : 'var(--border-strong)'), opacity: has ? 1 : 0.5
+                                }}>
+                                {c.label}{on ? ' · shown' : ''}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* Live model, sticky on desktop so it stays in view as the visitor
+              works down the accordion. */}
+          <div className="ubc-svc-model" style={{ position: 'relative' }}>
+            <div style={{ position: 'relative', borderRadius: 'var(--r-3)', overflow: 'hidden' }}>
+              {M && window.ModelViewer ? (
+                <window.ModelViewer src={M.src} radius={M.radius} height={520} onReady={setApi} />
+              ) : (
+                <div style={{ height: 520, background: 'var(--surface-inverse)' }} />
+              )}
+              {/* Which part of the model is on screen right now — announced to
+                  screen readers too, since the change is triggered by a
+                  button elsewhere on the page, not by focus landing here. */}
+              <div aria-live="polite" style={{ position: 'absolute', left: 'var(--s-5)', top: 'var(--s-5)', pointerEvents: 'none' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(16,18,21,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-pill)', padding: '5px 12px 5px 9px', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
+                  {activeLabel}
+                </span>
               </div>
-            );
-          })}
+
+              {/* Permit documents / Bill of Materials: nothing on the model to
+                  zoom to, so the real numbers land on top of it instead. */}
+              {view && view.kind === 'overlay' && (
+                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 320, marginLeft: 'auto', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)', padding: 'var(--s-5)' }}>
+                  {view.overlay === 'bom' ? (
+                    manifest ? (
+                      <>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Counted straight from this model</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px var(--s-4)', marginTop: 'var(--s-3)' }}>
+                          {[['Wall panels', 'IfcWallStandardCase'], ['Floor & roof plates', 'IfcSlab'], ['Windows', 'IfcWindow'], ['Doors', 'IfcDoor'], ['MEP fixtures', 'IfcFlowTerminal']].map(([label, cls]) => (
+                            manifest.byClass && manifest.byClass[cls] ? (
+                              <React.Fragment key={cls}>
+                                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.78)' }}>{label}</span>
+                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--paper)' }}>{manifest.byClass[cls].count}</span>
+                              </React.Fragment>
+                            ) : null
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.7)' }}>Counting the model…</div>
+                    )
+                  ) : (
+                    <>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Permit documents</div>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-2) 0 0' }}>
+                        Every sheet in the set — plans, elevations, sections and schedules — is drawn from this same coordinated model, so a revision here reaches the submission set with it.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
         <Reveal style={{ textAlign: 'center', marginTop: 'var(--s-9)' }}>
           <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 30px', cursor: 'pointer' }}>Request a quote</button>
         </Reveal>
@@ -263,7 +397,7 @@ function Home({ onGo, onQuote }) {
       <WhoWeAre onGo={onGo} />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
-      <WhatWeDeliver onQuote={onQuote} />
+      <ServicesExplorer onQuote={onQuote} />
     </div>
   );
 }
