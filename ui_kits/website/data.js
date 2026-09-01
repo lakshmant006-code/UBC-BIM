@@ -8,34 +8,40 @@ window.UBC_DATA = {
   // those get a small data card over the model instead. `chips` drills one
   // level deeper, to individually named instances of that class — the actual
   // bathroom fixtures placed in the model, e.g., not a generic MEP symbol.
+  // The camping resort steel frame is a single open-volume structure — 988
+  // columns and 834 beams spanning the whole footprint, nothing else (no
+  // walls, no MEP, no openings) — so unlike a compartmentalised building
+  // there is no spatially distinct "the walls" or "the fixtures" to fly to.
+  // Every view below is honestly one of the only two things this file
+  // contains; several land close to the same whole-structure framing rather
+  // than a meaningfully different close-up. Swap the hub model in
+  // servicesModel below for one with more element variety to get that back.
   services: [
     { n: '01', title: 'Wall panel detailing', body: 'Panel layouts, stud and opening detail, sheathing schedules and the machine files your line runs on.', tags: ['Wood frame', 'Light-gauge steel'],
-      view: { kind: 'class', class: 'IfcWallStandardCase', label: 'Wall panels' } },
+      view: { kind: 'class', class: 'IfcColumn', label: 'Structural columns' } },
     { n: '02', title: 'Roof and floor trusses', body: 'Truss layouts, spans, bracing and hanger detail, engineered against the framing model.', tags: ['Truss design', 'Shop drawings'],
-      view: { kind: 'class', class: 'IfcSlab', label: 'Floor plates and roof' } },
+      view: { kind: 'class', class: 'IfcBeam', label: 'Roof beams' } },
     { n: '03', title: 'Engineering of walls and trusses', body: 'Load paths, member sizing and connection detail, stamped where your jurisdiction requires it.', tags: ['Calculations'],
       view: { kind: 'whole', label: 'The coordinated structure' } },
     { n: '04', title: 'MEP detailing and clash detection', body: 'Services modelled against the frame, with every clash reported before anything is cut.', tags: ['Clash report'],
-      view: { kind: 'class', class: 'IfcFlowTerminal', label: 'MEP fixtures' },
-      chips: [
-        { label: 'Bathroom sink', class: 'Sink - Bathroom (2)' },
-        { label: 'Shower tray', class: 'Shower Tray (1)' },
-        { label: 'Basin', class: 'Basin - Small' }
-      ] },
+      // No MEP is modelled in this file, so this has nowhere honest to zoom
+      // to — it stays on the whole structure rather than pretending to point
+      // at services that aren't there.
+      view: { kind: 'whole', label: 'The coordinated structure' } },
     { n: '05', title: 'Permit documents', body: 'Coordinated permit sets drawn from the same model, ready for submission.', tags: ['Permit set'],
       view: { kind: 'overlay', overlay: 'permit' } },
     { n: '06', title: 'Bill of Materials and CSV', body: 'Quantified takeoffs and machine CSV output, tied to the model so revisions stay in step.', tags: ['BOM', 'Machine CSV'],
       view: { kind: 'overlay', overlay: 'bom' } },
     { n: '07', title: 'Architectural drafting', body: 'Plans, elevations and sections produced to your standards and titleblocks.', tags: ['DWG', 'PDF'],
-      view: { kind: 'class', class: 'IfcWindow', label: 'Openings and fenestration' } }
+      view: { kind: 'whole', label: 'The coordinated structure' } }
   ],
-  // The hub model behind "What we deliver": a coordinated architectural
-  // renovation with real walls, slabs, openings, MEP fixtures and furniture,
-  // converted by tools/ifc_to_glb.py alongside <src>.views.json.
+  // The hub model behind "What we deliver": the camping resort steel frame
+  // (988 columns, 834 beams), converted by tools/ifc_to_glb.py alongside
+  // <src>.views.json.
   servicesModel: {
-    src: 'assets/models/dael-4-0070.glb',
-    views: 'assets/models/dael-4-0070.views.json',
-    radius: 10.0
+    src: 'assets/models/camping-resort.glb',
+    views: 'assets/models/camping-resort.views.json',
+    radius: 11.2
   },
   layers: [
     { label: 'Slab and foundation', note: 'Setting out, anchor layout', spec: { eyebrow: 'Layer 01', title: 'Slab and foundation', specs: [{ label: 'Setting out', value: 'Gridlines to survey control' }, { label: 'Anchors', value: 'Bolt layout with panel takeoff' }, { label: 'Output', value: 'Foundation plan · DWG' }], tags: ['Revit'] } },

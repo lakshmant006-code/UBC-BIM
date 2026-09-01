@@ -20,6 +20,28 @@ Object.assign(window, { Page, Section, Reveal });
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
 
+// Plain-English labels for the IFC classes worth naming in the Bill of
+// Materials card. Whatever the hub model actually contains — a wall-and-MEP
+// renovation, a column-and-beam steel frame, anything else — the card reads
+// off manifest.byClass directly rather than a list tied to one specific
+// model, so swapping window.UBC_DATA.servicesModel never leaves it empty.
+const IFC_CLASS_LABEL = {
+  IfcWall: 'Walls', IfcWallStandardCase: 'Wall panels', IfcSlab: 'Floor & roof plates',
+  IfcRoof: 'Roof', IfcWindow: 'Windows', IfcDoor: 'Doors', IfcColumn: 'Columns',
+  IfcBeam: 'Beams', IfcMember: 'Members', IfcFlowTerminal: 'MEP fixtures',
+  IfcDistributionPort: 'MEP connections', IfcFurnishingElement: 'Furniture',
+  IfcRailing: 'Railings', IfcStair: 'Stairs', IfcStairFlight: 'Stair flights',
+  IfcCovering: 'Ceilings & finishes'
+};
+function bomRows(manifest) {
+  if (!manifest || !manifest.byClass) return [];
+  return Object.entries(manifest.byClass)
+    .filter(([cls]) => IFC_CLASS_LABEL[cls])   // skip proxies, spaces, openings — not a BOM line
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 6)
+    .map(([cls, v]) => [IFC_CLASS_LABEL[cls], v.count]);
+}
+
 // WHO WE ARE — centered serif editorial band.
 function WhoWeAre({ onGo }) {
   return (
@@ -354,13 +376,11 @@ function ServicesExplorer({ onQuote }) {
                       <>
                         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Counted straight from this model</div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px var(--s-4)', marginTop: 'var(--s-3)' }}>
-                          {[['Wall panels', 'IfcWallStandardCase'], ['Floor & roof plates', 'IfcSlab'], ['Windows', 'IfcWindow'], ['Doors', 'IfcDoor'], ['MEP fixtures', 'IfcFlowTerminal']].map(([label, cls]) => (
-                            manifest.byClass && manifest.byClass[cls] ? (
-                              <React.Fragment key={cls}>
-                                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.78)' }}>{label}</span>
-                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--paper)' }}>{manifest.byClass[cls].count}</span>
-                              </React.Fragment>
-                            ) : null
+                          {bomRows(manifest).map(([label, count]) => (
+                            <React.Fragment key={label}>
+                              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.78)' }}>{label}</span>
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--paper)' }}>{count}</span>
+                            </React.Fragment>
                           ))}
                         </div>
                       </>

@@ -1,0 +1,31 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 11.2
+ },
+ "byClass": {
+  "IfcBeam": {
+   "center": [
+    0.0,
+    0.001,
+    -0.0
+   ],
+   "radius": 11.238,
+   "count": 786
+  },
+  "IfcColumn": {
+   "center": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "radius": 10.902,
+   "count": 988
+  }
+ },
+ "byType": {}
+}
