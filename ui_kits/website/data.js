@@ -21,7 +21,29 @@ window.UBC_DATA = {
     { id: 'kingsway-retail', name: 'Kingsway retail block', type: 'Commercial', system: 'Light-gauge steel', size: '18,200 sq ft', units: '6 tenancies', location: 'Manchester, United Kingdom', delivered: 'Model · BOM · Clash report', software: ['Revit', 'Navisworks'] },
     { id: 'cedar-lane', name: 'Cedar Lane townhomes', type: 'Multifamily', system: 'Wood', size: '34,500 sq ft', units: '22 units', location: 'Oregon, United States', delivered: 'Model · CSV · Permit set', software: ['Revit', 'Vertex BD'] },
     { id: 'fernhill-house', name: 'Fernhill house', type: 'Residential', system: 'Wood', size: '3,180 sq ft', units: '1 unit', location: 'Dublin, Ireland', delivered: 'Model · BOM · Permit set', software: ['Revit'] },
-    { id: 'northgate-warehouse', name: 'Northgate warehouse', type: 'Commercial', system: 'Light-gauge steel', size: '46,000 sq ft', units: '1 unit', location: 'Queensland, Australia', delivered: 'Model · Shop drawings · CSV', software: ['Revit', 'Tekla'] }
+    { id: 'northgate-warehouse', name: 'Northgate warehouse', type: 'Commercial', system: 'Light-gauge steel', size: '46,000 sq ft', units: '1 unit', location: 'Queensland, Australia', delivered: 'Model · Shop drawings · CSV', software: ['Revit', 'Tekla'] },
+
+    // Four real client IFC models, converted once to glTF by tools/ifc_to_glb.py
+    // (see that file's docstring). Unlike the placeholder cards above, `size` is
+    // measured from the model geometry itself rather than invented, and
+    // `software` is read from each file's own header — everything else about
+    // these four is honestly what the model shows, not a delivery record.
+    { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Structural steel',
+      size: '≈ 2,390 sq ft footprint (from model)', units: '988 columns · 834 beams', location: 'Not specified',
+      delivered: 'Coordinated structural model', software: ['FRAMECAD Steelwise'],
+      model: { src: 'assets/models/camping-resort.glb', radius: 11.2 } },
+    { id: 'shita-room', name: 'Shita Room framing', type: 'Residential', system: 'Light-gauge steel',
+      size: '≈ 2,020 sq ft footprint (from model)', units: '3 storeys', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Vertex BD'],
+      model: { src: 'assets/models/shita-room.glb', radius: 10.2 } },
+    { id: 'dael-4-0070', name: 'Project 4.0070', type: 'Residential', system: 'Mixed construction',
+      size: '≈ 1,970 sq ft footprint (from model)', units: '4 storeys', location: 'Not specified',
+      delivered: 'Coordinated architectural model', software: ['Autodesk Revit'],
+      model: { src: 'assets/models/dael-4-0070.glb', radius: 10.0 } },
+    { id: 'mechanical-room', name: 'Mechanical room', type: 'Commercial', system: 'MEP',
+      size: '8 elements', units: '1 storey', location: 'Not specified',
+      delivered: 'Coordinated MEP model', software: ['SketchUp Pro'],
+      model: { src: 'assets/models/mechanical-room.glb', radius: 75.1 } }
   ],
   capability: {
     columns: ['Machine / software', 'Type', 'File output'],

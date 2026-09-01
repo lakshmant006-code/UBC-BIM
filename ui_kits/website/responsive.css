@@ -67,6 +67,16 @@
   .ubc-route-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ---------- Project detail model + spec panel ----------
+   On a desktop-width stage the spec card floats over the top-right corner
+   of the model. Below 900px there isn't room for both, and a model you
+   can't reach to drag or pinch defeats the point of it being 3D — so the
+   card drops out of the overlay and stacks under the model instead. */
+@media (max-width: 900px) {
+  .ubc-model-row { display: flex; flex-direction: column; gap: var(--s-6); }
+  .ubc-spec-panel { position: static !important; width: auto !important; }
+}
+
 /* ---------- Contact welcome scene ----------
    Its own hooks rather than the home hero's, so the two scenes can be tuned
    independently. On a phone the frames take a band across the top of the

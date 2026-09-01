@@ -10,13 +10,23 @@ function ProjectDetail({ project, onBack, onQuote }) {
       <Page style={{ paddingTop: 'var(--s-5)' }}>
         <SectionHeading eyebrow={project.type + ' · ' + project.system} title={project.name} size="lg" />
       </Page>
-      <div style={{ marginTop: 'var(--s-7)', position: 'relative' }}>
-        <ModelStage height={560} caption={project.name + ' · framing model'}>
-          <Hotspot x="30%" y="42%" label="Wall panel" />
-          <Hotspot x="56%" y="28%" label="Roof truss" leader="left" />
-          <Hotspot x="68%" y="62%" label="MEP run" leader="left" />
-        </ModelStage>
-        <div style={{ position: 'absolute', right: 'var(--s-7)', top: 'var(--s-6)' }}>
+      <div className="ubc-model-row" style={{ marginTop: 'var(--s-7)', position: 'relative' }}>
+        {/* A real IFC, converted to glTF, gets the orbitable viewer; everything
+            else keeps the placeholder stage until its own model is in hand. */}
+        {project.model && window.ModelViewer ? (
+          <window.ModelViewer src={project.model.src} radius={project.model.radius} title={project.name} height={560} />
+        ) : (
+          <ModelStage height={560} caption={project.name + ' · framing model'}>
+            <Hotspot x="30%" y="42%" label="Wall panel" />
+            <Hotspot x="56%" y="28%" label="Roof truss" leader="left" />
+            <Hotspot x="68%" y="62%" label="MEP run" leader="left" />
+          </ModelStage>
+        )}
+        {/* Floats over the model on a desktop-width stage; below 900px this
+            stacks under it instead (responsive.css), so the model itself
+            stays reachable to drag and pinch rather than hidden under the
+            spec card. */}
+        <div className="ubc-spec-panel" style={{ position: 'absolute', right: 'var(--s-7)', top: 'var(--s-6)' }}>
           <SpecPanel inverse title="Project specification" eyebrow="Spec"
             specs={[
               { label: 'Size', value: project.size },
@@ -32,7 +42,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
       </div>
       <Section tight>
         <Page>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)' }}>
+          <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)' }}>
             <div>
               <SectionHeading eyebrow="Walkthrough video" title="Model walkthrough" size="sm" />
               <div style={{ marginTop: 'var(--s-5)', aspectRatio: '16 / 9', background: 'var(--surface-sunken)', border: 'var(--bw-hair) solid var(--border-subtle)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>
@@ -78,9 +88,9 @@ function Portfolio({ onQuote }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-7)' }}>
           {list.map((p, i) => (
             <Reveal key={p.id} delay={i * 60}>
-              <Card interactive media={null} mediaLabel={p.name + ' — model render pending'}
+              <Card interactive media={null} mediaLabel={p.model ? p.name + ' — orbit the model' : p.name + ' — model render pending'}
                 eyebrow={p.type} title={p.name} meta={p.size + ' · ' + p.location}
-                tags={[<Tag key="s">{p.system}</Tag>, ...p.software.map((s) => <Tag key={s} tone="steel">{s}</Tag>)]}
+                tags={[<Tag key="s">{p.system}</Tag>, ...(p.model ? [<Tag key="3d" tone="steel">3D model</Tag>] : []), ...p.software.map((s) => <Tag key={s} tone="steel">{s}</Tag>)]}
                 onClick={() => setOpen(p)} style={{ height: '100%', cursor: 'pointer' }}>
                 {p.delivered}
               </Card>
