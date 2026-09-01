@@ -16,13 +16,6 @@ window.UBC_DATA = {
     { label: 'MEP and clash detection', note: 'Services against the frame', spec: { eyebrow: 'Layer 04', title: 'MEP and clash detection', specs: [{ label: 'Disciplines', value: 'Mechanical · electrical · plumbing' }, { label: 'Clashes found', value: '14 hard · 6 soft' }, { label: 'Resolved', value: 'All hard clashes cleared' }, { label: 'Output', value: 'Clash report · coordinated model' }], tags: ['Clash report'] } }
   ],
   projects: [
-    { id: 'maple-ridge', name: 'Maple Ridge duplex', type: 'Residential', system: 'Wood', size: '2,450 sq ft', units: '2 units', location: 'British Columbia, Canada', delivered: 'Model · BOM · CSV · Permit set', software: ['Revit', 'Vertex BD'] },
-    { id: 'harbour-lofts', name: 'Harbour Lofts', type: 'Multifamily', system: 'Light-gauge steel', size: '61,800 sq ft', units: '48 units', location: 'Auckland, New Zealand', delivered: 'Model · Shop drawings · CSV', software: ['Revit', 'Tekla'] },
-    { id: 'kingsway-retail', name: 'Kingsway retail block', type: 'Commercial', system: 'Light-gauge steel', size: '18,200 sq ft', units: '6 tenancies', location: 'Manchester, United Kingdom', delivered: 'Model · BOM · Clash report', software: ['Revit', 'Navisworks'] },
-    { id: 'cedar-lane', name: 'Cedar Lane townhomes', type: 'Multifamily', system: 'Wood', size: '34,500 sq ft', units: '22 units', location: 'Oregon, United States', delivered: 'Model · CSV · Permit set', software: ['Revit', 'Vertex BD'] },
-    { id: 'fernhill-house', name: 'Fernhill house', type: 'Residential', system: 'Wood', size: '3,180 sq ft', units: '1 unit', location: 'Dublin, Ireland', delivered: 'Model · BOM · Permit set', software: ['Revit'] },
-    { id: 'northgate-warehouse', name: 'Northgate warehouse', type: 'Commercial', system: 'Light-gauge steel', size: '46,000 sq ft', units: '1 unit', location: 'Queensland, Australia', delivered: 'Model · Shop drawings · CSV', software: ['Revit', 'Tekla'] },
-
     // Four real client IFC models, converted once to glTF by tools/ifc_to_glb.py
     // (see that file's docstring). Unlike the placeholder cards above, `size` is
     // measured from the model geometry itself rather than invented, and
