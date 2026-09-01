@@ -1,2 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap");
-:root{--font-display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;--font-body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--font-serif:"Fraunces","Georgia",serif}
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+/* --font-serif once pointed at Fraunces for the site's cinematic headlines,
+   which broke the design system's own "never Fraunces" rule (design.md,
+   rule id="typography"). It now aliases the sans-serif display face instead,
+   so every large headline built on var(--font-serif) goes sans-serif with
+   this one change. */
+:root{--font-display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;--font-body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--font-serif:"Space Grotesk","Helvetica Neue",Arial,sans-serif}

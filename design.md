@@ -43,7 +43,7 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 
 <rule id="typography" enforce="absolute">
   <do>Space Grotesk for display and headings (tight tracking, --lh-tight at size). Instrument Sans for body at --lh-relaxed, max 760px measure. JetBrains Mono for eyebrow labels, spec keys, dimensions and filenames.</do>
-  <dont>Never Inter, Roboto, Arial or Fraunces. Never set body copy above 18px or below 14px. Never use ALL-CAPS for headlines or sentences — only for mono labels with --ls-label tracking.</dont>
+  <dont>Never Inter, Roboto or Arial as a body/display substitute, and no serif anywhere — --font-serif itself is now a Space Grotesk alias, kept only so existing headline styles don't need touching. Never set body copy above 18px or below 14px. Never use ALL-CAPS for headlines or sentences — only for mono labels with --ls-label tracking.</dont>
   <why>These are substitutes for absent brand fonts, chosen for an engineered-but-quiet voice. Mono is the system's only "technical" signal, so overusing it spends the effect.</why>
   <flag>Substituted from Google Fonts. If real UBC BIM fonts arrive, swap them in tokens/fonts.css only.</flag>
 </rule>
