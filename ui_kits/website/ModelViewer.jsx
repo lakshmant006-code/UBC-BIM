@@ -1,14 +1,29 @@
 /*
-  ModelViewer — an orbitable 3D model on a project page. Drag to rotate, scroll
-  or pinch to zoom, right-drag or two-finger drag to pan.
+  ModelViewer — a live, orbitable 3D model. Drag to rotate, scroll or pinch to
+  zoom, right-drag or two-finger drag to pan. This is the model itself on
+  screen, not a photo of it: nowhere does this component sit behind a static
+  <img> — a caller either shows this or a plain "model pending" placeholder,
+  never an image standing in for the real thing.
 
   The models are authored as IFC and converted once by tools/ifc_to_glb.py, so
   the browser loads one glTF binary instead of parsing megabytes of IFC through
   a WASM kernel. three.js is fetched only when a viewer actually mounts, so the
   rest of the site never pays for it.
 
-  Props: src (GLB url), radius (framing radius in metres, from the converter),
-  title, and onReady.
+  Mounting is lazy: nothing (not three.js, not the GLB) loads until the viewer
+  scrolls near the viewport, so a grid of these costs nothing until the visitor
+  scrolls to it. Once mounted it stays mounted — re-loading the model every
+  time a card scrolls in and out would be worse than the cost of keeping it —
+  but the render loop pauses while off-screen, so an unattended grid of
+  viewers does not spend GPU time on cards nobody is looking at.
+
+  Props:
+    src      GLB url
+    radius   framing radius in metres, from the converter's printed output
+    title    caption
+    height   stage height in px
+    compact  smaller chrome for a grid thumbnail: no caption/hint row, a
+             small always-visible "3D" tag instead, Reset view only on hover
 */
 
 // three r147 is the last release that ships the plain-script builds, which is
@@ -42,13 +57,30 @@ function loadThree() {
   return loadThree._p;
 }
 
-function ModelViewer({ src, radius, title, height }) {
+function ModelViewer({ src, radius, title, height, compact }) {
+  const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
+  const visibleRef = React.useRef(false);
+  const [mount, setMount] = React.useState(false);    // near the viewport at least once
+  const [hover, setHover] = React.useState(false);
   const [state, setState] = React.useState('idle');   // idle | loading | ready | error
   const [pct, setPct] = React.useState(0);
 
+  // Start loading once the viewer comes within reach of the viewport, so a
+  // grid of these does not fetch three.js or any GLB until scrolled to.
   React.useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof IntersectionObserver !== 'function') { setMount(true); return; }
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) { setMount(true); io.disconnect(); }
+    }, { rootMargin: '600px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  React.useEffect(() => {
+    if (!mount) return;
     let dead = false;
     let cleanup = () => {};
     setState('loading');
@@ -109,9 +141,22 @@ function ModelViewer({ src, radius, title, height }) {
       if (ro) ro.observe(host);
       window.addEventListener('resize', fit);
 
+      // The render loop only spends GPU time while this viewer is actually on
+      // screen — a grid of live models must not keep rendering the ones the
+      // visitor has scrolled past. Interaction still works instantly on
+      // return: the scene and the loaded model are never torn down, only the
+      // loop is paused, so nothing reloads.
       let raf = 0;
-      const tick = () => { controls.update(); renderer.render(scene, camera); raf = requestAnimationFrame(tick); };
+      const tick = () => {
+        if (visibleRef.current) { controls.update(); renderer.render(scene, camera); }
+        raf = requestAnimationFrame(tick);
+      };
       raf = requestAnimationFrame(tick);
+
+      const vio = typeof IntersectionObserver === 'function'
+        ? new IntersectionObserver((entries) => { visibleRef.current = entries[0].isIntersecting; }, { threshold: 0.05 })
+        : null;
+      if (vio) vio.observe(host); else visibleRef.current = true;
 
       const loader = new THREE.GLTFLoader();
       loader.load(src, (gltf) => {
@@ -139,6 +184,7 @@ function ModelViewer({ src, radius, title, height }) {
         cancelAnimationFrame(raf);
         window.removeEventListener('resize', fit);
         if (ro) ro.disconnect();
+        if (vio) vio.disconnect();
         controls.dispose();
         scene.traverse((o) => {
           if (o.geometry) o.geometry.dispose();
@@ -150,7 +196,7 @@ function ModelViewer({ src, radius, title, height }) {
     }).catch(() => { if (!dead) setState('error'); });
 
     return () => { dead = true; cleanup(); };
-  }, [src, radius]);
+  }, [mount, src, radius]);
 
   const label = {
     loading: pct ? 'Loading model · ' + pct + '%' : 'Loading model',
@@ -159,7 +205,8 @@ function ModelViewer({ src, radius, title, height }) {
   }[state];
 
   return (
-    <div className="ubc-model-viewer" style={{ position: 'relative', height: height || 560, background: 'var(--surface-inverse)', overflow: 'hidden' }}>
+    <div ref={wrapRef} className="ubc-model-viewer" style={{ position: 'relative', height: height || 560, background: 'var(--surface-inverse)', overflow: 'hidden' }}
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
 
       {state !== 'ready' && (
@@ -170,26 +217,47 @@ function ModelViewer({ src, radius, title, height }) {
         </div>
       )}
 
-      {/* Caption, controls hint and Reset view all sit on the left: a caller
-          (ProjectDetail) overlays its own spec panel on the right, and the
-          page's sticky quote button is fixed to the viewport's bottom-right
-          at all times, so the right-hand side is never this component's to use. */}
-      <div style={{ position: 'absolute', left: 'var(--s-5)', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>
-          {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'rgba(245,244,241,.72)' }}>{title}</span>}
+      {compact ? (
+        <>
+          {/* Compact chrome for a grid thumbnail: a small always-on badge so
+              it reads as a live model rather than a photo, nothing else
+              cluttering the card until the visitor is actually hovering it. */}
+          <div style={{ position: 'absolute', left: 'var(--s-4)', top: 'var(--s-4)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(16,18,21,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-pill)', padding: '4px 10px 4px 8px' }}>
+            <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)' }}>3D · drag to orbit</span>
+          </div>
           {state === 'ready' && (
-            <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-caption)', color: 'rgba(245,244,241,.45)' }}>
-              Drag to rotate · scroll to zoom · right-drag to pan
-            </span>
+            <button onClick={(e) => { e.stopPropagation(); apiRef.current && apiRef.current.reset(); }}
+              style={{ position: 'absolute', right: 'var(--s-4)', top: 'var(--s-4)', cursor: 'pointer', opacity: hover ? 1 : 0, transition: 'opacity var(--dur-2) var(--ease-out)', background: 'rgba(16,18,21,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-2)', color: 'var(--paper)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '6px 9px' }}>
+              Reset
+            </button>
           )}
-        </div>
-        {state === 'ready' && (
-          <button onClick={() => apiRef.current && apiRef.current.reset()}
-            style={{ cursor: 'pointer', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-2)', color: 'var(--paper)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '8px 12px', whiteSpace: 'nowrap' }}>
-            Reset view
-          </button>
-        )}
-      </div>
+        </>
+      ) : (
+        <>
+          {/* Caption, controls hint and Reset view all sit on the left: a
+              caller (ProjectDetail) overlays its own spec panel on the right,
+              and the page's sticky quote button is fixed to the viewport's
+              bottom-right at all times, so the right-hand side is never this
+              component's to use. */}
+          <div style={{ position: 'absolute', left: 'var(--s-5)', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>
+              {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'rgba(245,244,241,.72)' }}>{title}</span>}
+              {state === 'ready' && (
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-caption)', color: 'rgba(245,244,241,.45)' }}>
+                  Drag to rotate · scroll to zoom · right-drag to pan
+                </span>
+              )}
+            </div>
+            {state === 'ready' && (
+              <button onClick={() => apiRef.current && apiRef.current.reset()}
+                style={{ cursor: 'pointer', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-2)', color: 'var(--paper)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                Reset view
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

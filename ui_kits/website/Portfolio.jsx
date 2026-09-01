@@ -76,7 +76,12 @@ function Portfolio({ onQuote }) {
   const [filter, setFilter] = React.useState(() => { const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null; return f || 'All'; });
   const [open, setOpen] = React.useState(null);
   const list = D.projects.filter((p) => filter === 'All' || p.type === filter || p.system === filter);
-  if (open) return <ProjectDetail project={open} onBack={() => setOpen(null)} onQuote={onQuote} />;
+  // Opening a project is local state, not a page change, so nothing else
+  // resets scroll — without this the live model can land scrolled out of
+  // view if the grid card that opened it was well down the page.
+  const openProject = (p) => { setOpen(p); window.scrollTo(0, 0); };
+  const closeProject = () => { setOpen(null); window.scrollTo(0, 0); };
+  if (open) return <ProjectDetail project={open} onBack={closeProject} onQuote={onQuote} />;
   return (
     <Section>
       <Page>
@@ -85,13 +90,25 @@ function Portfolio({ onQuote }) {
         <div style={{ marginTop: 'var(--s-7)' }}>
           <FilterBar value={filter} onChange={setFilter} count={list.length} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-7)' }}>
+        {/* This grid now carries live orbitable models, not just photos, so it
+            needs to actually be usable on a phone rather than squeezing three
+            columns into 390px. ubc-proj-grid already drops to one column
+            below 900px for the Home page's grid; reused here rather than a
+            near-duplicate rule. */}
+        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-7)' }}>
           {list.map((p, i) => (
             <Reveal key={p.id} delay={i * 60}>
-              <Card interactive media={null} mediaLabel={p.model ? p.name + ' — orbit the model' : p.name + ' — model render pending'}
+              <Card interactive
+                // A real IFC gets the live, orbitable model right on the card
+                // — not a photo of it. stopPropagation keeps a drag-to-orbit
+                // from also firing the card's own "open this project" click.
+                media={p.model && window.ModelViewer
+                  ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><window.ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact /></div>
+                  : null}
+                mediaLabel={p.name + ' — model render pending'}
                 eyebrow={p.type} title={p.name} meta={p.size + ' · ' + p.location}
                 tags={[<Tag key="s">{p.system}</Tag>, ...(p.model ? [<Tag key="3d" tone="steel">3D model</Tag>] : []), ...p.software.map((s) => <Tag key={s} tone="steel">{s}</Tag>)]}
-                onClick={() => setOpen(p)} style={{ height: '100%', cursor: 'pointer' }}>
+                onClick={() => openProject(p)} style={{ height: '100%', cursor: 'pointer' }}>
                 {p.delivered}
               </Card>
             </Reveal>

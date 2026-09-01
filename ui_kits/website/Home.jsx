@@ -188,18 +188,27 @@ function ProjectsGrid({ onGo }) {
         <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--s-9)' }}>
           {D.projects.map((p, i) => (
             <Reveal key={p.id} delay={(i % 2) * 80}>
-              <a onClick={() => onGo && onGo('projects')} style={{ display: 'block', cursor: 'pointer', textDecoration: 'none' }}>
-                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}>
-                  <img src={'assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ display: 'block' }}>
+                {/* A project with a real IFC gets the live model here, on the
+                    grid, orbitable on the spot — never a photo standing in
+                    for it. stopPropagation keeps a drag-to-orbit from also
+                    firing the navigate-to-project click below. */}
+                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
+                  onClick={(e) => { if (p.model) e.stopPropagation(); }}>
+                  {p.model && window.ModelViewer ? (
+                    <window.ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
+                  ) : (
+                    <img src={'assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)' }}>
+                <a onClick={() => onGo && onGo('projects')} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)', cursor: 'pointer', textDecoration: 'none' }}>
                   <div>
                     <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{p.name}</div>
                     <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>{p.location.split(',')[0]} · {p.system}</div>
                   </div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{String(i + 1).padStart(2, '0')}</div>
-                </div>
-              </a>
+                </a>
+              </div>
             </Reveal>
           ))}
         </div>
