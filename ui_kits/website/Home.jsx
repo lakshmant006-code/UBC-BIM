@@ -470,7 +470,7 @@ function ServicesExplorer({ onQuote }) {
               {M && window.ModelViewer ? (
                 <window.ModelViewer src={M.src} radius={M.radius} height={520} onReady={setApi} />
               ) : (
-                <div style={{ height: 520, background: 'var(--surface-sunken)' }} />
+                <div className="ubc-model-viewer" style={{ height: 520, background: 'var(--surface-sunken)' }} />
               )}
               {/* Which part of the model is on screen right now, announced to
                   screen readers too, since the change is triggered by a
@@ -771,7 +771,7 @@ function GlobalPresence() {
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0', maxWidth: '46ch' }}>
               One coordinated model and one workflow, run the same way for builders across {countries.value} countries.
             </p>
-            <div style={{ display: 'flex', gap: 'var(--s-7)', marginTop: 'var(--s-7)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-7)', marginTop: 'var(--s-7)' }}>
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--fs-h1)', color: 'var(--text-strong)' }}><AnimatedNumber value={countries.value} /></div>
                 <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>{countries.label}</div>

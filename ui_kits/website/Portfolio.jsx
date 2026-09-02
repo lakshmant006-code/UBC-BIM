@@ -16,7 +16,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
         {project.model && window.ModelViewer ? (
           <window.ModelViewer src={project.model.src} radius={project.model.radius} title={project.name} height={560} />
         ) : (
-          <ModelStage height={560} caption={project.name + ' · framing model'}>
+          <ModelStage className="ubc-model-viewer" height={560} caption={project.name + ' · framing model'}>
             <Hotspot x="30%" y="42%" label="Wall panel" />
             <Hotspot x="56%" y="28%" label="Roof truss" leader="left" />
             <Hotspot x="68%" y="62%" label="MEP run" leader="left" />

@@ -18,6 +18,25 @@
 
   /* The LGSF card sits over the frame; narrow it so it never runs off-screen */
   .ubc-lgsf-tab { max-width: 46vw !important; }
+
+  /* About stats: four columns is too tight once the label wraps to two words */
+  .ubc-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: var(--s-6) var(--s-5) !important; }
+
+  /* About office scene and Contact door scene: both are all %-positioned line
+     work inside a fixed-height panel, so the panel just needs a shorter fixed
+     height on a narrower screen rather than eating a huge vertical slice. */
+  .ubc-office-scene { height: 440px !important; }
+  .ubc-door-panel { min-height: 380px !important; }
+
+  /* Careers hero: the "hire me" tag needs its own row under the copy once
+     there isn't room for a 220px column beside the headline and buttons. */
+  .ubc-careers-hero { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+
+  /* Any 3D model viewer / model-stage placeholder: the canvas's width shrinks
+     with its column on a narrower screen, but height and min-height are set
+     inline per caller (520/560), so without this the camera framing gets
+     progressively taller and more distorted instead of scaling down with it. */
+  .ubc-model-viewer { height: 420px !important; min-height: 420px !important; }
 }
 
 /* ---------- Header ----------
@@ -60,6 +79,11 @@
 
   /* Services accordion: drop the leading number gutter */
   .ubc-acc-row { padding-left: 0 !important; }
+
+  /* Same panels as the tablet tier above, trimmed further for a phone */
+  .ubc-office-scene { height: 340px !important; }
+  .ubc-door-panel { min-height: 300px !important; }
+  .ubc-model-viewer { height: 300px !important; min-height: 300px !important; }
 }
 
 /* ---------- Contact page ----------
@@ -131,10 +155,14 @@
 }
 
 /* ---------- Footer ----------
-   The footer link columns are a fixed multi-column grid that overruns a phone.
-   Like the header it comes from the bundle with no class names, so the inline
-   grid template is overridden by attribute selector. */
-@media (max-width: 640px) {
+   The footer link columns are a fixed 4-column grid (brand blurb + 3 link
+   lists). It doesn't overflow above 640px since it's all `fr` units, but the
+   3 link columns get uncomfortably narrow through the tablet range, so this
+   drops to 2 columns for the whole "tablet and below" band, same threshold
+   the rest of the site's grids use, not just phones. Like the header it comes
+   from the bundle with no class names, so the inline grid template is
+   overridden by attribute selector. */
+@media (max-width: 900px) {
   footer div[style*="grid-template-columns"] {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: var(--s-6) var(--s-5) !important;
