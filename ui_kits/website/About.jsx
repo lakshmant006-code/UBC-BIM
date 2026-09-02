@@ -37,7 +37,7 @@ function About() {
               }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Who we are</div>
                 <p style={{ fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', marginTop: 'var(--s-4)' }}>
-                  UBC BIM produces framing models and the documents built from them: wall and truss detailing, engineering, MEP coordination, permit sets, Bills of Materials and machine files. We work for builders, panel manufacturers and steel roll-formers in 11 countries.
+                  UBC BIM produces framing models and the documents built from them: wall and truss detailing, engineering, MEP coordination, permit sets, Bills of Materials and machine files. We work for builders, panel manufacturers and steel roll-formers in 12 countries.
                 </p>
                 <p style={{ fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', marginTop: 'var(--s-4)' }}>
                   Every drawing we issue comes out of one coordinated model, so a revision on the frame reaches the takeoff, the permit set and the machine file together. That is the whole reason clients hand us the model rather than a stack of separate deliverables.

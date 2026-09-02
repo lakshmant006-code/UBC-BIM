@@ -183,7 +183,7 @@ function bounceHandlers(ref) {
     if (!el || typeof window.anime !== 'function') return;
     if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     window.anime.remove(el);
-    window.anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)' });
+    window.anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)', complete: () => { el.style.scale = ''; } });
   };
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }

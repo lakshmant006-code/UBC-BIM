@@ -66,8 +66,9 @@ function Button({
   const bounce = (keyframes, duration) => {
     if (variant !== 'primary' || disabled || !elRef.current || typeof window.anime !== 'function') return;
     if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    window.anime.remove(elRef.current);
-    window.anime({ targets: elRef.current, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)' });
+    const el = elRef.current;
+    window.anime.remove(el);
+    window.anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)', complete: () => { el.style.scale = ''; } });
   };
   const skin = {
     primary: {
