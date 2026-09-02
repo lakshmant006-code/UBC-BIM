@@ -98,11 +98,13 @@ window.UBC_DATA = {
       ['Wall panel saw', 'Machine', 'Cut list · CSV']
     ]
   },
+  // Real figures, from ubcbim.com itself: 783 projects, 12 countries, 224
+  // clients, 73 team members.
   stats: [
-    { value: '340', label: 'Projects delivered' },
-    { value: '11', label: 'Countries served' },
-    { value: '3–5', label: 'Typical turnaround', unit: 'days' },
-    { value: '8–12', label: 'Models at launch' }
+    { value: '783', label: 'Projects completed' },
+    { value: '12', label: 'Countries served' },
+    { value: '224', label: 'Clients served' },
+    { value: '73', label: 'Team members' }
   ],
   roles: [
     { title: 'Wood frame BIM modeller', place: 'Remote', type: 'Full time' },

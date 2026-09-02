@@ -671,8 +671,8 @@ function GlobalPresence() {
     return () => { dead = true; io.disconnect(); cleanup(); };
   }, []);
 
-  const countries = D.stats.find((s) => s.label === 'Countries served') || { value: '11' };
-  const projects = D.stats.find((s) => s.label === 'Projects delivered') || { value: '340' };
+  const countries = D.stats.find((s) => s.label === 'Countries served') || { value: '12', label: 'Countries served' };
+  const projects = D.stats.find((s) => s.label === 'Projects completed') || { value: '783', label: 'Projects completed' };
 
   return (
     <Section sunken>
@@ -687,11 +687,11 @@ function GlobalPresence() {
             <div style={{ display: 'flex', gap: 'var(--s-7)', marginTop: 'var(--s-7)' }}>
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--fs-h1)', color: 'var(--text-strong)' }}><AnimatedNumber value={countries.value} /></div>
-                <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>Countries served</div>
+                <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>{countries.label}</div>
               </div>
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--fs-h1)', color: 'var(--text-strong)' }}><AnimatedNumber value={projects.value} /></div>
-                <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>Projects delivered</div>
+                <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>{projects.label}</div>
               </div>
             </div>
           </Reveal>
