@@ -18,7 +18,7 @@ function About() {
       </Page>
       <Section tight>
         <Page>
-          <div ref={ref} style={{ position: 'relative', background: 'var(--surface-inverse)', height: 560, overflow: 'hidden', borderRadius: 'var(--r-3)' }}>
+          <div ref={ref} className="ubc-office-scene" style={{ position: 'relative', background: 'var(--surface-inverse)', height: 560, overflow: 'hidden', borderRadius: 'var(--r-3)' }}>
             {/* room line work */}
             <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(245,244,241,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,244,241,.05) 1px, transparent 1px)', backgroundSize: 'var(--s-6) var(--s-6)' }} />
             {/* desk + window frame */}
@@ -60,7 +60,7 @@ function About() {
       </Section>
       <Section sunken tight>
         <Page>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)' }}>
+          <div className="ubc-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)' }}>
             {D.stats.map((s, i) => <Reveal key={s.label} delay={i * 70}><Stat value={<AnimatedNumber value={s.value} />} label={s.label} unit={s.unit} /></Reveal>)}
           </div>
         </Page>

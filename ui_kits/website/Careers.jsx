@@ -12,7 +12,7 @@ function Careers({ onQuote }) {
       </Page>
       <Section tight>
         <Page>
-          <div className="ubc-grid" style={{ border: 'var(--bw-hair) solid var(--border-subtle)', padding: 'var(--s-9) var(--s-7)', display: 'grid', gridTemplateColumns: '1fr auto', gap: 'var(--s-8)', alignItems: 'center' }}>
+          <div className="ubc-grid ubc-careers-hero" style={{ border: 'var(--bw-hair) solid var(--border-subtle)', padding: 'var(--s-9) var(--s-7)', display: 'grid', gridTemplateColumns: '1fr auto', gap: 'var(--s-8)', alignItems: 'center' }}>
             <div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-display-2)', fontWeight: 'var(--fw-bold)', letterSpacing: 'var(--ls-display)', lineHeight: 'var(--lh-tight)', color: 'var(--text-strong)' }}>
                 Let's BIM together
@@ -27,18 +27,18 @@ function Careers({ onQuote }) {
             </div>
             {/* wall hanging artifact */}
             <div onMouseEnter={() => setLit(true)} onMouseLeave={() => setLit(false)}
-              style={{ position: 'relative', width: 220, display: 'grid', justifyItems: 'center' }}>
+              style={{ position: 'relative', width: '100%', maxWidth: 220, display: 'grid', justifyItems: 'center', justifySelf: 'center' }}>
               <div style={{ width: 1, height: 48, background: 'var(--border-strong)' }} />
               <div style={{
                 background: lit ? 'var(--accent)' : 'var(--surface-inverse)',
                 color: lit ? 'var(--white)' : 'var(--paper)',
-                padding: 'var(--s-6) var(--s-5)', width: 200, textAlign: 'center',
+                padding: 'var(--s-6) var(--s-5)', width: '100%', maxWidth: 200, textAlign: 'center',
                 transform: lit ? 'rotate(-1.2deg)' : 'rotate(1.2deg)',
                 transition: 'transform var(--dur-4) var(--ease-out), background var(--dur-2) var(--ease-out)',
                 boxShadow: 'var(--shadow-3)'
               }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', opacity: .72 }}>Hire me</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 'var(--fw-bold)', letterSpacing: '-.03em', marginTop: 'var(--s-3)', lineHeight: 1.1 }}>UBC BIM</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 6vw, 26px)', fontWeight: 'var(--fw-bold)', letterSpacing: '-.03em', marginTop: 'var(--s-3)', lineHeight: 1.1 }}>UBC BIM</div>
                 <div style={{ height: 1, background: 'currentColor', opacity: .3, margin: 'var(--s-4) 0' }} />
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '.06em', opacity: .8 }}>Wood · LGS · MEP</div>
               </div>
@@ -52,11 +52,13 @@ function Careers({ onQuote }) {
           <div style={{ marginTop: 'var(--s-6)' }}>
             {D.roles.map((r, i) => (
               <Reveal key={r.title} delay={i * 60}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-5) 0', borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-5) 0', borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', color: 'var(--text-faint)', width: 28 }}>{String(i + 1).padStart(2, '0')}</span>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-strong)', flex: 1 }}>{r.title}</span>
-                  <Tag>{r.place}</Tag><Tag>{r.type}</Tag>
-                  <Button variant="ghost" size="sm" iconRight={<Icon name="arrow-right" size={16} />}>Apply</Button>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-strong)', flex: '1 1 200px', minWidth: 0 }}>{r.title}</span>
+                  <span style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-3)', alignItems: 'center' }}>
+                    <Tag>{r.place}</Tag><Tag>{r.type}</Tag>
+                    <Button variant="ghost" size="sm" iconRight={<Icon name="arrow-right" size={16} />}>Apply</Button>
+                  </span>
                 </div>
               </Reveal>
             ))}

@@ -29,7 +29,7 @@ function Contact({ onQuote }) {
         <Page>
           <div className="ubc-contact-grid" style={{ display: 'grid', gridTemplateColumns: '.85fr 1.15fr', gap: 'var(--s-8)', alignItems: 'start' }}>
             {/* door + bell */}
-            <div style={{ background: 'var(--surface-inverse)', borderRadius: 'var(--r-3)', padding: 'var(--s-7)', position: 'relative', minHeight: 520, overflow: 'hidden' }}>
+            <div className="ubc-door-panel" style={{ background: 'var(--surface-inverse)', borderRadius: 'var(--r-3)', padding: 'var(--s-7)', position: 'relative', minHeight: 520, overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(245,244,241,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,244,241,.05) 1px, transparent 1px)', backgroundSize: 'var(--s-6) var(--s-6)' }} />
               {/* door line work */}
               <div style={{ position: 'absolute', left: '18%', right: '18%', top: '12%', bottom: 0, border: '1.5px solid rgba(245,244,241,.4)', borderBottom: 'none' }}>
