@@ -217,7 +217,7 @@ function ProjectsGrid({ onGo }) {
                     grid, orbitable on the spot; never a photo standing in
                     for it. stopPropagation keeps a drag-to-orbit from also
                     firing the navigate-to-project click below. */}
-                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
+                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
                   onClick={(e) => { if (p.model) e.stopPropagation(); }}>
                   {p.model && window.ModelViewer ? (
                     <window.ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
