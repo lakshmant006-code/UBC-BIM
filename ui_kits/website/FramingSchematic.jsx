@@ -1,4 +1,4 @@
-/* Schematic framing line work — deliberately a diagram, not a render.
+/* Schematic framing line work: deliberately a diagram, not a render.
    Real UBC BIM model exports replace this. */
 const framingLine = (o) => ({ position: 'absolute', background: 'rgba(245,244,241,.42)', ...o });
 const framingActive = { background: 'var(--accent)' };

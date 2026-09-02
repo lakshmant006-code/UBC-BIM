@@ -1,8 +1,8 @@
 /*
-  ModelViewer — a live, orbitable 3D model. Drag to rotate, scroll or pinch to
+  ModelViewer: a live, orbitable 3D model. Drag to rotate, scroll or pinch to
   zoom, right-drag or two-finger drag to pan. This is the model itself on
   screen, not a photo of it: nowhere does this component sit behind a static
-  <img> — a caller either shows this or a plain "model pending" placeholder,
+  <img>. A caller either shows this or a plain "model pending" placeholder,
   never an image standing in for the real thing.
 
   The models are authored as IFC and converted once by tools/ifc_to_glb.py, so
@@ -12,8 +12,8 @@
 
   Mounting is lazy: nothing (not three.js, not the GLB) loads until the viewer
   scrolls near the viewport, so a grid of these costs nothing until the visitor
-  scrolls to it. Once mounted it stays mounted — re-loading the model every
-  time a card scrolls in and out would be worse than the cost of keeping it —
+  scrolls to it. Once mounted it stays mounted (re-loading the model every
+  time a card scrolls in and out would be worse than the cost of keeping it),
   but the render loop pauses while off-screen, so an unattended grid of
   viewers does not spend GPU time on cards nobody is looking at.
 
@@ -24,8 +24,8 @@
     height   stage height in px
     compact  smaller chrome for a grid thumbnail: no caption/hint row, a
              small always-visible "3D" tag instead, Reset view only on hover
-    onReady  called once with { flyTo({ center, radius, duration }), reset() }
-             — flyTo eases the camera to a new centre + framing radius (both
+    onReady  called once with { flyTo({ center, radius, duration }), reset() }:
+             flyTo eases the camera to a new centre + framing radius (both
              in the model's own transformed space, e.g. from a .views.json
              manifest); reset() is flyTo back to the whole model. A caller
              (the Services explorer) drives the camera from outside this way
@@ -156,7 +156,7 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // The render loop only spends GPU time while this viewer is actually on
-      // screen — a grid of live models must not keep rendering the ones the
+      // screen: a grid of live models must not keep rendering the ones the
       // visitor has scrolled past. Interaction still works instantly on
       // return: the scene and the loaded model are never torn down, only the
       // loop is paused, so nothing reloads.
@@ -197,7 +197,7 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
       }, () => { if (!dead) setState('error'); });
 
       // Same offset direction and scale the initial framing uses (so a reset
-      // lands exactly where the model opened) — every preset looks from the
+      // lands exactly where the model opened): every preset looks from the
       // same angle, so a cut from one part of the model to another reads as
       // a move within one place rather than a different camera altogether.
       const flyTo = (view) => {
@@ -234,7 +234,7 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
     return () => { dead = true; cleanup(); };
     // onReady deliberately left out: it is a fresh arrow function on every
     // parent render, and this effect is the one that stands up the WebGL
-    // context — including it would tear the viewer down and reload the GLB
+    // context. Including it would tear the viewer down and reload the GLB
     // on every unrelated re-render of the caller.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, src, radius]);

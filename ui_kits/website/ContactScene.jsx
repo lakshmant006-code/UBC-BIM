@@ -1,5 +1,5 @@
 /*
-  ContactScene — the welcome sequence at the top of the Contact page. Scroll
+  ContactScene: the welcome sequence at the top of the Contact page. Scroll
   SCRUBS a JPEG frame sequence on a canvas: a UBC BIM lead meets two visitors at
   the studio door, shakes hands, holds the door, and walks them into the office.
   Same mechanics as the home-page build sequence (canvas + preloader + frame
@@ -29,7 +29,7 @@ const CS_SEQ = CS ? ((CS_NARROW && CS.seqMobile) ? CS.seqMobile : CS.seq) : null
 // barely a quarter of a tall stage, so it takes a band at the top and the
 // caption sits beneath it on the stage's own dark ground.
 // 56.25vw is 16:9 at full width, so on a phone the canvas is exactly the size
-// of the frame drawn in it — no letterbox bands inside the element, and the
+// of the frame drawn in it: no letterbox bands inside the element, and the
 // overlays below can be offset from the same number.
 const MEDIA_BOX = CS_NARROW
   ? { position: 'absolute', left: 0, right: 0, top: 0, height: '56.25vw' }
@@ -192,7 +192,7 @@ function ContactScene({ onRoute, onQuote }) {
     return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', fit); if (ro) ro.disconnect(); };
   }, [count, reduce]);
 
-  // Nothing to scrub without a sequence — render nothing rather than an empty
+  // Nothing to scrub without a sequence: render nothing rather than an empty
   // black hole, so the Contact page still stands on its own.
   if (!CS_SEQ || missing) return null;
 
@@ -230,7 +230,7 @@ function ContactScene({ onRoute, onQuote }) {
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'rgba(245,244,241,.55)', marginBottom: 'var(--s-5)' }}>Contact us</div>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--paper)', margin: 0, maxWidth: '15ch' }}>
-            Come in — let’s talk about the project
+            Come in, let’s talk about the project
           </h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.72)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
             Scroll to walk in with us. Every route below lands in our CRM, tagged with where it came from, and gets an answer within one working day.

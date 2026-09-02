@@ -1,7 +1,7 @@
 /*
-  SceneHero — dark, cinematic hero. Scroll moves a live camera through the
+  SceneHero: dark, cinematic hero. Scroll moves a live camera through the
   camping resort steel frame (assets/models/camping-resort.glb, rendered with
-  three.js): as you scroll, the ANGLE changes — a wide aerial, along the
+  three.js): as you scroll, the ANGLE changes, from a wide aerial, along the
   column grid, up into the roof beams, in among the bays, out to a full
   reveal. This is the model rendered live, not a pre-shot video: there is no
   frame sequence, no <video> element, nothing to re-record if the model
@@ -10,15 +10,15 @@
   An intro headline shows first and fades out; then the STAGE captions + a
   numbered rail track the scroll, same as they did over the old frame
   sequence. Four glassmorphic info cards appear one per stage, each one
-  roughly a fifth of the scroll — the "flash card" pacing — and link
+  roughly a fifth of the scroll (the "flash card" pacing), and link
   somewhere real on the site.
 
-  Depends on loadThree() from ModelViewer.jsx (loaded first in index.html) —
+  Depends on loadThree() from ModelViewer.jsx (loaded first in index.html),
   shared across the page the same way Page/Section/Reveal from Home.jsx are,
   so three.js is fetched once regardless of how many scenes on the page use
   it.
 
-  Config: window.UBC_DATA.hero — model { src, radius }, stages
+  Config: window.UBC_DATA.hero: model { src, radius }, stages
   [{ n, t, title, note, pos: [x,y,z] }], cards [{ t0, t1, side, ... }].
 */
 const { Icon: HeroIcon } = window.UBCBIMDesignSystem_353af8;
@@ -28,7 +28,7 @@ const HERO_STAGES = HERO.stages || [];
 const HERO_CARDS = HERO.cards || [];
 
 // Glassmorphic info card, visible for one span of scroll progress rather than
-// one span of frames — otherwise identical to the walkthrough's card: one
+// one span of frames, otherwise identical to the walkthrough's card: one
 // action each, `go` (+ optional Projects filter) navigates, `quote` opens
 // the drawer.
 function HeroCard({ card, visible, onGo, onQuote }) {
@@ -103,7 +103,7 @@ function SceneHero({ onQuote, onGo }) {
   }, []);
 
   // Live three.js scene: camera position is a pure function of scroll
-  // progress, lerped between each stage's [x,y,z] — no OrbitControls, this
+  // progress, lerped between each stage's [x,y,z]. No OrbitControls: this
   // is a fly-through the visitor drives by scrolling, not by dragging.
   React.useEffect(() => {
     if (!M || typeof window.loadThree !== 'function') return;
@@ -163,7 +163,7 @@ function SceneHero({ onQuote, onGo }) {
       if (vio) vio.observe(host); else visibleRef.current = true;
 
       // Find which pair of stage keyframes the (eased) scroll position falls
-      // between, and how far along that pair — the same "index by t" search
+      // between, and how far along that pair: the same "index by t" search
       // the numbered rail uses, just interpolated instead of stepped.
       const cameraAt = (p) => {
         if (stagePos.length < 2) return stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
@@ -237,7 +237,7 @@ function SceneHero({ onQuote, onGo }) {
             afford to. */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(16,18,21,.58), rgba(16,18,21,.32) 22%, rgba(16,18,21,.32) 55%, rgba(16,18,21,.74))', pointerEvents: 'none' }} />
 
-        {/* Glassmorphic info cards — one per stage after the intro, each linking on */}
+        {/* Glassmorphic info cards, one per stage after the intro, each linking on */}
         {HERO_CARDS.map((c, i) => (
           <HeroCard key={i} card={c} visible={cardShown[i]} onGo={onGo} onQuote={onQuote} />
         ))}
@@ -249,14 +249,14 @@ function SceneHero({ onQuote, onGo }) {
             Framing models built right the first time
           </h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.72)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
-            Wall panels, roof and floor trusses, MEP coordination and permit sets — produced from one coordinated model, delivered as the machine files your line runs on.
+            One coordinated model. Wall panels, roof and floor trusses, MEP coordination and permit sets, delivered as the machine files your line runs on.
           </p>
           <button onClick={onQuote} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
             Start your project today <HeroIcon name="arrow-right" size={16} />
           </button>
         </div>
 
-        {/* Stage label (bottom-left) — active.term surfaces the one word this
+        {/* Stage label (bottom-left): active.term surfaces the one word this
             stage is teaching as a small pill, so it reads at a glance rather
             than requiring the whole note to be read to find it. */}
         <div className="ubc-stage-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '42ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
