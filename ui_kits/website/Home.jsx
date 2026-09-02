@@ -5,17 +5,55 @@ const Page = ({ children, style }) => <div style={{ maxWidth: 'var(--page-max)',
 const Section = ({ children, sunken, tight, style }) => (
   <section className="ubc-section" style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
 );
+// anime.js-driven entrance, in place of the old CSS opacity/translateY
+// transition: same shape (fade up 22px, once, on scroll into view) and the
+// same --ease-out curve and --dur-4 length as tokens/motion.css, just
+// choreographed in JS so multiple elements can stagger against each other
+// (see ServiceRow) rather than each firing its own isolated CSS transition.
 function Reveal({ children, delay = 0, style }) {
   const ref = React.useRef(null);
-  const [on, setOn] = React.useState(false);
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   React.useEffect(() => {
     const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.15 });
-    io.observe(el); return () => io.disconnect();
+    if (reduceMotion || typeof window.anime !== 'function') { el.style.opacity = 1; el.style.transform = 'none'; return; }
+    const io = new IntersectionObserver((e) => {
+      if (!e[0].isIntersecting) return;
+      io.disconnect();
+      window.anime({ targets: el, opacity: [0, 1], translateY: [22, 0], duration: 620, delay, easing: 'cubicBezier(.16,1,.3,1)' });
+    }, { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
-  return <div ref={ref} style={{ opacity: on ? 1 : 0, transform: on ? 'none' : 'translateY(22px)', transition: 'opacity var(--dur-4) var(--ease-out) ' + delay + 'ms, transform var(--dur-4) var(--ease-out) ' + delay + 'ms', ...style }}>{children}</div>;
+  return <div ref={ref} style={{ opacity: reduceMotion ? 1 : 0, ...style }}>{children}</div>;
 }
-Object.assign(window, { Page, Section, Reveal });
+// Counts every number embedded in `value` up from zero once it scrolls into
+// view, keeping any surrounding characters (an en dash in a range like
+// "3–5", a unit) exactly where they are. Zero-pads the "before" state to the
+// same digit width so nothing reflows when the digits fill in.
+function AnimatedNumber({ value }) {
+  const ref = React.useRef(null);
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  React.useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const nums = String(value).match(/\d+/g);
+    if (reduceMotion || typeof window.anime !== 'function' || !nums) { el.textContent = value; return; }
+    el.textContent = value.replace(/\d+/g, (m) => '0'.repeat(m.length));
+    const io = new IntersectionObserver((e) => {
+      if (!e[0].isIntersecting) return;
+      io.disconnect();
+      const counters = nums.map(() => ({ v: 0 }));
+      window.anime({
+        targets: counters, v: (t, i) => Number(nums[i]), round: 1, duration: 1300, delay: 150,
+        easing: 'cubicBezier(.16,1,.3,1)',
+        update: () => { let i = 0; el.textContent = value.replace(/\d+/g, () => String(counters[i++].v)); }
+      });
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <span ref={ref}>{value}</span>;
+}
+Object.assign(window, { Page, Section, Reveal, AnimatedNumber });
 
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
@@ -241,6 +279,76 @@ function ProjectsGrid({ onGo }) {
   );
 }
 
+// One row of the services accordion. The expand/collapse is a real measured
+// height (anime.js animates 0 -> el.scrollHeight, not a fixed max-height
+// guess), so the body text, tag row and chip row (however many lines that
+// turns out to be) always animate open cleanly instead of clipping early or
+// leaving dead space. Opening also staggers those three pieces in (each
+// carries the .ubc-acc-item class), so the row reads as assembling rather
+// than a panel that was already there sliding into place.
+function ServiceRow({ s, isOpen, onToggle, manifest, activeChip, openChip }) {
+  const panelRef = React.useRef(null);
+  const panelId = 'svc-panel-' + s.n;
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  React.useEffect(() => {
+    const el = panelRef.current; if (!el) return;
+    if (reduceMotion || typeof window.anime !== 'function') {
+      el.style.height = isOpen ? 'auto' : '0px';
+      return;
+    }
+    window.anime.remove(el);
+    window.anime({
+      targets: el, height: isOpen ? el.scrollHeight : 0, duration: 340, easing: 'cubicBezier(.16,1,.3,1)',
+      complete: () => { if (isOpen) el.style.height = 'auto'; }
+    });
+    if (isOpen) {
+      const items = el.querySelectorAll('.ubc-acc-item');
+      window.anime.remove(items);
+      window.anime({
+        targets: items, opacity: [0, 1], translateY: [10, 0], duration: 380,
+        delay: window.anime.stagger(60, { start: 140 }), easing: 'cubicBezier(.16,1,.3,1)'
+      });
+    }
+  }, [isOpen]);
+
+  return (
+    <div style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <button onClick={onToggle} aria-expanded={isOpen} aria-controls={panelId}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
+        <span style={{ ...serifH, fontSize: 'clamp(20px, 2.1vw, 28px)', flex: 1 }}>{s.title}</span>
+        <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
+      </button>
+      <div ref={panelRef} id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', height: 0 }}>
+        <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
+          <p className="ubc-acc-item" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
+          <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
+          {s.chips && (
+            <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
+              {s.chips.map((c) => {
+                const has = manifest && manifest.byType && manifest.byType[c.class];
+                const on = activeChip === c.class;
+                return (
+                  <button key={c.class} onClick={() => openChip(c)} disabled={!has} aria-pressed={on}
+                    style={{
+                      fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase',
+                      padding: '7px 12px', borderRadius: 'var(--r-pill)', cursor: has ? 'pointer' : 'default',
+                      background: on ? 'var(--ink)' : 'var(--surface-card)', color: on ? 'var(--paper)' : (has ? 'var(--text-strong)' : 'var(--text-faint)'),
+                      border: 'var(--bw-1) solid ' + (on ? 'var(--ink)' : 'var(--border-strong)'), opacity: has ? 1 : 0.5
+                    }}>
+                    {c.label}{on ? ' · shown' : ''}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // WHAT WE DELIVER: the services accordion paired with a live model of the
 // hub project (window.UBC_DATA.servicesModel). Opening a service flies the
 // camera to the real part of that real model the service describes (the
@@ -334,45 +442,10 @@ function ServicesExplorer({ onQuote }) {
 
         <div className="ubc-svc-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-9)', alignItems: 'start' }}>
           <div style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-            {D.services.map((s, i) => {
-              const isOpen = open === i;
-              const panelId = 'svc-panel-' + s.n;
-              return (
-                <div key={s.n} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                  <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen} aria-controls={panelId}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
-                    <span style={{ ...serifH, fontSize: 'clamp(20px, 2.1vw, 28px)', flex: 1 }}>{s.title}</span>
-                    <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
-                  </button>
-                  <div id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', maxHeight: isOpen ? 220 : 0, transition: 'max-height var(--dur-3) var(--ease-out)' }}>
-                    <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
-                      <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
-                      {isOpen && s.chips && (
-                        <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
-                          {s.chips.map((c) => {
-                            const has = manifest && manifest.byType && manifest.byType[c.class];
-                            const on = activeChip === c.class;
-                            return (
-                              <button key={c.class} onClick={() => openChip(c)} disabled={!has} aria-pressed={on}
-                                style={{
-                                  fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase',
-                                  padding: '7px 12px', borderRadius: 'var(--r-pill)', cursor: has ? 'pointer' : 'default',
-                                  background: on ? 'var(--ink)' : 'var(--surface-card)', color: on ? 'var(--paper)' : (has ? 'var(--text-strong)' : 'var(--text-faint)'),
-                                  border: 'var(--bw-1) solid ' + (on ? 'var(--ink)' : 'var(--border-strong)'), opacity: has ? 1 : 0.5
-                                }}>
-                                {c.label}{on ? ' · shown' : ''}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {D.services.map((s, i) => (
+              <ServiceRow key={s.n} s={s} isOpen={open === i} onToggle={() => setOpen(open === i ? -1 : i)}
+                manifest={manifest} activeChip={activeChip} openChip={openChip} />
+            ))}
           </div>
 
           {/* Live model, sticky on desktop so it stays in view as the visitor

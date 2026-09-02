@@ -171,6 +171,23 @@ function makeGroundShadow(THREE, R) {
   return ground;
 }
 
+// The same hover-pop/press-squash the design system's primary Button variant
+// gets (see components/core/Button.jsx in _ds_bundle.js), for the two
+// hand-rolled hero/Contact-scene CTAs that can't use that component (they're
+// laid out over a 3D canvas, not a normal page flow). Animates the
+// standalone CSS `scale` property rather than `transform`, so it never
+// collides with React's own inline style writes on every re-render.
+function bounceHandlers(ref) {
+  const play = (keyframes, duration) => {
+    const el = ref.current;
+    if (!el || typeof window.anime !== 'function') return;
+    if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.anime.remove(el);
+    window.anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)' });
+  };
+  return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
+}
+
 function ModelViewer({ src, radius, title, height, compact, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);

@@ -49,10 +49,11 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="motion" enforce="strong">
-  <do>Long, slow, single-axis. --ease-out for entrances; --dur-4 for reveals; --dur-cine for the three signature moves (framing layers assembling, curtain descending, bell ring). Reveals are opacity plus a 16-24px upward translate, staggered 60-90ms, fired once.</do>
+  <do>Long, slow, single-axis. --ease-out for entrances; --dur-4 for reveals; --dur-cine for the three signature moves (framing layers assembling, curtain descending, bell ring). Reveals are opacity plus a 16-24px upward translate, staggered 60-90ms, fired once. Reveals, the services accordion's expand/collapse and the About page's stat counters run on anime.js rather than CSS transitions now, but keep the same shape and the same --ease-out curve (as a cubic-bezier easing string) and --dur-4 length: the library changed, not the motion language.</do>
   <dont>No springs, no bounce, no overshoot, no scale-up hovers, no looping ambient animation, and no carousels.</dont>
-  <why>"Cinematic" here means camera-like: one deliberate move at a time. The brief explicitly wants purposeful motion rather than carousels. Bounce reads as playful, which contradicts the engineering register.</why>
-  <accessibility>prefers-reduced-motion collapses --dur-3/4/cine to 0 and renders layers in final position.</accessibility>
+  <exception>The primary Button variant (and only that variant: never secondary, ghost or inverse) gets a scale hover-pop and press-squash on an elastic easing, animating a standalone CSS `scale` rather than `transform` so it never fights React's own style writes. Reserved for the one primary action per view, the same way --accent is reserved as the one red moment: everywhere else stays on the flat --t-hover transition this rule otherwise requires.</exception>
+  <why>"Cinematic" here means camera-like: one deliberate move at a time. The brief explicitly wants purposeful motion rather than carousels. Bounce reads as playful, which contradicts the engineering register outside the one place (the primary call to action) where a little delight earns its keep rather than undermining it.</why>
+  <accessibility>prefers-reduced-motion collapses --dur-3/4/cine to 0 and renders layers in final position; the anime.js-driven reveals, counters, accordion and button bounce all check prefers-reduced-motion in JS and skip straight to the end state.</accessibility>
 </rule>
 
 <rule id="states" enforce="strong">

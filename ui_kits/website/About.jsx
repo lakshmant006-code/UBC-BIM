@@ -61,7 +61,7 @@ function About() {
       <Section sunken tight>
         <Page>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)' }}>
-            {D.stats.map((s, i) => <Reveal key={s.label} delay={i * 70}><Stat value={s.value} label={s.label} unit={s.unit} /></Reveal>)}
+            {D.stats.map((s, i) => <Reveal key={s.label} delay={i * 70}><Stat value={<AnimatedNumber value={s.value} />} label={s.label} unit={s.unit} /></Reveal>)}
           </div>
         </Page>
       </Section>

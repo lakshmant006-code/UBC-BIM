@@ -57,6 +57,18 @@ function Button({
 }) {
   const [h, setH] = React.useState(false);
   const [p, setP] = React.useState(false);
+  const elRef = React.useRef(null);
+  // The one deliberately springy interaction on the site, reserved for the
+  // primary action the same way --accent is reserved as the one red moment
+  // per viewport: a hover pop and a press squash, both settling on an
+  // elastic overshoot rather than easing flat. Every other variant stays on
+  // the plain --t-hover colour/position transition.
+  const bounce = (keyframes, duration) => {
+    if (variant !== 'primary' || disabled || !elRef.current || typeof window.anime !== 'function') return;
+    if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.anime.remove(elRef.current);
+    window.anime({ targets: elRef.current, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)' });
+  };
   const skin = {
     primary: {
       background: p ? 'var(--accent-press)' : 'var(--accent)',
@@ -107,12 +119,13 @@ function Button({
     onClick: disabled ? undefined : onClick,
     disabled: Tag === 'button' ? disabled : undefined,
     "aria-disabled": disabled || undefined,
-    onMouseEnter: () => setH(true),
+    ref: elRef,
+    onMouseEnter: () => { setH(true); bounce([1, 1.06, 1], 520); },
     onMouseLeave: () => {
       setH(false);
       setP(false);
     },
-    onMouseDown: () => setP(true),
+    onMouseDown: () => { setP(true); bounce([1, 0.92, 1], 420); },
     onMouseUp: () => setP(false),
     style: s
   }), icon, children, iconRight);
