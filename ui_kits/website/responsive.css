@@ -10,6 +10,9 @@
   /* Compare systems: side-by-side columns -> stacked, writing above the slider */
   .ubc-compare-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
 
+  /* Global presence: side-by-side columns -> stacked, writing above the globe */
+  .ubc-globe-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
+
   /* Build-sequence hero: keep the stage caption clear of the numbered rail */
   .ubc-stage-label { max-width: 62vw !important; }
 

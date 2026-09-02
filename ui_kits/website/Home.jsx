@@ -19,7 +19,15 @@ function Reveal({ children, delay = 0, style }) {
     const io = new IntersectionObserver((e) => {
       if (!e[0].isIntersecting) return;
       io.disconnect();
-      window.anime({ targets: el, opacity: [0, 1], translateY: [22, 0], duration: 620, delay, easing: 'cubicBezier(.16,1,.3,1)' });
+      window.anime({
+        targets: el, opacity: [0, 1], translateY: [22, 0], duration: 620, delay, easing: 'cubicBezier(.16,1,.3,1)',
+        // Every section on the page goes through this component, so a
+        // starved tween (heavy concurrent 3D render eating its rAF ticks)
+        // leaving content stuck invisible is the worst version of this bug
+        // on the whole site; force the resting state once complete fires
+        // regardless of what update() managed to apply.
+        complete: () => { el.style.opacity = 1; el.style.transform = 'none'; }
+      });
     }, { threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
@@ -45,7 +53,13 @@ function AnimatedNumber({ value }) {
       window.anime({
         targets: counters, v: (t, i) => Number(nums[i]), round: 1, duration: 1300, delay: 150,
         easing: 'cubicBezier(.16,1,.3,1)',
-        update: () => { let i = 0; el.textContent = value.replace(/\d+/g, () => String(counters[i++].v)); }
+        update: () => { let i = 0; el.textContent = value.replace(/\d+/g, () => String(counters[i++].v)); },
+        // A heavy concurrent render (a 3D scene animating in the same
+        // viewport) can starve this tween's own rAF ticks badly enough on a
+        // slow device that update() never gets a chance to run before
+        // complete fires; forcing the real string here guarantees the
+        // count-up never gets stuck on its zero-padded starting state.
+        complete: () => { el.textContent = value; }
       });
     }, { threshold: 0.4 });
     io.observe(el);
@@ -307,7 +321,8 @@ function ServiceRow({ s, isOpen, onToggle, manifest, activeChip, openChip }) {
       window.anime.remove(items);
       window.anime({
         targets: items, opacity: [0, 1], translateY: [10, 0], duration: 380,
-        delay: window.anime.stagger(60, { start: 140 }), easing: 'cubicBezier(.16,1,.3,1)'
+        delay: window.anime.stagger(60, { start: 140 }), easing: 'cubicBezier(.16,1,.3,1)',
+        complete: () => { items.forEach((it) => { it.style.opacity = 1; it.style.transform = 'none'; }); }
       });
     }
   }, [isOpen]);
@@ -524,6 +539,247 @@ function ServicesExplorer({ onQuote }) {
   );
 }
 
+// lat/lng -> a point on a sphere of radius r. Plain {x,y,z}, not a
+// THREE.Vector3, since this runs at module load before loadThree() resolves
+// and three.js isn't in scope yet; BufferGeometry.setFromPoints and manual
+// position-array writes both only need the three numeric properties.
+function sphPoint(r, lat, lng) {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lng + 180) * (Math.PI / 180);
+  return {
+    x: -r * Math.sin(phi) * Math.cos(theta),
+    y: r * Math.cos(phi),
+    z: r * Math.sin(phi) * Math.sin(theta)
+  };
+}
+
+// GLOBAL PRESENCE: a lat/lng graticule plus a real coastline point cloud
+// (Natural Earth 110m land polygons, sampled to a 2.2deg grid and filtered
+// to points that actually fall on land — not invented dots), paired with
+// the same countries/projects figures already on the About page stats.
+// Drag to look around, same as the model viewers; no auto-rotate, matching
+// the "no looping ambient animation" motion rule.
+function GlobalPresence() {
+  const hostRef = React.useRef(null);
+  const wrapRef = React.useRef(null);
+  const [ready, setReady] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window.loadThree !== 'function') return;
+    let dead = false;
+    let cleanup = () => {};
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
+    const io = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      io.disconnect();
+
+      Promise.all([window.loadThree(), fetch('assets/data/land-points.json').then((r) => r.json())]).then(([THREE, points]) => {
+        if (dead) return;
+        const host = hostRef.current;
+        if (!host) return;
+
+        const scene = new THREE.Scene();
+        const R = 2;
+        const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 20);
+        camera.position.set(0, 0.55, 5.2);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        host.appendChild(renderer.domElement);
+        renderer.domElement.style.display = 'block';
+        renderer.domElement.style.touchAction = 'none';
+
+        // Lat/lng graticule: the same hairline-grid language the rest of the
+        // site uses for structure, standing in here for the globe's surface.
+        const graticule = new THREE.Group();
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xd6d2c9, transparent: true, opacity: 0.9 });
+        const lineGeos = [];
+        for (let lat = -60; lat <= 60; lat += 30) {
+          const pts = [];
+          for (let lng = 0; lng <= 360; lng += 4) pts.push(sphPoint(R, lat, lng - 180));
+          const g = new THREE.BufferGeometry().setFromPoints(pts);
+          lineGeos.push(g);
+          graticule.add(new THREE.LineLoop(g, lineMat));
+        }
+        for (let lng = -180; lng < 180; lng += 30) {
+          const pts = [];
+          for (let lat = -90; lat <= 90; lat += 4) pts.push(sphPoint(R, lat, lng));
+          const g = new THREE.BufferGeometry().setFromPoints(pts);
+          lineGeos.push(g);
+          graticule.add(new THREE.Line(g, lineMat));
+        }
+        scene.add(graticule);
+
+        // Real land points, lifted just off the graticule sphere so they
+        // don't z-fight with it.
+        const positions = new Float32Array(points.length * 3);
+        points.forEach(([lat, lng], i) => {
+          const p = sphPoint(R * 1.006, lat, lng);
+          positions[i * 3] = p.x; positions[i * 3 + 1] = p.y; positions[i * 3 + 2] = p.z;
+        });
+        const dotGeo = new THREE.BufferGeometry();
+        dotGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const dotMat = new THREE.PointsMaterial({ color: 0x17295c, size: 0.045, sizeAttenuation: true });
+        const dots = new THREE.Points(dotGeo, dotMat);
+        scene.add(dots);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.minPolarAngle = Math.PI * 0.28;
+        controls.maxPolarAngle = Math.PI * 0.72;
+
+        const fit = () => {
+          const w = host.clientWidth, h = host.clientHeight;
+          if (!w || !h) return;
+          renderer.setSize(w, h, false);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+        };
+        fit();
+        const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
+        if (ro) ro.observe(host);
+        window.addEventListener('resize', fit);
+
+        let raf = 0;
+        const tick = () => { controls.update(); renderer.render(scene, camera); raf = requestAnimationFrame(tick); };
+        raf = requestAnimationFrame(tick);
+
+        setReady(true);
+
+        cleanup = () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener('resize', fit);
+          if (ro) ro.disconnect();
+          controls.dispose();
+          dotGeo.dispose();
+          dotMat.dispose();
+          lineGeos.forEach((g) => g.dispose());
+          lineMat.dispose();
+          renderer.dispose();
+          if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+        };
+      });
+    }, { threshold: 0.2, rootMargin: '200px 0px' });
+    io.observe(wrap);
+
+    return () => { dead = true; io.disconnect(); cleanup(); };
+  }, []);
+
+  const countries = D.stats.find((s) => s.label === 'Countries served') || { value: '11' };
+  const projects = D.stats.find((s) => s.label === 'Projects delivered') || { value: '340' };
+
+  return (
+    <Section sunken>
+      <Page>
+        <div className="ubc-globe-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 'var(--s-9)', alignItems: 'center' }}>
+          <Reveal>
+            <div style={{ ...eyebrow, display: 'inline-block' }}>Global reach</div>
+            <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>The same process, wherever the drawing ships</h2>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0', maxWidth: '46ch' }}>
+              One coordinated model and one workflow, run the same way for builders across {countries.value} countries.
+            </p>
+            <div style={{ display: 'flex', gap: 'var(--s-7)', marginTop: 'var(--s-7)' }}>
+              <div>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--fs-h1)', color: 'var(--text-strong)' }}><AnimatedNumber value={countries.value} /></div>
+                <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>Countries served</div>
+              </div>
+              <div>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--fs-h1)', color: 'var(--text-strong)' }}><AnimatedNumber value={projects.value} /></div>
+                <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>Projects delivered</div>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
+            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto' }}>
+              <div ref={hostRef} style={{ position: 'absolute', inset: 0, cursor: 'grab' }} />
+              {!ready && (
+                <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Loading</span>
+                </div>
+              )}
+            </div>
+          </Reveal>
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// Placeholder testimonials in the brand voice, describing the real service
+// (panel layouts, coordinated models, turnaround) without inventing named
+// people or companies: replace with real client quotes and attribution when
+// they're in hand. A manually-navigated card, not an autoplaying slideshow —
+// nothing advances on its own, only on a click, so it stays "purposeful
+// motion" rather than the ambient carousel loop the motion rule bans.
+const TESTIMONIALS = [
+  { quote: 'They turned our IFC model into shop-ready panel layouts in days, not weeks. The machine files were exactly what our line needed, first pass.', name: 'Panel fabricator', role: 'Light-gauge steel' },
+  { quote: 'We hand over a plan set and get back a coordinated model with the clashes already resolved. That alone has saved us weeks on every project since.', name: 'Project manager', role: 'Residential builder' },
+  { quote: 'What they quote is what we get. The drawings match the model down to the bolt, every time.', name: 'Estimator', role: 'Commercial contractor' }
+];
+function Testimonials() {
+  const [i, setI] = React.useState(0);
+  const cardRef = React.useRef(null);
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const go = (dir) => {
+    const n = TESTIMONIALS.length;
+    const next = (i + dir + n) % n;
+    setI(next);
+    const el = cardRef.current;
+    if (el && !reduceMotion && typeof window.anime === 'function') {
+      window.anime.remove(el);
+      window.anime({
+        targets: el, translateX: [dir * 18, 0], opacity: [0, 1], duration: 420, easing: 'cubicBezier(.16,1,.3,1)',
+        complete: () => { el.style.opacity = 1; el.style.transform = 'none'; }
+      });
+    }
+  };
+
+  const t = TESTIMONIALS[i];
+  return (
+    <Section>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>Client feedback</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>What builders say once the model lands</h2>
+        </Reveal>
+        <div style={{ position: 'relative', maxWidth: 680, margin: 'var(--s-9) auto 0' }}>
+          <div ref={cardRef} style={{ background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-4)', boxShadow: 'var(--shadow-1)', padding: 'var(--s-8)' }}>
+            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(19px, 2.2vw, 24px)', lineHeight: 1.4, color: 'var(--text-strong)', margin: 0 }}>“{t.quote}”</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-4)', marginTop: 'var(--s-6)' }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--ubc-navy-tint)', color: 'var(--ubc-navy)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700, flexShrink: 0 }}>{t.name.charAt(0)}</div>
+              <div>
+                <div style={{ fontFamily: 'var(--font-body)', fontWeight: 600, color: 'var(--text-strong)' }}>{t.name}</div>
+                <div style={{ ...eyebrow }}>{t.role}</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--s-5)', marginTop: 'var(--s-6)' }}>
+            <button onClick={() => go(-1)} aria-label="Previous testimonial" style={{ width: 36, height: 36, display: 'grid', placeItems: 'center', borderRadius: 'var(--r-pill)', border: 'var(--bw-1) solid var(--border-strong)', background: 'var(--surface-card)', cursor: 'pointer', color: 'var(--text-strong)' }}>
+              <Icon name="arrow-left" size={16} />
+            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {TESTIMONIALS.map((_, idx) => (
+                <button key={idx} onClick={() => setI(idx)} aria-label={'Show testimonial ' + (idx + 1)} aria-current={idx === i}
+                  style={{ width: idx === i ? 22 : 8, height: 8, borderRadius: 999, border: 'none', background: idx === i ? 'var(--accent)' : 'var(--border-strong)', cursor: 'pointer', transition: 'width var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out)' }} />
+              ))}
+            </div>
+            <button onClick={() => go(1)} aria-label="Next testimonial" style={{ width: 36, height: 36, display: 'grid', placeItems: 'center', borderRadius: 'var(--r-pill)', border: 'var(--bw-1) solid var(--border-strong)', background: 'var(--surface-card)', cursor: 'pointer', color: 'var(--text-strong)' }}>
+              <Icon name="arrow-right" size={16} />
+            </button>
+          </div>
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
 function Home({ onGo, onQuote }) {
   const SceneHero = window.SceneHero;
   return (
@@ -533,6 +789,8 @@ function Home({ onGo, onQuote }) {
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
       <ServicesExplorer onQuote={onQuote} />
+      <GlobalPresence />
+      <Testimonials />
     </div>
   );
 }
