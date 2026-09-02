@@ -8,7 +8,7 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
   <do>Light. Page background is --paper (#F5F4F1), a warm off-white. Ink is --ink (#101215), never pure black.</do>
   <dont>Do not build a dark-themed page, a dark hero, or a dark "premium" section. Do not use pure #FFF as a page background.</dont>
   <why>The brief posed dark-vs-light as an open decision (section 5) and the client chose light. Pure white flattens the paper metaphor; pure black is heavier than drafting ink.</why>
-  <exception>--surface-inverse is allowed for the model stage and the About curtain reveal, at most once per page.</exception>
+  <exception>--surface-inverse is allowed for the About curtain reveal, at most once per page. The 3D model stages (Projects, Services explorer, the landing hero, the Contact welcome scene) moved off this exception to a white studio backdrop, so a real steel material actually reads as steel rather than as a silhouette against black; see the imagery rule.</exception>
 </rule>
 
 <rule id="accent-scarcity" enforce="absolute">
@@ -49,10 +49,11 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="motion" enforce="strong">
-  <do>Long, slow, single-axis. --ease-out for entrances; --dur-4 for reveals; --dur-cine for the three signature moves (framing layers assembling, curtain descending, bell ring). Reveals are opacity plus a 16-24px upward translate, staggered 60-90ms, fired once.</do>
+  <do>Long, slow, single-axis. --ease-out for entrances; --dur-4 for reveals; --dur-cine for the three signature moves (framing layers assembling, curtain descending, bell ring). Reveals are opacity plus a 16-24px upward translate, staggered 60-90ms, fired once. Reveals, the services accordion's expand/collapse and the About page's stat counters run on anime.js rather than CSS transitions now, but keep the same shape and the same --ease-out curve (as a cubic-bezier easing string) and --dur-4 length: the library changed, not the motion language.</do>
   <dont>No springs, no bounce, no overshoot, no scale-up hovers, no looping ambient animation, and no carousels.</dont>
-  <why>"Cinematic" here means camera-like: one deliberate move at a time. The brief explicitly wants purposeful motion rather than carousels. Bounce reads as playful, which contradicts the engineering register.</why>
-  <accessibility>prefers-reduced-motion collapses --dur-3/4/cine to 0 and renders layers in final position.</accessibility>
+  <exception>The primary Button variant (and only that variant: never secondary, ghost or inverse) gets a scale hover-pop and press-squash on an elastic easing, animating a standalone CSS `scale` rather than `transform` so it never fights React's own style writes. Reserved for the one primary action per view, the same way --accent is reserved as the one red moment: everywhere else stays on the flat --t-hover transition this rule otherwise requires.</exception>
+  <why>"Cinematic" here means camera-like: one deliberate move at a time. The brief explicitly wants purposeful motion rather than carousels. Bounce reads as playful, which contradicts the engineering register outside the one place (the primary call to action) where a little delight earns its keep rather than undermining it.</why>
+  <accessibility>prefers-reduced-motion collapses --dur-3/4/cine to 0 and renders layers in final position; the anime.js-driven reveals, counters, accordion and button bounce all check prefers-reduced-motion in JS and skip straight to the end state.</accessibility>
 </rule>
 
 <rule id="states" enforce="strong">
@@ -62,9 +63,9 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="imagery" enforce="absolute">
-  <do>Real UBC BIM 3D models and renders, cool and desaturated, with red only on the element under discussion. Until real assets exist, use labelled placeholders that say what belongs there.</do>
+  <do>Real UBC BIM 3D models and renders, cool and desaturated, with red only on the element under discussion. Every live model stage (Projects, Services explorer, the landing hero, the Contact welcome scene) sits on a white studio backdrop (--paper), not black: a PMREM-baked studio reflection environment plus ACES tone mapping so steel reads as metal, and any element the source IFC exported in a bright safety-yellow visualization colour is recoloured a real mill-steel grey rather than shown as-authored. The model rests on a real shadow-mapped floor, not a drafting grid: a soft contact shadow under the structure, the way a photographed model on a studio table casts one. Until real assets exist, use labelled placeholders that say what belongs there.</do>
   <dont>No stock photography. No AI-generated imagery. No hand-drawn SVG illustration standing in for a render. No noise, grain or texture overlays.</dont>
-  <why>The brief names stock photos as a current weakness and asks for real models instead. A fake illustration is worse than an honest empty slot because it ships into production unnoticed.</why>
+  <why>The brief names stock photos as a current weakness and asks for real models instead. A fake illustration is worse than an honest empty slot because it ships into production unnoticed. The white backdrop and steel recolour are themselves a step toward accuracy, not decoration: a safety-yellow visualization default is a software artifact, not the material, and a black stage hides more of a photorealistic render than it flatters.</why>
 </rule>
 
 <rule id="logo" enforce="absolute">

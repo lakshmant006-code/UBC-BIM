@@ -5,24 +5,62 @@ const Page = ({ children, style }) => <div style={{ maxWidth: 'var(--page-max)',
 const Section = ({ children, sunken, tight, style }) => (
   <section className="ubc-section" style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
 );
+// anime.js-driven entrance, in place of the old CSS opacity/translateY
+// transition: same shape (fade up 22px, once, on scroll into view) and the
+// same --ease-out curve and --dur-4 length as tokens/motion.css, just
+// choreographed in JS so multiple elements can stagger against each other
+// (see ServiceRow) rather than each firing its own isolated CSS transition.
 function Reveal({ children, delay = 0, style }) {
   const ref = React.useRef(null);
-  const [on, setOn] = React.useState(false);
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   React.useEffect(() => {
     const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.15 });
-    io.observe(el); return () => io.disconnect();
+    if (reduceMotion || typeof window.anime !== 'function') { el.style.opacity = 1; el.style.transform = 'none'; return; }
+    const io = new IntersectionObserver((e) => {
+      if (!e[0].isIntersecting) return;
+      io.disconnect();
+      window.anime({ targets: el, opacity: [0, 1], translateY: [22, 0], duration: 620, delay, easing: 'cubicBezier(.16,1,.3,1)' });
+    }, { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
-  return <div ref={ref} style={{ opacity: on ? 1 : 0, transform: on ? 'none' : 'translateY(22px)', transition: 'opacity var(--dur-4) var(--ease-out) ' + delay + 'ms, transform var(--dur-4) var(--ease-out) ' + delay + 'ms', ...style }}>{children}</div>;
+  return <div ref={ref} style={{ opacity: reduceMotion ? 1 : 0, ...style }}>{children}</div>;
 }
-Object.assign(window, { Page, Section, Reveal });
+// Counts every number embedded in `value` up from zero once it scrolls into
+// view, keeping any surrounding characters (an en dash in a range like
+// "3–5", a unit) exactly where they are. Zero-pads the "before" state to the
+// same digit width so nothing reflows when the digits fill in.
+function AnimatedNumber({ value }) {
+  const ref = React.useRef(null);
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  React.useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const nums = String(value).match(/\d+/g);
+    if (reduceMotion || typeof window.anime !== 'function' || !nums) { el.textContent = value; return; }
+    el.textContent = value.replace(/\d+/g, (m) => '0'.repeat(m.length));
+    const io = new IntersectionObserver((e) => {
+      if (!e[0].isIntersecting) return;
+      io.disconnect();
+      const counters = nums.map(() => ({ v: 0 }));
+      window.anime({
+        targets: counters, v: (t, i) => Number(nums[i]), round: 1, duration: 1300, delay: 150,
+        easing: 'cubicBezier(.16,1,.3,1)',
+        update: () => { let i = 0; el.textContent = value.replace(/\d+/g, () => String(counters[i++].v)); }
+      });
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <span ref={ref}>{value}</span>;
+}
+Object.assign(window, { Page, Section, Reveal, AnimatedNumber });
 
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
 
 // Plain-English labels for the IFC classes worth naming in the Bill of
-// Materials card. Whatever the hub model actually contains — a wall-and-MEP
-// renovation, a column-and-beam steel frame, anything else — the card reads
+// Materials card. Whatever the hub model actually contains (a wall-and-MEP
+// renovation, a column-and-beam steel frame, anything else), the card reads
 // off manifest.byClass directly rather than a list tied to one specific
 // model, so swapping window.UBC_DATA.servicesModel never leaves it empty.
 const IFC_CLASS_LABEL = {
@@ -36,13 +74,13 @@ const IFC_CLASS_LABEL = {
 function bomRows(manifest) {
   if (!manifest || !manifest.byClass) return [];
   return Object.entries(manifest.byClass)
-    .filter(([cls]) => IFC_CLASS_LABEL[cls])   // skip proxies, spaces, openings — not a BOM line
+    .filter(([cls]) => IFC_CLASS_LABEL[cls])   // skip proxies, spaces, openings: not a BOM line
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 6)
     .map(([cls, v]) => [IFC_CLASS_LABEL[cls], v.count]);
 }
 
-// WHO WE ARE — centered serif editorial band.
+// WHO WE ARE: centered serif editorial band.
 function WhoWeAre({ onGo }) {
   return (
     <Section>
@@ -62,10 +100,10 @@ function WhoWeAre({ onGo }) {
   );
 }
 
-// BEFORE / AFTER — drag-to-compare slider, mounted just above Selected work.
+// BEFORE / AFTER: drag-to-compare slider, mounted just above Selected work.
 // The reveal is driven by clip-path on a full-size image (rather than shrinking
 // a wrapper), so the "before" image never squashes and the whole thing stays
-// responsive. Drag writes styles directly on rAF — no per-frame React renders.
+// responsive. Drag writes styles directly on rAF: no per-frame React renders.
 const BA = window.UBC_DATA.beforeAfter || {};
 function BeforeAfterSlider() {
   const sliderRef = React.useRef(null);
@@ -151,50 +189,52 @@ function BeforeAfterSlider() {
   return (
     <Section>
       <Page>
-        <Reveal style={{ textAlign: 'center' }}>
-          {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
-          {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
-          {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) auto 0', maxWidth: '58ch' }}>{BA.standfirst}</p>}
-        </Reveal>
-        <Reveal delay={80} style={{ marginTop: 'var(--s-8)' }}>
-          <div
-            ref={sliderRef}
-            className="ubc-ba"
-            role="slider"
-            tabIndex={0}
-            aria-label="Compare before and after"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(pct)}
-            onPointerDown={onDown}
-            onPointerMove={onMove}
-            onPointerUp={onUp}
-            onPointerCancel={onUp}
-            onKeyDown={onKeyDown}
-            style={{
-              position: 'relative', width: '100%', maxWidth: 760, margin: '0 auto',
-              aspectRatio: BA.aspect || '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
-              borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
-              background: 'var(--surface-sunken)'
-            }}>
-            <img src={BA.after} alt={BA.afterLabel || 'After'} draggable="false"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-            <img ref={beforeRef} src={BA.before} alt={BA.beforeLabel || 'Before'} draggable="false"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-            {BA.beforeLabel && label(BA.beforeLabel, 'left')}
-            {BA.afterLabel && label(BA.afterLabel, 'right')}
-            <div ref={handleRef} className="ubc-ba-handle" style={{ position: 'absolute', top: 0, left: '50%', width: 40, height: '100%', transform: 'translateX(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-              <span style={{ position: 'absolute', width: 2, height: '100%', background: 'var(--paper)', boxShadow: '0 0 8px rgba(16,18,21,.5)' }} />
-              <span ref={circleRef} style={{ display: 'grid', placeItems: 'center', width: 36, height: 36, borderRadius: '50%', background: 'var(--paper)', color: 'var(--ink)', fontSize: 13, boxShadow: 'var(--shadow-2)' }}>↔</span>
+        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)', gap: 'var(--s-9)', alignItems: 'center' }}>
+          <Reveal>
+            {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
+            {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
+            {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0', maxWidth: '46ch' }}>{BA.standfirst}</p>}
+          </Reveal>
+          <Reveal delay={80}>
+            <div
+              ref={sliderRef}
+              className="ubc-ba"
+              role="slider"
+              tabIndex={0}
+              aria-label="Compare before and after"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(pct)}
+              onPointerDown={onDown}
+              onPointerMove={onMove}
+              onPointerUp={onUp}
+              onPointerCancel={onUp}
+              onKeyDown={onKeyDown}
+              style={{
+                position: 'relative', width: '100%',
+                aspectRatio: BA.aspect || '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
+                borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
+                background: 'var(--surface-sunken)'
+              }}>
+              <img src={BA.after} alt={BA.afterLabel || 'After'} draggable="false"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img ref={beforeRef} src={BA.before} alt={BA.beforeLabel || 'Before'} draggable="false"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              {BA.beforeLabel && label(BA.beforeLabel, 'left')}
+              {BA.afterLabel && label(BA.afterLabel, 'right')}
+              <div ref={handleRef} className="ubc-ba-handle" style={{ position: 'absolute', top: 0, left: '50%', width: 40, height: '100%', transform: 'translateX(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                <span style={{ position: 'absolute', width: 2, height: '100%', background: 'var(--paper)', boxShadow: '0 0 8px rgba(16,18,21,.5)' }} />
+                <span ref={circleRef} style={{ display: 'grid', placeItems: 'center', width: 36, height: 36, borderRadius: '50%', background: 'var(--paper)', color: 'var(--ink)', fontSize: 13, boxShadow: 'var(--shadow-2)' }}>↔</span>
+              </div>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
       </Page>
     </Section>
   );
 }
 
-// SELECTED WORK — serif project grid using the real frames as imagery.
+// SELECTED WORK: serif project grid using the real frames as imagery.
 function ProjectsGrid({ onGo }) {
   const imgs = ['05-facade', '03-steel-skeleton', '04-sheathing', '09-backyard', '06-living-room', '08-open-doors'];
   return (
@@ -212,10 +252,10 @@ function ProjectsGrid({ onGo }) {
             <Reveal key={p.id} delay={(i % 2) * 80}>
               <div style={{ display: 'block' }}>
                 {/* A project with a real IFC gets the live model here, on the
-                    grid, orbitable on the spot — never a photo standing in
+                    grid, orbitable on the spot; never a photo standing in
                     for it. stopPropagation keeps a drag-to-orbit from also
                     firing the navigate-to-project click below. */}
-                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
+                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
                   onClick={(e) => { if (p.model) e.stopPropagation(); }}>
                   {p.model && window.ModelViewer ? (
                     <window.ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
@@ -239,10 +279,80 @@ function ProjectsGrid({ onGo }) {
   );
 }
 
-// WHAT WE DELIVER — the services accordion paired with a live model of the
+// One row of the services accordion. The expand/collapse is a real measured
+// height (anime.js animates 0 -> el.scrollHeight, not a fixed max-height
+// guess), so the body text, tag row and chip row (however many lines that
+// turns out to be) always animate open cleanly instead of clipping early or
+// leaving dead space. Opening also staggers those three pieces in (each
+// carries the .ubc-acc-item class), so the row reads as assembling rather
+// than a panel that was already there sliding into place.
+function ServiceRow({ s, isOpen, onToggle, manifest, activeChip, openChip }) {
+  const panelRef = React.useRef(null);
+  const panelId = 'svc-panel-' + s.n;
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  React.useEffect(() => {
+    const el = panelRef.current; if (!el) return;
+    if (reduceMotion || typeof window.anime !== 'function') {
+      el.style.height = isOpen ? 'auto' : '0px';
+      return;
+    }
+    window.anime.remove(el);
+    window.anime({
+      targets: el, height: isOpen ? el.scrollHeight : 0, duration: 340, easing: 'cubicBezier(.16,1,.3,1)',
+      complete: () => { if (isOpen) el.style.height = 'auto'; }
+    });
+    if (isOpen) {
+      const items = el.querySelectorAll('.ubc-acc-item');
+      window.anime.remove(items);
+      window.anime({
+        targets: items, opacity: [0, 1], translateY: [10, 0], duration: 380,
+        delay: window.anime.stagger(60, { start: 140 }), easing: 'cubicBezier(.16,1,.3,1)'
+      });
+    }
+  }, [isOpen]);
+
+  return (
+    <div style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <button onClick={onToggle} aria-expanded={isOpen} aria-controls={panelId}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
+        <span style={{ ...serifH, fontSize: 'clamp(20px, 2.1vw, 28px)', flex: 1 }}>{s.title}</span>
+        <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
+      </button>
+      <div ref={panelRef} id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', height: 0 }}>
+        <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
+          <p className="ubc-acc-item" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
+          <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
+          {s.chips && (
+            <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
+              {s.chips.map((c) => {
+                const has = manifest && manifest.byType && manifest.byType[c.class];
+                const on = activeChip === c.class;
+                return (
+                  <button key={c.class} onClick={() => openChip(c)} disabled={!has} aria-pressed={on}
+                    style={{
+                      fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase',
+                      padding: '7px 12px', borderRadius: 'var(--r-pill)', cursor: has ? 'pointer' : 'default',
+                      background: on ? 'var(--ink)' : 'var(--surface-card)', color: on ? 'var(--paper)' : (has ? 'var(--text-strong)' : 'var(--text-faint)'),
+                      border: 'var(--bw-1) solid ' + (on ? 'var(--ink)' : 'var(--border-strong)'), opacity: has ? 1 : 0.5
+                    }}>
+                    {c.label}{on ? ' · shown' : ''}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// WHAT WE DELIVER: the services accordion paired with a live model of the
 // hub project (window.UBC_DATA.servicesModel). Opening a service flies the
-// camera to the real part of that real model the service describes — the
-// actual walls, the actual floor and roof plates, the actual MEP fixtures —
+// camera to the real part of that real model the service describes (the
+// actual walls, the actual floor and roof plates, the actual MEP fixtures)
 // read from tools/ifc_to_glb.py's <model>.views.json, not invented
 // coordinates. A service with nothing to point a camera at (a permit set, a
 // bill of materials) gets a data card over the model instead, its numbers
@@ -265,7 +375,7 @@ function ServicesExplorer({ onQuote }) {
   const view = svc && svc.view;
 
   // Fly the camera whenever the open service (or the manifest, or the viewer
-  // itself) becomes ready — covers both "clicked a new service" and "the
+  // itself) becomes ready. Covers both "clicked a new service" and "the
   // model finished loading after a service was already selected".
   React.useEffect(() => {
     if (!api || !manifest) return;
@@ -273,7 +383,7 @@ function ServicesExplorer({ onQuote }) {
     if (!view || view.kind === 'whole' || view.kind === 'overlay') { api.reset(); return; }
     if (view.kind === 'class') {
       // A view can hand-pick its own centre/radius (a real bounding box read
-      // off the model's own geometry — see the comments in data.js) rather
+      // off the model's own geometry, see the comments in data.js) rather
       // than the whole class's, for a tighter shot of one specific detail
       // within it; fall back to the class's own framing when it doesn't.
       if (view.center) { api.flyTo({ center: view.center, radius: view.radius }); return; }
@@ -290,8 +400,8 @@ function ServicesExplorer({ onQuote }) {
   };
 
   // What the badge over the model reads right now. activeChip can be one
-  // render stale relative to `open` — the effect that clears it on a service
-  // switch hasn't run yet — so this has to tolerate a chip class that
+  // render stale relative to `open` (the effect that clears it on a service
+  // switch hasn't run yet), so this has to tolerate a chip class that
   // doesn't belong to the now-current service rather than assume svc.chips
   // exists.
   const activeChipEntry = activeChip && svc && svc.chips && svc.chips.find((c) => c.class === activeChip);
@@ -299,8 +409,8 @@ function ServicesExplorer({ onQuote }) {
     ? activeChipEntry.label
     : (view && view.label) || (svc && svc.title) || 'Every drawing out of one model';
 
-  // A view can carry one sentence — naming and defining the specific detail
-  // the camera is now framing (a K-brace, a Fink truss) — typed out on the
+  // A view can carry one sentence, naming and defining the specific detail
+  // the camera is now framing (a K-brace, a Fink truss), typed out on the
   // model rather than dropped in all at once, so it reads as being pointed
   // out live rather than as another paragraph of copy.
   const [typed, setTyped] = React.useState('');
@@ -326,51 +436,16 @@ function ServicesExplorer({ onQuote }) {
           <div style={{ ...eyebrow, display: 'inline-block' }}>What we deliver</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(30px, 4vw, 56px)', margin: 'var(--s-3) 0 0' }}>Every drawing out of one model</h2>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0' }}>
-            Open a service to see the real part of the model it comes from — this is one of our own coordinated projects, not a stock illustration.
+            Open a service to see the real part of the model it comes from. This is one of our own coordinated projects, not a stock illustration.
           </p>
         </Reveal>
 
         <div className="ubc-svc-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-9)', alignItems: 'start' }}>
           <div style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-            {D.services.map((s, i) => {
-              const isOpen = open === i;
-              const panelId = 'svc-panel-' + s.n;
-              return (
-                <div key={s.n} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                  <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen} aria-controls={panelId}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
-                    <span style={{ ...serifH, fontSize: 'clamp(20px, 2.1vw, 28px)', flex: 1 }}>{s.title}</span>
-                    <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
-                  </button>
-                  <div id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', maxHeight: isOpen ? 220 : 0, transition: 'max-height var(--dur-3) var(--ease-out)' }}>
-                    <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
-                      <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
-                      {isOpen && s.chips && (
-                        <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
-                          {s.chips.map((c) => {
-                            const has = manifest && manifest.byType && manifest.byType[c.class];
-                            const on = activeChip === c.class;
-                            return (
-                              <button key={c.class} onClick={() => openChip(c)} disabled={!has} aria-pressed={on}
-                                style={{
-                                  fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase',
-                                  padding: '7px 12px', borderRadius: 'var(--r-pill)', cursor: has ? 'pointer' : 'default',
-                                  background: on ? 'var(--ink)' : 'var(--surface-card)', color: on ? 'var(--paper)' : (has ? 'var(--text-strong)' : 'var(--text-faint)'),
-                                  border: 'var(--bw-1) solid ' + (on ? 'var(--ink)' : 'var(--border-strong)'), opacity: has ? 1 : 0.5
-                                }}>
-                                {c.label}{on ? ' · shown' : ''}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {D.services.map((s, i) => (
+              <ServiceRow key={s.n} s={s} isOpen={open === i} onToggle={() => setOpen(open === i ? -1 : i)}
+                manifest={manifest} activeChip={activeChip} openChip={openChip} />
+            ))}
           </div>
 
           {/* Live model, sticky on desktop so it stays in view as the visitor
@@ -380,9 +455,9 @@ function ServicesExplorer({ onQuote }) {
               {M && window.ModelViewer ? (
                 <window.ModelViewer src={M.src} radius={M.radius} height={520} onReady={setApi} />
               ) : (
-                <div style={{ height: 520, background: 'var(--surface-inverse)' }} />
+                <div style={{ height: 520, background: 'var(--surface-sunken)' }} />
               )}
-              {/* Which part of the model is on screen right now — announced to
+              {/* Which part of the model is on screen right now, announced to
                   screen readers too, since the change is triggered by a
                   button elsewhere on the page, not by focus landing here. */}
               <div aria-live="polite" style={{ position: 'absolute', left: 'var(--s-5)', top: 'var(--s-5)', pointerEvents: 'none' }}>
@@ -395,7 +470,7 @@ function ServicesExplorer({ onQuote }) {
               {/* Permit documents / Bill of Materials: nothing on the model to
                   zoom to, so the real numbers land on top of it instead. */}
               {view && view.kind === 'overlay' && (
-                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 320, marginLeft: 'auto', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)', padding: 'var(--s-5)' }}>
+                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 320, marginLeft: 'auto', background: 'rgba(245,244,241,.75)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-5)' }}>
                   {view.overlay === 'bom' ? (
                     manifest ? (
                       <>
@@ -403,20 +478,20 @@ function ServicesExplorer({ onQuote }) {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px var(--s-4)', marginTop: 'var(--s-3)' }}>
                           {bomRows(manifest).map(([label, count]) => (
                             <React.Fragment key={label}>
-                              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.78)' }}>{label}</span>
-                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--paper)' }}>{count}</span>
+                              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>{label}</span>
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-strong)' }}>{count}</span>
                             </React.Fragment>
                           ))}
                         </div>
                       </>
                     ) : (
-                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.7)' }}>Counting the model…</div>
+                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>Counting the model…</div>
                     )
                   ) : (
                     <>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Permit documents</div>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-2) 0 0' }}>
-                        Every sheet in the set — plans, elevations, sections and schedules — is drawn from this same coordinated model, so a revision here reaches the submission set with it.
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-2) 0 0' }}>
+                        Every sheet in the set (plans, elevations, sections and schedules) is drawn from this same coordinated model, so a revision here reaches the submission set with it.
                       </p>
                     </>
                   )}
@@ -424,14 +499,14 @@ function ServicesExplorer({ onQuote }) {
               )}
 
               {/* A view with a term to teach types its explanation out on
-                  the model rather than dropping it in all at once — a
+                  the model rather than dropping it in all at once: a
                   blinking cursor while it runs, an aria-live region so a
                   screen reader gets the finished sentence once, not one
                   character at a time. */}
               {view && view.typewriter && (
-                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 360, marginLeft: 'auto', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)', padding: 'var(--s-5)' }}>
+                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 360, marginLeft: 'auto', background: 'rgba(245,244,241,.75)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-5)' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{view.label}</div>
-                  <p aria-live={typewriterDone ? 'off' : 'polite'} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.9)', margin: 'var(--s-2) 0 0', minHeight: '4.5em' }}>
+                  <p aria-live={typewriterDone ? 'off' : 'polite'} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 0', minHeight: '4.5em' }}>
                     {typed}
                     {!typewriterDone && <span aria-hidden="true" style={{ animation: 'ubcCaret .8s step-end infinite' }}>▌</span>}
                   </p>

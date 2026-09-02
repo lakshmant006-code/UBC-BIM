@@ -14,7 +14,7 @@ function About() {
     <div>
       <Page style={{ paddingTop: 'var(--s-9)' }}>
         <SectionHeading eyebrow="About us" title="Step into the office" size="lg"
-          standfirst="Pull the curtain at the window and read who we are. The room is schematic line work — a real office photograph replaces it." />
+          standfirst="Pull the curtain at the window and read who we are. The room is schematic line work until a real office photograph replaces it." />
       </Page>
       <Section tight>
         <Page>
@@ -43,7 +43,7 @@ function About() {
                   Every drawing we issue comes out of one coordinated model, so a revision on the frame reaches the takeoff, the permit set and the machine file together. That is the whole reason clients hand us the model rather than a stack of separate deliverables.
                 </p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', color: 'var(--text-faint)', marginTop: 'var(--s-5)' }}>
-                  Placeholder copy in the brand voice — replace with UBC BIM's own about text.
+                  Placeholder copy in the brand voice. Replace with UBC BIM's own about text.
                 </p>
               </div>
             </div>
@@ -61,14 +61,14 @@ function About() {
       <Section sunken tight>
         <Page>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)' }}>
-            {D.stats.map((s, i) => <Reveal key={s.label} delay={i * 70}><Stat value={s.value} label={s.label} unit={s.unit} /></Reveal>)}
+            {D.stats.map((s, i) => <Reveal key={s.label} delay={i * 70}><Stat value={<AnimatedNumber value={s.value} />} label={s.label} unit={s.unit} /></Reveal>)}
           </div>
         </Page>
       </Section>
       <Section tight>
         <Page>
           <SectionHeading eyebrow="Associations" title="Where we hold membership"
-            standfirst="Association logos belong here — no asset files were supplied, so the names are set in type." />
+            standfirst="Association logos belong here. No asset files were supplied, so the names are set in type." />
           <div style={{ display: 'flex', gap: 'var(--s-3)', flexWrap: 'wrap', marginTop: 'var(--s-6)' }}>
             {['Association logo pending', 'Association logo pending', 'Association logo pending'].map((a, i) => (
               <div key={i} style={{ padding: 'var(--s-5) var(--s-6)', border: 'var(--bw-hair) dashed var(--border-strong)', borderRadius: 'var(--r-2)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', color: 'var(--text-faint)' }}>{a}</div>
