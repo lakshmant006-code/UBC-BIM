@@ -1,7 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
-/* --font-serif once pointed at Fraunces for the site's cinematic headlines,
-   which broke the design system's own "never Fraunces" rule (design.md,
-   rule id="typography"). It now aliases the sans-serif display face instead,
-   so every large headline built on var(--font-serif) goes sans-serif with
-   this one change. */
-:root{--font-display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;--font-body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--font-serif:"Space Grotesk","Helvetica Neue",Arial,sans-serif}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+/* One typeface for headline and body alike — Inter, the closest broadly-
+   available match to the clean, neutral grotesk sites like openai.com set
+   everything in — rather than a display/body pairing. --font-serif once
+   pointed at Fraunces, then at Space Grotesk; it now aliases this same
+   Inter stack too, so every headline built on var(--font-serif) follows
+   from this one change same as --font-display and --font-body do. */
+:root{--font-display:"Inter","Helvetica Neue",Arial,sans-serif;--font-body:"Inter","Helvetica Neue",Arial,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--font-serif:"Inter","Helvetica Neue",Arial,sans-serif}
