@@ -63,6 +63,114 @@ function loadThree() {
   return loadThree._p;
 }
 
+// A handful of the source IFC/BIM exports (the camping resort frame among
+// them) carry a bright safety-yellow visualization colour on their structural
+// steel members: a software default, not what the material actually is. Any
+// surface in that hue band is recoloured a cool mill-steel grey and given the
+// metalness and roughness of unpainted steel rather than the flat, mostly
+// non-metal PBR values ifc_to_glb.py has to assume for every material it
+// cannot inspect further; anything not yellow (walls, MEP, wood) is left
+// exactly as converted, so this only touches the one colour it is meant to.
+function isSteelYellow(color) {
+  const hsl = { h: 0, s: 0, l: 0 };
+  color.getHSL(hsl);
+  return hsl.h > 0.10 && hsl.h < 0.20 && hsl.s > 0.25 && hsl.l > 0.25;
+}
+// A light, brushed mill-steel finish (reference: a horizontally brushed
+// stainless sheet, bright and cool with soft elongated highlights, not a
+// mirror polish). MeshPhysicalMaterial's thin clearcoat is what gives it that
+// second, sharper highlight layer on top of the metal's own broader one.
+// Kept short of a true mirror (metalness 0.85, not 0.95+): a near-mirror
+// metal has no diffuse term at all, so it renders purely from the reflected
+// environment direction, and that direction comes straight from the face
+// normal. tools/ifc_to_glb.py builds its trimesh meshes with `process=False`
+// (skips trimesh's own normal cleanup) to keep vertex order stable for the
+// framing manifests, so a few faces can carry a normal that doesn't quite
+// match their winding; a rough, mostly-diffuse material never shows that,
+// a near-mirror one reflects the wrong, often much darker, part of the
+// environment and reads as a black hole. Recomputing normals below fixes it
+// at the geometry level; staying off true mirror keeps it robust either way.
+function makeSteelMaterial(THREE) {
+  return new THREE.MeshPhysicalMaterial({
+    color: 0xbfc3c7, metalness: 0.85, roughness: 0.38,
+    clearcoat: 0.35, clearcoatRoughness: 0.25, envMapIntensity: 1.1
+  });
+}
+function applySteelMaterials(THREE, root) {
+  root.traverse((o) => {
+    if (!o.isMesh || !o.material) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    const next = mats.map((m) => {
+      if (!m.color) return m;
+      if (!isSteelYellow(m.color)) {
+        if (m.envMapIntensity == null || m.envMapIntensity === 1) m.envMapIntensity = 0.75;
+        m.needsUpdate = true;
+        return m;
+      }
+      if (o.geometry) o.geometry.computeVertexNormals();
+      const steel = makeSteelMaterial(THREE);
+      m.dispose();
+      return steel;
+    });
+    o.material = Array.isArray(o.material) ? next : next[0];
+  });
+}
+
+// A small procedural studio (a bright room with a few brighter panels
+// standing in for softboxes) baked into a reflection environment via
+// PMREMGenerator, so the steel above actually looks metallic instead of a
+// flat grey fill: a real metal reads through what it reflects, not through
+// its base colour alone. Built fresh per viewer rather than cached and
+// shared: the render target PMREMGenerator returns is GPU state that
+// belongs to the WebGL context it was built under, and each ModelViewer or
+// SceneHero mount stands up its own renderer and its own context, so a
+// texture built for one is invalid (renders black) handed to another. The
+// caller owns the returned render target and must dispose() it on cleanup.
+function buildStudioEnvironment(THREE, renderer) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+
+  // A metal this close to pure metalness has no diffuse term at all: it is
+  // lit entirely by what this environment reflects, not by the scene's
+  // directional lights. A dark room with a few bright rectangles (a good
+  // recipe for a chrome hero shot) reads as near-black on a mostly-metal
+  // surface once you average over its roughness lobe, so the walls
+  // themselves have to be bright, like the inside of a real softbox tent,
+  // with the panels only adding directional streaks on top of that.
+  const room = new THREE.Scene();
+  const box = new THREE.BoxGeometry(1, 1, 1);
+  const walls = new THREE.Mesh(box, new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: 0xdcdad3, roughness: 1, metalness: 0 }));
+  walls.scale.set(24, 24, 24);
+  room.add(walls);
+
+  const panel = (x, y, z, sx, sy, sz, hex, intensity) => {
+    const c = new THREE.Color(hex).multiplyScalar(intensity);
+    const m = new THREE.Mesh(box, new THREE.MeshBasicMaterial({ color: c }));
+    m.position.set(x, y, z);
+    m.scale.set(sx, sy, sz);
+    room.add(m);
+  };
+  panel(0, 9, 0, 7, 0.15, 7, 0xffffff, 4);     // overhead key, soft box
+  panel(-10, 3, 1, 0.15, 5, 5, 0xdfe6ef, 2.4); // cool side fill
+  panel(10, 2, -4, 0.15, 4, 4, 0x9fb4cc, 1.6); // cooler rim
+  panel(0, -1, 10, 7, 0.15, 0.2, 0xf5f4f1, 1.2); // warm low bounce off the "floor"
+
+  const rt = pmrem.fromScene(room, 0.035);
+  pmrem.dispose();
+  return rt;
+}
+
+// A soft, real shadow-mapped floor stands in for the old drafting grid: the
+// model reads as resting on a lit studio surface rather than floating over
+// technical gridlines. THREE.ShadowMaterial is transparent everywhere except
+// where a shadow actually falls, so the paper scene.background shows through
+// as the floor itself and only the cast shadow darkens it.
+function makeGroundShadow(THREE, R) {
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(R * 12, R * 12), new THREE.ShadowMaterial({ opacity: 0.22 }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  return ground;
+}
+
 function ModelViewer({ src, radius, title, height, compact, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
@@ -98,7 +206,7 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
       if (!host) return;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x101215);
+      scene.background = new THREE.Color(0xf5f4f1);   // --paper: a white studio sweep, not the model stage's old dark stage
 
       const R = radius || 12;
       const camera = new THREE.PerspectiveCamera(38, 1, R / 200, R * 60);
@@ -107,31 +215,46 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       host.appendChild(renderer.domElement);
       renderer.domElement.style.display = 'block';
       renderer.domElement.style.touchAction = 'none';
 
       // Studio-ish lighting: a key from the front-right, a cool fill from the
       // back-left, and a hemisphere so the undersides of members are readable.
-      scene.add(new THREE.HemisphereLight(0xdfe6ef, 0x20242b, 0.85));
+      // The hemisphere's ground colour is a paper tone, not black, so the
+      // bounce light off a white studio floor looks like a white floor. The
+      // key is the one light that casts a shadow; its shadow camera is a box
+      // sized to the model's own framing radius rather than three's default.
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xcfcdc5, 0.9));
       const key = new THREE.DirectionalLight(0xffffff, 1.15);
       key.position.set(R, R * 1.8, R * 1.4);
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      key.shadow.camera.left = -R * 1.6; key.shadow.camera.right = R * 1.6;
+      key.shadow.camera.top = R * 1.6; key.shadow.camera.bottom = -R * 1.6;
+      key.shadow.camera.near = R * 0.1; key.shadow.camera.far = R * 6;
+      key.shadow.bias = -0.0015;
       scene.add(key);
       const fill = new THREE.DirectionalLight(0x9fb4cc, 0.5);
       fill.position.set(-R * 1.2, R * 0.6, -R);
       scene.add(fill);
+      // Reflections so metal actually reads as metal; the studio panels never
+      // show up directly, only in what the steel bounces back.
+      const envRT = buildStudioEnvironment(THREE, renderer);
+      scene.environment = envRT.texture;
 
-      const grid = new THREE.GridHelper(R * 6, 24, 0x2b3038, 0x1d2127);
-      grid.material.transparent = true;
-      grid.material.opacity = 0.65;
-      scene.add(grid);
+      scene.add(makeGroundShadow(THREE, R));
 
       const controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
       controls.minDistance = R * 0.25;
       controls.maxDistance = R * 12;
-      // Stop the camera dropping under the grid, which reads as broken.
+      // Stop the camera dropping under the floor, which reads as broken.
       controls.maxPolarAngle = Math.PI * 0.495;
       controls.target.set(0, 0, 0);
 
@@ -186,10 +309,11 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
       loader.load(src, (gltf) => {
         if (dead) return;
         // The converter already recentred and rotated the model, so it drops
-        // straight in; sit it on the grid rather than through it.
+        // straight in; sit it on the floor rather than through it.
         const box = new THREE.Box3().setFromObject(gltf.scene);
         gltf.scene.position.y -= box.min.y;
-        grid.position.y = 0;
+        applySteelMaterials(THREE, gltf.scene);
+        gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
         scene.add(gltf.scene);
         setState('ready');
       }, (e) => {
@@ -220,6 +344,7 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
         if (ro) ro.disconnect();
         if (vio) vio.disconnect();
         controls.dispose();
+        envRT.dispose();
         scene.traverse((o) => {
           if (o.geometry) o.geometry.dispose();
           if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose());
@@ -246,13 +371,13 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
   }[state];
 
   return (
-    <div ref={wrapRef} className="ubc-model-viewer" style={{ position: 'relative', height: height || 560, background: 'var(--surface-inverse)', overflow: 'hidden' }}
+    <div ref={wrapRef} className="ubc-model-viewer" style={{ position: 'relative', height: height || 560, background: 'var(--surface-sunken)', overflow: 'hidden' }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
 
       {state !== 'ready' && (
         <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: state === 'error' ? 'var(--accent)' : 'rgba(245,244,241,.6)' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: state === 'error' ? 'var(--accent)' : 'var(--text-muted)' }}>
             {label}
           </div>
         </div>
@@ -283,16 +408,16 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
               component's to use. */}
           <div style={{ position: 'absolute', left: 'var(--s-5)', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>
-              {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'rgba(245,244,241,.72)' }}>{title}</span>}
+              {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)' }}>{title}</span>}
               {state === 'ready' && (
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-caption)', color: 'rgba(245,244,241,.45)' }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-caption)', color: 'var(--text-faint)' }}>
                   Drag to rotate · scroll to zoom · right-drag to pan
                 </span>
               )}
             </div>
             {state === 'ready' && (
               <button onClick={() => apiRef.current && apiRef.current.reset()}
-                style={{ cursor: 'pointer', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-2)', color: 'var(--paper)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                style={{ cursor: 'pointer', background: 'rgba(16,18,21,.05)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-2)', color: 'var(--text-strong)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '8px 12px', whiteSpace: 'nowrap' }}>
                 Reset view
               </button>
             )}

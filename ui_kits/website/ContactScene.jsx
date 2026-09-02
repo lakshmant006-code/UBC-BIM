@@ -27,7 +27,7 @@ const CS_SEQ = CS ? ((CS_NARROW && CS.seqMobile) ? CS.seqMobile : CS.seq) : null
 // Where the frames are drawn inside the sticky stage. On a wide screen the
 // media fills it; on a phone a 16:9 frame fitted to the width would occupy
 // barely a quarter of a tall stage, so it takes a band at the top and the
-// caption sits beneath it on the stage's own dark ground.
+// caption sits beneath it on the stage's own light ground.
 // 56.25vw is 16:9 at full width, so on a phone the canvas is exactly the size
 // of the frame drawn in it: no letterbox bands inside the element, and the
 // overlays below can be offset from the same number.
@@ -51,18 +51,19 @@ function SceneCard({ card, visible, onRoute }) {
       style={{
         position: 'absolute', ...side, top: '26%', zIndex: 4, maxWidth: 340,
         textAlign: 'left', cursor: 'pointer',
-        background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-        border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)',
+        background: 'rgba(245,244,241,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+        border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)',
+        boxShadow: 'var(--shadow-2)',
         padding: 'var(--s-5) var(--s-5) var(--s-4)',
         opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(10px)',
         pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out)'
       }}>
       {card.eyebrow && <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{card.eyebrow}</span>}
-      <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--paper)', margin: 'var(--s-2) 0 0' }}>{card.title}</span>
-      {card.body && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-3) 0 0' }}>{card.body}</span>}
+      <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{card.title}</span>
+      {card.body && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{card.body}</span>}
       {card.cta && (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid rgba(245,244,241,.4)', paddingBottom: 2 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid var(--border-strong)', paddingBottom: 2 }}>
           {card.cta} <CSIcon name="arrow-right" size={13} />
         </span>
       )}
@@ -214,13 +215,20 @@ function ContactScene({ onRoute, onQuote }) {
   const introOn = progress < 0.12;
 
   return (
-    <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-inverse)' }}>
+    <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-sunken)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {CS.poster && <img src={csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95) brightness(.92)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
-        <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95) brightness(.92)' }} />
+        {CS.poster && <img src={csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
+        <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95)' }} />
 
-        <div style={{ ...MEDIA_BOX, background: 'linear-gradient(180deg, rgba(16,18,21,.55), rgba(16,18,21,0) 22%, rgba(16,18,21,0) 55%, rgba(16,18,21,.74))', pointerEvents: 'none' }} />
+        {/* Light scrim: white studio system throughout, so the dark captions
+            need a paper-toned gradient under them rather than the old
+            ink-toned one a white-text hero used. The middle floor sits at
+            .5, not 0, because dark text over real photography needs the
+            darker patches in the shot (the doorway interior, reflections)
+            washed out wherever copy crosses them, the way light text over a
+            photo could get away with no scrim there at all. */}
+        <div style={{ ...MEDIA_BOX, background: 'linear-gradient(180deg, rgba(245,244,241,.65), rgba(245,244,241,.5) 22%, rgba(245,244,241,.5) 55%, rgba(245,244,241,.8))', pointerEvents: 'none' }} />
 
         {CS_CARDS.map((c, i) => (
           <SceneCard key={i} card={c} visible={cardShown[i]} onRoute={onRoute} />
@@ -228,11 +236,11 @@ function ContactScene({ onRoute, onQuote }) {
 
         {/* Intro headline */}
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'rgba(245,244,241,.55)', marginBottom: 'var(--s-5)' }}>Contact us</div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--paper)', margin: 0, maxWidth: '15ch' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-5)' }}>Contact us</div>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--text-strong)', margin: 0, maxWidth: '15ch' }}>
             Come in, let’s talk about the project
           </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.72)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
             Scroll to walk in with us. Every route below lands in our CRM, tagged with where it came from, and gets an answer within one working day.
           </p>
           <button onClick={onQuote} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
@@ -243,8 +251,8 @@ function ContactScene({ onRoute, onQuote }) {
         {/* Stage caption */}
         <div className="ubc-cs-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '40ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{active.n}</div>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.05, color: 'var(--paper)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
-          {active.note && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.7)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>{active.note}</p>}
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.05, color: 'var(--text-strong)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
+          {active.note && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>{active.note}</p>}
         </div>
 
         {/* Numbered rail */}
@@ -253,15 +261,15 @@ function ContactScene({ onRoute, onQuote }) {
             const on = i === stage;
             return (
               <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', justifyContent: 'flex-end' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', color: on ? 'var(--paper)' : 'rgba(245,244,241,.4)' }}>{s.n}</span>
-                <span style={{ width: on ? 44 : 22, height: 1, background: on ? 'var(--accent)' : 'rgba(245,244,241,.3)', transition: 'width var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out)' }} />
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', color: on ? 'var(--text-strong)' : 'var(--text-faint)' }}>{s.n}</span>
+                <span style={{ width: on ? 44 : 22, height: 1, background: on ? 'var(--accent)' : 'var(--border-strong)', transition: 'width var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out)' }} />
               </div>
             );
           })}
         </div>
 
         {introOn && (
-          <div style={{ position: 'absolute', left: '50%', bottom: 'var(--s-5)', transform: 'translateX(-50%)', opacity: introOp, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, color: 'rgba(245,244,241,.5)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase' }}>
+          <div style={{ position: 'absolute', left: '50%', bottom: 'var(--s-5)', transform: 'translateX(-50%)', opacity: introOp, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase' }}>
             Scroll<CSIcon name="chevron-down" size={18} />
           </div>
         )}

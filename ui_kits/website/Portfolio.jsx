@@ -27,7 +27,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
             stays reachable to drag and pinch rather than hidden under the
             spec card. */}
         <div className="ubc-spec-panel" style={{ position: 'absolute', right: 'var(--s-7)', top: 'var(--s-6)' }}>
-          <SpecPanel inverse title="Project specification" eyebrow="Spec"
+          <SpecPanel title="Project specification" eyebrow="Spec"
             specs={[
               { label: 'Size', value: project.size },
               { label: 'Units', value: project.units },
@@ -36,8 +36,8 @@ function ProjectDetail({ project, onBack, onQuote }) {
               { label: 'Framing system', value: project.system },
               { label: 'Delivered', value: project.delivered }
             ]}
-            tags={project.software.map((s) => <Tag key={s} tone="inverse">{s}</Tag>)}
-            actions={<><Button full size="sm" onClick={onQuote}>Request a similar quote</Button><Button full size="sm" variant="inverse">Download sample files</Button></>} />
+            tags={project.software.map((s) => <Tag key={s}>{s}</Tag>)}
+            actions={<><Button full size="sm" onClick={onQuote}>Request a similar quote</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
         </div>
       </div>
       <Section tight>

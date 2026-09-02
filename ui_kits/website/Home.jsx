@@ -382,7 +382,7 @@ function ServicesExplorer({ onQuote }) {
               {M && window.ModelViewer ? (
                 <window.ModelViewer src={M.src} radius={M.radius} height={520} onReady={setApi} />
               ) : (
-                <div style={{ height: 520, background: 'var(--surface-inverse)' }} />
+                <div style={{ height: 520, background: 'var(--surface-sunken)' }} />
               )}
               {/* Which part of the model is on screen right now, announced to
                   screen readers too, since the change is triggered by a
@@ -397,7 +397,7 @@ function ServicesExplorer({ onQuote }) {
               {/* Permit documents / Bill of Materials: nothing on the model to
                   zoom to, so the real numbers land on top of it instead. */}
               {view && view.kind === 'overlay' && (
-                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 320, marginLeft: 'auto', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)', padding: 'var(--s-5)' }}>
+                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 320, marginLeft: 'auto', background: 'rgba(245,244,241,.75)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-5)' }}>
                   {view.overlay === 'bom' ? (
                     manifest ? (
                       <>
@@ -405,19 +405,19 @@ function ServicesExplorer({ onQuote }) {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px var(--s-4)', marginTop: 'var(--s-3)' }}>
                           {bomRows(manifest).map(([label, count]) => (
                             <React.Fragment key={label}>
-                              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.78)' }}>{label}</span>
-                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--paper)' }}>{count}</span>
+                              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>{label}</span>
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-strong)' }}>{count}</span>
                             </React.Fragment>
                           ))}
                         </div>
                       </>
                     ) : (
-                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(245,244,241,.7)' }}>Counting the model…</div>
+                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>Counting the model…</div>
                     )
                   ) : (
                     <>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Permit documents</div>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.78)', margin: 'var(--s-2) 0 0' }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-2) 0 0' }}>
                         Every sheet in the set (plans, elevations, sections and schedules) is drawn from this same coordinated model, so a revision here reaches the submission set with it.
                       </p>
                     </>
@@ -431,9 +431,9 @@ function ServicesExplorer({ onQuote }) {
                   screen reader gets the finished sentence once, not one
                   character at a time. */}
               {view && view.typewriter && (
-                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 360, marginLeft: 'auto', background: 'rgba(245,244,241,.10)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.28)', borderRadius: 'var(--r-3)', padding: 'var(--s-5)' }}>
+                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 360, marginLeft: 'auto', background: 'rgba(245,244,241,.75)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-5)' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{view.label}</div>
-                  <p aria-live={typewriterDone ? 'off' : 'polite'} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(245,244,241,.9)', margin: 'var(--s-2) 0 0', minHeight: '4.5em' }}>
+                  <p aria-live={typewriterDone ? 'off' : 'polite'} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 0', minHeight: '4.5em' }}>
                     {typed}
                     {!typewriterDone && <span aria-hidden="true" style={{ animation: 'ubcCaret .8s step-end infinite' }}>▌</span>}
                   </p>
