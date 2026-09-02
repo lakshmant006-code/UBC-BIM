@@ -553,12 +553,31 @@ function sphPoint(r, lat, lng) {
   };
 }
 
-// GLOBAL PRESENCE: a lat/lng graticule plus a real coastline point cloud
-// (Natural Earth 110m land polygons, sampled to a 2.2deg grid and filtered
-// to points that actually fall on land — not invented dots), paired with
-// the same countries/projects figures already on the About page stats.
-// Drag to look around, same as the model viewers; no auto-rotate, matching
-// the "no looping ambient animation" motion rule.
+// Representative coordinates for the regions UBC BIM is asked to call out on
+// the globe. Continent-scale entries (Europe) use a central, non-partisan
+// business hub rather than any one capital; every other entry uses its
+// capital or primary commercial city.
+const MARKERS = [
+  { name: 'Canada', lat: 45.42, lng: -75.70 },
+  { name: 'USA', lat: 39.83, lng: -98.58 },
+  { name: 'Europe', lat: 49.0, lng: 11.0 },
+  { name: 'Israel', lat: 32.08, lng: 34.78 },
+  { name: 'Russia', lat: 55.75, lng: 37.62 },
+  { name: 'India', lat: 28.61, lng: 77.21 },
+  { name: 'Australia', lat: -33.87, lng: 151.21 },
+  { name: 'New Zealand', lat: -41.29, lng: 174.78 }
+];
+
+// GLOBAL PRESENCE: a lit, solid globe (so the far side of the graticule and
+// point cloud is properly occluded instead of showing through) built from a
+// lat/lng graticule plus a real coastline point cloud (Natural Earth 110m
+// land polygons, sampled to a 2.2deg grid and filtered to points that
+// actually fall on land — not invented dots), paired with the same
+// countries/projects figures already on the About page stats. Drag to look
+// around, same as the model viewers; the globe itself doesn't auto-rotate,
+// matching the "no looping ambient animation" motion rule — see that rule's
+// exception for why the eight marker pulses are the one deliberate,
+// requested case of looping motion on this card.
 function GlobalPresence() {
   const hostRef = React.useRef(null);
   const wrapRef = React.useRef(null);
@@ -592,10 +611,28 @@ function GlobalPresence() {
         renderer.domElement.style.display = 'block';
         renderer.domElement.style.touchAction = 'none';
 
+        // A soft two-light rig, purely so the solid globe body below reads as
+        // a lit sphere (a visible terminator curve) rather than a flat disc.
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        const key = new THREE.DirectionalLight(0xffffff, 0.85);
+        key.position.set(3, 2.4, 4);
+        scene.add(key);
+
+        // Solid globe body, just inside the graticule/point-cloud radius, in
+        // the site's paper tone. Beyond looking like an actual sphere instead
+        // of a wireframe, this is what lets the z-buffer occlude the far side
+        // of the graticule, points and markers, which the wireframe-only
+        // version couldn't do (everything on the back of the globe used to
+        // show through).
+        const globeGeo = new THREE.SphereGeometry(R * 0.99, 64, 48);
+        const globeMat = new THREE.MeshStandardMaterial({ color: 0xf5f4f1, roughness: 0.9, metalness: 0 });
+        const globeMesh = new THREE.Mesh(globeGeo, globeMat);
+        scene.add(globeMesh);
+
         // Lat/lng graticule: the same hairline-grid language the rest of the
         // site uses for structure, standing in here for the globe's surface.
         const graticule = new THREE.Group();
-        const lineMat = new THREE.LineBasicMaterial({ color: 0xd6d2c9, transparent: true, opacity: 0.9 });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xd6d2c9, transparent: true, opacity: 0.65 });
         const lineGeos = [];
         for (let lat = -60; lat <= 60; lat += 30) {
           const pts = [];
@@ -622,9 +659,36 @@ function GlobalPresence() {
         });
         const dotGeo = new THREE.BufferGeometry();
         dotGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const dotMat = new THREE.PointsMaterial({ color: 0x17295c, size: 0.045, sizeAttenuation: true });
+        const dotMat = new THREE.PointsMaterial({ color: 0x17295c, size: 0.05, sizeAttenuation: true });
         const dots = new THREE.Points(dotGeo, dotMat);
         scene.add(dots);
+
+        // Presence markers: a steady dot plus a pulsing ring per marked
+        // region, using the site's accent red so they read against both the
+        // paper globe and the navy land points. Reduced motion gets the
+        // steady dots with no pulse.
+        const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const markerGroup = new THREE.Group();
+        const markerDotGeo = new THREE.CircleGeometry(0.03, 24);
+        const markerDotMat = new THREE.MeshBasicMaterial({ color: 0xc1272d, side: THREE.DoubleSide });
+        const markerRingGeo = new THREE.RingGeometry(0.032, 0.04, 32);
+        const pulses = [];
+        MARKERS.forEach((m, i) => {
+          const p = sphPoint(R * 1.014, m.lat, m.lng);
+          const dot = new THREE.Mesh(markerDotGeo, markerDotMat);
+          dot.position.set(p.x, p.y, p.z);
+          dot.lookAt(0, 0, 0);
+          markerGroup.add(dot);
+          if (!reduceMotion) {
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xc1272d, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false });
+            const ring = new THREE.Mesh(markerRingGeo, ringMat);
+            ring.position.set(p.x, p.y, p.z);
+            ring.lookAt(0, 0, 0);
+            markerGroup.add(ring);
+            pulses.push({ ring, phase: (i / MARKERS.length) * 1.8 });
+          }
+        });
+        scene.add(markerGroup);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -646,8 +710,25 @@ function GlobalPresence() {
         if (ro) ro.observe(host);
         window.addEventListener('resize', fit);
 
+        // Pulse cycle mirrors tokens/motion.css's ubcPulse keyframe (scale
+        // 1 -> 2.6, opacity .9 -> 0) — same shape, just looped and staggered
+        // per marker instead of the CSS version's single run.
+        const cycle = 1.8;
         let raf = 0;
-        const tick = () => { controls.update(); renderer.render(scene, camera); raf = requestAnimationFrame(tick); };
+        const tick = () => {
+          controls.update();
+          if (pulses.length) {
+            const t = performance.now() / 1000;
+            pulses.forEach(({ ring, phase }) => {
+              const p = ((t + phase) % cycle) / cycle;
+              const scale = 1 + p * 1.6;
+              ring.scale.set(scale, scale, scale);
+              ring.material.opacity = 0.9 * (1 - p);
+            });
+          }
+          renderer.render(scene, camera);
+          raf = requestAnimationFrame(tick);
+        };
         raf = requestAnimationFrame(tick);
 
         setReady(true);
@@ -657,10 +738,16 @@ function GlobalPresence() {
           window.removeEventListener('resize', fit);
           if (ro) ro.disconnect();
           controls.dispose();
+          globeGeo.dispose();
+          globeMat.dispose();
           dotGeo.dispose();
           dotMat.dispose();
           lineGeos.forEach((g) => g.dispose());
           lineMat.dispose();
+          markerDotGeo.dispose();
+          markerDotMat.dispose();
+          markerRingGeo.dispose();
+          pulses.forEach(({ ring }) => ring.material.dispose());
           renderer.dispose();
           if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
         };
@@ -696,7 +783,7 @@ function GlobalPresence() {
             </div>
           </Reveal>
           <Reveal delay={80}>
-            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto' }}>
+            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto', background: 'radial-gradient(closest-side, rgba(16,18,21,.07), transparent 70%)' }}>
               <div ref={hostRef} style={{ position: 'absolute', inset: 0, cursor: 'grab' }} />
               {!ready && (
                 <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
@@ -704,6 +791,11 @@ function GlobalPresence() {
                 </div>
               )}
             </div>
+            {/* WebGL canvas content isn't screen-reader-navigable, so the marked
+                regions are restated here as real text. */}
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', textAlign: 'center', margin: 'var(--s-4) 0 0' }}>
+              Marked&nbsp;·&nbsp;{MARKERS.map((m) => m.name).join(' · ')}
+            </p>
           </Reveal>
         </div>
       </Page>
