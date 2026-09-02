@@ -1,5 +1,10 @@
 :root{
 --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;--s-8:64px;--s-9:96px;--s-10:128px;--s-11:160px;
 --gutter:24px;--page-max:1320px;--content-max:760px;--section-y:var(--s-10);--section-y-tight:var(--s-9);
---r-0:0px;--r-1:2px;--r-2:4px;--r-3:8px;--r-4:12px;--r-pill:999px;
+/* --r-3/--r-4 (cards, panels, the quote drawer) were raised from 8px/12px
+   to a softer, more generous radius — the "sleek" card language sites like
+   openai.com use — in one token change rather than per component. --r-0/1/2
+   (hairline chips, inputs, small controls) are unchanged: a huge radius on
+   something that small just looks broken, not soft. */
+--r-0:0px;--r-1:2px;--r-2:4px;--r-3:16px;--r-4:22px;--r-pill:999px;
 --bw-hair:1px /* @kind spacing */;--bw-1:1.5px /* @kind spacing */;--bw-2:2px /* @kind spacing */;--grid-unit:8px /* @kind spacing */}

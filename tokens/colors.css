@@ -3,11 +3,17 @@
 --ink:#101215;--ink-2:#2C3037;--ink-3:#5A6069;--ink-4:#8B9199;
 --line:#D6D2C9;--line-strong:#B8B3A8;--line-ink:rgba(16,18,21,.12);
 --orange:#FF4D14;--orange-press:#D93C08;--orange-tint:#FFE9E1;
+/* UBC brand: the red of the "Start Your Project Today" button and the navy of
+   the wordmark and navigation. --accent points at the red, so every call to
+   action, focus ring and hotspot in the kit picks it up. */
+--ubc-red:#C1272D;--ubc-red-press:#9C1D22;--ubc-red-tint:#F8E6E7;
+--ubc-navy:#17295C;--ubc-navy-2:#22377A;--ubc-navy-press:#0F1C42;--ubc-navy-tint:#E7EAF3;
 --steel:#3C4A5A;--steel-tint:#E3E7EC;
 --blueprint:#1B4DFF;--ok:#0F8F6B;--warn:#C98A00;--danger:#C42B1C;
 --surface-page:var(--paper);--surface-card:var(--white);--surface-sunken:var(--paper-2);--surface-inverse:var(--ink);
---text-body:var(--ink-2);--text-strong:var(--ink);--text-muted:var(--ink-3);--text-faint:var(--ink-4);--text-inverse:var(--paper);--text-accent:var(--orange);
---border-subtle:var(--line);--border-strong:var(--line-strong);--border-accent:var(--orange);
---accent:var(--orange);--accent-press:var(--orange-press);--accent-tint:var(--orange-tint);
+--text-body:var(--ink-2);--text-strong:var(--ink);--text-muted:var(--ink-3);--text-faint:var(--ink-4);--text-inverse:var(--paper);--text-accent:var(--ubc-red);
+--border-subtle:var(--line);--border-strong:var(--line-strong);--border-accent:var(--ubc-red);
+--accent:var(--ubc-red);--accent-press:var(--ubc-red-press);--accent-tint:var(--ubc-red-tint);
+--accent-alt:var(--ubc-navy);--accent-alt-press:var(--ubc-navy-press);--accent-alt-tint:var(--ubc-navy-tint);
 --grid-line:rgba(16,18,21,.06) /* @kind color */;--grid-line-strong:rgba(16,18,21,.11) /* @kind color */;
---focus-ring:rgba(255,77,20,.45) /* @kind color */}
+--focus-ring:rgba(193,39,45,.45) /* @kind color */}

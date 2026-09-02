@@ -56,6 +56,74 @@
   .ubc-acc-row { padding-left: 0 !important; }
 }
 
+/* ---------- Contact page ----------
+   The bell panel and the routes/form column sit side by side on a desktop and
+   stack on a tablet; the paired route cards and form fields go single column
+   on a phone. */
+@media (max-width: 900px) {
+  .ubc-contact-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+}
+@media (max-width: 560px) {
+  .ubc-route-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ---------- Project detail model + spec panel ----------
+   On a desktop-width stage the spec card floats over the top-right corner
+   of the model. Below 900px there isn't room for both, and a model you
+   can't reach to drag or pinch defeats the point of it being 3D — so the
+   card drops out of the overlay and stacks under the model instead. */
+@media (max-width: 900px) {
+  .ubc-model-row { display: flex; flex-direction: column; gap: var(--s-6); }
+  .ubc-spec-panel { position: static !important; width: auto !important; }
+}
+
+/* ---------- Services model explorer ----------
+   Two columns on desktop: the accordion on the left, a live model on the
+   right that stays in view (sticky, clear of the sticky header) as the
+   visitor works down the list. Below 900px there is no room for both side by
+   side, so it drops to one column and the model — no longer sticky — simply
+   sits above the accordion it explains. */
+.ubc-svc-model { position: sticky; top: 84px; }
+@media (max-width: 900px) {
+  .ubc-svc-grid { grid-template-columns: 1fr !important; }
+  .ubc-svc-model { position: static; order: -1; margin-bottom: var(--s-6); }
+}
+
+/* ---------- Contact welcome scene ----------
+   Its own hooks rather than the home hero's, so the two scenes can be tuned
+   independently. On a phone the frames take a band across the top of the
+   stage (see MEDIA_BOX in ContactScene.jsx) and the caption sits below it,
+   so nothing is stacked on top of the people in the shot. */
+@media (max-width: 900px) {
+  .ubc-cs-label { max-width: 62vw !important; }
+  .ubc-cs-tab { max-width: 46vw !important; }
+}
+
+@media (max-width: 640px) {
+  .ubc-cs-rail { display: none !important; }
+  /* Caption sits at the foot of the stage, on the dark ground below the frame */
+  .ubc-cs-label {
+    max-width: none !important;
+    left: var(--gutter) !important;
+    right: var(--gutter) !important;
+    top: auto !important;
+    bottom: var(--s-9) !important;
+  }
+  /* Cards sit directly under the frame band (56.25vw is 16:9 at full width) */
+  .ubc-cs-tab {
+    left: var(--gutter) !important;
+    right: var(--gutter) !important;
+    top: calc(56.25vw + var(--s-5)) !important;
+    bottom: auto !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ubc-cs-tab { transition: none !important; }
+}
+
 /* ---------- Footer ----------
    The footer link columns are a fixed multi-column grid that overruns a phone.
    Like the header it comes from the bundle with no class names, so the inline

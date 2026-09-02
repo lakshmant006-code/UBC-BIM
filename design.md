@@ -2,7 +2,7 @@
 
 Agent-readable rules. These are constraints, not suggestions. Each carries its reason so you can reason about edge cases instead of guessing — but the constraint wins over your judgement about what would look better.
 
-<brand-lock system="UBC BIM" theme="light-technical" accent="#FF4D14" motion="cinematic">
+<brand-lock system="UBC BIM" theme="light-technical" accent="#C1272D" motion="cinematic">
 
 <rule id="theme" enforce="absolute">
   <do>Light. Page background is --paper (#F5F4F1), a warm off-white. Ink is --ink (#101215), never pure black.</do>
@@ -12,8 +12,8 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="accent-scarcity" enforce="absolute">
-  <do>One orange moment per viewport: the primary action, or the active state, or the hotspot under discussion. --orange #FF4D14.</do>
-  <dont>No orange body text. No orange large-area backgrounds. No orange gradients. No second competing accent. No orange on orange.</dont>
+  <do>One red moment per viewport: the primary action, or the active state, or the hotspot under discussion. --ubc-red #C1272D, the red of the UBC "Start your project today" button. --ubc-navy #17295C is the wordmark navy and is available for type and quiet surfaces, never as a second call-to-action colour.</do>
+  <dont>No red body text. No red large-area backgrounds. No red gradients. No second competing accent — navy is type, not an accent. No red on red.</dont>
   <why>A single bold accent on neutral was the chosen direction. Scarcity is what makes it read as a marker on a drawing rather than as brand paint.</why>
 </rule>
 
@@ -30,9 +30,9 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="radii" enforce="absolute">
-  <do>2px and 4px are the working radii. 8px is the maximum, for large panels only. Pill radius only for tags and the sticky quote button.</do>
-  <dont>No 12px+ rounded cards. No rounded-square icon tiles. No fully rounded buttons in body content.</dont>
-  <why>Near-square corners read as engineered. Soft corners read as consumer app, which is the exact impression the redesign is moving away from.</why>
+  <do>--r-3 (16px) and --r-4 (22px) are the working radii for cards and panels; every button, primary or secondary, is pill radius (--r-pill). --r-1/--r-2 stay small (2px/4px) for chips, inputs and small controls, where a large radius reads as broken rather than soft.</do>
+  <dont>Do not drop a card back to --r-2 "to look sharper" — that was the old direction. Do not leave a primary CTA square while others are pill; the shape has to be consistent across the whole site.</dont>
+  <why>Reversed from the original "near-square reads as engineered" position: the brief moved explicitly toward the softer, cleaner card-and-pill-button language of sites like openai.com. Consistency of the shape across every card and every button is what reads as deliberate rather than mixed.</why>
 </rule>
 
 <rule id="shadows" enforce="strong">
@@ -42,10 +42,10 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="typography" enforce="absolute">
-  <do>Space Grotesk for display and headings (tight tracking, --lh-tight at size). Instrument Sans for body at --lh-relaxed, max 760px measure. JetBrains Mono for eyebrow labels, spec keys, dimensions and filenames.</do>
-  <dont>Never Inter, Roboto, Arial or Fraunces. Never set body copy above 18px or below 14px. Never use ALL-CAPS for headlines or sentences — only for mono labels with --ls-label tracking.</dont>
-  <why>These are substitutes for absent brand fonts, chosen for an engineered-but-quiet voice. Mono is the system's only "technical" signal, so overusing it spends the effect.</why>
-  <flag>Substituted from Google Fonts. If real UBC BIM fonts arrive, swap them in tokens/fonts.css only.</flag>
+  <do>Inter for display, headings and body alike — one typeface, not a display/body pairing, at --lh-tight for headings and --lh-relaxed at max 760px measure for body. JetBrains Mono for eyebrow labels, spec keys, dimensions and filenames.</do>
+  <dont>No serif anywhere — --font-serif itself is an Inter alias, kept only so existing headline styles don't need touching. Never set body copy above 18px or below 14px. Never use ALL-CAPS for headlines or sentences — only for mono labels with --ls-label tracking.</dont>
+  <why>Moved off Space Grotesk + Instrument Sans to a single clean, neutral grotesk — the register sites like openai.com set everything in — for a sleeker, less "indie startup" read. Mono is the system's only other typographic voice, reserved for the technical signal so overusing it spends the effect.</why>
+  <flag>Substituted from Google Fonts (Inter is the closest broadly-available match to that register). If real UBC BIM fonts arrive, swap them in tokens/fonts.css only.</flag>
 </rule>
 
 <rule id="motion" enforce="strong">
@@ -62,7 +62,7 @@ Agent-readable rules. These are constraints, not suggestions. Each carries its r
 </rule>
 
 <rule id="imagery" enforce="absolute">
-  <do>Real UBC BIM 3D models and renders, cool and desaturated, with orange only on the element under discussion. Until real assets exist, use labelled placeholders that say what belongs there.</do>
+  <do>Real UBC BIM 3D models and renders, cool and desaturated, with red only on the element under discussion. Until real assets exist, use labelled placeholders that say what belongs there.</do>
   <dont>No stock photography. No AI-generated imagery. No hand-drawn SVG illustration standing in for a render. No noise, grain or texture overlays.</dont>
   <why>The brief names stock photos as a current weakness and asks for real models instead. A fake illustration is worse than an honest empty slot because it ships into production unnoticed.</why>
 </rule>

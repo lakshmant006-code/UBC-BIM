@@ -16,7 +16,7 @@ export function Hotspot({ x, y, label, active, leader = 'right', onClick, style,
       <span style={{
         width: 12, height: 12, borderRadius: 999, flex: '0 0 auto',
         background: 'var(--accent)',
-        boxShadow: on ? '0 0 0 9px rgba(255,77,20,.20)' : 'var(--shadow-hotspot)',
+        boxShadow: on ? '0 0 0 9px rgba(193,39,45,.20)' : 'var(--shadow-hotspot)',
         transition: 'box-shadow var(--dur-2) var(--ease-out)'
       }} />
       {label && (

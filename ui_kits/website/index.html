@@ -18,7 +18,7 @@
 <meta name="twitter:title" content="UBC BIM — BIM detailing for wood frame and light-gauge steel">
 <meta name="twitter:description" content="Wall panels, roof and floor trusses, MEP coordination and permit sets, produced from one coordinated framing model.">
 <meta name="twitter:image" content="https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg">
-<link rel="preload" as="image" href="assets/seq/f_001.jpg" fetchpriority="high">
+<link rel="preload" as="fetch" href="assets/models/camping-resort.glb" crossorigin fetchpriority="high">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="responsive.css">
 <script type="application/ld+json">
@@ -29,7 +29,7 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
 <script src="data.js"></script>
-<style>@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}</style>
+<style>@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}@keyframes ubcCaret{0%,49%{opacity:1}50%,100%{opacity:0}}</style>
 </head><body><div id="root"></div>
 <noscript>
   <main style="max-width:760px;margin:0 auto;padding:48px 24px;font-family:Georgia,serif;color:#101215">
@@ -48,11 +48,13 @@
     <p>340 projects delivered across 11 countries. Typical turnaround 3–5 days.</p>
   </main>
 </noscript>
+<script type="text/babel" src="ModelViewer.jsx"></script>
 <script type="text/babel" src="FramingSchematic.jsx"></script>
-<script type="text/babel" src="VideoWalkthrough.jsx"></script>
+<script type="text/babel" src="SceneHero.jsx"></script>
 <script type="text/babel" src="Home.jsx"></script>
 <script type="text/babel" src="Portfolio.jsx"></script>
 <script type="text/babel" src="About.jsx"></script>
+<script type="text/babel" src="ContactScene.jsx"></script>
 <script type="text/babel" src="Contact.jsx"></script>
 <script type="text/babel" src="Careers.jsx"></script>
 <script type="text/babel">
@@ -118,7 +120,7 @@ function App() {
     projects: <window.Portfolio onQuote={() => setQuote(true)} />,
     about: <window.About />,
     careers: <window.Careers onQuote={() => setQuote(true)} />,
-    contact: <window.Contact />
+    contact: <window.Contact onQuote={() => setQuote(true)} />
   }[page];
   return (
     <div>
