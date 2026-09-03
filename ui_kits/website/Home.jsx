@@ -602,7 +602,13 @@ function GlobalPresence() {
         const scene = new THREE.Scene();
         const R = 2;
         const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 20);
-        camera.position.set(0, 0.55, 5.2);
+        // Pulled back enough that the full sphere (radius ~2.03 once the land
+        // points and markers sitting just above R are included) sits inside
+        // the frustum with room to spare, rather than the ~13% overflow the
+        // old, closer camera.position(0, 0.55, 5.2) produced at this fov
+        // (sphere angular radius ~22.6° > the 20° half-fov, which cropped the
+        // globe even before the canvas-sizing bug below made it much worse).
+        camera.position.set(0, 0.6, 7.4);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -610,6 +616,18 @@ function GlobalPresence() {
         host.appendChild(renderer.domElement);
         renderer.domElement.style.display = 'block';
         renderer.domElement.style.touchAction = 'none';
+        // setSize(..., false) below deliberately skips three.js's own
+        // style.width/height writes so they never fight our layout, but
+        // nothing else was setting them either: without an explicit CSS
+        // size a <canvas> falls back to its width/height *attributes* (the
+        // setSize call sets those to w/h * devicePixelRatio, for a sharp
+        // drawing buffer), so on any screen with devicePixelRatio > 1 the
+        // canvas actually laid out at 2x (or 3x) the intended box, spilling
+        // out of the card and making the globe look zoomed in and cropped.
+        // Sizing it in CSS instead keeps the drawing buffer crisp while the
+        // element itself always exactly fills its host, at any pixel ratio.
+        renderer.domElement.style.width = '100%';
+        renderer.domElement.style.height = '100%';
 
         // A soft two-light rig, purely so the solid globe body below reads as
         // a lit sphere (a visible terminator curve) rather than a flat disc.
@@ -783,7 +801,7 @@ function GlobalPresence() {
             </div>
           </Reveal>
           <Reveal delay={80}>
-            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto', background: 'radial-gradient(closest-side, rgba(16,18,21,.07), transparent 70%)' }}>
+            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto', overflow: 'hidden', background: 'radial-gradient(closest-side, rgba(16,18,21,.07), transparent 70%)' }}>
               <div ref={hostRef} style={{ position: 'absolute', inset: 0, cursor: 'grab' }} />
               {!ready && (
                 <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>

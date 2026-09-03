@@ -239,6 +239,13 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
       host.appendChild(renderer.domElement);
       renderer.domElement.style.display = 'block';
       renderer.domElement.style.touchAction = 'none';
+      // See the matching comment in Home.jsx's GlobalPresence: setSize(...,
+      // false) skips three.js's own style.width/height writes, so without
+      // this the canvas falls back to its width/height attributes (set to
+      // w/h * devicePixelRatio for a sharp buffer) as its literal CSS size,
+      // rendering at 2-3x the intended box on any non-1x-pixel-ratio screen.
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
 
       // Studio-ish lighting: a key from the front-right, a cool fill from the
       // back-left, and a hemisphere so the undersides of members are readable.
