@@ -1592,7 +1592,7 @@ function StickyQuote({
     }
   }), onChat && /*#__PURE__*/React.createElement("button", {
     onClick: onChat,
-    "aria-label": "Live chat",
+    "aria-label": "Quick answers",
     style: {
       width: 44,
       height: 44,
