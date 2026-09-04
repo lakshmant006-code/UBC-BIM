@@ -555,14 +555,19 @@ const MARKERS = [
 ];
 
 // GLOBAL PRESENCE: rendered with cobe (github.com/shuding/cobe, MIT), a
-// small WebGL globe library vendored locally at
-// assets/vendor/cobe.esm.js — no CDN dependency at request time, and one
-// this session could actually download and read in full before shipping it
-// (unlike the Framer component turned down earlier: unpkg/esm.sh are
-// unreachable from this sandbox, but the real npm registry is, so the
-// published package itself, not a guess at its API, is what's vendored
-// here). Its built-in world texture stands in for the hand-rolled Natural
-// Earth point cloud the previous three.js version sampled itself; both are
+// small WebGL globe library vendored locally at assets/vendor/cobe.js (its
+// real published dist file, converted from its original ES-module export
+// to a plain `window.createGlobe` global — the same loading pattern
+// index.html already uses for React, three.js and anime.js — rather than
+// an ES-module dynamic import(), the one part of that first attempt this
+// session had no way to test end to end). No CDN dependency at request
+// time either way, and one this session could actually download and read
+// in full before shipping it (unlike the Framer component turned down
+// earlier: unpkg/esm.sh are unreachable from this sandbox, but the real
+// npm registry is, so the published package itself, not a guess at its
+// API, is what's vendored here). Its built-in world texture stands in for
+// the hand-rolled Natural Earth point cloud the previous three.js version
+// sampled itself; both are
 // real Earth data, just packaged differently. Paired with the same
 // countries/projects figures already on the About page stats. Drag to look
 // around, same as the model viewers; the globe itself doesn't auto-rotate,
@@ -576,7 +581,6 @@ function GlobalPresence() {
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
-    let dead = false;
     let cleanup = () => {};
     const wrap = wrapRef.current;
     if (!wrap) return;
@@ -585,12 +589,14 @@ function GlobalPresence() {
       if (!entries[0].isIntersecting) return;
       io.disconnect();
 
-      import('./assets/vendor/cobe.esm.js').then(({ default: createGlobe }) => {
-        if (dead) return;
-        const canvas = canvasRef.current;
-        const host = hostRef.current;
-        if (!canvas || !host) return;
-
+      // cobe.js (a plain global-exposing script, loaded in index.html the
+      // same way as every other vendor dependency on this site) sets
+      // window.createGlobe well before this component's effect can run, so
+      // there's no load-on-demand step or promise to fail silently here.
+      const createGlobe = window.createGlobe;
+      const canvas = canvasRef.current;
+      const host = hostRef.current;
+      if (typeof createGlobe === 'function' && canvas && host) {
         const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
@@ -688,11 +694,11 @@ function GlobalPresence() {
           if (ro) ro.disconnect();
           globe.destroy();
         };
-      });
+      }
     }, { threshold: 0.2, rootMargin: '200px 0px' });
     io.observe(wrap);
 
-    return () => { dead = true; io.disconnect(); cleanup(); };
+    return () => { io.disconnect(); cleanup(); };
   }, []);
 
   const countries = D.stats.find((s) => s.label === 'Countries served') || { value: '12', label: 'Countries served' };
