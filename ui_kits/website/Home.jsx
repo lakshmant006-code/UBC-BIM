@@ -539,20 +539,6 @@ function ServicesExplorer({ onQuote }) {
   );
 }
 
-// lat/lng -> a point on a sphere of radius r. Plain {x,y,z}, not a
-// THREE.Vector3, since this runs at module load before loadThree() resolves
-// and three.js isn't in scope yet; BufferGeometry.setFromPoints and manual
-// position-array writes both only need the three numeric properties.
-function sphPoint(r, lat, lng) {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lng + 180) * (Math.PI / 180);
-  return {
-    x: -r * Math.sin(phi) * Math.cos(theta),
-    y: r * Math.cos(phi),
-    z: r * Math.sin(phi) * Math.sin(theta)
-  };
-}
-
 // Representative coordinates for the regions UBC BIM is asked to call out on
 // the globe. Continent-scale entries (Europe) use a central, non-partisan
 // business hub rather than any one capital; every other entry uses its
@@ -568,11 +554,16 @@ const MARKERS = [
   { name: 'New Zealand', lat: -41.29, lng: 174.78 }
 ];
 
-// GLOBAL PRESENCE: a lit, solid globe (so the far side of the graticule and
-// point cloud is properly occluded instead of showing through) built from a
-// lat/lng graticule plus a real coastline point cloud (Natural Earth 110m
-// land polygons, sampled to a 2.2deg grid and filtered to points that
-// actually fall on land — not invented dots), paired with the same
+// GLOBAL PRESENCE: rendered with cobe (github.com/shuding/cobe, MIT), a
+// small WebGL globe library vendored locally at
+// assets/vendor/cobe.esm.js — no CDN dependency at request time, and one
+// this session could actually download and read in full before shipping it
+// (unlike the Framer component turned down earlier: unpkg/esm.sh are
+// unreachable from this sandbox, but the real npm registry is, so the
+// published package itself, not a guess at its API, is what's vendored
+// here). Its built-in world texture stands in for the hand-rolled Natural
+// Earth point cloud the previous three.js version sampled itself; both are
+// real Earth data, just packaged differently. Paired with the same
 // countries/projects figures already on the About page stats. Drag to look
 // around, same as the model viewers; the globe itself doesn't auto-rotate,
 // matching the "no looping ambient animation" motion rule — see that rule's
@@ -581,10 +572,10 @@ const MARKERS = [
 function GlobalPresence() {
   const hostRef = React.useRef(null);
   const wrapRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
-    if (typeof window.loadThree !== 'function') return;
     let dead = false;
     let cleanup = () => {};
     const wrap = wrapRef.current;
@@ -594,157 +585,94 @@ function GlobalPresence() {
       if (!entries[0].isIntersecting) return;
       io.disconnect();
 
-      Promise.all([window.loadThree(), fetch('assets/data/land-points.json').then((r) => r.json())]).then(([THREE, points]) => {
+      import('./assets/vendor/cobe.esm.js').then(({ default: createGlobe }) => {
         if (dead) return;
+        const canvas = canvasRef.current;
         const host = hostRef.current;
-        if (!host) return;
+        if (!canvas || !host) return;
 
-        const scene = new THREE.Scene();
-        const R = 2;
-        const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 20);
-        // Pulled back enough that the full sphere (radius ~2.03 once the land
-        // points and markers sitting just above R are included) sits inside
-        // the frustum with room to spare, rather than the ~13% overflow the
-        // old, closer camera.position(0, 0.55, 5.2) produced at this fov
-        // (sphere angular radius ~22.6° > the 20° half-fov, which cropped the
-        // globe even before the canvas-sizing bug below made it much worse).
-        camera.position.set(0, 0.6, 7.4);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        host.appendChild(renderer.domElement);
-        renderer.domElement.style.display = 'block';
-        renderer.domElement.style.touchAction = 'none';
-        // setSize(..., false) below deliberately skips three.js's own
-        // style.width/height writes so they never fight our layout, but
-        // nothing else was setting them either: without an explicit CSS
-        // size a <canvas> falls back to its width/height *attributes* (the
-        // setSize call sets those to w/h * devicePixelRatio, for a sharp
-        // drawing buffer), so on any screen with devicePixelRatio > 1 the
-        // canvas actually laid out at 2x (or 3x) the intended box, spilling
-        // out of the card and making the globe look zoomed in and cropped.
-        // Sizing it in CSS instead keeps the drawing buffer crisp while the
-        // element itself always exactly fills its host, at any pixel ratio.
-        renderer.domElement.style.width = '100%';
-        renderer.domElement.style.height = '100%';
-
-        // A soft two-light rig, purely so the solid globe body below reads as
-        // a lit sphere (a visible terminator curve) rather than a flat disc.
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        const key = new THREE.DirectionalLight(0xffffff, 0.85);
-        key.position.set(3, 2.4, 4);
-        scene.add(key);
-
-        // Solid globe body, just inside the graticule/point-cloud radius, in
-        // the site's paper tone. Beyond looking like an actual sphere instead
-        // of a wireframe, this is what lets the z-buffer occlude the far side
-        // of the graticule, points and markers, which the wireframe-only
-        // version couldn't do (everything on the back of the globe used to
-        // show through).
-        const globeGeo = new THREE.SphereGeometry(R * 0.99, 64, 48);
-        const globeMat = new THREE.MeshStandardMaterial({ color: 0xf5f4f1, roughness: 0.9, metalness: 0 });
-        const globeMesh = new THREE.Mesh(globeGeo, globeMat);
-        scene.add(globeMesh);
-
-        // Lat/lng graticule: the same hairline-grid language the rest of the
-        // site uses for structure, standing in here for the globe's surface.
-        const graticule = new THREE.Group();
-        const lineMat = new THREE.LineBasicMaterial({ color: 0xd6d2c9, transparent: true, opacity: 0.65 });
-        const lineGeos = [];
-        for (let lat = -60; lat <= 60; lat += 30) {
-          const pts = [];
-          for (let lng = 0; lng <= 360; lng += 4) pts.push(sphPoint(R, lat, lng - 180));
-          const g = new THREE.BufferGeometry().setFromPoints(pts);
-          lineGeos.push(g);
-          graticule.add(new THREE.LineLoop(g, lineMat));
-        }
-        for (let lng = -180; lng < 180; lng += 30) {
-          const pts = [];
-          for (let lat = -90; lat <= 90; lat += 4) pts.push(sphPoint(R, lat, lng));
-          const g = new THREE.BufferGeometry().setFromPoints(pts);
-          lineGeos.push(g);
-          graticule.add(new THREE.Line(g, lineMat));
-        }
-        scene.add(graticule);
-
-        // Real land points, lifted just off the graticule sphere so they
-        // don't z-fight with it.
-        const positions = new Float32Array(points.length * 3);
-        points.forEach(([lat, lng], i) => {
-          const p = sphPoint(R * 1.006, lat, lng);
-          positions[i * 3] = p.x; positions[i * 3 + 1] = p.y; positions[i * 3 + 2] = p.z;
-        });
-        const dotGeo = new THREE.BufferGeometry();
-        dotGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const dotMat = new THREE.PointsMaterial({ color: 0x17295c, size: 0.05, sizeAttenuation: true });
-        const dots = new THREE.Points(dotGeo, dotMat);
-        scene.add(dots);
-
-        // Presence markers: a steady dot plus a pulsing ring per marked
-        // region, using the site's accent red so they read against both the
-        // paper globe and the navy land points. Reduced motion gets the
-        // steady dots with no pulse.
         const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const markerGroup = new THREE.Group();
-        const markerDotGeo = new THREE.CircleGeometry(0.03, 24);
-        const markerDotMat = new THREE.MeshBasicMaterial({ color: 0xc1272d, side: THREE.DoubleSide });
-        const markerRingGeo = new THREE.RingGeometry(0.032, 0.04, 32);
-        const pulses = [];
-        MARKERS.forEach((m, i) => {
-          const p = sphPoint(R * 1.014, m.lat, m.lng);
-          const dot = new THREE.Mesh(markerDotGeo, markerDotMat);
-          dot.position.set(p.x, p.y, p.z);
-          dot.lookAt(0, 0, 0);
-          markerGroup.add(dot);
-          if (!reduceMotion) {
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xc1272d, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false });
-            const ring = new THREE.Mesh(markerRingGeo, ringMat);
-            ring.position.set(p.x, p.y, p.z);
-            ring.lookAt(0, 0, 0);
-            markerGroup.add(ring);
-            pulses.push({ ring, phase: (i / MARKERS.length) * 1.8 });
-          }
-        });
-        scene.add(markerGroup);
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.08;
-        controls.enableZoom = false;
-        controls.enablePan = false;
-        controls.minPolarAngle = Math.PI * 0.28;
-        controls.maxPolarAngle = Math.PI * 0.72;
+        // tokens/colors.css, normalised to 0-1: --ubc-navy, --paper, --ubc-red.
+        const NAVY = [0.09, 0.161, 0.361];
+        const PAPER = [0.961, 0.957, 0.945];
+        const RED = [0.757, 0.153, 0.176];
+
+        // Resting orientation, not an auto-rotation start point: phi/theta
+        // only move from here in response to a drag (see the pointer
+        // handlers below), matching the "no auto-rotate" call the previous
+        // three.js version made — cobe has no ambient-motion option to
+        // accidentally leave on.
+        let phi = 0.35;
+        let theta = 0.3;
+        let dragPhi = 0;
+        let dragTheta = 0;
+        let pointerStart = null;
+
+        const globe = createGlobe(canvas, {
+          devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+          width: 600,
+          height: 600,
+          phi, theta,
+          dark: 0,
+          diffuse: 1.3,
+          mapSamples: 14000,
+          mapBrightness: 5.5,
+          mapBaseBrightness: 0.06,
+          baseColor: NAVY,
+          markerColor: RED,
+          glowColor: PAPER,
+          markerElevation: 0.02,
+          markers: MARKERS.map((m) => ({ location: [m.lat, m.lng], size: 0.05 }))
+        });
 
         const fit = () => {
-          const w = host.clientWidth, h = host.clientHeight;
-          if (!w || !h) return;
-          renderer.setSize(w, h, false);
-          camera.aspect = w / h;
-          camera.updateProjectionMatrix();
+          const w = host.clientWidth;
+          if (!w) return;
+          globe.update({ width: w, height: w });
         };
         fit();
         const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
         if (ro) ro.observe(host);
         window.addEventListener('resize', fit);
 
-        // Pulse cycle mirrors tokens/motion.css's ubcPulse keyframe (scale
-        // 1 -> 2.6, opacity .9 -> 0) — same shape, just looped and staggered
-        // per marker instead of the CSS version's single run.
-        const cycle = 1.8;
+        const onPointerDown = (e) => {
+          pointerStart = { x: e.clientX, y: e.clientY };
+          canvas.style.cursor = 'grabbing';
+        };
+        const onPointerMove = (e) => {
+          if (!pointerStart) return;
+          dragPhi = (e.clientX - pointerStart.x) / 200;
+          dragTheta = (e.clientY - pointerStart.y) / 200;
+        };
+        const onPointerUp = () => {
+          if (pointerStart) {
+            phi += dragPhi;
+            theta = clamp(theta + dragTheta, -1.2, 1.2);
+            dragPhi = 0; dragTheta = 0;
+          }
+          pointerStart = null;
+          canvas.style.cursor = 'grab';
+        };
+        canvas.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove, { passive: true });
+        window.addEventListener('pointerup', onPointerUp, { passive: true });
+
+        // A slow breathing size, staggered per marker (period 2.6s) rather
+        // than every marker pulsing in lockstep — cobe markers have no
+        // per-marker opacity, so "blinking" here means the dot visibly
+        // growing and shrinking, not fading. Reduced motion holds every
+        // marker at its resting size.
         let raf = 0;
         const tick = () => {
-          controls.update();
-          if (pulses.length) {
-            const t = performance.now() / 1000;
-            pulses.forEach(({ ring, phase }) => {
-              const p = ((t + phase) % cycle) / cycle;
-              const scale = 1 + p * 1.6;
-              ring.scale.set(scale, scale, scale);
-              ring.material.opacity = 0.9 * (1 - p);
-            });
-          }
-          renderer.render(scene, camera);
+          const t = performance.now() / 1000;
+          const markers = MARKERS.map((m, i) => {
+            const phase = (i / MARKERS.length) * 2.6;
+            const wave = reduceMotion ? 0 : (Math.sin(((t + phase) / 2.6) * Math.PI * 2) + 1) / 2;
+            return { location: [m.lat, m.lng], size: 0.045 + 0.035 * wave };
+          });
+          globe.update({ phi: phi + dragPhi, theta: clamp(theta + dragTheta, -1.2, 1.2), markers });
           raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
@@ -754,20 +682,11 @@ function GlobalPresence() {
         cleanup = () => {
           cancelAnimationFrame(raf);
           window.removeEventListener('resize', fit);
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+          canvas.removeEventListener('pointerdown', onPointerDown);
           if (ro) ro.disconnect();
-          controls.dispose();
-          globeGeo.dispose();
-          globeMat.dispose();
-          dotGeo.dispose();
-          dotMat.dispose();
-          lineGeos.forEach((g) => g.dispose());
-          lineMat.dispose();
-          markerDotGeo.dispose();
-          markerDotMat.dispose();
-          markerRingGeo.dispose();
-          pulses.forEach(({ ring }) => ring.material.dispose());
-          renderer.dispose();
-          if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+          globe.destroy();
         };
       });
     }, { threshold: 0.2, rootMargin: '200px 0px' });
@@ -802,7 +721,9 @@ function GlobalPresence() {
           </Reveal>
           <Reveal delay={80}>
             <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto', overflow: 'hidden', background: 'radial-gradient(closest-side, rgba(16,18,21,.07), transparent 70%)' }}>
-              <div ref={hostRef} style={{ position: 'absolute', inset: 0, cursor: 'grab' }} />
+              <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
+                <canvas ref={canvasRef} style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none', display: 'block' }} />
+              </div>
               {!ready && (
                 <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Loading</span>
