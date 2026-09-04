@@ -570,10 +570,10 @@ const MARKERS = [
 // sampled itself; both are
 // real Earth data, just packaged differently. Paired with the same
 // countries/projects figures already on the About page stats. Drag to look
-// around, same as the model viewers; the globe itself doesn't auto-rotate,
-// matching the "no looping ambient animation" motion rule — see that rule's
-// exception for why the eight marker pulses are the one deliberate,
-// requested case of looping motion on this card.
+// around; when nobody's touching it, it turns slowly on its own — see the
+// "no looping ambient animation" motion rule's exception for why both that
+// and the eight marker pulses are deliberate, requested looping motion on
+// this card rather than decoration invented in-house.
 function GlobalPresence() {
   const hostRef = React.useRef(null);
   const wrapRef = React.useRef(null);
@@ -600,16 +600,18 @@ function GlobalPresence() {
         const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-        // tokens/colors.css, normalised to 0-1: --ubc-navy, --paper, --ubc-red.
-        const NAVY = [0.09, 0.161, 0.361];
+        // tokens/colors.css, normalised to 0-1: --white, --paper, --ubc-red.
+        const WHITE = [1, 1, 1];
         const PAPER = [0.961, 0.957, 0.945];
         const RED = [0.757, 0.153, 0.176];
+        // Radians per frame at a nominal 60fps: one full turn roughly every
+        // 4 minutes — slow enough to read as "idle", not spinning.
+        const ROTATE_SPEED = 0.0018;
 
-        // Resting orientation, not an auto-rotation start point: phi/theta
-        // only move from here in response to a drag (see the pointer
-        // handlers below), matching the "no auto-rotate" call the previous
-        // three.js version made — cobe has no ambient-motion option to
-        // accidentally leave on.
+        // phi/theta are the committed orientation; dragPhi/dragTheta are a
+        // live, uncommitted delta added on top while a drag is in progress
+        // (folded into phi/theta on release). Auto-rotate only advances phi
+        // while pointerStart is null, i.e. nobody is currently dragging.
         let phi = 0.35;
         let theta = 0.3;
         let dragPhi = 0;
@@ -626,7 +628,7 @@ function GlobalPresence() {
           mapSamples: 14000,
           mapBrightness: 5.5,
           mapBaseBrightness: 0.06,
-          baseColor: NAVY,
+          baseColor: WHITE,
           markerColor: RED,
           glowColor: PAPER,
           markerElevation: 0.02,
@@ -672,6 +674,10 @@ function GlobalPresence() {
         // marker at its resting size.
         let raf = 0;
         const tick = () => {
+          // "Still" means not currently being dragged, not merely paused
+          // between drags — reduced motion turns this off entirely, same as
+          // the marker pulse below.
+          if (!reduceMotion && !pointerStart) phi += ROTATE_SPEED;
           const t = performance.now() / 1000;
           const markers = MARKERS.map((m, i) => {
             const phase = (i / MARKERS.length) * 2.6;
