@@ -135,6 +135,13 @@ function SceneHero({ onQuote, onGo }) {
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       host.appendChild(renderer.domElement);
       renderer.domElement.style.display = 'block';
+      // See the matching comment in Home.jsx's GlobalPresence: setSize(...,
+      // false) skips three.js's own style.width/height writes, so without
+      // this the canvas falls back to its width/height attributes (set to
+      // w/h * devicePixelRatio for a sharp buffer) as its literal CSS size,
+      // rendering at 2-3x the intended box on any non-1x-pixel-ratio screen.
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
 
       // Same studio lighting recipe as the Projects model viewer, so the
       // hero and the pages it links to read as one system. The hemisphere's

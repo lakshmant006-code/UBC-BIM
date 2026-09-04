@@ -9,7 +9,7 @@ export function StickyQuote({ onQuote, onChat, label = 'Request a quote', style,
       display: 'flex', alignItems: 'center', gap: 'var(--s-3)', ...style
     }}>
       {onChat && (
-        <button onClick={onChat} aria-label="Live chat" style={{
+        <button onClick={onChat} aria-label="Quick answers" style={{
           width: 44, height: 44, borderRadius: 'var(--r-pill)', cursor: 'pointer',
           background: 'var(--white)', border: 'var(--bw-hair) solid var(--border-strong)',
           color: 'var(--text-strong)', display: 'grid', placeItems: 'center', boxShadow: 'var(--shadow-2)'

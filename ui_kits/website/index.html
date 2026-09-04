@@ -58,6 +58,7 @@
 <script type="text/babel" src="ContactScene.jsx"></script>
 <script type="text/babel" src="Contact.jsx"></script>
 <script type="text/babel" src="Careers.jsx"></script>
+<script type="text/babel" src="ChatBot.jsx"></script>
 <script type="text/babel">
 const { Header, Footer, StickyQuote, Button, FormField, Input, Select, Textarea, Icon, SectionHeading } = window.UBCBIMDesignSystem_353af8;
 
@@ -102,6 +103,7 @@ function App() {
   const [page, setPage] = React.useState('home');
   const [scrolled, setScrolled] = React.useState(false);
   const [quote, setQuote] = React.useState(false);
+  const [chat, setChat] = React.useState(false);
   React.useEffect(() => {
     const on = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', on, { passive: true }); on();
@@ -128,8 +130,9 @@ function App() {
       <Header items={nav} active={page} scrolled={scrolled} onNavigate={go} onQuote={() => setQuote(true)} />
       {body}
       <Footer onNavigate={() => go('contact')} />
-      <StickyQuote onQuote={() => setQuote(true)} onChat={() => setQuote(true)} />
+      <StickyQuote onQuote={() => setQuote(true)} onChat={() => setChat((v) => !v)} />
       <QuoteDrawer open={quote} onClose={() => setQuote(false)} />
+      <window.ChatBot open={chat} onClose={() => setChat(false)} onQuote={() => setQuote(true)} />
     </div>
   );
 }

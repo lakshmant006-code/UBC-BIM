@@ -114,6 +114,31 @@ window.UBC_DATA = {
   ]
 };
 
+/* Quick-answers chat widget (ChatBot.jsx): predefined questions only, no
+   open-ended input and no backend to answer one, so every question below is
+   picked to have a real, already-true answer rather than something invented
+   for the bot. Answers are paraphrased from data already on the site (the
+   service list above, `capability`, `stats`, `hero.stages[0]` and the
+   contact `cards`), not new claims. */
+window.UBC_DATA.faq = [
+  { q: 'What services do you offer?',
+    a: 'Seven, all drawn from one coordinated model: wall panel detailing, roof and floor trusses, engineering, MEP detailing and clash detection, permit documents, Bill of Materials and machine CSV, and architectural drafting.' },
+  { q: 'Do you work with wood frame or light-gauge steel?',
+    a: 'Both, often on the same project. Wall panel detailing, engineering and machine files are covered for wood frame and light-gauge steel alike.' },
+  { q: 'What software and file formats do you use?',
+    a: 'Revit, Vertex BD, Tekla Structures and Navisworks on our side, producing RVT, IFC, DWG, NC1, machine CSV and clash reports. Send whatever you have: a Revit model, an IFC, an architectural PDF, or photos of a marked-up print.' },
+  { q: 'How many countries do you work in?',
+    a: '12 countries so far, across 783 projects and 224 clients, with a team of 73.' },
+  { q: "What does 'coordinated model' mean?",
+    a: "Every drawing (the panel layouts, the truss drawings, the permit set) is drawn from one 3D model instead of redrawn separately for each, so a change to the frame reaches every document that depends on it." },
+  { q: 'How do I get a quote?',
+    a: "Tell us the building type, square footage and what you need modelled. You'll get a scope and a price back, not a call-back." },
+  { q: "What's the fastest way to reach a person?",
+    a: 'Start a live chat, book a 15-minute call, or send drawings by email or WhatsApp — a modeller answers directly, no sales script.' },
+  { q: 'Can I see real project examples?',
+    a: 'Yes — real client models are live on the Projects page. Drag to rotate and zoom through a steel frame, a light-gauge steel build, a mixed-construction project and an MEP coordination job.' }
+];
+
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land; nothing else needs to change. */
 window.UBC_DATA.beforeAfter = {
