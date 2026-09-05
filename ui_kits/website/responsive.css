@@ -169,6 +169,25 @@
   }
 }
 
+/* ---------- Testimonials marquee ----------
+   Four 3D-tilted columns need real width (4 * 260px cards plus gaps) that a
+   tablet or phone doesn't have; rather than let `overflow: hidden` just
+   clip most of it away, the tilt flattens and the column count drops so
+   what's left is still fully visible and readable. Pause-on-hover is per
+   column (matching the four independently-scrolling tracks), not the
+   whole stage at once. */
+.ubc-tmn-col:hover .ubc-tmn-track { animation-play-state: paused; }
+
+@media (max-width: 900px) {
+  .ubc-tmn-tilt { transform: none !important; }
+  .ubc-tmn-tilt > div:nth-child(n+3) { display: none !important; }
+  .ubc-tmn-stage { height: 380px !important; }
+}
+@media (max-width: 640px) {
+  .ubc-tmn-tilt > div:nth-child(n+2) { display: none !important; }
+  .ubc-tmn-card { width: 220px !important; }
+}
+
 /* ---------- Pointer-coarse (touch) niceties ---------- */
 @media (pointer: coarse) {
   /* Bigger grab target for the comparison handle */
