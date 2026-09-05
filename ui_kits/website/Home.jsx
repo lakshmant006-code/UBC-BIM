@@ -810,16 +810,21 @@ function TestimonialColumn({ reverse, reduceMotion, ariaHidden }) {
 function Testimonials() {
   const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
-    <Section>
+    <Section style={{ paddingTop: 0 }}>
       {/* Full-bleed on purpose: a direct child of Section (which has no
           max-width of its own), not nested inside Page, so it spans the
           whole viewport edge to edge instead of sitting in a bordered card.
           The heading sits inside the frame as a side panel over the
           marquee rather than as its own centered block above it; it stacks
           back above the marquee on narrower screens (responsive.css),
-          where there isn't room for a side-by-side layout. */}
+          where there isn't room for a side-by-side layout. paddingTop: 0
+          above (rather than the section's usual --section-y) since the
+          marquee no longer has its own heading pushing it down first —
+          the section before this one already closes with its own bottom
+          padding, so stacking a second full top padding on top of that
+          was just dead air between the two. */}
       <Reveal delay={80}>
-        <div className="ubc-tmn-stage" style={{ position: 'relative', height: 440, marginTop: 'var(--s-9)', overflow: 'hidden', background: 'var(--surface-sunken)', '--ubc-mq-gap': 'var(--s-5)', perspective: 900 }}>
+        <div className="ubc-tmn-stage" style={{ position: 'relative', height: 440, overflow: 'hidden', background: 'var(--surface-sunken)', '--ubc-mq-gap': 'var(--s-5)', perspective: 900 }}>
           <div className="ubc-tmn-caption" style={{ position: 'absolute', inset: '0 auto 0 0', width: 'min(380px, 38%)', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'var(--s-8)' }}>
             <div style={{ ...eyebrow, display: 'inline-block' }}>Client feedback</div>
             <h2 style={{ ...serifH, fontSize: 'clamp(26px, 2.6vw, 40px)', margin: 'var(--s-3) 0 0' }}>What builders say once the model lands</h2>
