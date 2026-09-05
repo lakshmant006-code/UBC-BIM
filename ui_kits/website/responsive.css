@@ -175,13 +175,18 @@
    clip most of it away, the tilt flattens and the column count drops so
    what's left is still fully visible and readable. Pause-on-hover is per
    column (matching the four independently-scrolling tracks), not the
-   whole stage at once. */
+   whole stage at once. The caption is a side-by-side overlay on a desktop
+   stage; below 900px there's no width to spare for that, so it drops out
+   of absolute positioning and stacks in normal flow above the marquee
+   instead (it's already first in the DOM for exactly this reason), and the
+   stage grows taller to give the now-stacked marquee room to still read. */
 .ubc-tmn-col:hover .ubc-tmn-track { animation-play-state: paused; }
 
 @media (max-width: 900px) {
+  .ubc-tmn-caption { position: static !important; width: auto !important; text-align: center; padding: var(--s-7) var(--gutter) 0 !important; }
   .ubc-tmn-tilt { transform: none !important; }
   .ubc-tmn-tilt > div:nth-child(n+3) { display: none !important; }
-  .ubc-tmn-stage { height: 380px !important; }
+  .ubc-tmn-stage { height: 560px !important; }
 }
 @media (max-width: 640px) {
   .ubc-tmn-tilt > div:nth-child(n+2) { display: none !important; }
