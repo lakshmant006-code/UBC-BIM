@@ -55,6 +55,7 @@
 <script type="text/babel" src="SceneHero.jsx"></script>
 <script type="text/babel" src="Home.jsx"></script>
 <script type="text/babel" src="Portfolio.jsx"></script>
+<script type="text/babel" src="MockingBirdModel.jsx"></script>
 <script type="text/babel" src="About.jsx"></script>
 <script type="text/babel" src="ContactScene.jsx"></script>
 <script type="text/babel" src="Contact.jsx"></script>
@@ -120,7 +121,7 @@ function App() {
   ];
   const body = {
     home: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
-    services: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
+    services: <window.MockingBirdModel />,
     projects: <window.Portfolio onQuote={() => setQuote(true)} />,
     about: <window.About />,
     careers: <window.Careers onQuote={() => setQuote(true)} />,
