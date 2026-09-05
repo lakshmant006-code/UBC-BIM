@@ -79,6 +79,8 @@ function SceneHero({ onQuote, onGo }) {
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
   const [ready, setReady] = React.useState(false);
+  const [loadPct, setLoadPct] = React.useState(0);
+  const [loadError, setLoadError] = React.useState(false);
 
   const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const n = Math.max(1, HERO_STAGES.length);
@@ -221,6 +223,20 @@ function SceneHero({ onQuote, onGo }) {
         gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
         scene.add(gltf.scene);
         setReady(true);
+      }, (evt) => {
+        // This model is the one asset on the site heavy enough (44 MB) that
+        // a visitor can sit on a bare "Loading" caption for real seconds, not
+        // a blink — lengthComputable is false only if the server ever drops
+        // Content-Length, which every static host here does send.
+        if (!dead && evt.lengthComputable) setLoadPct(Math.round((evt.loaded / evt.total) * 100));
+      }, () => {
+        // Without this, any real failure (network drop, a host that
+        // doesn't serve range/Content-Length right) leaves `ready` false
+        // forever and the caption below reads "Loading" with no way to
+        // tell a slow fetch from a dead one — the exact silent-failure
+        // shape this hero has already shipped once (see the cobe globe's
+        // stuck-loading bug this same build fixed elsewhere).
+        if (!dead) setLoadError(true);
       });
 
       cleanup = () => {
@@ -253,7 +269,9 @@ function SceneHero({ onQuote, onGo }) {
         <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0, filter: 'saturate(.9) brightness(.95)' }} />
         {!ready && (
           <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Loading the structural model</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: loadError ? 'var(--accent)' : 'var(--text-faint)' }}>
+              {loadError ? 'The model could not be loaded' : loadPct > 0 ? `Loading the structural model — ${loadPct}%` : 'Loading the structural model'}
+            </span>
           </div>
         )}
 
