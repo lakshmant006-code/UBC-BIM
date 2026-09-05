@@ -811,17 +811,19 @@ function Testimonials() {
   const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
     <Section>
-      <Page>
-        <Reveal style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>Client feedback</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>What builders say once the model lands</h2>
-        </Reveal>
-      </Page>
       {/* Full-bleed on purpose: a direct child of Section (which has no
           max-width of its own), not nested inside Page, so it spans the
-          whole viewport edge to edge instead of sitting in a bordered card. */}
+          whole viewport edge to edge instead of sitting in a bordered card.
+          The heading sits inside the frame as a side panel over the
+          marquee rather than as its own centered block above it; it stacks
+          back above the marquee on narrower screens (responsive.css),
+          where there isn't room for a side-by-side layout. */}
       <Reveal delay={80}>
         <div className="ubc-tmn-stage" style={{ position: 'relative', height: 440, marginTop: 'var(--s-9)', overflow: 'hidden', background: 'var(--surface-sunken)', '--ubc-mq-gap': 'var(--s-5)', perspective: 900 }}>
+          <div className="ubc-tmn-caption" style={{ position: 'absolute', inset: '0 auto 0 0', width: 'min(380px, 38%)', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'var(--s-8)' }}>
+            <div style={{ ...eyebrow, display: 'inline-block' }}>Client feedback</div>
+            <h2 style={{ ...serifH, fontSize: 'clamp(26px, 2.6vw, 40px)', margin: 'var(--s-3) 0 0' }}>What builders say once the model lands</h2>
+          </div>
           <div className="ubc-tmn-tilt" style={{ display: 'flex', gap: 'var(--s-4)', width: 'max-content', margin: '0 auto', paddingTop: 'var(--s-6)', transform: 'rotateX(14deg) rotateY(-8deg) rotateZ(10deg)', transformStyle: 'preserve-3d' }}>
             <TestimonialColumn reduceMotion={reduceMotion} />
             <TestimonialColumn reduceMotion={reduceMotion} reverse ariaHidden />
@@ -830,7 +832,7 @@ function Testimonials() {
           </div>
           <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '25%', background: 'linear-gradient(var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', inset: 'auto 0 0 0', height: '25%', background: 'linear-gradient(transparent, var(--surface-sunken))', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', inset: '0 auto 0 0', width: '12%', background: 'linear-gradient(90deg, var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', inset: '0 auto 0 0', width: 'min(420px, 42%)', background: 'linear-gradient(90deg, var(--surface-sunken) 40%, transparent)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', inset: '0 0 0 auto', width: '12%', background: 'linear-gradient(270deg, var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
         </div>
       </Reveal>
