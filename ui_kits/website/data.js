@@ -201,11 +201,14 @@ window.UBC_DATA.contactScene = {
 };
 
 /* Landing hero: a live three.js scene (SceneHero.jsx), not a video or a
-   frame sequence. Scroll moves the camera through camping-resort.glb (the
-   same steel-frame model used in the Services explorer and on Projects)
-   between the five [x,y,z] positions in `stages`, all looking at the origin
-   the model is centred on. `radius` is the converter's printed frame
-   radius, used to size the lighting and grid to the model.
+   frame sequence. Scroll moves the camera through mocking-bird-lot-2.glb
+   (the two-storey light-gauge steel frame, also shown on Projects) between
+   the five [x,y,z] positions in `stages`, all looking at the origin the
+   model is centred on. `radius` is the converter's printed frame radius,
+   used to size the lighting and grid to the model; the stage positions
+   below are scaled to it (they were set for a radius-11.2 model, so each
+   is carried over at 9.2/11.2 of its original distance to keep the same
+   relative framing on this smaller one).
 
    The five stages walk the actual sequence an engineer works through on a
    project like this one: setting out, load path, framing, connections,
@@ -217,17 +220,17 @@ window.UBC_DATA.contactScene = {
    the last stage is given real room (0.78-1.0) rather than a sliver, since
    a stage whose `t` is 1.0 has no scroll left to actually show it. */
 window.UBC_DATA.hero = {
-  model: { src: 'assets/models/camping-resort.glb', radius: 11.2 },
+  model: { src: 'assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
   stages: [
-    { n: '01', t: 0.00, pos: [17.9, 14.6, 21.3], term: null,
+    { n: '01', t: 0.00, pos: [14.70, 11.99, 17.50], term: null,
       title: 'One coordinated model', note: 'Everything downstream (the panel layouts, the truss drawings, the permit set) is drawn from this single 3D model, not redrawn for each one.' },
-    { n: '02', t: 0.20, pos: [22.4, 3.9, 4.5], term: 'Setting out',
+    { n: '02', t: 0.20, pos: [18.40, 3.20, 3.70], term: 'Setting out',
       title: 'Setting out the grid', note: '“Setting out” is transferring the design gridlines from the model to the site, so every column base plate lands exactly where it was engineered.' },
-    { n: '03', t: 0.40, pos: [3.4, 21.3, -17.9], term: 'Load path',
+    { n: '03', t: 0.40, pos: [2.79, 17.50, -14.70], term: 'Load path',
       title: 'Sizing the load path', note: 'The “load path” is the route a load travels: down through the roof beams, into the columns, and out to the foundation. Every member on it must be sized for what passes through it.' },
-    { n: '04', t: 0.60, pos: [4.5, 3.8, 2.6], term: 'Moment connection',
+    { n: '04', t: 0.60, pos: [3.70, 3.12, 2.14], term: 'Moment connection',
       title: 'Connections and bracing', note: 'Where a beam meets a column is a “connection”: pinned if it only carries load, a “moment connection” if it also has to resist the frame twisting under wind or seismic load.' },
-    { n: '05', t: 0.78, pos: [-19.0, 11.2, -15.7], term: 'Clash detection',
+    { n: '05', t: 0.78, pos: [-15.61, 9.20, -12.90], term: 'Clash detection',
       title: 'Clash-checked and fabrication-ready', note: '“Clash detection” catches two elements trying to occupy the same space (a beam through a duct run) in the model, before it turns up on site with a torch.' }
   ],
   // Glassmorphic info cards, one per stage after the intro: each teaches a
