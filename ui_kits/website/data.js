@@ -88,9 +88,14 @@ window.UBC_DATA = {
       model: { src: 'assets/models/mechanical-room.glb', radius: 75.1 } },
     // Source IFC was 456 MB (9,213 elements) — too large for git outright, so
     // it's kept as a GitHub Release asset rather than in the repo; only the
-    // converted, compressed GLB below ships to the site. Storey count is
-    // read from the file's own IfcBuildingStorey entities (1st floor, 2nd
-    // floor, roof), not estimated from height.
+    // converted GLB below ships to the site, at full mesh detail (no
+    // simplification) so its 254 real structural bolts, nuts and washers
+    // (A325/A490 hardware, read straight from the IFC) and 5,379 fastener
+    // connections stay visible up close, not simplified away — 44 MB as a
+    // result, the one model on this site not size-optimized down to a
+    // typical web asset. Storey count is read from the file's own
+    // IfcBuildingStorey entities (1st floor, 2nd floor, roof), not
+    // estimated from height.
     { id: 'mocking-bird-lot-2', name: 'Mocking Bird Lot 2', type: 'Residential', system: 'Light-gauge steel',
       size: '≈ 1,560 sq ft footprint (from model)', units: '2 storeys', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
