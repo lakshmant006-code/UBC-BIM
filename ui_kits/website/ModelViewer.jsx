@@ -110,7 +110,7 @@ function isSteelColor(color, opacity) {
 // at the geometry level; staying off true mirror keeps it robust either way.
 function makeSteelMaterial(THREE) {
   return new THREE.MeshPhysicalMaterial({
-    color: 0x54585d, metalness: 0.85, roughness: 0.38,
+    color: 0x33363a, metalness: 0.85, roughness: 0.38,
     clearcoat: 0.35, clearcoatRoughness: 0.25, envMapIntensity: 1.1
   });
 }
