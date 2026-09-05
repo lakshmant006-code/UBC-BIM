@@ -63,18 +63,36 @@ function loadThree() {
   return loadThree._p;
 }
 
-// A handful of the source IFC/BIM exports (the camping resort frame among
-// them) carry a bright safety-yellow visualization colour on their structural
-// steel members: a software default, not what the material actually is. Any
-// surface in that hue band is recoloured a cool mill-steel grey and given the
-// metalness and roughness of unpainted steel rather than the flat, mostly
-// non-metal PBR values ifc_to_glb.py has to assume for every material it
-// cannot inspect further; anything not yellow (walls, MEP, wood) is left
-// exactly as converted, so this only touches the one colour it is meant to.
-function isSteelYellow(color) {
+// A handful of the source IFC/BIM exports carry a software-default
+// visualization colour on their structural steel members rather than what
+// the material actually is: the camping resort frame (FRAMECAD Steelwise) in
+// a bright safety yellow, the Vertex BD frames (Shita Room, Mocking Bird Lot
+// 2) in a mid-saturation steel blue. Any surface in either hue band is
+// recoloured a cool mill-steel grey and given the metalness and roughness of
+// unpainted steel rather than the flat, mostly non-metal PBR values
+// ifc_to_glb.py has to assume for every material it cannot inspect further.
+//
+// The blue band is deliberately narrower than it needs to be for the frame
+// colour alone, to stay clear of two real look-alikes elsewhere on the site:
+// the mechanical room's MEP piping uses ifc_to_glb.py's own unstyled-part
+// fallback grey (DEFAULT_RGBA), which sits at nearly the same hue but far
+// lower saturation (~0.16 vs. ~0.4-0.45 for an actual steel frame) — the
+// saturation floor below excludes it, so ducting stays its own flat grey
+// rather than turning into shiny framing. A mixed-construction model's
+// window glass can land in the same hue *and* saturation band, so the
+// opacity check below excludes anything translucent before either band is
+// even tested — recolouring glass to an opaque metal would be a much worse
+// mistake than leaving one hue undetected.
+//
+// Anything outside both bands (walls, MEP, wood, glass) is left exactly as
+// converted, so this only touches the colours it is meant to.
+function isSteelColor(color, opacity) {
+  if (opacity != null && opacity < 0.98) return false;
   const hsl = { h: 0, s: 0, l: 0 };
   color.getHSL(hsl);
-  return hsl.h > 0.10 && hsl.h < 0.20 && hsl.s > 0.25 && hsl.l > 0.25;
+  const yellow = hsl.h > 0.10 && hsl.h < 0.20 && hsl.s > 0.25 && hsl.l > 0.25;
+  const vertexBdBlue = hsl.h > 0.50 && hsl.h < 0.65 && hsl.s > 0.35 && hsl.l > 0.35 && hsl.l < 0.75;
+  return yellow || vertexBdBlue;
 }
 // A dark, brushed mill-steel finish (reference: a horizontally brushed
 // gunmetal sheet, cool with soft elongated highlights, not a mirror polish).
@@ -102,7 +120,7 @@ function applySteelMaterials(THREE, root) {
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     const next = mats.map((m) => {
       if (!m.color) return m;
-      if (!isSteelYellow(m.color)) {
+      if (!isSteelColor(m.color, m.opacity)) {
         if (m.envMapIntensity == null || m.envMapIntensity === 1) m.envMapIntensity = 0.75;
         m.needsUpdate = true;
         return m;
