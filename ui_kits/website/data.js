@@ -65,11 +65,11 @@ window.UBC_DATA = {
     { label: 'MEP and clash detection', note: 'Services against the frame', spec: { eyebrow: 'Layer 04', title: 'MEP and clash detection', specs: [{ label: 'Disciplines', value: 'Mechanical · electrical · plumbing' }, { label: 'Clashes found', value: '14 hard · 6 soft' }, { label: 'Resolved', value: 'All hard clashes cleared' }, { label: 'Output', value: 'Clash report · coordinated model' }], tags: ['Clash report'] } }
   ],
   projects: [
-    // Four real client IFC models, converted once to glTF by tools/ifc_to_glb.py
+    // Five real client IFC models, converted once to glTF by tools/ifc_to_glb.py
     // (see that file's docstring). Unlike the placeholder cards above, `size` is
     // measured from the model geometry itself rather than invented, and
     // `software` is read from each file's own header. Everything else about
-    // these four is honestly what the model shows, not a delivery record.
+    // these five is honestly what the model shows, not a delivery record.
     { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Structural steel',
       size: '≈ 2,390 sq ft footprint (from model)', units: '988 columns · 834 beams', location: 'Not specified',
       delivered: 'Coordinated structural model', software: ['FRAMECAD Steelwise'],
@@ -85,7 +85,16 @@ window.UBC_DATA = {
     { id: 'mechanical-room', name: 'Mechanical room', type: 'Commercial', system: 'MEP',
       size: '8 elements', units: '1 storey', location: 'Not specified',
       delivered: 'Coordinated MEP model', software: ['SketchUp Pro'],
-      model: { src: 'assets/models/mechanical-room.glb', radius: 75.1 } }
+      model: { src: 'assets/models/mechanical-room.glb', radius: 75.1 } },
+    // Source IFC was 456 MB (9,213 elements) — too large for git outright, so
+    // it's kept as a GitHub Release asset rather than in the repo; only the
+    // converted, compressed GLB below ships to the site. Storey count is
+    // read from the file's own IfcBuildingStorey entities (1st floor, 2nd
+    // floor, roof), not estimated from height.
+    { id: 'mocking-bird-lot-2', name: 'Mocking Bird Lot 2', type: 'Residential', system: 'Light-gauge steel',
+      size: '≈ 1,560 sq ft footprint (from model)', units: '2 storeys', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Vertex BD'],
+      model: { src: 'assets/models/mocking-bird-lot-2.glb', radius: 9.2 } }
   ],
   capability: {
     columns: ['Machine / software', 'Type', 'File output'],
