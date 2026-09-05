@@ -1,7 +1,7 @@
 /*
   SceneHero: a white-studio, cinematic hero. Scroll moves a live camera through the
-  camping resort steel frame (assets/models/camping-resort.glb, rendered with
-  three.js): as you scroll, the ANGLE changes, from a wide aerial, along the
+  Mocking Bird Lot 2 light-gauge steel frame (assets/models/mocking-bird-lot-2.glb,
+  rendered with three.js): as you scroll, the ANGLE changes, from a wide aerial, along the
   column grid, up into the roof beams, in among the bays, out to a full
   reveal. This is the model rendered live, not a pre-shot video: there is no
   frame sequence, no <video> element, nothing to re-record if the model
