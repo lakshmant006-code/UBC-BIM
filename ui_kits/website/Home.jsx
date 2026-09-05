@@ -755,36 +755,60 @@ function GlobalPresence() {
 }
 
 // Placeholder testimonials in the brand voice, describing the real service
-// (panel layouts, coordinated models, turnaround) without inventing named
-// people or companies: replace with real client quotes and attribution when
-// they're in hand. A manually-navigated card, not an autoplaying slideshow —
-// nothing advances on its own, only on a click, so it stays "purposeful
-// motion" rather than the ambient carousel loop the motion rule bans.
+// (panel layouts, coordinated models, clash detection, permit sets) without
+// inventing named people, companies or photos: replace with real client
+// quotes, attribution and (if supplied) photos when they're in hand.
 const TESTIMONIALS = [
   { quote: 'They turned our IFC model into shop-ready panel layouts in days, not weeks. The machine files were exactly what our line needed, first pass.', name: 'Panel fabricator', role: 'Light-gauge steel' },
   { quote: 'We hand over a plan set and get back a coordinated model with the clashes already resolved. That alone has saved us weeks on every project since.', name: 'Project manager', role: 'Residential builder' },
-  { quote: 'What they quote is what we get. The drawings match the model down to the bolt, every time.', name: 'Estimator', role: 'Commercial contractor' }
+  { quote: 'What they quote is what we get. The drawings match the model down to the bolt, every time.', name: 'Estimator', role: 'Commercial contractor' },
+  { quote: 'Truss layouts came back engineered, not just drafted. Spans, bracing, hangers, all of it matched the frame the first time we checked it against the model.', name: 'Truss designer', role: 'Multifamily builder' },
+  { quote: 'Every clash they caught was one our crew never found out about on site. Fourteen hard clashes resolved before a single beam was cut.', name: 'MEP coordinator', role: 'Design-build firm' },
+  { quote: 'Our permit set came out of the same model as the shop drawings, so nothing drifted between what the city stamped and what actually got built.', name: 'Permit expediter', role: 'Municipal reviewer' }
 ];
+
+// A 3D-tilted, four-column testimonial marquee: an explicit request, not a
+// house-style default. This site's own motion rule otherwise bans exactly
+// this shape of thing (an unattended, continuously looping carousel) — see
+// the rule's exception in design.md. Each column is CSS-only (a real
+// three.js/anime.js dependency would be overkill for a translateY loop):
+// the visible content is duplicated MARQUEE_REPEAT times back-to-back per
+// column so the loop wraps seamlessly, with every copy after the first
+// marked aria-hidden so a screen reader hits each quote once per column,
+// not four times over.
+const MARQUEE_REPEAT = 3;
+function TestimonialCard({ t }) {
+  return (
+    <div className="ubc-tmn-card" style={{ width: 260, flexShrink: 0, background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-1)', padding: 'var(--s-5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)' }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--ubc-navy-tint)', color: 'var(--ubc-navy)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700, flexShrink: 0 }}>{t.name.charAt(0)}</div>
+        <div>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>{t.name}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>{t.role}</div>
+        </div>
+      </div>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--s-4) 0 0' }}>“{t.quote}”</p>
+    </div>
+  );
+}
+function TestimonialColumn({ reverse, reduceMotion, ariaHidden }) {
+  return (
+    <div className="ubc-tmn-col" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s-5)', overflow: 'visible' }}>
+      {Array.from({ length: MARQUEE_REPEAT }, (_, g) => (
+        <div key={g} className="ubc-tmn-track" aria-hidden={g > 0 || ariaHidden || undefined}
+          style={{
+            display: 'flex', flexDirection: 'column', gap: 'var(--s-5)',
+            animation: reduceMotion ? 'none' : 'ubcMarqueeV 42s linear infinite',
+            animationDirection: reverse ? 'reverse' : 'normal'
+          }}>
+          {TESTIMONIALS.map((t, i) => <TestimonialCard key={i} t={t} />)}
+        </div>
+      ))}
+    </div>
+  );
+}
 function Testimonials() {
-  const [i, setI] = React.useState(0);
-  const cardRef = React.useRef(null);
   const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const go = (dir) => {
-    const n = TESTIMONIALS.length;
-    const next = (i + dir + n) % n;
-    setI(next);
-    const el = cardRef.current;
-    if (el && !reduceMotion && typeof window.anime === 'function') {
-      window.anime.remove(el);
-      window.anime({
-        targets: el, translateX: [dir * 18, 0], opacity: [0, 1], duration: 420, easing: 'cubicBezier(.16,1,.3,1)',
-        complete: () => { el.style.opacity = 1; el.style.transform = 'none'; }
-      });
-    }
-  };
-
-  const t = TESTIMONIALS[i];
   return (
     <Section>
       <Page>
@@ -792,32 +816,20 @@ function Testimonials() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>Client feedback</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>What builders say once the model lands</h2>
         </Reveal>
-        <div style={{ position: 'relative', maxWidth: 680, margin: 'var(--s-9) auto 0' }}>
-          <div ref={cardRef} style={{ background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-4)', boxShadow: 'var(--shadow-1)', padding: 'var(--s-8)' }}>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(19px, 2.2vw, 24px)', lineHeight: 1.4, color: 'var(--text-strong)', margin: 0 }}>“{t.quote}”</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-4)', marginTop: 'var(--s-6)' }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--ubc-navy-tint)', color: 'var(--ubc-navy)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700, flexShrink: 0 }}>{t.name.charAt(0)}</div>
-              <div>
-                <div style={{ fontFamily: 'var(--font-body)', fontWeight: 600, color: 'var(--text-strong)' }}>{t.name}</div>
-                <div style={{ ...eyebrow }}>{t.role}</div>
-              </div>
+        <Reveal delay={80}>
+          <div className="ubc-tmn-stage" style={{ position: 'relative', height: 440, maxWidth: 900, margin: 'var(--s-9) auto 0', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', background: 'var(--surface-sunken)', '--ubc-mq-gap': 'var(--s-5)', perspective: 900 }}>
+            <div className="ubc-tmn-tilt" style={{ display: 'flex', gap: 'var(--s-4)', width: 'max-content', margin: '0 auto', paddingTop: 'var(--s-6)', transform: 'rotateX(14deg) rotateY(-8deg) rotateZ(10deg)', transformStyle: 'preserve-3d' }}>
+              <TestimonialColumn reduceMotion={reduceMotion} />
+              <TestimonialColumn reduceMotion={reduceMotion} reverse ariaHidden />
+              <TestimonialColumn reduceMotion={reduceMotion} ariaHidden />
+              <TestimonialColumn reduceMotion={reduceMotion} reverse ariaHidden />
             </div>
+            <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '25%', background: 'linear-gradient(var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', inset: 'auto 0 0 0', height: '25%', background: 'linear-gradient(transparent, var(--surface-sunken))', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', inset: '0 auto 0 0', width: '12%', background: 'linear-gradient(90deg, var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', inset: '0 0 0 auto', width: '12%', background: 'linear-gradient(270deg, var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--s-5)', marginTop: 'var(--s-6)' }}>
-            <button onClick={() => go(-1)} aria-label="Previous testimonial" style={{ width: 36, height: 36, display: 'grid', placeItems: 'center', borderRadius: 'var(--r-pill)', border: 'var(--bw-1) solid var(--border-strong)', background: 'var(--surface-card)', cursor: 'pointer', color: 'var(--text-strong)' }}>
-              <Icon name="arrow-left" size={16} />
-            </button>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {TESTIMONIALS.map((_, idx) => (
-                <button key={idx} onClick={() => setI(idx)} aria-label={'Show testimonial ' + (idx + 1)} aria-current={idx === i}
-                  style={{ width: idx === i ? 22 : 8, height: 8, borderRadius: 999, border: 'none', background: idx === i ? 'var(--accent)' : 'var(--border-strong)', cursor: 'pointer', transition: 'width var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out)' }} />
-              ))}
-            </div>
-            <button onClick={() => go(1)} aria-label="Next testimonial" style={{ width: 36, height: 36, display: 'grid', placeItems: 'center', borderRadius: 'var(--r-pill)', border: 'var(--bw-1) solid var(--border-strong)', background: 'var(--surface-card)', cursor: 'pointer', color: 'var(--text-strong)' }}>
-              <Icon name="arrow-right" size={16} />
-            </button>
-          </div>
-        </div>
+        </Reveal>
       </Page>
     </Section>
   );
