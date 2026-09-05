@@ -76,10 +76,10 @@ function isSteelYellow(color) {
   color.getHSL(hsl);
   return hsl.h > 0.10 && hsl.h < 0.20 && hsl.s > 0.25 && hsl.l > 0.25;
 }
-// A light, brushed mill-steel finish (reference: a horizontally brushed
-// stainless sheet, bright and cool with soft elongated highlights, not a
-// mirror polish). MeshPhysicalMaterial's thin clearcoat is what gives it that
-// second, sharper highlight layer on top of the metal's own broader one.
+// A dark, brushed mill-steel finish (reference: a horizontally brushed
+// gunmetal sheet, cool with soft elongated highlights, not a mirror polish).
+// MeshPhysicalMaterial's thin clearcoat is what gives it that second,
+// sharper highlight layer on top of the metal's own broader one.
 // Kept short of a true mirror (metalness 0.85, not 0.95+): a near-mirror
 // metal has no diffuse term at all, so it renders purely from the reflected
 // environment direction, and that direction comes straight from the face
@@ -92,7 +92,7 @@ function isSteelYellow(color) {
 // at the geometry level; staying off true mirror keeps it robust either way.
 function makeSteelMaterial(THREE) {
   return new THREE.MeshPhysicalMaterial({
-    color: 0xbfc3c7, metalness: 0.85, roughness: 0.38,
+    color: 0x54585d, metalness: 0.85, roughness: 0.38,
     clearcoat: 0.35, clearcoatRoughness: 0.25, envMapIntensity: 1.1
   });
 }
