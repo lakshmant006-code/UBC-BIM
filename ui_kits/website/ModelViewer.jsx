@@ -206,7 +206,7 @@ function bounceHandlers(ref) {
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }
 
-function ModelViewer({ src, radius, title, height, compact, onReady }) {
+function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -244,8 +244,15 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
       scene.background = new THREE.Color(0xf5f4f1);   // --paper: a white studio sweep, not the model stage's old dark stage
 
       const R = radius || 12;
+      // The offset direction the camera opens on and returns to on reset.
+      // Every caller shares the same [1.5, 1.1, 1.9] three-quarter aerial
+      // angle by default so cutting between projects reads as one
+      // consistent camera, not a different look each time; a caller can
+      // override it (see MockingBirdModel.jsx) when a specific model reads
+      // better resting at its own angle.
+      const angle = initialAngle || [1.5, 1.1, 1.9];
       const camera = new THREE.PerspectiveCamera(38, 1, R / 200, R * 60);
-      camera.position.set(R * 1.5, R * 1.1, R * 1.9);
+      camera.position.set(R * angle[0], R * angle[1], R * angle[2]);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -370,7 +377,7 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
         const c = view && view.center;
         const center = new THREE.Vector3(...(c || [0, 0, 0]));
         const r = Math.max(0.3, (view && view.radius) || R);
-        const toPos = center.clone().add(new THREE.Vector3(1.5, 1.1, 1.9).multiplyScalar(r));
+        const toPos = center.clone().add(new THREE.Vector3(...angle).multiplyScalar(r));
         flight = {
           fromPos: camera.position.clone(), fromTarget: controls.target.clone(),
           toPos, toTarget: center,
@@ -441,13 +448,14 @@ function ModelViewer({ src, radius, title, height, compact, onReady }) {
             </button>
           )}
         </>
-      ) : (
+      ) : !bare && (
         <>
           {/* Caption, controls hint and Reset view all sit on the left: a
               caller (ProjectDetail) overlays its own spec panel on the right,
               and the page's sticky quote button is fixed to the viewport's
               bottom-right at all times, so the right-hand side is never this
-              component's to use. */}
+              component's to use. A caller wanting nothing but the model
+              (MockingBirdModel.jsx) passes `bare` to drop this whole group. */}
           <div style={{ position: 'absolute', left: 'var(--s-5)', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>
               {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)' }}>{title}</span>}
