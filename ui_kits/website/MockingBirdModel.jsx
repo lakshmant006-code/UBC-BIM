@@ -1,9 +1,13 @@
 /*
-  MockingBirdModel: a dedicated page holding nothing but the Mocking Bird
-  Lot 2 model — no heading, no caption, no controls hint, no Reset view
-  button, no spec panel, no accordion. `bare` on ModelViewer drops all of
-  that chrome (it still shows the transient "Loading"/error state, since
-  that's the failure-visibility fix from earlier, not decoration).
+  MockingBirdModel: the site's "Services" page — the Mocking Bird Lot 2
+  model full-bleed at the top, the full service articles (ServicesDetail
+  .jsx) below it. One plain nav link, one page; no dropdown/popup menu and
+  no separate article page to jump to.
+
+  The model itself carries no heading, caption, controls hint, or Reset
+  view button, no spec panel, no accordion. `bare` on ModelViewer drops
+  all of that chrome (it still shows the transient "Loading"/error state,
+  since that's the failure-visibility fix from earlier, not decoration).
 
   initialAngle points the camera down the ridge line at a low, near-level
   angle instead of ModelViewer's shared three-quarter aerial default, so
@@ -66,22 +70,41 @@ function HotspotCard({ hotspot, onClose }) {
   );
 }
 
-function MockingBirdModel() {
+// How close flyTo frames a single connection detail: tight enough to read
+// the bolt/bracket/brace clearly, tighter than any of the Services
+// explorer's own close-ups (its nearest, a K-brace stud detail, uses 2.725)
+// since a hotspot is one connection, not a whole corner bay.
+const HOTSPOT_ZOOM_RADIUS = 1.3;
+
+function MockingBirdModel({ onQuote }) {
   const { Page } = window;
   const D = window.UBC_DATA;
   const project = D.projects.find((p) => p.id === 'mocking-bird-lot-2');
+  const [api, setApi] = React.useState(null);
   const [openHotspot, setOpenHotspot] = React.useState(null);
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Click flies the camera in on the hotspot's own real position first
+  // (same flyTo the Services explorer uses to point the camera at a
+  // service's own part of its model), then brings the card up once that
+  // move actually lands, rather than popping it up over a camera still
+  // mid-flight.
+  const handleHotspotClick = (hs) => {
+    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS });
+    window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
+  };
 
   return (
     <div style={{ paddingTop: 'var(--s-6)' }}>
       {project && project.model && window.ModelViewer ? (
         <window.ModelViewer src={project.model.src} radius={project.model.radius}
           height="calc(100vh - 84px)" bare initialAngle={[2.6, 0.55, 1.0]}
-          hotspots={project.model.hotspots} onHotspotClick={setOpenHotspot} />
+          hotspots={project.model.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
       ) : (
         <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
       )}
       {openHotspot && <HotspotCard hotspot={openHotspot} onClose={() => setOpenHotspot(null)} />}
+      {window.ServicesDetail && <window.ServicesDetail onQuote={onQuote} />}
     </div>
   );
 }

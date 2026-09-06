@@ -1507,18 +1507,15 @@ function Header({
     }
   }, items.map(it => {
     const on = active === it.id;
-    const showDropdown = hover === it.id && it.dropdown && it.dropdown.length > 0;
-    return /*#__PURE__*/React.createElement("div", {
+    return /*#__PURE__*/React.createElement("a", {
       key: it.id,
-      style: { position: 'relative' },
-      onMouseEnter: () => setHover(it.id),
-      onMouseLeave: () => setHover(null)
-    }, /*#__PURE__*/React.createElement("a", {
       href: '#' + it.id,
       onClick: e => {
         e.preventDefault();
         onNavigate && onNavigate(it.id);
       },
+      onMouseEnter: () => setHover(it.id),
+      onMouseLeave: () => setHover(null),
       style: {
         fontSize: 'var(--fs-body-sm)',
         fontWeight: 'var(--fw-medium)',
@@ -1527,27 +1524,7 @@ function Header({
         borderBottom: 'var(--bw-2) solid ' + (on ? 'var(--accent)' : 'transparent'),
         transition: 'var(--t-hover)'
       }
-    }, it.label), showDropdown && /*#__PURE__*/React.createElement("div", {
-      className: "ubc-nav-dropdown",
-      style: {
-        position: 'absolute', top: '100%', left: 0, marginTop: 'var(--s-4)', minWidth: 280,
-        background: 'var(--surface-page)', border: 'var(--bw-hair) solid var(--border-subtle)',
-        borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-2)', zIndex: 50
-      }
-    }, it.dropdown.map(d => /*#__PURE__*/React.createElement("a", {
-      key: d.label,
-      href: "#",
-      className: "ubc-nav-dropdown-item",
-      onClick: e => {
-        e.preventDefault();
-        setHover(null);
-        d.onClick && d.onClick();
-      },
-      style: {
-        display: 'block', padding: '10px 12px', borderRadius: 'var(--r-2)',
-        fontSize: 'var(--fs-body-sm)', color: 'var(--text-body)', borderBottom: 'none'
-      }
-    }, d.label))));
+    }, it.label);
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginLeft: 'auto',

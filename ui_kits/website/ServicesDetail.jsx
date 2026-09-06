@@ -1,31 +1,23 @@
 /*
-  ServicesDetail: the full write-up behind each of the header's 8 "Services"
-  dropdown entries, one tab per category (window.UBC_DATA.serviceArticles).
-  This is the client's own real copy — see the comment above that array in
+  ServicesDetail: the full write-up behind each of the site's 8 service
+  categories, one tab per category (window.UBC_DATA.serviceArticles). This
+  is the client's own real copy — see the comment above that array in
   data.js for exactly what editing was and wasn't done to it.
+
+  Rendered directly under the model on the Services page (MockingBirdModel
+  .jsx) rather than behind its own nav entry or popup menu, so "Services"
+  is one plain link to one page: the model up top, every article below it.
 
   Reuses FilterBar for the tab strip (the same underline-tab component the
   Projects page uses for its category filter) rather than introducing a
   second tab pattern, and Tag for the "Where we deliver" region row.
-
-  window.UBC_NAV_SERVICE_TAB is a one-shot deep-link index, same pattern as
-  window.UBC_NAV_FILTER for Projects: the header's dropdown sets it right
-  before navigating here, so a specific category opens directly instead of
-  always landing on the first tab.
 */
 function ServicesDetail({ onQuote }) {
   const { Button, Tag, FilterBar } = window.UBCBIMDesignSystem_353af8;
   const { Page, Section, Reveal } = window;
   const D = window.UBC_DATA;
   const articles = D.serviceArticles || [];
-
   const [active, setActive] = React.useState(0);
-  React.useEffect(() => {
-    if (typeof window.UBC_NAV_SERVICE_TAB === 'number' && window.UBC_NAV_SERVICE_TAB < articles.length) {
-      setActive(window.UBC_NAV_SERVICE_TAB);
-    }
-    window.UBC_NAV_SERVICE_TAB = null;
-  }, []);
 
   const a = articles[active];
   if (!a) return null;

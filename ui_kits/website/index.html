@@ -113,25 +113,8 @@ function App() {
     return () => window.removeEventListener('scroll', on);
   }, []);
   const go = (id) => { setPage(id); window.scrollTo(0, 0); };
-  // Sets a one-shot deep-link index ServicesDetail (ServicesDetail.jsx) reads
-  // on mount, then navigates to it: the tab strip opens straight to that
-  // category instead of always landing on the first one. Indices line up
-  // 1:1 with window.UBC_DATA.serviceArticles, in the same order as the
-  // dropdown below (unlike the old ServicesExplorer accordion, every one of
-  // these 8 categories now has its own real article, so there's no need to
-  // map onto a different, mismatched list).
-  const openServiceArticle = (i) => { window.UBC_NAV_SERVICE_TAB = i; go('service-detail'); };
   const nav = [
-    { label: 'Services', id: 'services', dropdown: [
-      { label: 'Drafting and architectural', onClick: () => openServiceArticle(0) },
-      { label: 'Bill of material and estimation', onClick: () => openServiceArticle(1) },
-      { label: 'Lot specific permit sets', onClick: () => openServiceArticle(2) },
-      { label: 'Modeling and detailing', onClick: () => openServiceArticle(3) },
-      { label: 'Engineering', onClick: () => openServiceArticle(4) },
-      { label: 'Manufacture and supply of materials', onClick: () => openServiceArticle(5) },
-      { label: 'Project management', onClick: () => openServiceArticle(6) },
-      { label: 'Training services', onClick: () => openServiceArticle(7) }
-    ] },
+    { label: 'Services', id: 'services' },
     { label: 'Projects', id: 'projects' },
     { label: 'About', id: 'about' },
     { label: 'Careers', id: 'careers' },
@@ -139,8 +122,7 @@ function App() {
   ];
   const body = {
     home: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
-    services: <window.MockingBirdModel />,
-    'service-detail': <window.ServicesDetail onQuote={() => setQuote(true)} />,
+    services: <window.MockingBirdModel onQuote={() => setQuote(true)} />,
     projects: <window.Portfolio onQuote={() => setQuote(true)} />,
     about: <window.About />,
     careers: <window.Careers onQuote={() => setQuote(true)} />,
