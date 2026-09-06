@@ -125,10 +125,14 @@ window.UBC_DATA = {
         //    (a real structural bolt, distinct from its own washer/nut).
         //  - truss: the highest IfcBeam (this file's roof framing class),
         //    i.e. genuinely up at the ridge.
-        //  - bracing: no distinct IFC tag exists for bracing in this file,
-        //    so its position is geometric best-effort rather than
-        //    name-matched like the other four, pending a closer look at
-        //    the real drawing to place it precisely.
+        //  - bracing: no distinct IFC tag exists for bracing in this file
+        //    (unlike the other four, name-matched), so this one is found
+        //    by shape: an IfcBeam in the same 350S162-43 profile as every
+        //    stud and track, but 5.5 m long and only 4 cm through — a
+        //    flat horizontal run, not a stud — starting right at the same
+        //    footprint corner as cornerStud above. Matches the client's
+        //    own TYPICAL_DETAILS.pdf, which labels this exact run
+        //    "HORIZONTAL BRACE" in the typical wall elevation.
         // image/body for all five are real, drawn from the client's own
         // TYPICAL_DETAILS.pdf (cropped renders in assets/details/, copy
         // paraphrased from that sheet's own callouts) rather than invented.
@@ -145,7 +149,7 @@ window.UBC_DATA = {
           { id: 'truss', label: 'Truss', position: [3.331, 2.440, -2.419],
             image: 'assets/details/truss.jpg',
             body: 'An open-web roof truss, engineered separately on its own truss drawings, lands directly on the wall’s top plate and is screwed down at 24 in. o.c. Where two trusses share a bearing wall, their heels are screwed to each other too, so the roof diaphragm and the wall below act as one assembly rather than two separately-fastened parts.' },
-          { id: 'bracing', label: 'Bracing', position: [-2.359, 1.063, -4.756],
+          { id: 'bracing', label: 'Bracing', position: [-7.518, 1.335, 2.057],
             image: 'assets/details/bracing.jpg',
             body: 'A horizontal brace runs across the wall’s studs partway up its height, screwed through every stud it crosses, to keep them from twisting or buckling sideways between the base track and the top plate.' }
         ]
