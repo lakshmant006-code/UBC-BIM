@@ -431,15 +431,21 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         if (e && e.lengthComputable) setPct(Math.round((e.loaded / e.total) * 100));
       }, () => { if (!dead) setState('error'); });
 
-      // Same offset direction and scale the initial framing uses (so a reset
-      // lands exactly where the model opened): every preset looks from the
-      // same angle, so a cut from one part of the model to another reads as
-      // a move within one place rather than a different camera altogether.
+      // Same offset direction and scale the initial framing uses by default
+      // (so a reset lands exactly where the model opened, and a cut between
+      // most presets reads as a move within one place rather than a
+      // different camera altogether) — but a caller can hand flyTo its own
+      // direction instead (MockingBirdModel.jsx's hotspots): the page's own
+      // resting angle is a low, near-level, ridge-line-reading one, good for
+      // the whole building but not for a tight close-up on one arbitrary
+      // point on it, so a hotspot picks whichever of the direction it's
+      // simplest to shoot from.
       const flyTo = (view) => {
         const c = view && view.center;
         const center = new THREE.Vector3(...(c || [0, 0, 0]));
         const r = Math.max(0.3, (view && view.radius) || R);
-        const toPos = center.clone().add(new THREE.Vector3(...angle).multiplyScalar(r));
+        const dir = (view && view.angle) || angle;
+        const toPos = center.clone().add(new THREE.Vector3(...dir).multiplyScalar(r));
         flight = {
           fromPos: camera.position.clone(), fromTarget: controls.target.clone(),
           toPos, toTarget: center,
