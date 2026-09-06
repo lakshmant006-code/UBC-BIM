@@ -193,6 +193,11 @@
   .ubc-tmn-card { width: 220px !important; }
 }
 
+/* ---------- Header nav dropdown ----------
+   A nav item's hover panel (currently just "Services"). Hover-highlight
+   for its rows lives here since inline styles can't do :hover. */
+.ubc-nav-dropdown-item:hover { background: var(--surface-sunken); }
+
 /* ---------- Pointer-coarse (touch) niceties ---------- */
 @media (pointer: coarse) {
   /* Bigger grab target for the comparison handle */
@@ -202,4 +207,6 @@
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .ubc-ba img, .ubc-ba-handle, .ubc-lgsf-tab { transition: none !important; }
+  /* Steady ring, no loop, same as the globe's marker pulse and auto-rotate */
+  .ubc-hotspot-ring { animation: none !important; opacity: .7; }
 }

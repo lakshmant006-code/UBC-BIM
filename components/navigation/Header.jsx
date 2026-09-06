@@ -36,16 +36,42 @@ export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, sty
         <nav style={{ display: 'flex', gap: 'var(--s-6)', marginLeft: 'var(--s-4)' }}>
           {items.map((it) => {
             const on = active === it.id;
+            // A nav item can carry its own `dropdown` (an array of
+            // {label, onClick}), e.g. the service categories under
+            // "Services": hovering the whole wrapper (link + panel), not
+            // just the link, keeps the panel open while the cursor moves
+            // down into it. Clicking the link itself still navigates
+            // normally; the dropdown is a hover-only shortcut into one
+            // part of wherever that navigation lands.
+            const showDropdown = hover === it.id && it.dropdown && it.dropdown.length > 0;
             return (
-              <a key={it.id} href={'#' + it.id}
-                 onClick={(e) => { e.preventDefault(); onNavigate && onNavigate(it.id); }}
-                 onMouseEnter={() => setHover(it.id)} onMouseLeave={() => setHover(null)}
-                 style={{
-                   fontSize: 'var(--fs-body-sm)', fontWeight: 'var(--fw-medium)',
-                   color: on ? 'var(--text-strong)' : (hover === it.id ? 'var(--accent)' : 'var(--text-muted)'),
-                   paddingBottom: 4, borderBottom: 'var(--bw-2) solid ' + (on ? 'var(--accent)' : 'transparent'),
-                   transition: 'var(--t-hover)'
-                 }}>{it.label}</a>
+              <div key={it.id} style={{ position: 'relative' }}
+                onMouseEnter={() => setHover(it.id)} onMouseLeave={() => setHover(null)}>
+                <a href={'#' + it.id}
+                   onClick={(e) => { e.preventDefault(); onNavigate && onNavigate(it.id); }}
+                   style={{
+                     fontSize: 'var(--fs-body-sm)', fontWeight: 'var(--fw-medium)',
+                     color: on ? 'var(--text-strong)' : (hover === it.id ? 'var(--accent)' : 'var(--text-muted)'),
+                     paddingBottom: 4, borderBottom: 'var(--bw-2) solid ' + (on ? 'var(--accent)' : 'transparent'),
+                     transition: 'var(--t-hover)'
+                   }}>{it.label}</a>
+                {showDropdown && (
+                  <div className="ubc-nav-dropdown" style={{
+                    position: 'absolute', top: '100%', left: 0, marginTop: 'var(--s-4)', minWidth: 280,
+                    background: 'var(--surface-page)', border: 'var(--bw-hair) solid var(--border-subtle)',
+                    borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-2)', zIndex: 50
+                  }}>
+                    {it.dropdown.map((d) => (
+                      <a key={d.label} href="#" className="ubc-nav-dropdown-item"
+                         onClick={(e) => { e.preventDefault(); setHover(null); d.onClick && d.onClick(); }}
+                         style={{
+                           display: 'block', padding: '10px 12px', borderRadius: 'var(--r-2)',
+                           fontSize: 'var(--fs-body-sm)', color: 'var(--text-body)', borderBottom: 'none'
+                         }}>{d.label}</a>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
