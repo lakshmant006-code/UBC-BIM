@@ -48,6 +48,16 @@ window.UBC_DATA = {
     { n: '06', title: 'Bill of Materials and CSV', body: 'Quantified takeoffs and machine CSV output, tied to the model so revisions stay in step.', tags: ['BOM', 'Machine CSV'],
       view: { kind: 'overlay', overlay: 'bom' } },
     { n: '07', title: 'Architectural drafting', body: 'Plans, elevations and sections produced to your standards and titleblocks.', tags: ['DWG', 'PDF'],
+      view: { kind: 'whole', label: 'The coordinated structure' } },
+    // Three categories from the header's "Services" dropdown with no
+    // existing row to match: real service lines, just without their real
+    // copy yet. Marked `pending` rather than given invented body text, so
+    // the UI can show an honest "content coming soon" state until it does.
+    { n: '08', title: 'Manufacture and supply of materials', body: null, pending: true, tags: [],
+      view: { kind: 'whole', label: 'The coordinated structure' } },
+    { n: '09', title: 'Project management', body: null, pending: true, tags: [],
+      view: { kind: 'whole', label: 'The coordinated structure' } },
+    { n: '10', title: 'Training services', body: null, pending: true, tags: [],
       view: { kind: 'whole', label: 'The coordinated structure' } }
   ],
   // The hub model behind "What we deliver": the camping resort steel frame
@@ -99,7 +109,51 @@ window.UBC_DATA = {
     { id: 'mocking-bird-lot-2', name: 'Mocking Bird Lot 2', type: 'Residential', system: 'Light-gauge steel',
       size: '≈ 1,560 sq ft footprint (from model)', units: '2 storeys', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
-      model: { src: 'assets/models/mocking-bird-lot-2.glb', radius: 9.2 } }
+      model: {
+        src: 'assets/models/mocking-bird-lot-2.glb', radius: 9.2,
+        // Five red pulsing hotspots for the dedicated model page
+        // (MockingBirdModel.jsx). Position is a real element found in the
+        // source IFC — not a guessed spot on the model — transformed
+        // through the exact same percentile-centre + Z-up-to-Y-up rotation
+        // tools/ifc_to_glb.py applies to the mesh itself, so a position
+        // here really is that element's location in this GLB:
+        //  - cornerStud: the IfcMember (350S162-43 stud profile) nearest
+        //    an actual footprint corner of the building.
+        //  - holdDown: the lowest ANCHOR-family IfcBuildingElementProxy
+        //    (the file's own hold-down/anchor bracket hardware).
+        //  - anchorBolt: the lowest A325-12x200 IfcBuildingElementPart
+        //    (a real structural bolt, distinct from its own washer/nut).
+        //  - truss: the highest IfcBeam (this file's roof framing class),
+        //    i.e. genuinely up at the ridge.
+        //  - bracing: no distinct IFC tag exists for bracing in this file
+        //    (unlike the other four, name-matched), so this one is found
+        //    by shape: an IfcBeam in the same 350S162-43 profile as every
+        //    stud and track, but 5.5 m long and only 4 cm through — a
+        //    flat horizontal run, not a stud — starting right at the same
+        //    footprint corner as cornerStud above. Matches the client's
+        //    own TYPICAL_DETAILS.pdf, which labels this exact run
+        //    "HORIZONTAL BRACE" in the typical wall elevation.
+        // image/body for all five are real, drawn from the client's own
+        // TYPICAL_DETAILS.pdf (cropped renders in assets/details/, copy
+        // paraphrased from that sheet's own callouts) rather than invented.
+        hotspots: [
+          { id: 'corner-stud', label: 'Corner stud', position: [-7.518, 1.063, 4.641],
+            image: 'assets/details/corner-stud.jpg',
+            body: 'Where two exterior walls meet, the corner is framed from grouped studs (or ladder blocking, per the framing plan) so both wall panels have something solid to fasten into. Panel-to-panel seams like this one are joined with paired hex-head screws, per the project’s typical panel connection detail.' },
+          { id: 'hold-down', label: 'Hold-down', position: [-6.040, -2.371, -4.731],
+            image: 'assets/details/hold-down.jpg',
+            body: 'A hold-down bracket ties the end stud of a shear wall down to the foundation, resisting the wall trying to lift or rotate under lateral (wind or seismic) load. Sized per the project’s own hold-down schedule, one sits at each end of a shear wall panel, fastened through the base track.' },
+          { id: 'anchor-bolt', label: 'Anchor bolt', position: [-6.078, -2.252, -0.616],
+            image: 'assets/details/anchor-bolt.jpg',
+            body: 'The base track is bolted straight through to the concrete slab at each location called out on the plan, holding the wall’s bottom track against sliding and uplift before any stud or sheathing load is even applied.' },
+          { id: 'truss', label: 'Truss', position: [3.331, 2.440, -2.419],
+            image: 'assets/details/truss.jpg',
+            body: 'An open-web roof truss, engineered separately on its own truss drawings, lands directly on the wall’s top plate and is screwed down at 24 in. o.c. Where two trusses share a bearing wall, their heels are screwed to each other too, so the roof diaphragm and the wall below act as one assembly rather than two separately-fastened parts.' },
+          { id: 'bracing', label: 'Bracing', position: [-7.518, 1.335, 2.057],
+            image: 'assets/details/bracing.jpg',
+            body: 'A horizontal brace runs across the wall’s studs partway up its height, screwed through every stud it crosses, to keep them from twisting or buckling sideways between the base track and the top plate.' }
+        ]
+      } }
   ],
   capability: {
     columns: ['Machine / software', 'Type', 'File output'],

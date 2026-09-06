@@ -337,7 +337,9 @@ function ServiceRow({ s, isOpen, onToggle, manifest, activeChip, openChip }) {
       </button>
       <div ref={panelRef} id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', height: 0 }}>
         <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
-          <p className="ubc-acc-item" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '60ch', margin: 0 }}>{s.body}</p>
+          <p className="ubc-acc-item" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: s.pending ? 'var(--text-faint)' : 'var(--text-muted)', fontStyle: s.pending ? 'italic' : 'normal', maxWidth: '60ch', margin: 0 }}>
+            {s.pending ? 'Content coming soon — full details pending.' : s.body}
+          </p>
           <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
           {s.chips && (
             <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
@@ -378,6 +380,20 @@ function ServicesExplorer({ onQuote }) {
   const [manifest, setManifest] = React.useState(null);
   const [api, setApi] = React.useState(null);
   const M = D.servicesModel;
+  const sectionRef = React.useRef(null);
+  // One-shot deep link: the header's "Services" dropdown sets
+  // window.UBC_NAV_SERVICE (a services[] index) before navigating home, so
+  // a category picked from the nav opens straight to that row instead of
+  // the default first one, and the page scrolls down to meet it (a plain
+  // "Services" nav click, or arriving at Home any other way, leaves this
+  // untouched and starts on row 0 as before).
+  React.useEffect(() => {
+    const s = window.UBC_NAV_SERVICE;
+    if (s == null) return;
+    window.UBC_NAV_SERVICE = null;
+    setOpen(s);
+    if (sectionRef.current) sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
 
   React.useEffect(() => {
     if (!M || !M.views) return;
@@ -445,6 +461,7 @@ function ServicesExplorer({ onQuote }) {
   const typewriterDone = !!view && typed.length >= (view.typewriter || '').length;
 
   return (
+    <div ref={sectionRef}>
     <Section>
       <Page>
         <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
@@ -536,6 +553,7 @@ function ServicesExplorer({ onQuote }) {
         </Reveal>
       </Page>
     </Section>
+    </div>
   );
 }
 

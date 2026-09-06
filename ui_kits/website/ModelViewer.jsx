@@ -206,7 +206,7 @@ function bounceHandlers(ref) {
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }
 
-function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, onReady }) {
+function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -215,6 +215,13 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
   const [hover, setHover] = React.useState(false);
   const [state, setState] = React.useState('idle');   // idle | loading | ready | error
   const [pct, setPct] = React.useState(0);
+  // Kept fresh every render without going in the mount effect's dependency
+  // array (same reason onReady is left out, below): the render loop reads
+  // whatever hotspots the current render passed, without tearing down and
+  // reloading the whole GLB if a caller's hotspots array changes identity.
+  const hotspotDomRefs = React.useRef({});
+  const hotspotsRef = React.useRef(hotspots);
+  hotspotsRef.current = hotspots;
 
   // Start loading once the viewer comes within reach of the viewport, so a
   // grid of these does not fetch three.js or any GLB until scrolled to.
@@ -326,6 +333,13 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       let flight = null;
       const reduceMotion = typeof window.matchMedia === 'function'
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // The loaded model is shifted up so its lowest point sits on the floor
+      // (see loader.load below); a hotspot's [x,y,z] is authored in the same
+      // pre-shift space tools/ifc_to_glb.py's GLB ships in, so it needs the
+      // same shift added before it means the same point on the model.
+      let floorOffsetY = 0;
+      let modelReady = false;
+      const hotspotVec = new THREE.Vector3();
 
       // The render loop only spends GPU time while this viewer is actually on
       // screen: a grid of live models must not keep rendering the ones the
@@ -344,6 +358,28 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
           }
           controls.update();
           renderer.render(scene, camera);
+          // Project each hotspot's 3D position to a screen percentage and
+          // write it straight to the marker's own style, imperatively:
+          // this runs every frame the camera could have moved, and routing
+          // it through React state/re-render for what's otherwise a static
+          // set of markers would re-render the whole viewer at 60fps for
+          // nothing. Hidden (not just dimmed) once its point goes behind
+          // the camera or outside the frame, rather than pinned to an edge.
+          const hs = modelReady ? hotspotsRef.current : null;
+          if (hs && hs.length) {
+            for (let i = 0; i < hs.length; i++) {
+              const node = hotspotDomRefs.current[hs[i].id];
+              if (!node) continue;
+              const p = hs[i].position;
+              hotspotVec.set(p[0], p[1] + floorOffsetY, p[2]).project(camera);
+              const onScreen = hotspotVec.z < 1 && hotspotVec.x >= -1 && hotspotVec.x <= 1 && hotspotVec.y >= -1 && hotspotVec.y <= 1;
+              node.style.display = onScreen ? 'block' : 'none';
+              if (onScreen) {
+                node.style.left = ((hotspotVec.x * 0.5 + 0.5) * 100) + '%';
+                node.style.top = ((1 - (hotspotVec.y * 0.5 + 0.5)) * 100) + '%';
+              }
+            }
+          }
         }
         raf = requestAnimationFrame(tick);
       };
@@ -360,10 +396,12 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         // The converter already recentred and rotated the model, so it drops
         // straight in; sit it on the floor rather than through it.
         const box = new THREE.Box3().setFromObject(gltf.scene);
-        gltf.scene.position.y -= box.min.y;
+        floorOffsetY = -box.min.y;
+        gltf.scene.position.y = floorOffsetY;
         applySteelMaterials(THREE, gltf.scene);
         gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
         scene.add(gltf.scene);
+        modelReady = true;
         setState('ready');
       }, (e) => {
         if (e && e.lengthComputable) setPct(Math.round((e.loaded / e.total) * 100));
@@ -423,6 +461,20 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
     <div ref={wrapRef} className="ubc-model-viewer" style={{ position: 'relative', height: height || 560, background: 'var(--surface-sunken)', overflow: 'hidden' }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
+
+      {/* Hotspots: positioned every frame in the render loop above (direct
+          DOM writes, not React state — see the comment there), so these
+          start hidden and only ever get shown once a real screen position
+          lands on them. */}
+      {hotspots && hotspots.map((hs) => (
+        <button key={hs.id} ref={(el) => { hotspotDomRefs.current[hs.id] = el; }}
+          onClick={() => onHotspotClick && onHotspotClick(hs)}
+          aria-label={hs.label} title={hs.label}
+          className="ubc-hotspot" style={{ position: 'absolute', display: 'none', width: 22, height: 22, marginLeft: -11, marginTop: -11, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}>
+          <span aria-hidden="true" className="ubc-hotspot-ring" style={{ position: 'absolute', left: '50%', top: '50%', width: 34, height: 34, marginLeft: -17, marginTop: -17, borderRadius: 999, border: '1.5px solid var(--accent)', animation: 'ubcHotspotPulse 1.8s ease-out infinite' }} />
+          <span aria-hidden="true" style={{ position: 'absolute', left: '50%', top: '50%', width: 12, height: 12, marginLeft: -6, marginTop: -6, borderRadius: 999, background: 'var(--accent)', boxShadow: '0 0 0 2px rgba(245,244,241,.9)' }} />
+        </button>
+      ))}
 
       {state !== 'ready' && (
         <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
