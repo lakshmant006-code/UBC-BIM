@@ -274,7 +274,14 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       host.appendChild(renderer.domElement);
       renderer.domElement.style.display = 'block';
-      renderer.domElement.style.touchAction = 'none';
+      // A locked viewer has nothing for touch to drag, pinch or pan — so it
+      // shouldn't swallow a touch gesture at all, and 'none' otherwise blocks
+      // native scroll past the model on a touchscreen even with OrbitControls
+      // itself disabled (that's a plain CSS property, not gated by
+      // controls.enabled). An orbitable one still needs 'none': without it,
+      // the same one-finger drag the browser wants to scroll the page with
+      // is also this canvas's own single-finger rotate gesture.
+      renderer.domElement.style.touchAction = locked ? 'auto' : 'none';
       // See the matching comment in Home.jsx's GlobalPresence: setSize(...,
       // false) skips three.js's own style.width/height writes, so without
       // this the canvas falls back to its width/height attributes (set to

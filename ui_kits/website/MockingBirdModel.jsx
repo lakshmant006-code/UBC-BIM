@@ -76,11 +76,13 @@ function HotspotCard({ hotspot, onClose }) {
   );
 }
 
-// How close flyTo frames a single connection detail: tight enough to read
-// the bolt/bracket/brace clearly, tighter than any of the Services
-// explorer's own close-ups (its nearest, a K-brace stud detail, uses 2.725)
-// since a hotspot is one connection, not a whole corner bay.
-const HOTSPOT_ZOOM_RADIUS = 1.3;
+// How close flyTo frames a single connection detail. The first value (1.3)
+// framed tighter than intended — cropped in past the point of reading the
+// connection in context. Widened to match the framing in the reference
+// video: a full corner bay, several full-height studs either side of the
+// detail, comparable to (a touch wider than) the Services explorer's own
+// K-brace stud close-up at 2.725.
+const HOTSPOT_ZOOM_RADIUS = 3.0;
 
 function MockingBirdModel({ onQuote }) {
   const { Page } = window;
