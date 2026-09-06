@@ -226,6 +226,12 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
   const hotspotDomRefs = React.useRef({});
   const hotspotsRef = React.useRef(hotspots);
   hotspotsRef.current = hotspots;
+  // The mount effect's own floorOffsetY (below) is a closure-local var, not
+  // state — this is how the click handler in the render below gets at the
+  // same value the render loop already uses to draw the markers in the
+  // right place, so a click flies to the same point the marker is sitting
+  // on, not the pre-shift one.
+  const floorOffsetRef = React.useRef(0);
 
   // Start loading once the viewer comes within reach of the viewport, so a
   // grid of these does not fetch three.js or any GLB until scrolled to.
@@ -414,6 +420,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         // straight in; sit it on the floor rather than through it.
         const box = new THREE.Box3().setFromObject(gltf.scene);
         floorOffsetY = -box.min.y;
+        floorOffsetRef.current = floorOffsetY;
         gltf.scene.position.y = floorOffsetY;
         applySteelMaterials(THREE, gltf.scene);
         gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
@@ -485,7 +492,12 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
           lands on them. */}
       {hotspots && hotspots.map((hs) => (
         <button key={hs.id} ref={(el) => { hotspotDomRefs.current[hs.id] = el; }}
-          onClick={(e) => { e.stopPropagation(); onHotspotClick && onHotspotClick(hs); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!onHotspotClick) return;
+            const p = hs.position;
+            onHotspotClick({ ...hs, position: [p[0], p[1] + floorOffsetRef.current, p[2]] });
+          }}
           aria-label={hs.label} title={hs.label}
           className="ubc-hotspot" style={{ position: 'absolute', display: 'none', width: 22, height: 22, marginLeft: -11, marginTop: -11, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}>
           <span aria-hidden="true" className="ubc-hotspot-ring" style={{ position: 'absolute', left: '50%', top: '50%', width: 34, height: 34, marginLeft: -17, marginTop: -17, borderRadius: 999, border: '1.5px solid var(--accent)', animation: 'ubcHotspotPulse 1.8s ease-out infinite' }} />
