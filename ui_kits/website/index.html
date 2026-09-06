@@ -56,6 +56,7 @@
 <script type="text/babel" src="Home.jsx"></script>
 <script type="text/babel" src="Portfolio.jsx"></script>
 <script type="text/babel" src="MockingBirdModel.jsx"></script>
+<script type="text/babel" src="ServicesDetail.jsx"></script>
 <script type="text/babel" src="About.jsx"></script>
 <script type="text/babel" src="ContactScene.jsx"></script>
 <script type="text/babel" src="Contact.jsx"></script>
@@ -112,25 +113,8 @@ function App() {
     return () => window.removeEventListener('scroll', on);
   }, []);
   const go = (id) => { setPage(id); window.scrollTo(0, 0); };
-  // Sets a one-shot deep-link index ServicesExplorer (Home.jsx) reads on
-  // mount, then navigates home: the accordion opens straight to that row
-  // and scrolls down to meet it, instead of landing on row 0. Indices are
-  // this dropdown's best match into window.UBC_DATA.services; three of the
-  // eight categories (manufacture & supply, project management, training)
-  // have no existing row yet, so those point at new placeholder rows added
-  // alongside the real ones rather than a mismatched existing one.
-  const openService = (i) => { window.UBC_NAV_SERVICE = i; go('home'); };
   const nav = [
-    { label: 'Services', id: 'services', dropdown: [
-      { label: 'Drafting and architectural', onClick: () => openService(6) },
-      { label: 'Bill of material and estimation', onClick: () => openService(5) },
-      { label: 'Lot specific permit sets', onClick: () => openService(4) },
-      { label: 'Modeling and detailing', onClick: () => openService(0) },
-      { label: 'Engineering', onClick: () => openService(2) },
-      { label: 'Manufacture and supply of materials', onClick: () => openService(7) },
-      { label: 'Project management', onClick: () => openService(8) },
-      { label: 'Training services', onClick: () => openService(9) }
-    ] },
+    { label: 'Services', id: 'services' },
     { label: 'Projects', id: 'projects' },
     { label: 'About', id: 'about' },
     { label: 'Careers', id: 'careers' },
@@ -138,7 +122,7 @@ function App() {
   ];
   const body = {
     home: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
-    services: <window.MockingBirdModel />,
+    services: <window.MockingBirdModel onQuote={() => setQuote(true)} />,
     projects: <window.Portfolio onQuote={() => setQuote(true)} />,
     about: <window.About />,
     careers: <window.Careers onQuote={() => setQuote(true)} />,
