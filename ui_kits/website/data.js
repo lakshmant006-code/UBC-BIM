@@ -319,3 +319,175 @@ window.UBC_DATA.hero = {
       cta: 'See all projects', go: 'projects' }
   ]
 };
+
+// Full service articles, one per header dropdown entry (see index.html's
+// `nav` for the exact 8 labels and the index each opens). This is the
+// client's own real copy, supplied in full; the only editing done here is
+// structural: the same region list ("South Carolina, Florida, Texas,
+// California, Australia, New Zealand, Chile, Hyderabad, Dubai") repeated in
+// nearly every source paragraph is deduplicated into one `regions` tag row
+// per article instead of restated three or four times a page, and Training
+// Services' four platform write-ups (FrameCAD/Vertex BD/ScotSteel/Revit MWF
+// StructSoft), which were near-identical boilerplate in the source beyond
+// one distinguishing clause each, are condensed to that one real difference
+// apiece rather than repeated in full. Nothing else is paraphrased away:
+// every list, every process step and every real number (a week, three
+// months, HTT5/A325 aside — those are the model's own hardware, not this
+// copy) is kept.
+const CORE_REGIONS = ['South Carolina', 'Florida', 'Texas', 'California', 'Australia', 'New Zealand', 'Chile', 'Hyderabad, India', 'Dubai, UAE'];
+const EXTENDED_REGIONS = [...CORE_REGIONS, 'UK', 'Europe', 'Canada', 'Israel'];
+
+window.UBC_DATA.serviceArticles = [
+  { id: 'drafting-architectural', label: 'Drafting and architectural', title: 'Drafting & Architectural Services',
+    summary: 'Technical drawings and architectural documentation that turn a design into a buildable, coordinated construction set.',
+    regions: CORE_REGIONS,
+    sections: [
+      { body: [
+        'Drafting services primarily involve the creation of technical drawings and plans, while architectural services encompass the broader scope of activities related to the design and execution of a project: planning, conceptualization, documentation and oversight. Both are essential to delivering a building project.',
+        'Drafting involves creating the technical drawings and plans that document a project in detail. Traditionally done by hand, it is now done almost entirely in CAD software, and covers several distinct kinds of drawings.'
+      ] },
+      { heading: 'What a drafting set includes', list: [
+        { title: 'Architectural drawings', body: 'Floor plans, elevations, sections and details that illustrate the layout, dimensions and features of buildings and spaces.' },
+        { title: 'Structural drawings', body: 'Structural plans, sections and details showing the layout and specifications of beams, columns, foundations and reinforcement.' },
+        { title: 'MEP drawings', body: 'HVAC, electrical, plumbing and fire-protection plans detailing the layout and specifications of building systems.' },
+        { title: 'Site plans and landscaping drawings', body: 'Site layout, grading, landscaping features, utilities and other site-related information.' },
+        { title: 'Detail drawings', body: 'Close-up views and specifications of specific building components, connections and assemblies.' }
+      ] },
+      { body: [
+        'Drafting services ensure accurate communication of design intent, facilitate coordination among disciplines, and provide the information construction and fabrication need.',
+        'UBC delivers drafting and architectural services across the USA and internationally, with location-specific expertise that means accurate documentation, faster approvals, and seamless coordination with local authorities and construction teams.'
+      ] }
+    ] },
+
+  { id: 'bom-estimation', label: 'Bill of material and estimation', title: 'Bill of Material & Estimation',
+    summary: '3D-modeled bills of material that turn bid packages around in under a week and cut change orders before they start.',
+    regions: CORE_REGIONS,
+    sections: [
+      { body: [
+        '3D modeling significantly streamlines the time and expense of a construction project. Rather than flat renderings, our team works in full 3D perspective to capture every intricate detail, from foundation to ridge vent — stud spacing, drywall, siding and every other material — in one holistic, easily accessible format.',
+        'Obtaining quotes for bid packages is traditionally slow, often stalling on delayed or incomplete responses. With our modeling capability, we deliver bid packages, complete with full 3D views of every phase of construction, in under a week depending on complexity — letting clients compare quotes across every aspect of the project.',
+        'A detailed bill of materials paired with 3D views doesn’t just speed up bidding: it mitigates the risk of change orders, back-charges and disputes later. Clients frequently save up to three months solely from the efficiency this gains them.'
+      ] }
+    ] },
+
+  { id: 'permit-sets', label: 'Lot specific permit sets', title: 'Lot Specific Permit Sets',
+    summary: 'Complete, code-compliant permit sets — architectural, structural, MEP, site, specifications and calculations — ready for submission.',
+    regions: CORE_REGIONS,
+    sections: [
+      { body: [
+        'A "permit set" is the specific set of construction documents submitted to local building authorities to obtain the permits a project needs. It provides the detailed information that lets a jurisdiction confirm compliance with building codes, regulations and zoning requirements, for both residential and commercial projects.'
+      ] },
+      { heading: 'What a permit set includes', list: [
+        { title: 'Architectural drawings', body: 'Plans, elevations, sections and details of the building’s architectural features, including floor plans with layout, dimensions and finishes.' },
+        { title: 'Structural drawings', body: 'The design and layout of foundations, columns, beams, slabs and walls, with structural materials, sizes, reinforcement and connections.' },
+        { title: 'MEP drawings', body: 'Mechanical, electrical, plumbing and fire-protection systems: HVAC ductwork, electrical wiring, plumbing and fire suppression.' },
+        { title: 'Site plans', body: 'Building location on the property, property lines, setbacks, easements, parking, driveways, landscaping, utilities, stormwater and erosion control.' },
+        { title: 'Specifications', body: 'Written descriptions of materials, finishes, construction methods and quality standards, complementing the drawings.' },
+        { title: 'Calculations and reports', body: 'Engineering calculations, energy compliance reports, environmental assessments and other technical documents where required.' }
+      ] },
+      { body: [
+        'The permit set is typically one of the first steps in the construction process. Building authorities review it to confirm the proposed construction meets code and safety requirements before permits are issued, and inspections follow at various stages to verify the work matches the approved plans.'
+      ] }
+    ] },
+
+  { id: 'modeling-detailing', label: 'Modeling and detailing', title: 'Modeling & Detailing',
+    summary: 'Fully customizable 3D modeling and detailing — build it once virtually before you build it once for real.',
+    regions: CORE_REGIONS,
+    sections: [
+      { body: [
+        'Our approach to 3D modeling and detailing is entirely customizable, for an individual homeowner or a national builder alike. Building a home effectively means building it twice: with us, the first build happens virtually, as a full walkthrough of the interior before anything real breaks ground.',
+        'That proactive pass lets us catch and resolve issues early, before they become costly delays on site. Problems that surface mid-construction escalate fast, in cost, in schedule and in frustration; prototyping the project as a detailed 3D rendering, with our engineers involved throughout, is how we get ahead of that.',
+        'The detailing phase is where consistency gets decided: uniform placement of light switches, framing packages aligned so stud spacing lines up under every floor truss, consistent corner blocking throughout. These are the details we model so you can specify them exactly on site, cutting waste and keeping construction moving.'
+      ] }
+    ] },
+
+  { id: 'engineering', label: 'Engineering', title: 'Engineering',
+    summary: 'In-house engineering for wood and light-gauge steel, from concept through permitting — no outside engineers required.',
+    regions: CORE_REGIONS,
+    sections: [
+      { body: [
+        'Our engineering services support both wood and steel projects end to end, so you don’t need to bring on separate engineers or contractors. Our in-house team works with you from concept through execution, delivering engineered solutions that meet local building codes and construction standards.',
+        'You choose the level of service: bring us plans you’ve already developed, or ones purchased online, and we’ll provide the engineering — wood or light-gauge steel — needed to meet permitting requirements.',
+        'For specialized elements like floor and roof trusses, we have established affiliations across both the wood and light-gauge steel industries, connecting you with the specific expertise a given truss design needs.',
+        'Our office network lets us apply region-specific code expertise while keeping one unified engineering standard: timber construction in New Zealand, steel systems in Australia, seismic-compliant design in Chile, engineering production in Hyderabad, fast-track developments in Dubai — all under the same integrated approach.'
+      ] }
+    ] },
+
+  { id: 'manufacturing', label: 'Manufacture and supply of materials', title: 'Manufacturing',
+    summary: 'In-house manufacturing of structural components, exteriors, interior fixtures and specialty parts — precision-planned and quality-controlled.',
+    regions: CORE_REGIONS,
+    sections: [
+      { body: [
+        'Manufacturing is integrated into our full suite of services: a streamlined way to cover a project’s construction material needs, with a focus on quality, efficiency and reliability. It begins with precise planning and design, using advanced software to turn conceptual ideas into tangible products, whether that’s a custom building component or a standardized material.',
+        'Strategic partnerships with trusted suppliers give us access to a wide range of high-quality materials, so we can manufacture and supply a comprehensive range of construction materials, including:'
+      ] },
+      { list: [
+        'Structural components: beams, columns and trusses',
+        'Exterior finishes: siding, roofing materials and windows',
+        'Interior fixtures: doors, cabinets and hardware',
+        'Specialized components for specific project requirements'
+      ] },
+      { body: [
+        'Our facility runs on state-of-the-art machinery, operated by skilled professionals, under quality-control measures that keep every product at or above regulatory standards and client expectations — fulfilling orders promptly and consistently, from a single renovation to a multi-million-dollar development.'
+      ] }
+    ] },
+
+  { id: 'project-management', label: 'Project management', title: 'End-to-End Project Management for LGSF & Wooden Construction',
+    summary: 'Full-phase project management for Light Gauge Steel Frame and wooden construction — from estimation to final handover.',
+    regions: EXTENDED_REGIONS,
+    sections: [
+      { body: [
+        'We manage every phase of a Light Gauge Steel Frame (LGSF) or wooden construction project — from initial estimation to final handover, interior works included — with precision and seamless coordination.'
+      ] },
+      { heading: 'Scope of our project management services', list: [
+        { title: 'Estimation & costing', body: 'Complete estimations from foundation to finishing at client-standard rates, updated during execution to keep budgets aligned, with timely alerts on major variations.' },
+        { title: 'RFQ management', body: 'Competitive quotes sourced from your registered contractors and suppliers, exploring new vendors when needed to support expansion into newer areas.' },
+        { title: 'Quote validation', body: 'Every quote evaluated on pricing, contractor reliability, past experience and responsiveness to the project location, so only the most suitable vendors get recommended.' },
+        { title: 'PO management', body: 'Purchase orders issued swiftly with full transparency once approved, materials timed to arrive ahead of installation and quality-inspected, with delays escalated early so alternative plans can activate in time.' },
+        { title: 'Scheduling & coordination', body: 'Work schedules shared in advance with every stakeholder, coordinated by email, phone and your own ERP system so nothing slips through, and site readiness confirmed before trades arrive.' },
+        { title: 'Material procurement', body: 'Materials planned and procured in sync with the construction timeline, to keep delivery on time, storage needs down, and the site never waiting on downtime.' }
+      ] },
+      { heading: 'Why choose us', list: [
+        { title: 'Expert engineering support', body: 'Experienced civil engineers ensure seamless coordination and precise technical communication throughout the project.' },
+        { title: 'Integrated team approach', body: 'We work as an extension of your team, using your ERP systems and collaborating under your own project manager for smooth execution.' },
+        { title: 'High value at competitive cost', body: 'Round-the-clock service across time zones, with top-tier talent, at a highly competitive price.' }
+      ] },
+      { heading: 'Our latest projects', list: [
+        'Multi-storey steel frame buildings',
+        'Industrial facilities in harsh terrains',
+        'Infrastructure expansion in urban zones',
+        'Road and pavement reinforcement projects'
+      ] }
+    ] },
+
+  { id: 'training', label: 'Training services', title: 'Training Services for LGS and Wood-Framing BIM Software',
+    summary: 'Hands-on training on Vertex BD, MWF StructSoft, ScotSteel, FRAMECAD and Strap — customized to your team’s skill level.',
+    regions: EXTENDED_REGIONS,
+    sections: [
+      { body: [
+        'Our training helps construction and design professionals master Light Gauge Steel (LGS) and wood-framing BIM tools. Whether your team is new to a platform or already experienced, the program is customized to skill level, teaching efficient, production-ready use of the tool on real LGS projects.'
+      ] },
+      { heading: 'Platforms we train on', list: [
+        { title: 'FrameCAD', body: 'One of the most widely used BIM platforms for light steel framing design and detailing; training covers modeling, detailing and automating steel-framing workflows end to end.' },
+        { title: 'Vertex BD', body: 'The same end-to-end modeling, detailing and workflow automation training, built around Vertex BD’s own tools and conventions.' },
+        { title: 'ScotSteel', body: 'Covers truss engineering alongside 3D modeling and detailing — ScotSteel’s particular strength.' },
+        { title: 'Revit MWF StructSoft', body: 'Covers engineering, 3D modeling and detailing within Revit’s own MWF StructSoft workflow.' },
+        { title: 'Strap', body: 'Also covered as part of the same LGS BIM training program.' }
+      ] },
+      { heading: 'Who should attend', list: [
+        'Structural engineers & detailers',
+        'BIM coordinators & managers',
+        'Drafting technicians',
+        'Design-build contractors',
+        'Fabrication shop engineers'
+      ] },
+      { heading: 'What your team will learn', list: [
+        'Introduction to Vertex BD / ScotSteel / Revit MWF StructSoft / FrameCAD and LGS BIM workflows',
+        '3D modeling techniques for light-gauge steel structures',
+        'Automated generation of detailed drawings, framing plans and cut lists',
+        'Customizing project templates and part libraries',
+        'Integration with CNC fabrication machines for seamless production',
+        'Best practices for collaboration within BIM environments'
+      ] }
+    ] }
+];

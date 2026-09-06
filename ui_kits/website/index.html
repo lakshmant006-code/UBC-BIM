@@ -56,6 +56,7 @@
 <script type="text/babel" src="Home.jsx"></script>
 <script type="text/babel" src="Portfolio.jsx"></script>
 <script type="text/babel" src="MockingBirdModel.jsx"></script>
+<script type="text/babel" src="ServicesDetail.jsx"></script>
 <script type="text/babel" src="About.jsx"></script>
 <script type="text/babel" src="ContactScene.jsx"></script>
 <script type="text/babel" src="Contact.jsx"></script>
@@ -112,24 +113,24 @@ function App() {
     return () => window.removeEventListener('scroll', on);
   }, []);
   const go = (id) => { setPage(id); window.scrollTo(0, 0); };
-  // Sets a one-shot deep-link index ServicesExplorer (Home.jsx) reads on
-  // mount, then navigates home: the accordion opens straight to that row
-  // and scrolls down to meet it, instead of landing on row 0. Indices are
-  // this dropdown's best match into window.UBC_DATA.services; three of the
-  // eight categories (manufacture & supply, project management, training)
-  // have no existing row yet, so those point at new placeholder rows added
-  // alongside the real ones rather than a mismatched existing one.
-  const openService = (i) => { window.UBC_NAV_SERVICE = i; go('home'); };
+  // Sets a one-shot deep-link index ServicesDetail (ServicesDetail.jsx) reads
+  // on mount, then navigates to it: the tab strip opens straight to that
+  // category instead of always landing on the first one. Indices line up
+  // 1:1 with window.UBC_DATA.serviceArticles, in the same order as the
+  // dropdown below (unlike the old ServicesExplorer accordion, every one of
+  // these 8 categories now has its own real article, so there's no need to
+  // map onto a different, mismatched list).
+  const openServiceArticle = (i) => { window.UBC_NAV_SERVICE_TAB = i; go('service-detail'); };
   const nav = [
     { label: 'Services', id: 'services', dropdown: [
-      { label: 'Drafting and architectural', onClick: () => openService(6) },
-      { label: 'Bill of material and estimation', onClick: () => openService(5) },
-      { label: 'Lot specific permit sets', onClick: () => openService(4) },
-      { label: 'Modeling and detailing', onClick: () => openService(0) },
-      { label: 'Engineering', onClick: () => openService(2) },
-      { label: 'Manufacture and supply of materials', onClick: () => openService(7) },
-      { label: 'Project management', onClick: () => openService(8) },
-      { label: 'Training services', onClick: () => openService(9) }
+      { label: 'Drafting and architectural', onClick: () => openServiceArticle(0) },
+      { label: 'Bill of material and estimation', onClick: () => openServiceArticle(1) },
+      { label: 'Lot specific permit sets', onClick: () => openServiceArticle(2) },
+      { label: 'Modeling and detailing', onClick: () => openServiceArticle(3) },
+      { label: 'Engineering', onClick: () => openServiceArticle(4) },
+      { label: 'Manufacture and supply of materials', onClick: () => openServiceArticle(5) },
+      { label: 'Project management', onClick: () => openServiceArticle(6) },
+      { label: 'Training services', onClick: () => openServiceArticle(7) }
     ] },
     { label: 'Projects', id: 'projects' },
     { label: 'About', id: 'about' },
@@ -139,6 +140,7 @@ function App() {
   const body = {
     home: <window.Home onGo={go} onQuote={() => setQuote(true)} />,
     services: <window.MockingBirdModel />,
+    'service-detail': <window.ServicesDetail onQuote={() => setQuote(true)} />,
     projects: <window.Portfolio onQuote={() => setQuote(true)} />,
     about: <window.About />,
     careers: <window.Careers onQuote={() => setQuote(true)} />,
