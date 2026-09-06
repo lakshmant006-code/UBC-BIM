@@ -17,11 +17,17 @@
   Five red pulsing hotspot markers (corner stud, hold-down, anchor bolt,
   truss, bracing) sit on real structural detail, positioned from the
   model's own source IFC rather than guessed: see the comment on each
-  entry in data.js for how. Clicking one opens a card with that detail's
-  own real photo and paragraph (from the client's TYPICAL_DETAILS.pdf) —
-  a hotspot with no content yet would set `pending: true` instead and the
+  entry in data.js for how. Clicking one flies the camera in on that real
+  position and, once the move lands, opens a card with that detail's own
+  real photo and paragraph (from the client's TYPICAL_DETAILS.pdf) — a
+  hotspot with no content yet would set `pending: true` instead and the
   card falls back to an honest "content coming soon" state rather than
   invented copy, but every hotspot here already has real content.
+
+  `locked` on ModelViewer turns off free drag/scroll orbiting, so the
+  camera only ever moves via a hotspot's own flyTo or back out via reset —
+  closing the card (its own × button, or a click anywhere outside it)
+  always flies back to the initial resting frame.
 
   Reads its src/radius/hotspots straight from window.UBC_DATA.projects
   (the same entry the Projects card uses) rather than hardcoding them a
@@ -94,16 +100,31 @@ function MockingBirdModel({ onQuote }) {
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
   };
 
+  // The model is `locked` (no free drag/scroll) precisely so the camera is
+  // only ever where a hotspot put it or back at the resting frame — so
+  // closing the card, by its own × or by clicking anywhere outside it,
+  // always flies back out to that resting frame rather than leaving the
+  // camera parked on whichever detail was last open.
+  const closeHotspot = () => {
+    setOpenHotspot(null);
+    if (api) api.reset();
+  };
+  // Hotspot buttons stopPropagation on click (ModelViewer.jsx), so this
+  // only ever fires for a click that is genuinely outside the open card.
+  const handleBackgroundClick = (e) => {
+    if (openHotspot && !e.target.closest('[role="dialog"]')) closeHotspot();
+  };
+
   return (
-    <div style={{ paddingTop: 'var(--s-6)' }}>
+    <div style={{ paddingTop: 'var(--s-6)' }} onClick={handleBackgroundClick}>
       {project && project.model && window.ModelViewer ? (
         <window.ModelViewer src={project.model.src} radius={project.model.radius}
-          height="calc(100vh - 84px)" bare initialAngle={[2.6, 0.55, 1.0]}
+          height="calc(100vh - 84px)" bare locked initialAngle={[2.6, 0.55, 1.0]}
           hotspots={project.model.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
       ) : (
         <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
       )}
-      {openHotspot && <HotspotCard hotspot={openHotspot} onClose={() => setOpenHotspot(null)} />}
+      {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
       {window.ServicesDetail && <window.ServicesDetail onQuote={onQuote} />}
     </div>
   );

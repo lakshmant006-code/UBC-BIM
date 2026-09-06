@@ -30,6 +30,10 @@
              manifest); reset() is flyTo back to the whole model. A caller
              (the Services explorer) drives the camera from outside this way
              without reaching into three.js itself.
+    locked   drop the "orbitable" part: OrbitControls stops reacting to
+             drag/scroll/pan, so the only way the camera moves is a caller's
+             own flyTo/reset calls (MockingBirdModel.jsx, for a guided,
+             hotspot-driven view rather than a free-roam one).
 */
 
 // three r147 is the last release that ships the plain-script builds, which is
@@ -206,7 +210,7 @@ function bounceHandlers(ref) {
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }
 
-function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, onReady }) {
+function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -313,6 +317,12 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       // Stop the camera dropping under the floor, which reads as broken.
       controls.maxPolarAngle = Math.PI * 0.495;
       controls.target.set(0, 0, 0);
+      // A caller wanting a guided, hotspot-driven view rather than a
+      // free-roam one (MockingBirdModel.jsx) passes `locked`: this only
+      // stops OrbitControls reacting to drag/scroll/pan input, it doesn't
+      // touch controls.update() below, so flyTo's own camera moves (the
+      // hotspot zoom-in, and the reset back out) still animate normally.
+      controls.enabled = !locked;
 
       const fit = () => {
         const w = host.clientWidth, h = host.clientHeight;
@@ -468,7 +478,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
           lands on them. */}
       {hotspots && hotspots.map((hs) => (
         <button key={hs.id} ref={(el) => { hotspotDomRefs.current[hs.id] = el; }}
-          onClick={() => onHotspotClick && onHotspotClick(hs)}
+          onClick={(e) => { e.stopPropagation(); onHotspotClick && onHotspotClick(hs); }}
           aria-label={hs.label} title={hs.label}
           className="ubc-hotspot" style={{ position: 'absolute', display: 'none', width: 22, height: 22, marginLeft: -11, marginTop: -11, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}>
           <span aria-hidden="true" className="ubc-hotspot-ring" style={{ position: 'absolute', left: '50%', top: '50%', width: 34, height: 34, marginLeft: -17, marginTop: -17, borderRadius: 999, border: '1.5px solid var(--accent)', animation: 'ubcHotspotPulse 1.8s ease-out infinite' }} />
