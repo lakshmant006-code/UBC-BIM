@@ -30,6 +30,10 @@
              manifest); reset() is flyTo back to the whole model. A caller
              (the Services explorer) drives the camera from outside this way
              without reaching into three.js itself.
+    locked   drop the "orbitable" part: OrbitControls stops reacting to
+             drag/scroll/pan, so the only way the camera moves is a caller's
+             own flyTo/reset calls (MockingBirdModel.jsx, for a guided,
+             hotspot-driven view rather than a free-roam one).
 */
 
 // three r147 is the last release that ships the plain-script builds, which is
@@ -206,7 +210,7 @@ function bounceHandlers(ref) {
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }
 
-function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, onReady }) {
+function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -270,7 +274,14 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       host.appendChild(renderer.domElement);
       renderer.domElement.style.display = 'block';
-      renderer.domElement.style.touchAction = 'none';
+      // A locked viewer has nothing for touch to drag, pinch or pan — so it
+      // shouldn't swallow a touch gesture at all, and 'none' otherwise blocks
+      // native scroll past the model on a touchscreen even with OrbitControls
+      // itself disabled (that's a plain CSS property, not gated by
+      // controls.enabled). An orbitable one still needs 'none': without it,
+      // the same one-finger drag the browser wants to scroll the page with
+      // is also this canvas's own single-finger rotate gesture.
+      renderer.domElement.style.touchAction = locked ? 'auto' : 'none';
       // See the matching comment in Home.jsx's GlobalPresence: setSize(...,
       // false) skips three.js's own style.width/height writes, so without
       // this the canvas falls back to its width/height attributes (set to
@@ -313,6 +324,12 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       // Stop the camera dropping under the floor, which reads as broken.
       controls.maxPolarAngle = Math.PI * 0.495;
       controls.target.set(0, 0, 0);
+      // A caller wanting a guided, hotspot-driven view rather than a
+      // free-roam one (MockingBirdModel.jsx) passes `locked`: this only
+      // stops OrbitControls reacting to drag/scroll/pan input, it doesn't
+      // touch controls.update() below, so flyTo's own camera moves (the
+      // hotspot zoom-in, and the reset back out) still animate normally.
+      controls.enabled = !locked;
 
       const fit = () => {
         const w = host.clientWidth, h = host.clientHeight;
@@ -468,7 +485,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
           lands on them. */}
       {hotspots && hotspots.map((hs) => (
         <button key={hs.id} ref={(el) => { hotspotDomRefs.current[hs.id] = el; }}
-          onClick={() => onHotspotClick && onHotspotClick(hs)}
+          onClick={(e) => { e.stopPropagation(); onHotspotClick && onHotspotClick(hs); }}
           aria-label={hs.label} title={hs.label}
           className="ubc-hotspot" style={{ position: 'absolute', display: 'none', width: 22, height: 22, marginLeft: -11, marginTop: -11, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}>
           <span aria-hidden="true" className="ubc-hotspot-ring" style={{ position: 'absolute', left: '50%', top: '50%', width: 34, height: 34, marginLeft: -17, marginTop: -17, borderRadius: 999, border: '1.5px solid var(--accent)', animation: 'ubcHotspotPulse 1.8s ease-out infinite' }} />
