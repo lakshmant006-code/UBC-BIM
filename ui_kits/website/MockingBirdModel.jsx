@@ -96,9 +96,12 @@ function MockingBirdModel({ onQuote }) {
   // (same flyTo the Services explorer uses to point the camera at a
   // service's own part of its model), then brings the card up once that
   // move actually lands, rather than popping it up over a camera still
-  // mid-flight.
+  // mid-flight. Each hotspot's own viewAngle (data.js) points the camera
+  // in from whichever side actually reads clearly for that specific
+  // detail, rather than every hotspot sharing the page's one resting
+  // angle regardless of where on the building it sits.
   const handleHotspotClick = (hs) => {
-    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS });
+    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
   };
 
