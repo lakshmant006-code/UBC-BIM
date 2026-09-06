@@ -76,13 +76,13 @@ function HotspotCard({ hotspot, onClose }) {
   );
 }
 
-// How close flyTo frames a single connection detail. The first value (1.3)
-// framed tighter than intended — cropped in past the point of reading the
-// connection in context. Widened to match the framing in the reference
-// video: a full corner bay, several full-height studs either side of the
-// detail, comparable to (a touch wider than) the Services explorer's own
-// K-brace stud close-up at 2.725.
-const HOTSPOT_ZOOM_RADIUS = 3.0;
+// How close flyTo frames a single connection detail. What looked like
+// over-cropping at 1.3 was actually the separate floor-offset targeting bug
+// (fixed above) landing the camera on the wrong point entirely; 3.0 was a
+// safe, verifiably-correct widening while that was still unresolved. Now
+// that a hotspot flies to the exact point its marker sits on, tightened
+// back down closer to that original intent.
+const HOTSPOT_ZOOM_RADIUS = 1.6;
 
 function MockingBirdModel({ onQuote }) {
   const { Page } = window;
@@ -96,9 +96,12 @@ function MockingBirdModel({ onQuote }) {
   // (same flyTo the Services explorer uses to point the camera at a
   // service's own part of its model), then brings the card up once that
   // move actually lands, rather than popping it up over a camera still
-  // mid-flight.
+  // mid-flight. Each hotspot's own viewAngle (data.js) points the camera
+  // in from whichever side actually reads clearly for that specific
+  // detail, rather than every hotspot sharing the page's one resting
+  // angle regardless of where on the building it sits.
   const handleHotspotClick = (hs) => {
-    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS });
+    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
   };
 

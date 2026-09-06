@@ -136,20 +136,37 @@ window.UBC_DATA = {
         // image/body for all five are real, drawn from the client's own
         // TYPICAL_DETAILS.pdf (cropped renders in assets/details/, copy
         // paraphrased from that sheet's own callouts) rather than invented.
+        // viewAngle is the [x,y,z] direction (scaled by the zoom radius,
+        // same math as hero/services flyTo presets) the camera closes in
+        // from for this one hotspot, instead of the page's own shared
+        // resting angle. Chosen per hotspot from where it actually sits on
+        // the building (real coordinates, see position below), not
+        // guessed blind: corner-stud and bracing both sit right at the
+        // west wall's exterior face (x = -7.518, the building's own x-min),
+        // so their view looks from further west (more negative x) — from
+        // outside that wall — rather than from inside it; hold-down and
+        // anchor-bolt sit on the recessed porch-back wall a couple of
+        // metres east of that same face, so the same "look from outside,
+        // i.e. further west/negative x" logic applies, angled north or
+        // south to each one's own z; truss sits up in the roof, so its
+        // view comes in low and to the side rather than from above, to
+        // read the W-webbing in profile instead of looking down on the
+        // top chord. None of this has been checked against a render yet —
+        // if one still doesn't frame well, that's the value to adjust.
         hotspots: [
-          { id: 'corner-stud', label: 'Corner stud', position: [-7.518, 1.063, 4.641],
+          { id: 'corner-stud', label: 'Corner stud', position: [-7.518, 1.063, 4.641], viewAngle: [-1.6, 1.0, 1.4],
             image: 'assets/details/corner-stud.jpg',
             body: 'Where two exterior walls meet, the corner is framed from grouped studs (or ladder blocking, per the framing plan) so both wall panels have something solid to fasten into. Panel-to-panel seams like this one are joined with paired hex-head screws, per the project’s typical panel connection detail.' },
-          { id: 'hold-down', label: 'Hold-down', position: [-6.040, -2.371, -4.731],
+          { id: 'hold-down', label: 'Hold-down', position: [-6.040, -2.371, -4.731], viewAngle: [-1.5, 0.9, -1.3],
             image: 'assets/details/hold-down.jpg',
             body: 'A hold-down bracket ties the end stud of a shear wall down to the foundation, resisting the wall trying to lift or rotate under lateral (wind or seismic) load. Sized per the project’s own hold-down schedule, one sits at each end of a shear wall panel, fastened through the base track.' },
-          { id: 'anchor-bolt', label: 'Anchor bolt', position: [-6.078, -2.252, -0.616],
+          { id: 'anchor-bolt', label: 'Anchor bolt', position: [-6.078, -2.252, -0.616], viewAngle: [-1.8, 0.9, 0.5],
             image: 'assets/details/anchor-bolt.jpg',
             body: 'The base track is bolted straight through to the concrete slab at each location called out on the plan, holding the wall’s bottom track against sliding and uplift before any stud or sheathing load is even applied.' },
-          { id: 'truss', label: 'Truss', position: [3.331, 2.440, -2.419],
+          { id: 'truss', label: 'Truss', position: [3.331, 2.440, -2.419], viewAngle: [0.8, 0.5, 1.8],
             image: 'assets/details/truss.jpg',
             body: 'An open-web roof truss, engineered separately on its own truss drawings, lands directly on the wall’s top plate and is screwed down at 24 in. o.c. Where two trusses share a bearing wall, their heels are screwed to each other too, so the roof diaphragm and the wall below act as one assembly rather than two separately-fastened parts.' },
-          { id: 'bracing', label: 'Bracing', position: [-7.518, 1.335, 2.057],
+          { id: 'bracing', label: 'Bracing', position: [-7.518, 1.335, 2.057], viewAngle: [-1.8, 0.9, 0.6],
             image: 'assets/details/bracing.jpg',
             body: 'A horizontal brace runs across the wall’s studs partway up its height, screwed through every stud it crosses, to keep them from twisting or buckling sideways between the base track and the top plate.' }
         ]
