@@ -200,6 +200,23 @@ function HotspotCard({ hotspot, onClose }) {
 // back down closer to that original intent.
 const HOTSPOT_ZOOM_RADIUS = 1.6;
 
+// Wall panels' own resting frame: an interior, fairly level oblique view
+// across several stud-wall assemblies with the floor joists above, per the
+// client's own reference screenshot — replacing the page's earlier low,
+// near-level "read the ridge line" angle, which read well for the roofline
+// but, being close and near-level, likely cropped the low, foundation-level
+// hotspots (hold-down, anchor-bolt) out of frame. All five hotspots sit
+// scattered around the building's own centre (the point this camera always
+// looks at — see ModelViewer.jsx's fixed controls.target), corner-to-corner
+// and floor-to-ridge, so pulled a step further back than that ridge-line
+// shot (2.2/0.85/2.0, magnitude ≈3.1 vs. the old 2.6/0.55/1.0's ≈2.84) and
+// raised a little in elevation, to bring the low foundation-level pair and
+// the high roof truss inside the same frame at once rather than favouring
+// one end of the building's height over the other. Not checked against a
+// render yet (no browser access in this sandbox) — if any hotspot still
+// sits outside this frame, that's the value to nudge further.
+const WALL_PANELS_ANGLE = [2.2, 0.85, 2.0];
+
 function MockingBirdModel({ onQuote }) {
   const D = window.UBC_DATA;
   const project = D.projects.find((p) => p.id === 'mocking-bird-lot-2');
@@ -255,7 +272,7 @@ function MockingBirdModel({ onQuote }) {
         project && project.model && window.ModelViewer ? (
           <>
             <window.ModelViewer src={project.model.src} radius={project.model.radius}
-              height="calc(100vh - 84px)" bare locked initialAngle={[2.6, 0.55, 1.0]}
+              height="calc(100vh - 84px)" bare locked initialAngle={WALL_PANELS_ANGLE}
               hotspots={project.model.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
             {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
           </>
