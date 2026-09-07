@@ -5,7 +5,10 @@
   column grid, up into the roof beams, in among the bays, out to a full
   reveal. This is the model rendered live, not a pre-shot video: there is no
   frame sequence, no <video> element, nothing to re-record if the model
-  changes.
+  changes. The camera's path between stages rides a Catmull-Rom curve
+  through all five stage positions (see camCurve below), not a straight
+  line segment-by-segment, so scrolling through it reads as one continuous,
+  smooth flight rather than a series of kinks at each stage.
 
   An intro headline shows first and fades out; then the STAGE captions + a
   numbered rail track the scroll, same as they did over the old frame
@@ -125,6 +128,15 @@ function SceneHero({ onQuote, onGo }) {
 
       const camera = new THREE.PerspectiveCamera(42, 1, R / 200, R * 80);
       const stagePos = HERO_STAGES.map((s) => new THREE.Vector3(...(s.pos || [R * 1.6, R * 1.2, R * 1.9])));
+      // A Catmull-Rom curve through all five stage positions, not just a
+      // straight line between whichever pair is current: cameraAt below
+      // still walks the exact same per-stage timing (the t breakpoints),
+      // but samples a point off this curve instead of lerping, so the
+      // camera glides through each waypoint on a continuous, rounded path
+      // rather than visibly changing direction in a straight-line kink at
+      // every stage. THREE.CatmullRomCurve3 is core three.js (bundled in
+      // three.min.js), not an examples/ addon, so no extra script needed.
+      const camCurve = stagePos.length > 2 ? new THREE.CatmullRomCurve3(stagePos, false, 'catmullrom', 0.5) : null;
       camera.position.copy(stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9));
       camera.lookAt(0, 0, 0);
 
@@ -191,14 +203,20 @@ function SceneHero({ onQuote, onGo }) {
 
       // Find which pair of stage keyframes the (eased) scroll position falls
       // between, and how far along that pair: the same "index by t" search
-      // the numbered rail uses, just interpolated instead of stepped.
+      // the numbered rail uses. With camCurve available, i + local becomes
+      // one continuous parameter along the whole curve (0 at stage 0, 1 at
+      // the last stage) rather than a per-segment straight-line lerp, so
+      // the exact same per-stage timing now walks a smooth path instead of
+      // a piecewise-linear one.
       const cameraAt = (p) => {
         if (stagePos.length < 2) return stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
         let i = 0;
         for (; i < HERO_STAGES.length - 2; i++) if (p < (HERO_STAGES[i + 1].t || 0)) break;
         const t0 = HERO_STAGES[i].t || 0, t1 = HERO_STAGES[i + 1].t || 1;
         const local = t1 > t0 ? Math.min(1, Math.max(0, (p - t0) / (t1 - t0))) : 0;
-        return new THREE.Vector3().lerpVectors(stagePos[i], stagePos[i + 1], local);
+        if (!camCurve) return new THREE.Vector3().lerpVectors(stagePos[i], stagePos[i + 1], local);
+        const u = Math.min(1, Math.max(0, (i + local) / (stagePos.length - 1)));
+        return camCurve.getPoint(u);
       };
 
       let raf = 0;
