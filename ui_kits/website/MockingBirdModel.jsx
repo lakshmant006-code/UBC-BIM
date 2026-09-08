@@ -190,6 +190,28 @@ function HotspotCard({ hotspot, onClose }) {
   );
 }
 
+// Drops the model out of its guided, hotspot-only camera and back to a
+// plain orbitable one (drag to rotate, scroll to zoom — ModelViewer's own
+// OrbitControls, not a custom control), so anyone can dial in whatever
+// frame they actually want to see rather than trusting the page's own
+// reasoned-but-unrendered isometric numbers.
+function FreeRotateToggle({ on, onToggle }) {
+  const { Icon } = window.UBCBIMDesignSystem_353af8;
+  return (
+    <button onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{
+      position: 'fixed', right: 'var(--gutter)', top: 'calc(84px + var(--s-5))', zIndex: 55,
+      display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+      background: on ? 'var(--accent)' : 'rgba(245,244,241,.88)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+      border: 'var(--bw-hair) solid ' + (on ? 'var(--accent)' : 'var(--border-strong)'), borderRadius: 'var(--r-2)', boxShadow: 'var(--shadow-2)',
+      padding: '8px 12px', color: on ? 'var(--white)' : 'var(--text-strong)',
+      fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase'
+    }}>
+      <Icon name="rotate-3d" size={14} />
+      {on ? 'Lock view' : 'Free rotate'}
+    </button>
+  );
+}
+
 // How close flyTo frames a single connection detail on wallPanelModel — a
 // panel-scale model (radius 4.2 m, see data.js), so this is proportionally
 // tighter than a whole-building model's own hotspot zoom would be.
@@ -202,14 +224,32 @@ function MockingBirdModel({ onQuote }) {
   const [selection, setSelection] = React.useState({ type: 'article', id: (articles[0] && articles[0].id) || null });
   const [api, setApi] = React.useState(null);
   const [openHotspot, setOpenHotspot] = React.useState(null);
+  // Off by default (the guided, hotspot-only camera this view is built
+  // around) — but the exact isometric numbers above were reasoned from
+  // real coordinates, never actually seen rendered, so a visitor (or
+  // whoever's checking the framing) can switch this on to drag/scroll the
+  // model freely and see the real thing rather than trusting the math.
+  const [freeRotate, setFreeRotate] = React.useState(false);
   const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Leaving the Wall panels view tears down that ModelViewer instance;
-  // clear its stale api/open-card state so returning to it later starts
-  // clean instead of briefly showing whatever card was last open.
+  // clear its stale api/open-card/free-rotate state so returning to it
+  // later starts clean instead of picking up wherever it was left.
   React.useEffect(() => {
-    if (selection.type !== 'wall-panels') { setApi(null); setOpenHotspot(null); }
+    if (selection.type !== 'wall-panels') { setApi(null); setOpenHotspot(null); setFreeRotate(false); }
   }, [selection.type]);
+
+  // Switching back to the guided view snaps the camera back to the
+  // resting isometric shot, so turning free rotate off always leaves the
+  // model exactly where a visitor who never touched it would find it —
+  // never wherever it happened to be dragged to.
+  const toggleFreeRotate = () => {
+    setFreeRotate((v) => {
+      const next = !v;
+      if (!next && api) api.reset();
+      return next;
+    });
+  };
 
   // Click flies the camera in on the hotspot's own real position first,
   // then brings the card up once that move actually lands, rather than
@@ -250,8 +290,9 @@ function MockingBirdModel({ onQuote }) {
         wallPanel && window.ModelViewer ? (
           <>
             <window.ModelViewer src={wallPanel.src} radius={wallPanel.radius}
-              height="calc(100vh - 84px)" bare locked initialAngle={wallPanel.restAngle}
+              height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={wallPanel.restAngle}
               hotspots={wallPanel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
+            <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
             {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
           </>
         ) : (
