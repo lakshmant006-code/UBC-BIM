@@ -360,14 +360,17 @@ window.UBC_DATA.hero = {
    thing rather than needing a hotspot-reachable "jump to detail" list the
    way the whole building did.
 
-   restAngle is a true isometric direction (equal x/y/z, the classic
-   "three visible faces, no perspective favoured" drafting angle) rather
-   than the shared three-quarter default: pulled back to magnitude 2.1
-   (not the usual ~1.5-2.6) specifically so all five hotspots below clear
-   the camera's own field of view at once — verified by projecting each
-   one into camera space at this exact position (not eyeballed), see the
-   session's own working notes if that check needs redoing after any
-   position changes here.
+   restAngle opens on the hold-down side: same direction as the hold-down
+   hotspot's own viewAngle below ([-1.6, 0.9, -1.4], the side that hotspot
+   itself flies in from), scaled up from that hotspot's own tight
+   close-up distance to a whole-panel one (magnitude ~3.64, matching the
+   width this used to open at when it was a plain equal-x/y/z isometric)
+   rather than a generic three-quarter default. That same wider distance
+   happens to still clear every one of the five hotspots below through the
+   camera's own field of view, same as the isometric version did —
+   verified by projecting each one into camera space at this exact
+   position (not eyeballed), see the session's own working notes if that
+   check needs redoing after any position changes here.
 
    hotspots: real, named elements from the source IFC (ifcopenshell), not
    guessed, transformed through the exact same percentile-centre +
@@ -404,7 +407,7 @@ window.UBC_DATA.hero = {
    else. */
 window.UBC_DATA.wallPanelModel = {
   src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
-  restAngle: [2.1, 2.1, 2.1],
+  restAngle: [-2.52, 1.42, -2.20],
   hotspots: [
     { id: 'hold-down', label: 'Hold-down', position: [-2.852, -1.742, -2.057], viewAngle: [-1.6, 0.9, -1.4],
       image: 'assets/details/wp-hold-down.jpg',
