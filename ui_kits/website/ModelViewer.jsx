@@ -427,14 +427,6 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         scene.add(gltf.scene);
         modelReady = true;
         setState('ready');
-        // floorOffsetY above is only known once the mesh has actually
-        // loaded; api.getFloorOffset() below closes over the same `let`,
-        // so re-emitting onReady now (a fresh object, so a caller keying an
-        // effect off it — MockingBirdModel.jsx's own resting-frame flyTo —
-        // actually re-fires) is what tells a caller it's safe to read a
-        // real value rather than the pre-load 0.
-        apiRef.current = buildApi(true);
-        if (onReady) onReady(apiRef.current);
       }, (e) => {
         if (e && e.lengthComputable) setPct(Math.round((e.loaded / e.total) * 100));
       }, () => { if (!dead) setState('error'); });
@@ -460,14 +452,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
           start: performance.now(), duration: reduceMotion ? 1 : ((view && view.duration) || 900)
         };
       };
-      // getFloorOffset lets a caller doing its own custom flyTo (a resting
-      // frame off-centre from the model's origin, say) apply the same
-      // floor-snap correction this component already applies to a
-      // hotspot's own [x,y,z] before using it as a camera target — see the
-      // `ready` flag below for why that value isn't trustworthy yet on the
-      // very first onReady.
-      const buildApi = (ready) => ({ flyTo, reset: () => flyTo({ center: [0, 0, 0], radius: R }), getFloorOffset: () => floorOffsetY, ready });
-      apiRef.current = buildApi(false);
+      apiRef.current = { flyTo, reset: () => flyTo({ center: [0, 0, 0], radius: R }) };
       if (onReady) onReady(apiRef.current);
 
       cleanup = () => {
