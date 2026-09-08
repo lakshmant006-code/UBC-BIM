@@ -389,20 +389,36 @@ window.UBC_DATA.hero = {
    viewAngle is reasoned per hotspot from which side of the panel's own
    bounding box it sits nearest (same method as Mocking Bird Lot 2's own
    hotspots) — not checked against a render (no browser access in this
-   sandbox); if one still doesn't frame well, that's the value to adjust. */
+   sandbox); if one still doesn't frame well, that's the value to adjust.
+
+   image: real crops of the client's own TYPICAL_DETAILS.pdf (assets/
+   details/wp-*.jpg), taken directly from that PDF's own drawn sheets
+   rather than rendered separately — hold-down from its "TYPICAL HOLDDOWN
+   DETAIL" isometric, anchor from the base-of-wall elevation labelled
+   "ANCHOR BOLT AND HOLD DOWNS", top-track from "TYPICAL VERTICAL STUD
+   TRACK CONNECTION", sheathing from "TYPICAL SHEAR WALL DETAIL
+   PERPENDICULAR TO TRUSS". bolt has none: the PDF's own fastening details
+   only show self-drilling screws (#10/#12), never a structural bolt like
+   this one, so no real crop of it exists to show — its card falls back to
+   its own text-only body rather than borrowing a picture of something
+   else. */
 window.UBC_DATA.wallPanelModel = {
   src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
   restAngle: [2.1, 2.1, 2.1],
   hotspots: [
     { id: 'hold-down', label: 'Hold-down', position: [-2.852, -1.742, -2.057], viewAngle: [-1.6, 0.9, -1.4],
+      image: 'assets/details/wp-hold-down.jpg',
       body: 'A Simpson Strong-Tie HTT5 hold-down tie, fastened to the stud above and anchored below — it resists this end of the panel lifting or rotating under lateral load, the same role a hold-down plays wherever a shear wall needs one.' },
     { id: 'anchor', label: 'Anchor', position: [0.455, -2.012, -2.057], viewAngle: [1.2, 0.9, -1.6],
+      image: 'assets/details/wp-anchor.jpg',
       body: 'One of six base anchor connections along this panel’s bottom track, holding it down against whatever it lands on — slab or foundation — before any stud or sheathing load is even applied.' },
     { id: 'bolt', label: 'Structural bolt', position: [-0.057, 1.106, 2.058], viewAngle: [0.6, 0.9, 1.8],
       body: 'A 1/2 in. A325 structural bolt, 12 mm × 200 mm — the grade used through most of this panel’s stud-to-track and panel-to-panel connections. A single heavier A490 bolt appears once elsewhere on the same panel, at the one connection sized to need it.' },
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
+      image: 'assets/details/wp-top-track.jpg',
       body: 'The longest single member in this panel — its own track, running nearly the full 4.25 m depth along the top and tying every stud in this run into one continuous assembly rather than a row of independent members. Labelled RT_9 in the source model.' },
     { id: 'sheathing', label: 'Sheathing', position: [0.203, 1.833, -2.057], viewAngle: [0.8, 0.6, -1.7],
+      image: 'assets/details/wp-sheathing.jpg',
       body: 'This panel’s own sheathing, modelled as one continuous surface spanning nearly its full 6.17 m width rather than as individual sheets — the layer that ties every stud together into a working diaphragm and gives the wall its real shear capacity.' }
   ]
 };
