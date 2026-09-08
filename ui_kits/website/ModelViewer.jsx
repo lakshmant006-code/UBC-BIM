@@ -232,6 +232,15 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
   // right place, so a click flies to the same point the marker is sitting
   // on, not the pre-shift one.
   const floorOffsetRef = React.useRef(0);
+  // controls/renderer live outside React state (three.js objects, not
+  // something to re-render on), so a caller flipping `locked` after the
+  // model has already loaded (MockingBirdModel.jsx's free-rotate toggle)
+  // needs a way to reach the very controls.enabled the mount effect set
+  // once at start-up — these refs are that way in. Without them, `locked`
+  // changing would only update the closed-over local the mount effect
+  // already used and moved on from, never the live controls instance.
+  const controlsRef = React.useRef(null);
+  const rendererRef = React.useRef(null);
 
   // Start loading once the viewer comes within reach of the viewport, so a
   // grid of these does not fetch three.js or any GLB until scrolled to.
@@ -336,6 +345,8 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       // touch controls.update() below, so flyTo's own camera moves (the
       // hotspot zoom-in, and the reset back out) still animate normally.
       controls.enabled = !locked;
+      controlsRef.current = controls;
+      rendererRef.current = renderer;
 
       const fit = () => {
         const w = host.clientWidth, h = host.clientHeight;
@@ -469,6 +480,8 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
         apiRef.current = null;
+        controlsRef.current = null;
+        rendererRef.current = null;
         if (onReady) onReady(null);
       };
     }).catch(() => { if (!dead) setState('error'); });
@@ -480,6 +493,16 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
     // on every unrelated re-render of the caller.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mount, src, radius]);
+
+  // `locked` flipping after the model has already loaded (a caller's own
+  // free-rotate toggle, say) needs to reach the live controls/renderer the
+  // mount effect above already created — that effect only runs again for
+  // mount/src/radius, never for `locked`, so without this a toggle would
+  // update the React prop but never actually re-enable OrbitControls.
+  React.useEffect(() => {
+    if (controlsRef.current) controlsRef.current.enabled = !locked;
+    if (rendererRef.current) rendererRef.current.domElement.style.touchAction = locked ? 'auto' : 'none';
+  }, [locked]);
 
   const label = {
     loading: pct ? 'Loading model · ' + pct + '%' : 'Loading model',
