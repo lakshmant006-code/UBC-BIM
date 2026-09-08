@@ -19,8 +19,16 @@
 <meta name="twitter:description" content="Wall panels, roof and floor trusses, MEP coordination and permit sets, produced from one coordinated framing model.">
 <meta name="twitter:image" content="https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg">
 <link rel="preload" as="fetch" href="assets/models/mocking-bird-lot-2.glb" crossorigin fetchpriority="high">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="responsive.css">
+<!-- Every local script/stylesheet below carries ?v=N: none of them are
+     content-hashed (no build step), so without a query string a browser or
+     edge cache that already has an old copy has no reason to ever refetch
+     one after it changes on the server — a visitor can sit on stale JS
+     indefinitely. Bump N (one shared number, not per-file) whenever any
+     locally-referenced file's content changes; anything unbumped keeps
+     whatever cached copy a visitor already has, which is the whole
+     problem this exists to avoid. -->
+<link rel="stylesheet" href="../../styles.css?v=53">
+<link rel="stylesheet" href="responsive.css?v=53">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"ProfessionalService","name":"UBC BIM","description":"BIM detailing for wood-frame and light-gauge-steel construction: wall panels, roof and floor trusses, MEP coordination, permit sets and machine files.","url":"https://ubc-bim.vercel.app/","image":"https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg","areaServed":"Worldwide","knowsAbout":["Building Information Modelling","Light-gauge steel framing","Wood frame construction","Roof and floor trusses","MEP clash detection","Permit documentation"],"serviceType":["Wall panel detailing","Roof and floor trusses","Engineering of walls and trusses","MEP detailing and clash detection","Permit documents","Bill of Materials and machine CSV","Architectural drafting"]}
 </script>
@@ -29,8 +37,8 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha384-fXdIufVbE9aU7STmdk/DWK0imNOozId9fTwzM/gi0NfPjphEIC3gq0M760UnsKVy" crossorigin="anonymous"></script>
 <script src="assets/vendor/cobe.js"></script>
-<script src="../../_ds_bundle.js"></script>
-<script src="data.js"></script>
+<script src="../../_ds_bundle.js?v=53"></script>
+<script src="data.js?v=53"></script>
 <style>@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}@keyframes ubcCaret{0%,49%{opacity:1}50%,100%{opacity:0}}@keyframes ubcMarqueeV{from{transform:translateY(0)}to{transform:translateY(calc(-100% - var(--ubc-mq-gap)))}}@keyframes ubcHotspotPulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}</style>
 </head><body><div id="root"></div>
 <noscript>
@@ -50,18 +58,18 @@
     <p>783 projects completed across 12 countries, for 224 clients, by a team of 73.</p>
   </main>
 </noscript>
-<script type="text/babel" src="ModelViewer.jsx"></script>
-<script type="text/babel" src="FramingSchematic.jsx"></script>
-<script type="text/babel" src="SceneHero.jsx"></script>
-<script type="text/babel" src="Home.jsx"></script>
-<script type="text/babel" src="Portfolio.jsx"></script>
-<script type="text/babel" src="MockingBirdModel.jsx"></script>
-<script type="text/babel" src="ServicesDetail.jsx"></script>
-<script type="text/babel" src="About.jsx"></script>
-<script type="text/babel" src="ContactScene.jsx"></script>
-<script type="text/babel" src="Contact.jsx"></script>
-<script type="text/babel" src="Careers.jsx"></script>
-<script type="text/babel" src="ChatBot.jsx"></script>
+<script type="text/babel" src="ModelViewer.jsx?v=53"></script>
+<script type="text/babel" src="FramingSchematic.jsx?v=53"></script>
+<script type="text/babel" src="SceneHero.jsx?v=53"></script>
+<script type="text/babel" src="Home.jsx?v=53"></script>
+<script type="text/babel" src="Portfolio.jsx?v=53"></script>
+<script type="text/babel" src="MockingBirdModel.jsx?v=53"></script>
+<script type="text/babel" src="ServicesDetail.jsx?v=53"></script>
+<script type="text/babel" src="About.jsx?v=53"></script>
+<script type="text/babel" src="ContactScene.jsx?v=53"></script>
+<script type="text/babel" src="Contact.jsx?v=53"></script>
+<script type="text/babel" src="Careers.jsx?v=53"></script>
+<script type="text/babel" src="ChatBot.jsx?v=53"></script>
 <script type="text/babel">
 const { Header, Footer, StickyQuote, Button, FormField, Input, Select, Textarea, Icon, SectionHeading } = window.UBCBIMDesignSystem_353af8;
 
