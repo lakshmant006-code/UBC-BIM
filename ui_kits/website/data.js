@@ -396,15 +396,25 @@ window.UBC_DATA.hero = {
 
    image: real crops of the client's own TYPICAL_DETAILS.pdf (assets/
    details/wp-*.jpg), taken directly from that PDF's own drawn sheets
-   rather than rendered separately — hold-down from its "TYPICAL HOLDDOWN
-   DETAIL" isometric, anchor from the base-of-wall elevation labelled
-   "ANCHOR BOLT AND HOLD DOWNS", top-track from "TYPICAL VERTICAL STUD
-   TRACK CONNECTION", sheathing from "TYPICAL SHEAR WALL DETAIL
-   PERPENDICULAR TO TRUSS". bolt has none: the PDF's own fastening details
-   only show self-drilling screws (#10/#12), never a structural bolt like
-   this one, so no real crop of it exists to show — its card falls back to
-   its own text-only body rather than borrowing a picture of something
-   else. */
+   rather than rendered separately. The client's first upload was 6 pages
+   (sheets S620/S640/S650); a fuller upload later added three more
+   (S660/S661/S662) with the same project's own 3D-rendered isometric
+   connection details rather than flat 2D callouts, so hold-down and
+   anchor were swapped from that first pass's 2D crops to these clearer
+   isometric ones once the fuller PDF made them available — same real
+   connections either way, just a better picture of them:
+    - hold-down: sheet S660's own "HOLDDOWN CONNECTION" isometric.
+    - anchor: sheet S660's own "ANCHOR BOLT CONNECTION" isometric.
+    - top-track: "TYPICAL VERTICAL STUD TRACK CONNECTION" (first upload,
+      sheet S650) — no equivalent isometric in the later sheets, so this
+      2D one stands.
+    - sheathing: "TYPICAL SHEAR WALL DETAIL PERPENDICULAR TO TRUSS" (first
+      upload, sheet S640) — same reason.
+    - bolt: sheet S661's own "PANEL TO PANEL CONNECTION" isometric, the
+      two hex bolt heads visible partway up the stud — genuinely a
+      structural bolt, not one of the self-drilling screws (#10/#12) the
+      first 6-page upload only ever showed, which is why this one had no
+      image before the fuller PDF arrived. */
 window.UBC_DATA.wallPanelModel = {
   src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
   restAngle: [-2.52, 1.42, -2.20],
@@ -416,6 +426,7 @@ window.UBC_DATA.wallPanelModel = {
       image: 'assets/details/wp-anchor.jpg',
       body: 'One of six base anchor connections along this panel’s bottom track, holding it down against whatever it lands on — slab or foundation — before any stud or sheathing load is even applied.' },
     { id: 'bolt', label: 'Structural bolt', position: [-0.057, 1.106, 2.058], viewAngle: [0.6, 0.9, 1.8],
+      image: 'assets/details/wp-bolt.jpg',
       body: 'A 1/2 in. A325 structural bolt, 12 mm × 200 mm — the grade used through most of this panel’s stud-to-track and panel-to-panel connections. A single heavier A490 bolt appears once elsewhere on the same panel, at the one connection sized to need it.' },
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
       image: 'assets/details/wp-top-track.jpg',
