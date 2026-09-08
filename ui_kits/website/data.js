@@ -351,6 +351,62 @@ window.UBC_DATA.hero = {
 // every list, every process step and every real number (a week, three
 // months, HTT5/A325 aside — those are the model's own hardware, not this
 // copy) is kept.
+/* Wall panels' own model (MockingBirdModel.jsx): a real, panel-scale IFC
+   supplied specifically for this view (tools/ifc_to_glb.py — "m2 wall
+   panel"), not a crop of the whole-building Mocking Bird Lot 2 model used
+   elsewhere on the site. No IfcBuildingStorey/IfcSite hierarchy in the
+   source file — it's one wall panel assembly on its own, 6.0 x 4.3 x 3.9 m
+   (w x d x h, IFC axes), which is why one isometric shot can hold the whole
+   thing rather than needing a hotspot-reachable "jump to detail" list the
+   way the whole building did.
+
+   restAngle is a true isometric direction (equal x/y/z, the classic
+   "three visible faces, no perspective favoured" drafting angle) rather
+   than the shared three-quarter default: pulled back to magnitude 2.1
+   (not the usual ~1.5-2.6) specifically so all five hotspots below clear
+   the camera's own field of view at once — verified by projecting each
+   one into camera space at this exact position (not eyeballed), see the
+   session's own working notes if that check needs redoing after any
+   position changes here.
+
+   hotspots: real, named elements from the source IFC (ifcopenshell), not
+   guessed, transformed through the exact same percentile-centre +
+   Z-up-to-Y-up rotation tools/ifc_to_glb.py applies to the mesh itself:
+    - hold-down: the sole child (a BuildingElementProxy named "PART") of
+      the source file's own HTT5 IfcElementAssembly — a real Simpson
+      Strong-Tie HTT5 hold-down tie.
+    - anchor: one of 6 real "ANCHOR" IfcBuildingElementProxy instances
+      along the panel's base track.
+    - bolt: one of 17 real "A325-12x200" IfcBuildingElementPart instances
+      (a 1/2 in. A325 structural bolt) — one "A490-12x200" also appears
+      once elsewhere on the same panel.
+    - top-track: the IfcBeam named "1-RT_9" in the source model — the
+      single longest member in the panel (spans 4.25 m, nearly the whole
+      depth).
+    - sheathing: the IfcCurtainWall named "1-PP_4" — the panel's own
+      sheathing plane, modelled as one surface spanning 6.17 m, nearly the
+      whole width.
+   viewAngle is reasoned per hotspot from which side of the panel's own
+   bounding box it sits nearest (same method as Mocking Bird Lot 2's own
+   hotspots) — not checked against a render (no browser access in this
+   sandbox); if one still doesn't frame well, that's the value to adjust. */
+window.UBC_DATA.wallPanelModel = {
+  src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
+  restAngle: [2.1, 2.1, 2.1],
+  hotspots: [
+    { id: 'hold-down', label: 'Hold-down', position: [-2.852, -1.742, -2.057], viewAngle: [-1.6, 0.9, -1.4],
+      body: 'A Simpson Strong-Tie HTT5 hold-down tie, fastened to the stud above and anchored below — it resists this end of the panel lifting or rotating under lateral load, the same role a hold-down plays wherever a shear wall needs one.' },
+    { id: 'anchor', label: 'Anchor', position: [0.455, -2.012, -2.057], viewAngle: [1.2, 0.9, -1.6],
+      body: 'One of six base anchor connections along this panel’s bottom track, holding it down against whatever it lands on — slab or foundation — before any stud or sheathing load is even applied.' },
+    { id: 'bolt', label: 'Structural bolt', position: [-0.057, 1.106, 2.058], viewAngle: [0.6, 0.9, 1.8],
+      body: 'A 1/2 in. A325 structural bolt, 12 mm × 200 mm — the grade used through most of this panel’s stud-to-track and panel-to-panel connections. A single heavier A490 bolt appears once elsewhere on the same panel, at the one connection sized to need it.' },
+    { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
+      body: 'The longest single member in this panel — its own track, running nearly the full 4.25 m depth along the top and tying every stud in this run into one continuous assembly rather than a row of independent members. Labelled RT_9 in the source model.' },
+    { id: 'sheathing', label: 'Sheathing', position: [0.203, 1.833, -2.057], viewAngle: [0.8, 0.6, -1.7],
+      body: 'This panel’s own sheathing, modelled as one continuous surface spanning nearly its full 6.17 m width rather than as individual sheets — the layer that ties every stud together into a working diaphragm and gives the wall its real shear capacity.' }
+  ]
+};
+
 const CORE_REGIONS = ['South Carolina', 'Florida', 'Texas', 'California', 'Australia', 'New Zealand', 'Chile', 'Hyderabad, India', 'Dubai, UAE'];
 const EXTENDED_REGIONS = [...CORE_REGIONS, 'UK', 'Europe', 'Canada', 'Israel'];
 

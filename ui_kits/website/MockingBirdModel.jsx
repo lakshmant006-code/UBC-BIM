@@ -12,38 +12,32 @@
   (or tapping its own chevron, for touch) opens a small dropdown with two
   sub-items, Wall panels and Truss panels. Clicking the "Modeling and
   detailing" label itself, same as any other tab, shows its write-up.
-  Clicking "Wall panels" instead shows the Mocking Bird Lot 2 model —
-  full-bleed, locked to hotspot-driven navigation rather than free orbit —
-  resting on a tight zoom of one real wall panel (WALL_PANEL_HOME below,
-  per the client's own reference screenshot) with five red pulsing markers
-  on real structural detail (corner stud, hold-down, anchor bolt, truss,
-  bracing), positioned from the model's own source IFC rather than guessed:
-  see the comment on each entry in data.js for how. Clicking a marker (or a
-  label in the small "Jump to detail" list, for the three that sit outside
-  that one panel's tight frame) flies the camera in on that real position
-  and, once the move lands, opens a card with that detail's own real photo
-  and paragraph (from the client's TYPICAL_DETAILS.pdf) — the same "walk up
-  and ask to see every detail we considered" idea the client asked for,
-  just built once here first; the same pattern (a model, a marker per
-  detail, a card on click) is the template for the other seven categories'
-  own models as those arrive. Truss panels has no model yet, so it shows an
-  honest "coming soon" placeholder rather than reusing Wall panels' content
-  or inventing something in its place.
+  Clicking "Wall panels" instead shows a dedicated, panel-scale model —
+  window.UBC_DATA.wallPanelModel, a real IFC supplied specifically for this
+  view rather than a crop of the whole-building Mocking Bird Lot 2 model —
+  full-bleed, locked to hotspot-driven navigation rather than free orbit,
+  resting on a true isometric shot (equal x/y/z in restAngle) chosen wide
+  enough that all five hotspots sit inside that one frame at once. Five red
+  pulsing markers sit on real structural detail (hold-down, anchor, a
+  structural bolt, the panel's own top track, its sheathing), positioned
+  from the model's own source IFC rather than guessed: see the comment on
+  wallPanelModel in data.js for how. Clicking a marker flies the camera in
+  on that real position and, once the move lands, opens a card with that
+  detail's own description — the same "walk up and ask to see every detail
+  we considered" idea the client asked for, and the template for the other
+  seven categories' own models as those arrive. Truss panels has no model
+  yet, so it shows an honest "coming soon" placeholder rather than reusing
+  Wall panels' content or inventing something in its place.
 
   `locked` on ModelViewer turns off free drag/scroll orbiting, so the camera
-  only ever moves via a hotspot's (or jump-list entry's) own flyTo, or back
-  out via closeHotspot — closing the card (its own × button, or a click
-  anywhere outside it) always flies back to WALL_PANEL_HOME, the one panel
-  this view rests on, rather than ModelViewer's own whole-building default
-  (see the effect that snaps to it as soon as the model's real floor offset
-  is known). `bare` drops every bit of caption/hint/Reset-view chrome — just
-  the model.
+  only ever moves via a hotspot's own flyTo or back out via reset — closing
+  the card (its own × button, or a click anywhere outside it) always flies
+  back to the resting isometric frame. `bare` drops every bit of
+  caption/hint/Reset-view chrome — just the model.
 
-  Reads its src/radius/hotspots straight from window.UBC_DATA.projects (the
-  same entry the Projects card uses) and its articles from
-  window.UBC_DATA.serviceArticles, rather than hardcoding either a second
-  time, so a future model or article-content swap in data.js only ever has
-  to happen in one place.
+  Reads wallPanelModel and its articles from window.UBC_DATA.serviceArticles
+  straight out of data.js rather than hardcoding either, so a future model
+  or article-content swap only ever has to happen in one place.
 */
 
 // Which top-level tabs carry their own dropdown, and what's in it. Only
@@ -196,66 +190,14 @@ function HotspotCard({ hotspot, onClose }) {
   );
 }
 
-// How close flyTo frames a single connection detail. What looked like
-// over-cropping at 1.3 was actually the separate floor-offset targeting bug
-// (fixed above) landing the camera on the wrong point entirely; 3.0 was a
-// safe, verifiably-correct widening while that was still unresolved. Now
-// that a hotspot flies to the exact point its marker sits on, tightened
-// back down closer to that original intent.
-const HOTSPOT_ZOOM_RADIUS = 1.6;
-
-// Wall panels' own resting frame: a tight zoom on one real wall panel,
-// per the client's own reference screenshot (a circle drawn around the
-// near-left corner room) — rather than a wide shot of the whole building.
-// centre is the midpoint of corner-stud [-7.518, 1.063, 4.641] and bracing
-// [-7.518, 1.335, 2.057]: both real elements on that exact same west-wall
-// panel (x = -7.518, the building's own x-min), 2.6 m apart in z, so their
-// midpoint sits right in the middle of that one panel. angle reuses corner
-// stud's own viewAngle (already reasoned from which side of the building
-// this wall faces); radius is wide enough to hold both in frame together,
-// not just one at a time (their own tight per-hotspot HOTSPOT_ZOOM_RADIUS
-// of 1.6 would crop the other one out). Not checked against a render yet
-// (no browser access in this sandbox) — if this still doesn't match, the
-// centre/angle/radius below are what to adjust.
-const WALL_PANEL_HOME = { center: [-7.518, 1.199, 3.349], angle: [-1.6, 1.0, 1.4], radius: 3.4 };
-
-// The other three hotspots (hold-down, anchor bolt, truss) are real
-// elements elsewhere on the building, well outside that one panel's tight
-// frame — and the model is `locked` (no free orbit), so once the resting
-// shot is zoomed into just the one panel, there is no way to pan to them.
-// This small always-on list is how they stay reachable regardless of
-// where the camera currently is: each entry flies the locked camera
-// straight to that hotspot's own view, same as clicking its on-model
-// marker would if it happened to be on screen.
-function HotspotJumpList({ hotspots, activeId, onSelect }) {
-  return (
-    <div onClick={(e) => e.stopPropagation()} style={{
-      position: 'fixed', right: 'var(--gutter)', top: 'calc(84px + var(--s-5))', zIndex: 55,
-      display: 'flex', flexDirection: 'column', gap: 2, minWidth: 168,
-      background: 'rgba(245,244,241,.88)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-      border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-2)', boxShadow: 'var(--shadow-2)',
-      padding: 'var(--s-3)'
-    }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 4 }}>
-        Jump to detail
-      </div>
-      {hotspots.map((hs) => {
-        const on = activeId === hs.id;
-        return (
-          <button key={hs.id} onClick={() => onSelect(hs)} style={{
-            textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 2px',
-            fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)',
-            color: on ? 'var(--accent)' : 'var(--text-body)'
-          }}>{hs.label}</button>
-        );
-      })}
-    </div>
-  );
-}
+// How close flyTo frames a single connection detail on wallPanelModel — a
+// panel-scale model (radius 4.2 m, see data.js), so this is proportionally
+// tighter than a whole-building model's own hotspot zoom would be.
+const HOTSPOT_ZOOM_RADIUS = 0.8;
 
 function MockingBirdModel({ onQuote }) {
   const D = window.UBC_DATA;
-  const project = D.projects.find((p) => p.id === 'mocking-bird-lot-2');
+  const wallPanel = D.wallPanelModel;
   const articles = D.serviceArticles || [];
   const [selection, setSelection] = React.useState({ type: 'article', id: (articles[0] && articles[0].id) || null });
   const [api, setApi] = React.useState(null);
@@ -269,60 +211,29 @@ function MockingBirdModel({ onQuote }) {
     if (selection.type !== 'wall-panels') { setApi(null); setOpenHotspot(null); }
   }, [selection.type]);
 
-  // A hotspot's [x,y,z] (and this custom home centre, authored in that same
-  // pre-shift space) needs the model's own floor-snap offset added before
-  // it means the same point ModelViewer.jsx actually rendered the mesh at
-  // — see ModelViewer.jsx's own comment on floorOffsetRef. `api.ready`
-  // only turns true once that offset is the model's real one rather than
-  // the pre-load 0, so this is called only once it's safe to trust.
-  const withFloorOffset = (position) => [position[0], position[1] + (api ? api.getFloorOffset() : 0), position[2]];
-
-  // Wall panels' resting frame: snap straight to WALL_PANEL_HOME as soon as
-  // the model (and its real floor offset) is ready, replacing ModelViewer's
-  // own whole-building default. duration 1 so this reads as the frame the
-  // page opens on, not a swoop into it.
-  React.useEffect(() => {
-    if (selection.type === 'wall-panels' && api && api.ready) {
-      api.flyTo({ center: withFloorOffset(WALL_PANEL_HOME.center), radius: WALL_PANEL_HOME.radius, angle: WALL_PANEL_HOME.angle, duration: 1 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection.type, api]);
-
   // Click flies the camera in on the hotspot's own real position first,
   // then brings the card up once that move actually lands, rather than
   // popping it up over a camera still mid-flight. Each hotspot's own
-  // viewAngle (data.js) points the camera in from whichever side actually
-  // reads clearly for that specific detail, rather than every hotspot
-  // sharing the page's one resting angle regardless of where on the
-  // building it sits.
-  // ModelViewer.jsx only shows an on-model marker once its own render loop
-  // has a real model to project (i.e. once it's already `ready`), so this
-  // guard only ever actually matters for the jump list below, which — being
-  // always visible rather than gated on the model being loaded — could
-  // otherwise fire a flyTo before api.getFloorOffset() has a real value.
+  // viewAngle (data.js) points the camera in from whichever side of the
+  // panel actually reads clearly for that specific detail, rather than
+  // every hotspot sharing the page's one resting isometric angle.
   const handleHotspotClick = (hs) => {
-    if (api && api.ready) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
+    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
   };
-  // The jump list's own hotspot objects are the same raw, un-corrected
-  // ones ModelViewer.jsx's on-model markers start from — its own onClick
-  // applies the same withFloorOffset before calling onHotspotClick, so this
-  // does the same correction by hand rather than skipping it.
-  const handleJumpSelect = (hs) => handleHotspotClick({ ...hs, position: withFloorOffset(hs.position) });
 
   // The model is `locked` (no free drag/scroll) precisely so the camera is
   // only ever where a hotspot put it or back at the resting frame — so
   // closing the card, by its own × or by clicking anywhere outside it,
-  // always flies back out to that resting frame (now WALL_PANEL_HOME, not
-  // the whole building) rather than leaving the camera parked on whichever
-  // detail was last open.
+  // always flies back out to the resting isometric shot (ModelViewer's own
+  // reset(), since wallPanelModel's restAngle is centred on the model's own
+  // origin rather than an off-centre point).
   const closeHotspot = () => {
     setOpenHotspot(null);
-    if (api && api.ready) api.flyTo({ center: withFloorOffset(WALL_PANEL_HOME.center), radius: WALL_PANEL_HOME.radius, angle: WALL_PANEL_HOME.angle });
+    if (api) api.reset();
   };
-  // Hotspot buttons and the jump list both stopPropagation on click
-  // (ModelViewer.jsx, HotspotJumpList above), so this only ever fires for a
-  // click that is genuinely outside the open card.
+  // Hotspot buttons stopPropagation on click (ModelViewer.jsx), so this
+  // only ever fires for a click that is genuinely outside the open card.
   const handleBackgroundClick = (e) => {
     if (openHotspot && !e.target.closest('[role="dialog"]')) closeHotspot();
   };
@@ -336,12 +247,11 @@ function MockingBirdModel({ onQuote }) {
         onSelectSub={(parentId, subId) => setSelection({ type: subId, parentId })} />
 
       {selection.type === 'wall-panels' ? (
-        project && project.model && window.ModelViewer ? (
+        wallPanel && window.ModelViewer ? (
           <>
-            <window.ModelViewer src={project.model.src} radius={project.model.radius}
-              height="calc(100vh - 84px)" bare locked initialAngle={WALL_PANEL_HOME.angle}
-              hotspots={project.model.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
-            <HotspotJumpList hotspots={project.model.hotspots} activeId={openHotspot && openHotspot.id} onSelect={handleJumpSelect} />
+            <window.ModelViewer src={wallPanel.src} radius={wallPanel.radius}
+              height="calc(100vh - 84px)" bare locked initialAngle={wallPanel.restAngle}
+              hotspots={wallPanel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
             {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
           </>
         ) : (
