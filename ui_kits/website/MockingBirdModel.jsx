@@ -16,10 +16,12 @@
   window.UBC_DATA.wallPanelModel, a real IFC supplied specifically for this
   view rather than a crop of the whole-building Mocking Bird Lot 2 model —
   full-bleed, locked to hotspot-driven navigation rather than free orbit,
-  resting on a true isometric shot (equal x/y/z in restAngle) chosen wide
-  enough that all five hotspots sit inside that one frame at once. Five red
-  pulsing markers sit on real structural detail (hold-down, anchor, a
-  structural bolt, the panel's own top track, its sheathing), positioned
+  resting on a wide shot from the hold-down's own side (restAngle — the
+  same direction that hotspot's own viewAngle flies in from, just pulled
+  back further) chosen wide enough that all five hotspots still sit inside
+  that one frame at once. Five red pulsing markers sit on real structural
+  detail (hold-down, anchor, a structural bolt, the panel's own top track,
+  its sheathing), positioned
   from the model's own source IFC rather than guessed: see the comment on
   wallPanelModel in data.js for how. Clicking a marker flies the camera in
   on that real position and, once the move lands, opens a card with that
@@ -32,7 +34,7 @@
   `locked` on ModelViewer turns off free drag/scroll orbiting, so the camera
   only ever moves via a hotspot's own flyTo or back out via reset — closing
   the card (its own × button, or a click anywhere outside it) always flies
-  back to the resting isometric frame. `bare` drops every bit of
+  back to the resting frame. `bare` drops every bit of
   caption/hint/Reset-view chrome — just the model.
 
   Reads wallPanelModel and its articles from window.UBC_DATA.serviceArticles
@@ -194,7 +196,7 @@ function HotspotCard({ hotspot, onClose }) {
 // plain orbitable one (drag to rotate, scroll to zoom — ModelViewer's own
 // OrbitControls, not a custom control), so anyone can dial in whatever
 // frame they actually want to see rather than trusting the page's own
-// reasoned-but-unrendered isometric numbers.
+// reasoned-but-unrendered restAngle numbers.
 function FreeRotateToggle({ on, onToggle }) {
   const { Icon } = window.UBCBIMDesignSystem_353af8;
   return (
@@ -225,7 +227,7 @@ function MockingBirdModel({ onQuote }) {
   const [api, setApi] = React.useState(null);
   const [openHotspot, setOpenHotspot] = React.useState(null);
   // Off by default (the guided, hotspot-only camera this view is built
-  // around) — but the exact isometric numbers above were reasoned from
+  // around) — but the exact restAngle numbers above were reasoned from
   // real coordinates, never actually seen rendered, so a visitor (or
   // whoever's checking the framing) can switch this on to drag/scroll the
   // model freely and see the real thing rather than trusting the math.
@@ -240,7 +242,7 @@ function MockingBirdModel({ onQuote }) {
   }, [selection.type]);
 
   // Switching back to the guided view snaps the camera back to the
-  // resting isometric shot, so turning free rotate off always leaves the
+  // resting frame, so turning free rotate off always leaves the
   // model exactly where a visitor who never touched it would find it —
   // never wherever it happened to be dragged to.
   const toggleFreeRotate = () => {
@@ -256,7 +258,7 @@ function MockingBirdModel({ onQuote }) {
   // popping it up over a camera still mid-flight. Each hotspot's own
   // viewAngle (data.js) points the camera in from whichever side of the
   // panel actually reads clearly for that specific detail, rather than
-  // every hotspot sharing the page's one resting isometric angle.
+  // every hotspot sharing the page's one resting angle.
   const handleHotspotClick = (hs) => {
     if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
@@ -265,7 +267,7 @@ function MockingBirdModel({ onQuote }) {
   // The model is `locked` (no free drag/scroll) precisely so the camera is
   // only ever where a hotspot put it or back at the resting frame — so
   // closing the card, by its own × or by clicking anywhere outside it,
-  // always flies back out to the resting isometric shot (ModelViewer's own
+  // always flies back out to the resting frame (ModelViewer's own
   // reset(), since wallPanelModel's restAngle is centred on the model's own
   // origin rather than an off-centre point).
   const closeHotspot = () => {
