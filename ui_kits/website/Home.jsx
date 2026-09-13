@@ -114,6 +114,36 @@ function WhoWeAre({ onGo }) {
   );
 }
 
+// CLIENT LOGO WALL (blueprint section 03, "RECOGNIZE"): no client has
+// approved a logo for use here yet, so this renders honest empty slots
+// rather than invented company names — the same "coming soon" convention
+// as TrussPanelsPending (MockingBirdModel.jsx) and s.pending (ServiceRow
+// above), not a placeholder that could be mistaken for a real client list.
+function ClientLogoWall() {
+  const slots = Array.from({ length: 6 });
+  return (
+    <Section tight>
+      <Page>
+        <Reveal style={{ textAlign: 'center' }}>
+          <div style={eyebrow}>Trusted by teams across the building industry</div>
+        </Reveal>
+        <Reveal delay={80}>
+          <div className="ubc-logo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-6)' }}>
+            {slots.map((_, i) => (
+              <div key={i} style={{ height: 56, borderRadius: 'var(--r-2)', border: 'var(--bw-hair) dashed var(--border-subtle)', display: 'grid', placeItems: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Client logo</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', textAlign: 'center', margin: 'var(--s-4) 0 0' }}>
+            Added here once client logos are approved for use.
+          </p>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
 // PROJECT FIT: "What are you working on?" — the blueprint's own early
 // routing step. Building types deep-link into Portfolio's real FilterBar
 // (window.UBC_NAV_FILTER, the same one-shot mechanism "Selected work"
@@ -384,6 +414,26 @@ function ProjectsGrid({ onGo }) {
             </Reveal>
           ))}
         </div>
+      </Page>
+    </Section>
+  );
+}
+
+// CASE STUDIES NOTE (blueprint section 10): the real projects above already
+// show the actual model, but the narrative fields the blueprint asks for
+// (client requirement, UBC's own scope, the outcome) aren't data this site
+// has for any of them yet — rather than write that narrative up as if it
+// were on file, this says plainly that it's coming.
+function CaseStudiesNote() {
+  return (
+    <Section tight sunken>
+      <Page style={{ textAlign: 'center' }}>
+        <Reveal>
+          <div style={eyebrow}>Case studies</div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-3) auto 0', maxWidth: '58ch' }}>
+            Full write-ups for these projects — the client's requirement, UBC's own scope and the outcome — are coming soon.
+          </p>
+        </Reveal>
       </Page>
     </Section>
   );
@@ -1031,6 +1081,36 @@ function WhoWeServe({ onOpenService }) {
   );
 }
 
+// COMPANY PROOF + TECHNOLOGY (blueprint section 15): the real
+// machine/software table already sitting unused in window.UBC_DATA.capability
+// (CapabilityMatrix itself was imported at the top of this file but never
+// actually rendered anywhere before now), paired with a certifications line
+// that's left an honest "coming soon" rather than naming a standard nobody
+// has supplied — see the blueprint object's own note in data.js.
+function CompanyProofTech() {
+  const cap = D.capability;
+  if (!cap) return null;
+  return (
+    <Section>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>Technology</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What runs behind the model</h2>
+        </Reveal>
+        <Reveal delay={80} style={{ marginTop: 'var(--s-8)' }}>
+          <CapabilityMatrix columns={cap.columns} rows={cap.rows} />
+        </Reveal>
+        <Reveal delay={140} style={{ textAlign: 'center', marginTop: 'var(--s-7)' }}>
+          <div style={eyebrow}>Certifications & standards</div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-2) 0 0' }}>
+            Listed here once issued.
+          </p>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
 // FAQ: the same real Q&A already answering the chatbot widget, surfaced here
 // as a plain accordion for anyone who never opens that widget.
 function FAQSection() {
@@ -1097,18 +1177,21 @@ function Home({ onGo, onQuote }) {
   return (
     <div>
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
+      <ClientLogoWall />
       <WhoWeAre onGo={onGo} />
       <ProjectFitSelector onGo={onGo} onOpenService={openService} />
       <WhatWeNeedFromYou onQuote={onQuote} />
       <HowWeWork />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
+      <CaseStudiesNote />
       <ServicesExplorer onQuote={onQuote} open={svcOpen} setOpen={setSvcOpen} />
       <WhyUBC />
       <UBCWayQA />
       <GlobalPresence />
       <Testimonials />
       <WhoWeServe onOpenService={openService} />
+      <CompanyProofTech />
       <FAQSection />
       <FinalCTA onQuote={onQuote} />
     </div>

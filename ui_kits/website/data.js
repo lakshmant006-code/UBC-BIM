@@ -207,11 +207,14 @@ window.UBC_DATA = {
    ubcWay's four steps) or, where the blueprint only names a section and
    this site already has the real underlying fact elsewhere (howWeWork's
    five one-line descriptions, each role's own blurb), written to describe
-   what's already true on this site rather than a new claim. Sections the
-   blueprint calls for that need assets nobody has supplied yet — a client
-   logo wall (03), named video testimonials (11), certifications (15) — are
-   deliberately left out rather than invented; add them here once real
-   logos/quotes/certificates exist. */
+   what's already true on this site rather than a new claim. Three sections
+   the blueprint calls for need assets nobody has supplied yet — a client
+   logo wall (03), named video testimonials (11), certifications (15) — so
+   Home.jsx renders those as explicit "coming soon" placeholders (empty
+   logo slots, a case-studies note, a certifications line) instead of either
+   inventing content for them or leaving them out silently; swap in the
+   real logos/quotes/certificates here (and in Home.jsx's ClientLogoWall /
+   CaseStudiesNote / CompanyProofTech) once they exist. */
 window.UBC_DATA.blueprint = {
   // 04 Project fit selector: "What are you working on?" Building types map
   // straight onto Portfolio's own FilterBar categories (window.UBC_NAV_FILTER,
