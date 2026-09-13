@@ -37,6 +37,16 @@
      inline per caller (520/560), so without this the camera framing gets
      progressively taller and more distorted instead of scaling down with it. */
   .ubc-model-viewer { height: 420px !important; min-height: 420px !important; }
+
+  /* Project fit selector: building-type / needs columns stack */
+  .ubc-fit-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
+
+  /* How we work: five steps, three per row before stacking to one */
+  .ubc-how-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* Why UBC / Who we serve: three cards -> two */
+  .ubc-why-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .ubc-serve-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* ---------- Header ----------
@@ -84,6 +94,11 @@
   .ubc-office-scene { height: 340px !important; }
   .ubc-door-panel { min-height: 300px !important; }
   .ubc-model-viewer { height: 300px !important; min-height: 300px !important; }
+
+  /* How we work / Why UBC / Who we serve: down to one column on a phone */
+  .ubc-how-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+  .ubc-why-grid { grid-template-columns: 1fr !important; }
+  .ubc-serve-grid { grid-template-columns: 1fr !important; }
 }
 
 /* ---------- Contact page ----------
