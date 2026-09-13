@@ -114,6 +114,132 @@ function WhoWeAre({ onGo }) {
   );
 }
 
+// CLIENT LOGO WALL (blueprint section 03, "RECOGNIZE"): no client has
+// approved a logo for use here yet, so this renders honest empty slots
+// rather than invented company names — the same "coming soon" convention
+// as TrussPanelsPending (MockingBirdModel.jsx) and s.pending (ServiceRow
+// above), not a placeholder that could be mistaken for a real client list.
+function ClientLogoWall() {
+  const slots = Array.from({ length: 6 });
+  return (
+    <Section tight>
+      <Page>
+        <Reveal style={{ textAlign: 'center' }}>
+          <div style={eyebrow}>Trusted by teams across the building industry</div>
+        </Reveal>
+        <Reveal delay={80}>
+          <div className="ubc-logo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-6)' }}>
+            {slots.map((_, i) => (
+              <div key={i} style={{ height: 56, borderRadius: 'var(--r-2)', border: 'var(--bw-hair) dashed var(--border-subtle)', display: 'grid', placeItems: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Client logo</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', textAlign: 'center', margin: 'var(--s-4) 0 0' }}>
+            Added here once client logos are approved for use.
+          </p>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+// PROJECT FIT: "What are you working on?" — the blueprint's own early
+// routing step. Building types deep-link into Portfolio's real FilterBar
+// (window.UBC_NAV_FILTER, the same one-shot mechanism "Selected work"
+// already assumes elsewhere on this page); needs jump down to the specific
+// row of the real services accordion below and open it, rather than
+// describing the service again in different words up here.
+const PF = D.blueprint && D.blueprint.projectFit;
+function ProjectFitSelector({ onGo, onOpenService }) {
+  if (!PF) return null;
+  const pill = { fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', background: 'var(--surface-card)', border: 'var(--bw-1) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '10px 18px', cursor: 'pointer' };
+  return (
+    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)', borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>What are you working on?</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Start from your project, not our menu</h2>
+        </Reveal>
+        <div className="ubc-fit-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-8)' }}>
+          <Reveal>
+            <div style={{ ...eyebrow, marginBottom: 'var(--s-4)' }}>Building type</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-3)' }}>
+              {PF.buildingTypes.map((b) => (
+                <button key={b.label} style={pill} onClick={() => { window.UBC_NAV_FILTER = b.filter; onGo && onGo('projects'); }}>{b.label}</button>
+              ))}
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
+            <div style={{ ...eyebrow, marginBottom: 'var(--s-4)' }}>What you need</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-3)' }}>
+              {PF.needs.map((n) => (
+                <button key={n.label} style={pill} onClick={() => onOpenService && onOpenService(n.serviceIndex)}>{n.label}</button>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// WHAT WE NEED FROM YOU + HOW WE WORK: paired "before you send anything" /
+// "here's what happens once you do" sections, both lifted straight from the
+// client's own blueprint bullet lists (window.UBC_DATA.blueprint).
+const WWN = D.blueprint && D.blueprint.whatWeNeed;
+function WhatWeNeedFromYou({ onQuote }) {
+  if (!WWN) return null;
+  return (
+    <Section>
+      <Page style={{ maxWidth: 720, marginLeft: 'auto', marginRight: 'auto' }}>
+        <Reveal style={{ textAlign: 'center' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>Before you send anything</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What we need from you</h2>
+        </Reveal>
+        <Reveal delay={80}>
+          <div style={{ display: 'grid', gap: 'var(--s-4)', marginTop: 'var(--s-8)' }}>
+            {WWN.items.map((item) => (
+              <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--s-4)', padding: 'var(--s-4) var(--s-5)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
+                <Icon name="check" size={18} style={{ color: 'var(--accent)', marginTop: 2 }} />
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-strong)' }}>{item}</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', textAlign: 'center', margin: 'var(--s-6) 0 0' }}>{WWN.note}</p>
+          <div style={{ textAlign: 'center', marginTop: 'var(--s-6)' }}>
+            <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '12px 26px', cursor: 'pointer' }}>Send what you have</button>
+          </div>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+const HWW = D.blueprint && D.blueprint.howWeWork;
+function HowWeWork() {
+  if (!HWW) return null;
+  return (
+    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>How we work</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>From what you send to what ships</h2>
+        </Reveal>
+        <div className="ubc-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
+          {HWW.map((step, i) => (
+            <Reveal key={step.n} delay={i * 60}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{step.n}</div>
+              <div style={{ ...serifH, fontSize: 'var(--fs-h3)', margin: 'var(--s-2) 0 0' }}>{step.title}</div>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{step.body}</p>
+            </Reveal>
+          ))}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
 // BEFORE / AFTER: drag-to-compare slider, mounted just above Selected work.
 // The reveal is driven by clip-path on a full-size image (rather than shrinking
 // a wrapper), so the "before" image never squashes and the whole thing stays
@@ -293,6 +419,26 @@ function ProjectsGrid({ onGo }) {
   );
 }
 
+// CASE STUDIES NOTE (blueprint section 10): the real projects above already
+// show the actual model, but the narrative fields the blueprint asks for
+// (client requirement, UBC's own scope, the outcome) aren't data this site
+// has for any of them yet — rather than write that narrative up as if it
+// were on file, this says plainly that it's coming.
+function CaseStudiesNote() {
+  return (
+    <Section tight sunken>
+      <Page style={{ textAlign: 'center' }}>
+        <Reveal>
+          <div style={eyebrow}>Case studies</div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-3) auto 0', maxWidth: '58ch' }}>
+            Full write-ups for these projects — the client's requirement, UBC's own scope and the outcome — are coming soon.
+          </p>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
 // One row of the services accordion. The expand/collapse is a real measured
 // height (anime.js animates 0 -> el.scrollHeight, not a fixed max-height
 // guess), so the body text, tag row and chip row (however many lines that
@@ -374,8 +520,7 @@ function ServiceRow({ s, isOpen, onToggle, manifest, activeChip, openChip }) {
 // coordinates. A service with nothing to point a camera at (a permit set, a
 // bill of materials) gets a data card over the model instead, its numbers
 // computed from that same manifest.
-function ServicesExplorer({ onQuote }) {
-  const [open, setOpen] = React.useState(0);
+function ServicesExplorer({ onQuote, open, setOpen }) {
   const [activeChip, setActiveChip] = React.useState(null);
   const [manifest, setManifest] = React.useState(null);
   const [api, setApi] = React.useState(null);
@@ -449,6 +594,7 @@ function ServicesExplorer({ onQuote }) {
   return (
     <Section>
       <Page>
+        <div id="services-explorer" style={{ scrollMarginTop: 100 }} />
         <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>What we deliver</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(30px, 4vw, 56px)', margin: 'var(--s-3) 0 0' }}>Every drawing out of one model</h2>
@@ -535,6 +681,59 @@ function ServicesExplorer({ onQuote }) {
 
         <Reveal style={{ textAlign: 'center', marginTop: 'var(--s-9)' }}>
           <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 30px', cursor: 'pointer' }}>Request a quote</button>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+// WHY UBC: the blueprint's own six value labels, each already tied above (in
+// data.js) to a real mechanism on this site rather than a bare adjective.
+const WHY = D.blueprint && D.blueprint.whyUbc;
+function WhyUBC() {
+  if (!WHY) return null;
+  return (
+    <Section>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>Why UBC</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What one coordinated model actually buys you</h2>
+        </Reveal>
+        <div className="ubc-why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-7)', marginTop: 'var(--s-9)' }}>
+          {WHY.map((w, i) => (
+            <Reveal key={w.title} delay={(i % 3) * 70}>
+              <div style={{ padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
+                <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{w.title}</div>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{w.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// THE UBC WAY: a four-step culture framing plus the one QA claim this site
+// can make honestly (a real check every drawing goes through, not a named
+// certification nobody has supplied).
+const UW = D.blueprint && D.blueprint.ubcWay;
+function UBCWayQA() {
+  if (!UW) return null;
+  return (
+    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <Page style={{ maxWidth: 860, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>
+        <Reveal>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>The UBC way</div>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 'var(--s-3)', marginTop: 'var(--s-5)' }}>
+            {UW.steps.map((s, i) => (
+              <React.Fragment key={s}>
+                <span style={{ ...serifH, fontSize: 'clamp(20px, 2.4vw, 30px)' }}>{s}</span>
+                {i < UW.steps.length - 1 && <Icon name="arrow-right" size={18} style={{ color: 'var(--text-faint)', alignSelf: 'center' }} />}
+              </React.Fragment>
+            ))}
+          </div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-6) auto 0', maxWidth: '60ch' }}>{UW.qa}</p>
         </Reveal>
       </Page>
     </Section>
@@ -847,17 +1046,154 @@ function Testimonials() {
   );
 }
 
+// WHO WE SERVE: the blueprint's six roles, each pointed at the real service
+// rows most relevant to it (Tag chips reuse D.services' own titles, so this
+// never drifts from what the accordion above actually says).
+const WWS = D.blueprint && D.blueprint.whoWeServe;
+function WhoWeServe({ onOpenService }) {
+  if (!WWS) return null;
+  return (
+    <Section>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>Who we serve</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Built around who's actually asking</h2>
+        </Reveal>
+        <div className="ubc-serve-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-7)', marginTop: 'var(--s-9)' }}>
+          {WWS.map((r, i) => (
+            <Reveal key={r.role} delay={(i % 3) * 70}>
+              <div style={{ padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
+                <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{r.role}</div>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{r.body}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)', marginTop: 'var(--s-4)' }}>
+                  {r.serviceIndexes.map((si) => D.services[si] && (
+                    <button key={si} onClick={() => onOpenService && onOpenService(si)} style={{ all: 'unset', cursor: 'pointer' }}>
+                      <Tag>{D.services[si].title}</Tag>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// COMPANY PROOF + TECHNOLOGY (blueprint section 15): the real
+// machine/software table already sitting unused in window.UBC_DATA.capability
+// (CapabilityMatrix itself was imported at the top of this file but never
+// actually rendered anywhere before now), paired with a certifications line
+// that's left an honest "coming soon" rather than naming a standard nobody
+// has supplied — see the blueprint object's own note in data.js.
+function CompanyProofTech() {
+  const cap = D.capability;
+  if (!cap) return null;
+  return (
+    <Section>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>Technology</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What runs behind the model</h2>
+        </Reveal>
+        <Reveal delay={80} style={{ marginTop: 'var(--s-8)' }}>
+          <CapabilityMatrix columns={cap.columns} rows={cap.rows} />
+        </Reveal>
+        <Reveal delay={140} style={{ textAlign: 'center', marginTop: 'var(--s-7)' }}>
+          <div style={eyebrow}>Certifications & standards</div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-2) 0 0' }}>
+            Listed here once issued.
+          </p>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+// FAQ: the same real Q&A already answering the chatbot widget, surfaced here
+// as a plain accordion for anyone who never opens that widget.
+function FAQSection() {
+  const [open, setOpen] = React.useState(-1);
+  const faq = D.faq || [];
+  if (!faq.length) return null;
+  return (
+    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <Page style={{ maxWidth: 780, marginLeft: 'auto', marginRight: 'auto' }}>
+        <Reveal style={{ textAlign: 'center' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>FAQ</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Common questions</h2>
+        </Reveal>
+        <div style={{ marginTop: 'var(--s-8)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+          {faq.map((item, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={item.q} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
+                <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--s-4)', padding: 'var(--s-5) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)' }}>{item.q}</span>
+                  <Icon name={isOpen ? 'minus' : 'plus'} size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                </button>
+                {isOpen && (
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: '0 0 var(--s-5)', maxWidth: '68ch' }}>{item.a}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// FINAL CTA: the buying journey's own close, reusing the same onQuote flow
+// every other call to action on the site already opens.
+function FinalCTA({ onQuote }) {
+  return (
+    <Section style={{ textAlign: 'center' }}>
+      <Page style={{ maxWidth: 640 }}>
+        <Reveal>
+          <h2 style={{ ...serifH, fontSize: 'clamp(30px, 4vw, 52px)', margin: 0 }}>Send what you have. Get a scope back.</h2>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-5) 0 0' }}>
+            No sales script — a modeller looks at what you send and answers directly.
+          </p>
+          <div style={{ marginTop: 'var(--s-7)' }}>
+            <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 32px', cursor: 'pointer' }}>Request a quote</button>
+          </div>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
 function Home({ onGo, onQuote }) {
   const SceneHero = window.SceneHero;
+  const [svcOpen, setSvcOpen] = React.useState(0);
+  const openService = (i) => {
+    setSvcOpen(i);
+    const el = document.getElementById('services-explorer');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   return (
     <div>
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
+      <ClientLogoWall />
       <WhoWeAre onGo={onGo} />
+      <ProjectFitSelector onGo={onGo} onOpenService={openService} />
+      <WhatWeNeedFromYou onQuote={onQuote} />
+      <HowWeWork />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
-      <ServicesExplorer onQuote={onQuote} />
+      <CaseStudiesNote />
+      <ServicesExplorer onQuote={onQuote} open={svcOpen} setOpen={setSvcOpen} />
+      <WhyUBC />
+      <UBCWayQA />
       <GlobalPresence />
       <Testimonials />
+      <WhoWeServe onOpenService={openService} />
+      <CompanyProofTech />
+      <FAQSection />
+      <FinalCTA onQuote={onQuote} />
     </div>
   );
 }

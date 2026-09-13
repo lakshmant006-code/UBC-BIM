@@ -199,6 +199,100 @@ window.UBC_DATA = {
   ]
 };
 
+/* Home-page sections drawn from the client's own supplied UX/UI blueprint
+   (UBC_BIM_FINAL_Website_UX_Blueprint.pdf), sections 04/06/07/12/13/14: the
+   buying-journey sections that page defines but the site didn't have a
+   place for yet. Copy is either lifted directly from that document's own
+   bullet lists (whatWeNeed, whyUbc's six labels, whoWeServe's six roles,
+   ubcWay's four steps) or, where the blueprint only names a section and
+   this site already has the real underlying fact elsewhere (howWeWork's
+   five one-line descriptions, each role's own blurb), written to describe
+   what's already true on this site rather than a new claim. Three sections
+   the blueprint calls for need assets nobody has supplied yet — a client
+   logo wall (03), named video testimonials (11), certifications (15) — so
+   Home.jsx renders those as explicit "coming soon" placeholders (empty
+   logo slots, a case-studies note, a certifications line) instead of either
+   inventing content for them or leaving them out silently; swap in the
+   real logos/quotes/certificates here (and in Home.jsx's ClientLogoWall /
+   CaseStudiesNote / CompanyProofTech) once they exist. */
+window.UBC_DATA.blueprint = {
+  // 04 Project fit selector: "What are you working on?" Building types map
+  // straight onto Portfolio's own FilterBar categories (window.UBC_NAV_FILTER,
+  // the same one-shot deep-link Home's "Selected work" already assumes),
+  // so picking one and following through actually filters real projects
+  // rather than just wording a button. Needs map onto five of the seven
+  // real rows in `services` above — the two dropped (BOM's own machine-CSV
+  // angle already covered by "Takeoff", and plain "BIM modelling" being the
+  // umbrella every other need already sits under) would have had nothing
+  // distinct of their own to show.
+  projectFit: {
+    buildingTypes: [
+      { label: 'Two-storey residential', filter: 'Residential' },
+      { label: 'Multifamily', filter: 'Multifamily' },
+      { label: 'Commercial', filter: 'Commercial' },
+      { label: 'Something else', filter: 'All' }
+    ],
+    needs: [
+      { label: 'Detailing', serviceIndex: 0 },
+      { label: 'Engineering', serviceIndex: 2 },
+      { label: 'Coordination', serviceIndex: 3 },
+      { label: 'Permit set', serviceIndex: 4 },
+      { label: 'Takeoff / BOM', serviceIndex: 5 }
+    ]
+  },
+  // 06 What we need from you.
+  whatWeNeed: {
+    items: [
+      'Architectural drawings',
+      'Structural information, if you have it',
+      "Specifications or standards you're building to",
+      'Project scope and the deliverables you need',
+      'Existing BIM or CAD files, if any exist'
+    ],
+    note: "Don't have everything on that list? Send what you have — a scope comes back either way."
+  },
+  // 07 How we work: the same five-stage sequence the home hero (SceneHero)
+  // walks a visitor through visually, restated here as plain, readable
+  // steps for anyone who scrolled past without the model loading.
+  howWeWork: [
+    { n: '01', title: 'Input', body: 'Send what you have: a plan set, a Revit model, an IFC, or photos of a marked-up print.' },
+    { n: '02', title: 'Model', body: 'We build the one coordinated 3D model every drawing and machine file downstream will come from.' },
+    { n: '03', title: 'Coordinate', body: 'Structure, MEP and architecture are checked against each other inside that model, before anything ships.' },
+    { n: '04', title: 'Document', body: 'Panel layouts, truss drawings, permit sets and machine files are drawn straight from the same coordinated model.' },
+    { n: '05', title: 'Deliver', body: 'A scope-matched set comes back: drawings, BOM and machine-ready files, coordinated with each other by construction.' }
+  ],
+  // 12 Why UBC / client value — the blueprint's own six labels, each given
+  // one line tying it to a real mechanism already on this site (the
+  // coordinated model, clash detection, BOM) rather than a bare adjective.
+  whyUbc: [
+    { title: 'Better coordination', body: 'Structure, MEP and architecture are checked against one model, not three separate drawing sets.' },
+    { title: 'Less rework', body: 'Clashes get caught in the model, before a beam is cut rather than after a crew finds one on site.' },
+    { title: 'Clearer documentation', body: 'Every sheet in a set comes from the same source, so nothing drifts between what is drawn and what is built.' },
+    { title: 'Quantity visibility', body: 'A Bill of Materials and machine CSV are counted straight off the model, not re-tallied by hand.' },
+    { title: 'Faster downstream workflow', body: 'A revision to the frame reaches the takeoff, the permit set and the machine file together, not one at a time.' },
+    { title: 'Flexible technical support', body: 'Send a Revit model, an IFC, an architectural PDF, or a marked-up print — whatever you already have is enough to start.' }
+  ],
+  // 13 Who we serve: the blueprint's six roles, each pointed at the real
+  // service rows on this site most relevant to it (by index into
+  // `services` above) rather than a generic paragraph repeated six times.
+  whoWeServe: [
+    { role: 'Contractors', body: 'A coordinated model and a permit set drawn from it, so what is approved matches what your crew builds.', serviceIndexes: [4, 3] },
+    { role: 'LGSF / CFS manufacturers', body: 'Panel layouts and machine-ready CSV, sized to how your own roll-forming line actually runs.', serviceIndexes: [0, 5] },
+    { role: 'Fabricators', body: 'Shop-ready detail, drawn from the same model as the takeoff, so a revision reaches both together.', serviceIndexes: [0, 5] },
+    { role: 'Engineers', body: 'Engineering support for wood and light-gauge steel, in house, from concept through permitting.', serviceIndexes: [2] },
+    { role: 'Architects / design teams', body: 'Drafting and detailing that stays inside your own drawing standards and titleblocks.', serviceIndexes: [6] },
+    { role: 'Developers', body: 'One coordinated model across a project, so the framing, MEP and permit set never fall out of step with each other.', serviceIndexes: [3, 4] }
+  ],
+  // 14 The UBC way + QA: the blueprint's own four-step culture framing,
+  // paired with the one QA mechanism this site can actually describe
+  // honestly (the coordinated-model check every drawing already goes
+  // through) rather than naming a formal certification nobody has supplied.
+  ubcWay: {
+    steps: ['Understand', 'Communicate', 'Coordinate', 'Deliver'],
+    qa: 'Every drawing and machine file is checked back against the same coordinated model it came from before it ships — model and drawing checks and revision control on every project, not just the large ones.'
+  }
+};
+
 /* Quick-answers chat widget (ChatBot.jsx): predefined questions only, no
    open-ended input and no backend to answer one, so every question below is
    picked to have a real, already-true answer rather than something invented
