@@ -154,11 +154,12 @@ function HotspotCard({ hotspot, onClose }) {
   const { Icon } = window.UBCBIMDesignSystem_353af8;
   return (
     <div role="dialog" aria-label={hotspot.label} style={{
-      position: 'fixed', left: 'var(--gutter)', bottom: 'var(--s-6)', zIndex: 60,
-      width: 'min(380px, calc(100vw - 2 * var(--gutter)))',
+      position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 60,
+      width: 'min(460px, calc(100vw - 2 * var(--gutter)))',
+      maxHeight: 'calc(100vh - 2 * var(--s-6))', overflowY: 'auto',
       background: 'rgba(245,244,241,.92)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-      border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)',
-      padding: 'var(--s-5)'
+      border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-3)',
+      padding: 'var(--s-6)'
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>
@@ -183,7 +184,7 @@ function HotspotCard({ hotspot, onClose }) {
           {hotspot.image && (
             <img src={hotspot.image} alt={hotspot.label} style={{ display: 'block', width: '100%', marginTop: 'var(--s-4)', borderRadius: 'var(--r-2)', border: 'var(--bw-hair) solid var(--border-subtle)' }} />
           )}
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--s-4) 0 0' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--s-4) 0 0' }}>
             {hotspot.body}
           </p>
         </>
