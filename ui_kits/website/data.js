@@ -263,30 +263,6 @@ window.UBC_DATA = {
    certifications line stay explicit "coming soon" placeholders until those
    exist too. */
 window.UBC_DATA.blueprint = {
-  // 04 Project fit selector: "What are you working on?" Building types map
-  // straight onto Portfolio's own FilterBar categories (window.UBC_NAV_FILTER,
-  // the same one-shot deep-link Home's "Selected work" already assumes),
-  // so picking one and following through actually filters real projects
-  // rather than just wording a button. Needs map onto five of the seven
-  // real rows in `services` above — the two dropped (BOM's own machine-CSV
-  // angle already covered by "Takeoff", and plain "BIM modelling" being the
-  // umbrella every other need already sits under) would have had nothing
-  // distinct of their own to show.
-  projectFit: {
-    buildingTypes: [
-      { label: 'Two-storey residential', filter: 'Residential' },
-      { label: 'Multifamily', filter: 'Multifamily' },
-      { label: 'Commercial', filter: 'Commercial' },
-      { label: 'Something else', filter: 'All' }
-    ],
-    needs: [
-      { label: 'Detailing', serviceIndex: 0 },
-      { label: 'Engineering', serviceIndex: 2 },
-      { label: 'Coordination', serviceIndex: 3 },
-      { label: 'Permit set', serviceIndex: 4 },
-      { label: 'Takeoff / BOM', serviceIndex: 5 }
-    ]
-  },
   // 06 What we need from you.
   whatWeNeed: {
     items: [

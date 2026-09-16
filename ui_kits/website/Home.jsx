@@ -172,46 +172,6 @@ function LogoWalls() {
   );
 }
 
-// PROJECT FIT: "What are you working on?" — the blueprint's own early
-// routing step. Building types deep-link into Portfolio's real FilterBar
-// (window.UBC_NAV_FILTER, the same one-shot mechanism "Selected work"
-// already assumes elsewhere on this page); needs jump down to the specific
-// row of the real services accordion below and open it, rather than
-// describing the service again in different words up here.
-const PF = D.blueprint && D.blueprint.projectFit;
-function ProjectFitSelector({ onGo, onOpenService }) {
-  if (!PF) return null;
-  const pill = { fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', background: 'var(--surface-card)', border: 'var(--bw-1) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '10px 18px', cursor: 'pointer' };
-  return (
-    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)', borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-      <Page>
-        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>What are you working on?</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Start from your project, not our menu</h2>
-        </Reveal>
-        <div className="ubc-fit-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-8)' }}>
-          <Reveal>
-            <div style={{ ...eyebrow, marginBottom: 'var(--s-4)' }}>Building type</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-3)' }}>
-              {PF.buildingTypes.map((b) => (
-                <button key={b.label} style={pill} onClick={() => { window.UBC_NAV_FILTER = b.filter; onGo && onGo('projects'); }}>{b.label}</button>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal delay={80}>
-            <div style={{ ...eyebrow, marginBottom: 'var(--s-4)' }}>What you need</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-3)' }}>
-              {PF.needs.map((n) => (
-                <button key={n.label} style={pill} onClick={() => onOpenService && onOpenService(n.serviceIndex)}>{n.label}</button>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </Page>
-    </Section>
-  );
-}
-
 // WHAT WE NEED FROM YOU + HOW WE WORK: paired "before you send anything" /
 // "here's what happens once you do" sections, both lifted straight from the
 // client's own blueprint bullet lists (window.UBC_DATA.blueprint).
@@ -1238,7 +1198,6 @@ function Home({ onGo, onQuote }) {
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
       <LogoWalls />
       <WhoWeAre onGo={onGo} />
-      <ProjectFitSelector onGo={onGo} onOpenService={openService} />
       <WhatWeNeedFromYou onQuote={onQuote} />
       <HowWeWork />
       <BeforeAfterSlider />

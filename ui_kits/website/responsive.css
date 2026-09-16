@@ -38,9 +38,6 @@
      progressively taller and more distorted instead of scaling down with it. */
   .ubc-model-viewer { height: 420px !important; min-height: 420px !important; }
 
-  /* Project fit selector: building-type / needs columns stack */
-  .ubc-fit-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
-
   /* How we work: five steps, three per row before stacking to one */
   .ubc-how-grid { grid-template-columns: repeat(3, 1fr) !important; }
 
