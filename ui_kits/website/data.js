@@ -183,6 +183,50 @@ window.UBC_DATA = {
       ['Wall panel saw', 'Machine', 'Cut list · CSV']
     ]
   },
+  // Real logo/photo assets the client supplied directly (Client_Logos.zip,
+  // Software_logos.zip, Machine_logo.zip), processed once (resized, no
+  // content changes) into ui_kits/website/assets/logos/. `machine` mixes
+  // brand logos (Arkitech, Pinnacle, AMS Controls, Beck Automation,
+  // FrameMac) with photos of the roll-forming lines themselves
+  // (FrameCAD/Howick/Knudson/Scottsdale/Pinnacle), exactly as supplied —
+  // not all of that folder was flat logo artwork, so the label says what
+  // each image actually shows rather than calling a machine photo a logo.
+  logos: {
+    client: [
+      { src: 'assets/logos/client/revolution-steel.jpg', alt: 'Revolution Steel' },
+      { src: 'assets/logos/client/lgs-framing.jpg', alt: 'LGS Framing' },
+      { src: 'assets/logos/client/accurate-steel-fab.jpg', alt: 'Accurate Steel Fab' },
+      { src: 'assets/logos/client/steel-tek-framing.jpg', alt: 'Steel Tek Framing' },
+      { src: 'assets/logos/client/offsitek.jpg', alt: 'OffsiteK' },
+      { src: 'assets/logos/client/taynr.jpg', alt: 'TAYNR' },
+      { src: 'assets/logos/client/conqst.jpg', alt: 'CONQST' },
+      { src: 'assets/logos/client/my-barndo-plans.jpg', alt: 'My Barndo Plans' },
+      { src: 'assets/logos/client/evolusion-innovation.jpg', alt: 'Evolusion Innovation' },
+      { src: 'assets/logos/client/beattie.jpg', alt: 'Beattie' },
+      { src: 'assets/logos/client/expertise.jpg', alt: 'Expertise' },
+      { src: 'assets/logos/client/innovative-living-design.jpg', alt: 'Innovative Living Design Inc.' },
+      { src: 'assets/logos/client/indan-planning-systems.jpg', alt: 'INDAN Planning Systems Ltd.' }
+    ],
+    software: [
+      { src: 'assets/logos/software/framecad.jpg', alt: 'FrameCAD' },
+      { src: 'assets/logos/software/mwf-pro-metal.png', alt: 'MWF Pro Metal' },
+      { src: 'assets/logos/software/autodesk-revit.jpg', alt: 'Autodesk Revit' },
+      { src: 'assets/logos/software/scottsdale.jpg', alt: 'Scottsdale' },
+      { src: 'assets/logos/software/vertex-bd.jpg', alt: 'Vertex BD' }
+    ],
+    machine: [
+      { src: 'assets/logos/machine/arkitech.jpg', alt: 'Arkitech' },
+      { src: 'assets/logos/machine/framecad-machine.jpg', alt: 'FrameCAD roll-forming line' },
+      { src: 'assets/logos/machine/howick-machine.png', alt: 'Howick roll-forming line' },
+      { src: 'assets/logos/machine/knudson-machine.jpg', alt: 'Knudson roll-forming line' },
+      { src: 'assets/logos/machine/pinnacle.jpg', alt: 'Pinnacle Light Gauge Steel' },
+      { src: 'assets/logos/machine/scottsdale-machine.jpg', alt: 'Scottsdale roll-forming line' },
+      { src: 'assets/logos/machine/ams-controls.jpg', alt: 'AMS Controls' },
+      { src: 'assets/logos/machine/beck-automation.png', alt: 'Beck Automation' },
+      { src: 'assets/logos/machine/framemac.jpg', alt: 'FrameMac' },
+      { src: 'assets/logos/machine/pinnacle-machine.jpg', alt: 'Pinnacle roll-forming line' }
+    ]
+  },
   // Real figures, from ubcbim.com itself: 783 projects, 12 countries, 224
   // clients, 73 team members.
   stats: [
@@ -208,13 +252,16 @@ window.UBC_DATA = {
    this site already has the real underlying fact elsewhere (howWeWork's
    five one-line descriptions, each role's own blurb), written to describe
    what's already true on this site rather than a new claim. Three sections
-   the blueprint calls for need assets nobody has supplied yet — a client
-   logo wall (03), named video testimonials (11), certifications (15) — so
-   Home.jsx renders those as explicit "coming soon" placeholders (empty
-   logo slots, a case-studies note, a certifications line) instead of either
-   inventing content for them or leaving them out silently; swap in the
-   real logos/quotes/certificates here (and in Home.jsx's ClientLogoWall /
-   CaseStudiesNote / CompanyProofTech) once they exist. */
+   the blueprint calls for need assets nobody had supplied yet — a client
+   logo wall (03), named video testimonials (11), certifications (15).
+   The client logo wall now has real logos (window.UBC_DATA.logos.client,
+   above, from Client_Logos.zip) and Home.jsx's LogoWalls renders those —
+   plus the supplied software and machine logos, which the blueprint didn't
+   ask for by name but the client sent anyway — as running carousels rather
+   than a static grid. Named video testimonials and certifications still
+   have nothing real behind them, so CaseStudiesNote / CompanyProofTech's
+   certifications line stay explicit "coming soon" placeholders until those
+   exist too. */
 window.UBC_DATA.blueprint = {
   // 04 Project fit selector: "What are you working on?" Building types map
   // straight onto Portfolio's own FilterBar categories (window.UBC_NAV_FILTER,
