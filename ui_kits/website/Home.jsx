@@ -114,13 +114,48 @@ function WhoWeAre({ onGo }) {
   );
 }
 
-// CLIENT LOGO WALL (blueprint section 03, "RECOGNIZE"): no client has
-// approved a logo for use here yet, so this renders honest empty slots
-// rather than invented company names — the same "coming soon" convention
-// as TrussPanelsPending (MockingBirdModel.jsx) and s.pending (ServiceRow
-// above), not a placeholder that could be mistaken for a real client list.
-function ClientLogoWall() {
-  const slots = Array.from({ length: 6 });
+// LOGO CAROUSELS (blueprint section 03, "RECOGNIZE", plus two strips the
+// blueprint didn't ask for by name but the client sent real assets for
+// anyway): real logos and machine photos supplied directly
+// (Client_Logos.zip, Software_logos.zip, Machine_logo.zip), processed once
+// (resized only, no content changes) into assets/logos/ — nothing here is
+// invented. Three strips stacked one above another: clients, the software
+// UBC models in, and the roll-forming lines UBC's own machine files run on.
+// Each is a duplicated-content CSS marquee — two copies of the same row
+// back to back, animated by exactly translateX(-50%) (ubcMarqueeH,
+// index.html) — the same technique the Testimonials marquee below already
+// uses vertically, chosen because it loops seamlessly for a mixed-width
+// logo row without pre-computing any distance. Pauses on hover/focus
+// (responsive.css) and holds still under prefers-reduced-motion.
+function LogoCarousel({ images, reverse, height = 64 }) {
+  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return (
+    <div className="ubc-logo-track-wrap" style={{ overflow: 'hidden', WebkitMaskImage: 'linear-gradient(90deg, transparent, black 6%, black 94%, transparent)', maskImage: 'linear-gradient(90deg, transparent, black 6%, black 94%, transparent)' }}>
+      <div className="ubc-logo-track" style={{
+        display: 'flex', width: 'max-content', gap: 'var(--s-6)',
+        animation: reduceMotion ? 'none' : 'ubcMarqueeH 32s linear infinite',
+        animationDirection: reverse ? 'reverse' : 'normal'
+      }}>
+        {[...images, ...images].map((img, i) => (
+          <div key={i} aria-hidden={i >= images.length || undefined}
+            style={{ flexShrink: 0, height, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 var(--s-4)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
+            <img src={img.src} alt={i < images.length ? img.alt : ''} style={{ height: '66%', width: 'auto', maxWidth: 150, objectFit: 'contain' }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const LOGOS = D.logos;
+function LogoWalls() {
+  if (!LOGOS) return null;
+  const strip = (label, images, reverse) => images && images.length > 0 && (
+    <div style={{ marginTop: 'var(--s-7)' }}>
+      <div style={{ ...eyebrow, textAlign: 'center', marginBottom: 'var(--s-4)' }}>{label}</div>
+      <LogoCarousel images={images} reverse={reverse} />
+    </div>
+  );
   return (
     <Section tight>
       <Page>
@@ -128,16 +163,9 @@ function ClientLogoWall() {
           <div style={eyebrow}>Trusted by teams across the building industry</div>
         </Reveal>
         <Reveal delay={80}>
-          <div className="ubc-logo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-6)' }}>
-            {slots.map((_, i) => (
-              <div key={i} style={{ height: 56, borderRadius: 'var(--r-2)', border: 'var(--bw-hair) dashed var(--border-subtle)', display: 'grid', placeItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Client logo</span>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', textAlign: 'center', margin: 'var(--s-4) 0 0' }}>
-            Added here once client logos are approved for use.
-          </p>
+          {strip('Clients', LOGOS.client)}
+          {strip('Software we model in', LOGOS.software, true)}
+          {strip("Machines our files run on", LOGOS.machine)}
         </Reveal>
       </Page>
     </Section>
@@ -1177,7 +1205,7 @@ function Home({ onGo, onQuote }) {
   return (
     <div>
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
-      <ClientLogoWall />
+      <LogoWalls />
       <WhoWeAre onGo={onGo} />
       <ProjectFitSelector onGo={onGo} onOpenService={openService} />
       <WhatWeNeedFromYou onQuote={onQuote} />
