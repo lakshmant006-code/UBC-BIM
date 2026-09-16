@@ -9,7 +9,7 @@ const Section = ({ children, sunken, tight, style }) => (
 // transition: same shape (fade up 22px, once, on scroll into view) and the
 // same --ease-out curve and --dur-4 length as tokens/motion.css, just
 // choreographed in JS so multiple elements can stagger against each other
-// (see ServiceRow) rather than each firing its own isolated CSS transition.
+// rather than each firing its own isolated CSS transition.
 function Reveal({ children, delay = 0, style }) {
   const ref = React.useRef(null);
   const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -71,28 +71,6 @@ Object.assign(window, { Page, Section, Reveal, AnimatedNumber });
 
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
-
-// Plain-English labels for the IFC classes worth naming in the Bill of
-// Materials card. Whatever the hub model actually contains (a wall-and-MEP
-// renovation, a column-and-beam steel frame, anything else), the card reads
-// off manifest.byClass directly rather than a list tied to one specific
-// model, so swapping window.UBC_DATA.servicesModel never leaves it empty.
-const IFC_CLASS_LABEL = {
-  IfcWall: 'Walls', IfcWallStandardCase: 'Wall panels', IfcSlab: 'Floor & roof plates',
-  IfcRoof: 'Roof', IfcWindow: 'Windows', IfcDoor: 'Doors', IfcColumn: 'Columns',
-  IfcBeam: 'Beams', IfcMember: 'Members', IfcFlowTerminal: 'MEP fixtures',
-  IfcDistributionPort: 'MEP connections', IfcFurnishingElement: 'Furniture',
-  IfcRailing: 'Railings', IfcStair: 'Stairs', IfcStairFlight: 'Stair flights',
-  IfcCovering: 'Ceilings & finishes'
-};
-function bomRows(manifest) {
-  if (!manifest || !manifest.byClass) return [];
-  return Object.entries(manifest.byClass)
-    .filter(([cls]) => IFC_CLASS_LABEL[cls])   // skip proxies, spaces, openings: not a BOM line
-    .sort((a, b) => b[1].count - a[1].count)
-    .slice(0, 6)
-    .map(([cls, v]) => [IFC_CLASS_LABEL[cls], v.count]);
-}
 
 // WHO WE ARE: centered serif editorial band.
 function WhoWeAre({ onGo }) {
@@ -421,254 +399,6 @@ function CaseStudiesNote() {
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-3) auto 0', maxWidth: '58ch' }}>
             Full write-ups for these projects — the client's requirement, UBC's own scope and the outcome — are coming soon.
           </p>
-        </Reveal>
-      </Page>
-    </Section>
-  );
-}
-
-// One row of the services accordion. The expand/collapse is a real measured
-// height (anime.js animates 0 -> el.scrollHeight, not a fixed max-height
-// guess), so the body text, tag row and chip row (however many lines that
-// turns out to be) always animate open cleanly instead of clipping early or
-// leaving dead space. Opening also staggers those three pieces in (each
-// carries the .ubc-acc-item class), so the row reads as assembling rather
-// than a panel that was already there sliding into place.
-function ServiceRow({ s, isOpen, onToggle, manifest, activeChip, openChip }) {
-  const panelRef = React.useRef(null);
-  const panelId = 'svc-panel-' + s.n;
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  React.useEffect(() => {
-    const el = panelRef.current; if (!el) return;
-    if (reduceMotion || typeof window.anime !== 'function') {
-      el.style.height = isOpen ? 'auto' : '0px';
-      return;
-    }
-    window.anime.remove(el);
-    window.anime({
-      targets: el, height: isOpen ? el.scrollHeight : 0, duration: 340, easing: 'cubicBezier(.16,1,.3,1)',
-      complete: () => { if (isOpen) el.style.height = 'auto'; }
-    });
-    if (isOpen) {
-      const items = el.querySelectorAll('.ubc-acc-item');
-      window.anime.remove(items);
-      window.anime({
-        targets: items, opacity: [0, 1], translateY: [10, 0], duration: 380,
-        delay: window.anime.stagger(60, { start: 140 }), easing: 'cubicBezier(.16,1,.3,1)',
-        complete: () => { items.forEach((it) => { it.style.opacity = 1; it.style.transform = 'none'; }); }
-      });
-    }
-  }, [isOpen]);
-
-  return (
-    <div style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-      <button onClick={onToggle} aria-expanded={isOpen} aria-controls={panelId}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--s-5)', padding: 'var(--s-6) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)', width: 28 }}>{s.n}</span>
-        <span style={{ ...serifH, fontSize: 'clamp(20px, 2.1vw, 28px)', flex: 1 }}>{s.title}</span>
-        <Icon name={isOpen ? 'minus' : 'plus'} size={22} style={{ color: 'var(--text-muted)' }} />
-      </button>
-      <div ref={panelRef} id={panelId} role="region" aria-label={s.title} style={{ overflow: 'hidden', height: 0 }}>
-        <div className="ubc-acc-row" style={{ padding: '0 0 var(--s-6) calc(28px + var(--s-5))', display: 'flex', flexWrap: 'wrap', gap: 'var(--s-5)', alignItems: 'flex-start' }}>
-          <p className="ubc-acc-item" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: s.pending ? 'var(--text-faint)' : 'var(--text-muted)', fontStyle: s.pending ? 'italic' : 'normal', maxWidth: '60ch', margin: 0 }}>
-            {s.pending ? 'Content coming soon — full details pending.' : s.body}
-          </p>
-          <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}>{s.tags.map((t) => <Tag key={t}>{t}</Tag>)}</div>
-          {s.chips && (
-            <div className="ubc-acc-item" style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', width: '100%' }}>
-              {s.chips.map((c) => {
-                const has = manifest && manifest.byType && manifest.byType[c.class];
-                const on = activeChip === c.class;
-                return (
-                  <button key={c.class} onClick={() => openChip(c)} disabled={!has} aria-pressed={on}
-                    style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase',
-                      padding: '7px 12px', borderRadius: 'var(--r-pill)', cursor: has ? 'pointer' : 'default',
-                      background: on ? 'var(--ink)' : 'var(--surface-card)', color: on ? 'var(--paper)' : (has ? 'var(--text-strong)' : 'var(--text-faint)'),
-                      border: 'var(--bw-1) solid ' + (on ? 'var(--ink)' : 'var(--border-strong)'), opacity: has ? 1 : 0.5
-                    }}>
-                    {c.label}{on ? ' · shown' : ''}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// WHAT WE DELIVER: the services accordion paired with a live model of the
-// hub project (window.UBC_DATA.servicesModel). Opening a service flies the
-// camera to the real part of that real model the service describes (the
-// actual walls, the actual floor and roof plates, the actual MEP fixtures)
-// read from tools/ifc_to_glb.py's <model>.views.json, not invented
-// coordinates. A service with nothing to point a camera at (a permit set, a
-// bill of materials) gets a data card over the model instead, its numbers
-// computed from that same manifest.
-function ServicesExplorer({ onQuote, open, setOpen }) {
-  const [activeChip, setActiveChip] = React.useState(null);
-  const [manifest, setManifest] = React.useState(null);
-  const [api, setApi] = React.useState(null);
-  const M = D.servicesModel;
-
-  React.useEffect(() => {
-    if (!M || !M.views) return;
-    let dead = false;
-    fetch(M.views).then((r) => r.json()).then((j) => { if (!dead) setManifest(j); }).catch(() => {});
-    return () => { dead = true; };
-  }, []);
-
-  const svc = open >= 0 ? D.services[open] : null;
-  const view = svc && svc.view;
-
-  // Fly the camera whenever the open service (or the manifest, or the viewer
-  // itself) becomes ready. Covers both "clicked a new service" and "the
-  // model finished loading after a service was already selected".
-  React.useEffect(() => {
-    if (!api || !manifest) return;
-    setActiveChip(null);
-    if (!view || view.kind === 'whole' || view.kind === 'overlay') { api.reset(); return; }
-    if (view.kind === 'class') {
-      // A view can hand-pick its own centre/radius (a real bounding box read
-      // off the model's own geometry, see the comments in data.js) rather
-      // than the whole class's, for a tighter shot of one specific detail
-      // within it; fall back to the class's own framing when it doesn't.
-      if (view.center) { api.flyTo({ center: view.center, radius: view.radius }); return; }
-      const v = manifest.byClass && manifest.byClass[view.class];
-      if (v) api.flyTo({ center: v.center, radius: v.radius }); else api.reset();
-    }
-  }, [open, api, manifest]);
-
-  const openChip = (chip) => {
-    if (!api || !manifest) return;
-    const v = manifest.byType && manifest.byType[chip.class];
-    setActiveChip(chip.class);
-    if (v) api.flyTo({ center: v.center, radius: v.radius });
-  };
-
-  // What the badge over the model reads right now. activeChip can be one
-  // render stale relative to `open` (the effect that clears it on a service
-  // switch hasn't run yet), so this has to tolerate a chip class that
-  // doesn't belong to the now-current service rather than assume svc.chips
-  // exists.
-  const activeChipEntry = activeChip && svc && svc.chips && svc.chips.find((c) => c.class === activeChip);
-  const activeLabel = activeChipEntry
-    ? activeChipEntry.label
-    : (view && view.label) || (svc && svc.title) || 'Every drawing out of one model';
-
-  // A view can carry one sentence, naming and defining the specific detail
-  // the camera is now framing (a K-brace, a Fink truss), typed out on the
-  // model rather than dropped in all at once, so it reads as being pointed
-  // out live rather than as another paragraph of copy.
-  const [typed, setTyped] = React.useState('');
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  React.useEffect(() => {
-    const text = (view && view.typewriter) || '';
-    setTyped(reduceMotion ? text : '');
-    if (!text || reduceMotion) return;
-    let i = 0;
-    const id = setInterval(() => {
-      i++;
-      setTyped(text.slice(0, i));
-      if (i >= text.length) clearInterval(id);
-    }, 18);
-    return () => clearInterval(id);
-  }, [open]);
-  const typewriterDone = !!view && typed.length >= (view.typewriter || '').length;
-
-  return (
-    <Section>
-      <Page>
-        <div id="services-explorer" style={{ scrollMarginTop: 100 }} />
-        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>What we deliver</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(30px, 4vw, 56px)', margin: 'var(--s-3) 0 0' }}>Every drawing out of one model</h2>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0' }}>
-            Open a service to see the real part of the model it comes from. This is one of our own coordinated projects, not a stock illustration.
-          </p>
-        </Reveal>
-
-        <div className="ubc-svc-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-9)', alignItems: 'start' }}>
-          <div style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-            {D.services.map((s, i) => (
-              <ServiceRow key={s.n} s={s} isOpen={open === i} onToggle={() => setOpen(open === i ? -1 : i)}
-                manifest={manifest} activeChip={activeChip} openChip={openChip} />
-            ))}
-          </div>
-
-          {/* Live model, sticky on desktop so it stays in view as the visitor
-              works down the accordion. */}
-          <div className="ubc-svc-model" style={{ position: 'relative' }}>
-            <div style={{ position: 'relative', borderRadius: 'var(--r-3)', overflow: 'hidden' }}>
-              {M && window.ModelViewer ? (
-                <window.ModelViewer src={M.src} radius={M.radius} height={520} onReady={setApi} />
-              ) : (
-                <div className="ubc-model-viewer" style={{ height: 520, background: 'var(--surface-sunken)' }} />
-              )}
-              {/* Which part of the model is on screen right now, announced to
-                  screen readers too, since the change is triggered by a
-                  button elsewhere on the page, not by focus landing here. */}
-              <div aria-live="polite" style={{ position: 'absolute', left: 'var(--s-5)', top: 'var(--s-5)', pointerEvents: 'none' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(16,18,21,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-pill)', padding: '5px 12px 5px 9px', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
-                  {activeLabel}
-                </span>
-              </div>
-
-              {/* Permit documents / Bill of Materials: nothing on the model to
-                  zoom to, so the real numbers land on top of it instead. */}
-              {view && view.kind === 'overlay' && (
-                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 320, marginLeft: 'auto', background: 'rgba(245,244,241,.75)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-5)' }}>
-                  {view.overlay === 'bom' ? (
-                    manifest ? (
-                      <>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Counted straight from this model</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px var(--s-4)', marginTop: 'var(--s-3)' }}>
-                          {bomRows(manifest).map(([label, count]) => (
-                            <React.Fragment key={label}>
-                              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>{label}</span>
-                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-strong)' }}>{count}</span>
-                            </React.Fragment>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>Counting the model…</div>
-                    )
-                  ) : (
-                    <>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Permit documents</div>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-2) 0 0' }}>
-                        Every sheet in the set (plans, elevations, sections and schedules) is drawn from this same coordinated model, so a revision here reaches the submission set with it.
-                      </p>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* A view with a term to teach types its explanation out on
-                  the model rather than dropping it in all at once: a
-                  blinking cursor while it runs, an aria-live region so a
-                  screen reader gets the finished sentence once, not one
-                  character at a time. */}
-              {view && view.typewriter && (
-                <div style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', left: 'var(--s-5)', maxWidth: 360, marginLeft: 'auto', background: 'rgba(245,244,241,.75)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-5)' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{view.label}</div>
-                  <p aria-live={typewriterDone ? 'off' : 'polite'} style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 0', minHeight: '4.5em' }}>
-                    {typed}
-                    {!typewriterDone && <span aria-hidden="true" style={{ animation: 'ubcCaret .8s step-end infinite' }}>▌</span>}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <Reveal style={{ textAlign: 'center', marginTop: 'var(--s-9)' }}>
-          <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 30px', cursor: 'pointer' }}>Request a quote</button>
         </Reveal>
       </Page>
     </Section>
@@ -1067,9 +797,9 @@ function Testimonials() {
 
 // WHO WE SERVE: the blueprint's six roles, each pointed at the real service
 // rows most relevant to it (Tag chips reuse D.services' own titles, so this
-// never drifts from what the accordion above actually says).
+// never drifts from what those service names actually say elsewhere).
 const WWS = D.blueprint && D.blueprint.whoWeServe;
-function WhoWeServe({ onOpenService }) {
+function WhoWeServe() {
   if (!WWS) return null;
   return (
     <Section>
@@ -1085,11 +815,7 @@ function WhoWeServe({ onOpenService }) {
                 <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{r.role}</div>
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{r.body}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)', marginTop: 'var(--s-4)' }}>
-                  {r.serviceIndexes.map((si) => D.services[si] && (
-                    <button key={si} onClick={() => onOpenService && onOpenService(si)} style={{ all: 'unset', cursor: 'pointer' }}>
-                      <Tag>{D.services[si].title}</Tag>
-                    </button>
-                  ))}
+                  {r.serviceIndexes.map((si) => D.services[si] && <Tag key={si}>{D.services[si].title}</Tag>)}
                 </div>
               </div>
             </Reveal>
@@ -1187,12 +913,6 @@ function FinalCTA({ onQuote }) {
 
 function Home({ onGo, onQuote }) {
   const SceneHero = window.SceneHero;
-  const [svcOpen, setSvcOpen] = React.useState(0);
-  const openService = (i) => {
-    setSvcOpen(i);
-    const el = document.getElementById('services-explorer');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
   return (
     <div>
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
@@ -1203,13 +923,12 @@ function Home({ onGo, onQuote }) {
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
       <CaseStudiesNote />
-      <ServicesExplorer onQuote={onQuote} open={svcOpen} setOpen={setSvcOpen} />
       <WhyUBC />
       <UBCWayQA />
       <GlobalPresence />
       <VideoTestimonials />
       <Testimonials />
-      <WhoWeServe onOpenService={openService} />
+      <WhoWeServe />
       <CompanyProofTech />
       <FAQSection />
       <FinalCTA onQuote={onQuote} />

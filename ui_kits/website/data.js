@@ -1,21 +1,12 @@
 /* Placeholder content in the brand's voice. Figures are illustrative: replace with real UBC BIM numbers. */
 window.UBC_DATA = {
-  // Each service can point the model explorer (Home, "What we deliver") at a
-  // real part of the hub model: `view.class` keys into that model's
-  // <name>.views.json, written by tools/ifc_to_glb.py from the model's own
-  // IFC classes, never invented coordinates. `view.kind: 'overlay'` is for
-  // services with nothing to zoom to (a permit set, a bill of materials);
-  // those get a small data card over the model instead. `chips` drills one
-  // level deeper, to individually named instances of that class: the actual
-  // bathroom fixtures placed in the model, e.g., not a generic MEP symbol.
-  // The camping resort steel frame is a single open-volume structure (988
-  // columns and 834 beams spanning the whole footprint, nothing else: no
-  // walls, no MEP, no openings), so unlike a compartmentalised building
-  // there is no spatially distinct "the walls" or "the fixtures" to fly to.
-  // Every view below is honestly one of the only two things this file
-  // contains; several land close to the same whole-structure framing rather
-  // than a meaningfully different close-up. Swap the hub model in
-  // servicesModel below for one with more element variety to get that back.
+  // Each service's `view` field once pointed Home's "What we deliver" model
+  // explorer at a real part of the hub model (a class/center/radius from
+  // that model's own <name>.views.json, written by tools/ifc_to_glb.py, or
+  // `kind: 'overlay'` for a service with nothing to zoom to). That explorer
+  // section has since been removed from Home.jsx; `view` is left as-is on
+  // each entry below rather than stripped out, in case the section (or
+  // something like it) comes back — nothing currently reads it.
   services: [
     { n: '01', title: 'Wall panel detailing', body: 'Panel layouts, stud and opening detail, sheathing schedules and the machine files your line runs on.', tags: ['Wood frame', 'Light-gauge steel'],
       // A hand-picked close-up rather than the whole IfcColumn class: centre
@@ -60,14 +51,6 @@ window.UBC_DATA = {
     { n: '10', title: 'Training services', body: null, pending: true, tags: [],
       view: { kind: 'whole', label: 'The coordinated structure' } }
   ],
-  // The hub model behind "What we deliver": the camping resort steel frame
-  // (988 columns, 834 beams), converted by tools/ifc_to_glb.py alongside
-  // <src>.views.json.
-  servicesModel: {
-    src: 'assets/models/camping-resort.glb',
-    views: 'assets/models/camping-resort.views.json',
-    radius: 11.2
-  },
   layers: [
     { label: 'Slab and foundation', note: 'Setting out, anchor layout', spec: { eyebrow: 'Layer 01', title: 'Slab and foundation', specs: [{ label: 'Setting out', value: 'Gridlines to survey control' }, { label: 'Anchors', value: 'Bolt layout with panel takeoff' }, { label: 'Output', value: 'Foundation plan · DWG' }], tags: ['Revit'] } },
     { label: 'Wall panels', note: 'Studs, openings, sheathing', spec: { eyebrow: 'Layer 02', title: 'Wall panels', specs: [{ label: 'Stud', value: '2×6 at 16" O.C.' }, { label: 'Sheathing', value: '7/16" OSB' }, { label: 'Openings', value: 'Headers sized per opening' }, { label: 'Output', value: 'Panel layout · machine CSV' }], tags: ['Machine CSV', 'Shop drawings'] } },
