@@ -365,6 +365,21 @@ window.UBC_DATA.faq = [
     a: 'Yes — real client models are live on the Projects page. Drag to rotate and zoom through a steel frame, a light-gauge steel build, a mixed-construction project and an MEP coordination job.' }
 ];
 
+/* Real client video testimonials, supplied directly by the client
+   (client_testimonals.zip: one "Testimonial video.mp4" plus three
+   WhatsApp-exported clips), transcoded once for the web (scaled, re-encoded,
+   a poster frame pulled from each) with no content changes. None of the
+   four names the speaker on screen or in an overlay, and there's no
+   transcript to read a name or company off of either, so each entry is
+   honestly unattributed here — swap in name/company/role for each `id`
+   once the client supplies it, rather than guessing at who's speaking. */
+window.UBC_DATA.videoTestimonials = [
+  { id: 'client-1', src: 'assets/testimonials/client-1.mp4', poster: 'assets/testimonials/client-1-poster.jpg' },
+  { id: 'client-2', src: 'assets/testimonials/client-2.mp4', poster: 'assets/testimonials/client-2-poster.jpg' },
+  { id: 'client-3', src: 'assets/testimonials/client-3.mp4', poster: 'assets/testimonials/client-3-poster.jpg' },
+  { id: 'client-4', src: 'assets/testimonials/client-4.mp4', poster: 'assets/testimonials/client-4-poster.jpg' }
+];
+
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land; nothing else needs to change. */
 window.UBC_DATA.beforeAfter = {

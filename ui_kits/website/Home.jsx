@@ -983,6 +983,37 @@ function GlobalPresence() {
   );
 }
 
+// REAL VIDEO TESTIMONIALS: four clips the client sent directly
+// (client_testimonals.zip), played with the browser's own <video controls>
+// rather than autoplaying or muting anything — a testimonial is only worth
+// having with its own audio intact. Deliberately unattributed (see the
+// comment on window.UBC_DATA.videoTestimonials in data.js): no name,
+// company or role is guessed at just to fill the card.
+const VIDEO_TESTIMONIALS = D.videoTestimonials || [];
+function VideoTestimonials() {
+  if (!VIDEO_TESTIMONIALS.length) return null;
+  return (
+    <Section>
+      <Page>
+        <Reveal style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>In their own words</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Clients, on camera</h2>
+        </Reveal>
+        <div className="ubc-video-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-8)' }}>
+          {VIDEO_TESTIMONIALS.map((v, i) => (
+            <Reveal key={v.id} delay={i * 60}>
+              <video controls preload="metadata" poster={v.poster} playsInline
+                style={{ display: 'block', width: '100%', aspectRatio: '9 / 16', objectFit: 'cover', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: '#000' }}>
+                <source src={v.src} type="video/mp4" />
+              </video>
+            </Reveal>
+          ))}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
 // Placeholder testimonials in the brand voice, describing the real service
 // (panel layouts, coordinated models, clash detection, permit sets) without
 // inventing named people, companies or photos: replace with real client
@@ -1217,6 +1248,7 @@ function Home({ onGo, onQuote }) {
       <WhyUBC />
       <UBCWayQA />
       <GlobalPresence />
+      <VideoTestimonials />
       <Testimonials />
       <WhoWeServe onOpenService={openService} />
       <CompanyProofTech />

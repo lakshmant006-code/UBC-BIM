@@ -47,6 +47,9 @@
   /* Why UBC / Who we serve: three cards -> two */
   .ubc-why-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .ubc-serve-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Client video testimonials: four portrait clips -> two per row */
+  .ubc-video-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* ---------- Header ----------
@@ -99,6 +102,9 @@
   .ubc-how-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
   .ubc-why-grid { grid-template-columns: 1fr !important; }
   .ubc-serve-grid { grid-template-columns: 1fr !important; }
+
+  /* Client video testimonials: two portrait clips -> one, full width */
+  .ubc-video-grid { grid-template-columns: 1fr !important; max-width: 360px !important; margin-left: auto !important; margin-right: auto !important; }
 }
 
 /* ---------- Contact page ----------
