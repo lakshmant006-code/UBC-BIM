@@ -542,27 +542,48 @@ window.UBC_DATA.hero = {
    wall stability by transferring designed loads to the foundation"; web
    holes "facilitate panel-to-panel connections" — the real reason this
    panel's own structural bolt (above) passes through one. top-track and
-   sheathing aren't named in that PDF's parts list, so their body text is
-   unchanged. */
+   sheathing aren't named in that PDF's parts list, so their body text
+   wasn't rewritten from it.
+
+   All five bodies below were rewritten a second time for plain language —
+   no "shear wall," "overturning forces," "diaphragm" or IFC labels like
+   "RT_9" — since a general site visitor, not a structural engineer, is who
+   actually reads these. Every concrete fact stays (the Simpson Strong-Tie
+   model number, six anchor bolts, the A325 bolt grade, the top track's own
+   real length); only the engineering vocabulary explaining why each part
+   matters was replaced with a plain-English version of the same real
+   function documented above.
+
+   hold-down's own image was swapped from the TYPICAL_DETAILS.pdf isometric
+   to VERTEX_IMAGE.pdf's own "HOLD DOWN 3D Image" crop (page 1) — a
+   tighter, cleaner close-up of the same kind of connection. anchor's and
+   bolt's existing TYPICAL_DETAILS.pdf isometrics ("ANCHOR BOLT CONNECTION"
+   / "PANEL TO PANEL CONNECTION") are dedicated close-ups already; the only
+   equivalent for either in VERTEX_IMAGE.pdf is a small label pointing at a
+   thin line on its full wall-panel elevation, not a close-up, so those two
+   images are unchanged. top-track and sheathing aren't shown as their own
+   image in VERTEX_IMAGE.pdf either (top-track only appears as a label on
+   that same full elevation; sheathing isn't drawn on it at all), so those
+   two keep their original TYPICAL_DETAILS.pdf crops too. */
 window.UBC_DATA.wallPanelModel = {
   src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
   restAngle: [-2.52, 1.42, -2.20],
   hotspots: [
     { id: 'hold-down', label: 'Hold-down', position: [-2.852, -1.742, -2.057], viewAngle: [-1.6, 0.9, -1.4],
       image: 'assets/details/wp-hold-down.jpg',
-      body: 'A Simpson Strong-Tie HTT5 hold-down, fastened to the stud above and anchored below. In a light-gauge-steel shear wall like this one, a hold-down’s job is to resist uplift and overturning forces caused by wind or lateral loads — without it, this end of the panel would be free to lift or rotate under exactly that kind of load.' },
+      body: 'A Simpson Strong-Tie HTT5 hold-down — a metal bracket bolted to the stud above and anchored to what’s below. Its job is simple: keep this corner of the wall from lifting up or twisting loose when wind or an earthquake pushes on the building.' },
     { id: 'anchor', label: 'Anchor bolt', position: [0.455, -2.012, -2.057], viewAngle: [1.2, 0.9, -1.6],
       image: 'assets/details/wp-anchor.jpg',
-      body: 'One of six anchor bolts along this panel’s bottom track, connecting it to the concrete foundation below. An anchor bolt’s job is to prevent the wall sliding, resist uplift, and transfer the wall’s designed loads down into the foundation — the connection every stud and sheathing load above ultimately depends on.' },
+      body: 'One of six anchor bolts along the bottom of this panel, fixing it straight into the concrete floor or foundation below. It keeps the wall from sliding or lifting off its base — the connection everything else in the wall is ultimately standing on.' },
     { id: 'bolt', label: 'Structural bolt', position: [-0.057, 1.106, 2.058], viewAngle: [0.6, 0.9, 1.8],
       image: 'assets/details/wp-bolt.jpg',
-      body: 'A 1/2 in. A325 structural bolt, 12 mm × 200 mm — the grade used through most of this panel’s stud-to-track and panel-to-panel connections. A connection like this one passes through a web hole punched in the framing member specifically to allow that panel-to-panel fastening. A single heavier A490 bolt appears once elsewhere on the same panel, at the one connection sized to need it.' },
+      body: 'A heavy-duty A325 bolt, 12 mm thick and 200 mm long, that joins this wall panel to the one next to it. It passes through a hole already punched in the metal stud for exactly this purpose, so two panels bolt together into one solid wall instead of standing as separate pieces. One connection elsewhere on this same panel uses an even heavier bolt, at the one spot built to need it.' },
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
       image: 'assets/details/wp-top-track.jpg',
-      body: 'The longest single member in this panel — its own track, running nearly the full 4.25 m depth along the top and tying every stud in this run into one continuous assembly rather than a row of independent members. Labelled RT_9 in the source model.' },
+      body: 'The metal rail running along the very top of the wall — the longest single piece in this panel, spanning nearly its full 4.25 m length. Every stud underneath screws into it, which is what turns a row of separate studs into one solid wall frame.' },
     { id: 'sheathing', label: 'Sheathing', position: [0.203, 1.833, -2.057], viewAngle: [0.8, 0.6, -1.7],
       image: 'assets/details/wp-sheathing.jpg',
-      body: 'This panel’s own sheathing, modelled as one continuous surface spanning nearly its full 6.17 m width rather than as individual sheets — the layer that ties every stud together into a working diaphragm and gives the wall its real shear capacity.' }
+      body: 'The flat panel skin fastened over the studs, covering nearly the full 6.17 m width of the wall in one continuous piece. It ties the whole frame together into one stiff surface, which is what actually gives the wall its strength against being pushed sideways.' }
   ]
 };
 
