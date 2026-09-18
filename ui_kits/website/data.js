@@ -529,20 +529,34 @@ window.UBC_DATA.hero = {
       two hex bolt heads visible partway up the stud — genuinely a
       structural bolt, not one of the self-drilling screws (#10/#12) the
       first 6-page upload only ever showed, which is why this one had no
-      image before the fuller PDF arrived. */
+      image before the fuller PDF arrived.
+
+   body text for hold-down, anchor and bolt was rewritten against a later
+   upload, VERTEX_IMAGE.pdf — a labelled Vertex BD wall-panel elevation plus
+   the client's own written "PANEL PARTS" definitions, not this session's
+   paraphrase of what a hold-down or anchor bolt does. Quoting that PDF
+   directly: hold-downs "are mainly used in LGSF shear walls to resist
+   uplift and overturning forces caused by wind or lateral loads"; anchor
+   bolts "are used to connect the LGSF wall panel bottom track to the
+   concrete foundation... to prevent sliding, resist uplift and maintain
+   wall stability by transferring designed loads to the foundation"; web
+   holes "facilitate panel-to-panel connections" — the real reason this
+   panel's own structural bolt (above) passes through one. top-track and
+   sheathing aren't named in that PDF's parts list, so their body text is
+   unchanged. */
 window.UBC_DATA.wallPanelModel = {
   src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
   restAngle: [-2.52, 1.42, -2.20],
   hotspots: [
     { id: 'hold-down', label: 'Hold-down', position: [-2.852, -1.742, -2.057], viewAngle: [-1.6, 0.9, -1.4],
       image: 'assets/details/wp-hold-down.jpg',
-      body: 'A Simpson Strong-Tie HTT5 hold-down tie, fastened to the stud above and anchored below — it resists this end of the panel lifting or rotating under lateral load, the same role a hold-down plays wherever a shear wall needs one.' },
-    { id: 'anchor', label: 'Anchor', position: [0.455, -2.012, -2.057], viewAngle: [1.2, 0.9, -1.6],
+      body: 'A Simpson Strong-Tie HTT5 hold-down, fastened to the stud above and anchored below. In a light-gauge-steel shear wall like this one, a hold-down’s job is to resist uplift and overturning forces caused by wind or lateral loads — without it, this end of the panel would be free to lift or rotate under exactly that kind of load.' },
+    { id: 'anchor', label: 'Anchor bolt', position: [0.455, -2.012, -2.057], viewAngle: [1.2, 0.9, -1.6],
       image: 'assets/details/wp-anchor.jpg',
-      body: 'One of six base anchor connections along this panel’s bottom track, holding it down against whatever it lands on — slab or foundation — before any stud or sheathing load is even applied.' },
+      body: 'One of six anchor bolts along this panel’s bottom track, connecting it to the concrete foundation below. An anchor bolt’s job is to prevent the wall sliding, resist uplift, and transfer the wall’s designed loads down into the foundation — the connection every stud and sheathing load above ultimately depends on.' },
     { id: 'bolt', label: 'Structural bolt', position: [-0.057, 1.106, 2.058], viewAngle: [0.6, 0.9, 1.8],
       image: 'assets/details/wp-bolt.jpg',
-      body: 'A 1/2 in. A325 structural bolt, 12 mm × 200 mm — the grade used through most of this panel’s stud-to-track and panel-to-panel connections. A single heavier A490 bolt appears once elsewhere on the same panel, at the one connection sized to need it.' },
+      body: 'A 1/2 in. A325 structural bolt, 12 mm × 200 mm — the grade used through most of this panel’s stud-to-track and panel-to-panel connections. A connection like this one passes through a web hole punched in the framing member specifically to allow that panel-to-panel fastening. A single heavier A490 bolt appears once elsewhere on the same panel, at the one connection sized to need it.' },
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
       image: 'assets/details/wp-top-track.jpg',
       body: 'The longest single member in this panel — its own track, running nearly the full 4.25 m depth along the top and tying every stud in this run into one continuous assembly rather than a row of independent members. Labelled RT_9 in the source model.' },
