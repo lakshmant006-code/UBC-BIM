@@ -7,6 +7,9 @@
   /* Selected work: two columns -> one */
   .ubc-proj-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
 
+  /* Blog grid: three columns -> two */
+  .ubc-blog-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
   /* Compare systems: side-by-side columns -> stacked, writing above the slider */
   .ubc-compare-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
 
@@ -64,6 +67,9 @@
 @media (max-width: 640px) {
   /* Section rhythm tightens up so the page is not endless on a small screen */
   .ubc-section { padding: var(--s-9) 0 !important; }
+
+  /* Blog grid: two columns -> one */
+  .ubc-blog-grid { grid-template-columns: 1fr !important; }
 
   /* Hero: the sticky stage runs full height, so pull the overlays in */
   .ubc-stage-label {
