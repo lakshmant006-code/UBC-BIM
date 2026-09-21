@@ -338,12 +338,303 @@ window.UBC_DATA.videoTestimonials = [
   { id: 'client-4', src: 'assets/testimonials/client-4.mp4', poster: 'assets/testimonials/client-4-poster.jpg' }
 ];
 
-/* The Blogs page (Blogs.jsx). Empty until real posts are supplied — the
-   page itself already renders a proper card grid once this has entries
-   ({id, title, date, excerpt, tags, image}), so adding a post is just
-   adding an object here, nothing else to build. Empty shows an honest
-   "coming soon" state instead of inventing a post. */
-window.UBC_DATA.blogPosts = [];
+/* The Blogs page (Blogs.jsx). Real posts supplied by the client (five
+   .docx write-ups, each with its own embedded project photos/diagrams —
+   nothing here is invented). Each `sections` block follows the same shape
+   ServicesDetail.jsx already reads for serviceArticles ({heading?, body?:
+   [...paragraphs], list?: [...strings or {title,body}]}), plus one field
+   ServicesDetail doesn't need: an optional `image` (+ `caption`) so a
+   section can carry its own real diagram/photo inline, not just the
+   post's own cover image. `date` is only set where the client's own
+   filename supplied one (12_days_of_BIM_posted_on_13-01-2026.docx); the
+   other four don't carry a date in the source document, so `date` is left
+   unset for those rather than guessed. */
+window.UBC_DATA.blogPosts = [
+  {
+    id: 'climbing-wall-lgsf',
+    title: 'Engineering Innovation in Light Gauge Steel: Custom 30-Foot Climbing Wall for a Commercial Building',
+    excerpt: 'A client asked for a 30-foot climbing wall panel inside a light-gauge-steel commercial building — three times the height LGSF walls are normally engineered for. Here’s how strap connections made it work.',
+    tags: ['Engineering', 'Light-gauge steel', 'Commercial'],
+    image: 'assets/blog/climbing-wall-cover.jpg',
+    sections: [
+      { body: [
+        'Modern commercial construction demands flexibility, precision, and engineering creativity. At UBC, every project is approached with a solution-driven mindset — especially when client requirements go beyond standard design practices.',
+        'This project is a perfect example of how advanced engineering and prefabrication technologies can transform complex ideas into practical, buildable solutions: BIM services for a light-gauge-steel commercial building of 3,879 sq ft in Ohio, USA — a 2-storey commercial building with a mono-sloped roof, modelled from LOD 100 to LOD 500 for both light-gauge steel and timber-framed structures.'
+      ] },
+      { heading: 'Scope of Work', body: ['UBC delivered a complete end-to-end solution covering:'], list: [
+        'Engineering', '3D Modeling', 'Detailing', 'Permit Set', 'CNC production Files', 'Foundation Design'
+      ] },
+      { body: ['By integrating design, engineering, and manufacturing workflows, the project ensured smooth coordination from concept to production.'] },
+      { heading: 'The Engineering Challenge', body: [
+        'In Light Gauge Steel Frame (LGSF) construction, the standard engineered wall height is typically 10 feet. However, this project introduced a unique client requirement — a custom 30-foot-high climbing wall panel.',
+        'Designing such an oversized structural element presented multiple challenges:'
+      ], list: [
+        'Maintaining structural stability at increased height',
+        'Controlling lateral movement and deflection',
+        'Ensuring safety under operational loads',
+        'Achieving manufacturability using prefabrication systems'
+      ] },
+      { heading: 'Innovative Engineering Solution', body: [
+        'To successfully engineer the 30-foot climbing wall, UBC’s engineering team implemented a specialized structural strategy.',
+        'The oversized wall panel was stabilized using precisely positioned strap connections, which played a critical role in:'
+      ], list: [
+        'Enhancing lateral stiffness',
+        'Distributing loads efficiently',
+        'Preventing structural deformation',
+        'Ensuring long-term safety and performance'
+      ] },
+      { body: ['This solution allowed the structure to maintain strength without compromising construction efficiency or fabrication accuracy.'] },
+      { heading: 'Software Used', list: [
+        'Revit MWF — Modeling & Detailing',
+        'STRAP Software — Structural Engineering & Analysis'
+      ] },
+      { heading: 'Machine Used', list: [
+        'FrameCAD Machine — Precision production and CNC file execution'
+      ] },
+      { body: ['The seamless integration between design software and manufacturing equipment ensured accurate component production and reduced on-site adjustments.'] }
+    ]
+  },
+
+  {
+    id: 'lgsf-software-stack-2026',
+    title: 'The Complete Software Stack for LGSF Detailing in 2026',
+    excerpt: 'A working detailer’s guide to the five platforms that actually ship light-gauge steel framing projects today — Vertex BD, Framecad, Scottsdale Scottsteel, Revit with MWF, and StaadPro.',
+    tags: ['Software', 'LGSF', 'BIM'],
+    image: 'assets/blog/software-stack-cover.jpg',
+    sections: [
+      { body: [
+        'A working detailer’s guide to the 5 platforms that actually ship light-gauge steel framing projects today.',
+        'TL;DR: Five software platforms dominate LGSF detailing in 2026 — Vertex BD, Framecad, Scottsdale Scottsteel, Revit with MWF (Strucsoft), and StaadPro for structural analysis. The right stack depends on whether you’re a panel manufacturer, a residential builder, or a structural engineer. Here’s how the working detailers we know actually pick.'
+      ] },
+      { heading: 'What software do LGSF detailers actually use?', body: [
+        'After detailing 783 light-gauge steel framing projects across 12 countries — across the US, UK, Australia, and Canada — our team has touched every major platform in the cold-formed steel (CFS) detailing space. The honest answer to “what’s the best software for LGSF?” is: it depends on your fabrication floor and your project mix. Most professional LGSF operations end up running 2–3 tools in parallel.',
+        'This guide breaks down the platforms that matter in 2026, what each does best, and where each one falls short — with no vendor bias.'
+      ] },
+      { heading: '1. Vertex BD', body: [
+        'Vertex BD is the leading cold-formed steel design software for prefab, modular, residential, and commercial construction. If you panelize, this is where most US LGSF manufacturers start.'
+      ], list: [
+        'Automates wall, floor, ceiling, and roof panel fabrication drawings from one BIM model',
+        'Generates CSV exports directly to roll-forming machines (Arkitech Advanced Construction Technologies, Pinnacle, HOWICK LTD)',
+        'Lot-specific drawing automation for production home builders',
+        'Strong cut-list, BoM, and material-report generation',
+        'Equally usable for LGSF and timber framing — useful for hybrid shops'
+      ] },
+      { body: ['Best for: production home builders, prefab panel manufacturers, kit-home companies, modular housing operations.'] },
+      { heading: '2. Framecad', body: [
+        'FRAMECAD is a closed, vertically-integrated ecosystem — proprietary detailing software paired with proprietary roll-forming machines, optimized for speed from design to factory floor.'
+      ], list: [
+        'Single workflow from design → roll-formed panel',
+        'Strong factory-floor integration with Framecad machines',
+        'Used globally for LGSF, with particularly strong presence in Australia, New Zealand, the UK, and the Middle East',
+        'Robust code support across multiple regions'
+      ] },
+      { body: ['Best for: manufacturers running Framecad roll-formers; builders launching greenfield LGSF operations who want a single-vendor stack.'] },
+      { heading: '3. Scottsdale Scottsteel', body: [
+        'Scottsdale Construction Systems’ Scottsteel software is the dominant LGSF design platform for North American manufacturers running Scottsdale FrameMaster roll-formers, especially across the US sun-belt.'
+      ], list: [
+        'Tight integration with Scottsdale FrameMaster roll-forming machines',
+        'Strong code library for IRC, IBC, and Canadian building codes',
+        'Handles US residential framing conventions natively',
+        'Common across the Texas, Arizona, Florida, and Pacific Northwest LGSF markets'
+      ] },
+      { body: ['Best for: manufacturers running Scottsdale roll-formers in the US and Canadian markets.'] },
+      { heading: '4. Revit + MWF (Strucsoft)', body: [
+        'The MWF (Metal Wood Framer) add-in by Strucsoft is the standard LGSF detailing path when a project is BIM-coordinated with MEP, architectural, and structural disciplines — typical for commercial and mid-rise residential.'
+      ], list: [
+        'Lives inside Autodesk’s BIM ecosystem — easy clash detection with MEP and structural',
+        'Plays well with architectural teams already working in Revit',
+        'Strong for complex multi-storey commercial LGSF',
+        'Coordinates wood and steel framing inside one shared model'
+      ] },
+      { body: ['Best for: mid-rise multi-family buildings, hotels, hospitals, mixed-use developments, and projects where MEP/structural clash detection matters.'] },
+      { heading: '5. StaadPro / Strap', body: [
+        'STAAD.Pro and ATIR’s Strap are the structural finite-element analysis engines that validate LGSF designs against gravity, wind, and seismic loads — and produce the calculations needed for engineer-of-record (EOR) sealed sets.'
+      ], list: [
+        'Industry-standard finite-element structural analysis',
+        'US (IBC/ASCE), Indian (IS), European (Eurocode) code libraries built in',
+        'Required for sealed structural drawings in most US states',
+        'Outputs feed back into detailing software for member sizing'
+      ] },
+      { body: ['Best for: structural engineering teams sealing LGSF designs; any project requiring an engineer-of-record stamp.'] },
+      { heading: 'How to choose your LGSF software stack in 2026', body: [
+        'Most working US LGSF operations end up with a hybrid stack of 2–3 tools: the shop floor decides the detailer, the project complexity decides the BIM tool, and code requirements decide the analysis tool.'
+      ] }
+    ]
+  },
+
+  {
+    id: 'steel-framed-modular-homes',
+    title: 'Building the Future: Why Steel-Framed Modular Homes are a Game Changer',
+    excerpt: 'Splitting a 600 sq ft California home into two 300 sq ft light-gauge-steel modules, engineered to bolt together into one seamless, permanent-feeling house.',
+    tags: ['Modular', 'Light-gauge steel', 'Residential'],
+    image: 'assets/blog/modular-home-cover.jpg',
+    sections: [
+      { body: [
+        'Modular building is changing how we think about high-quality housing. By building in a controlled environment and then moving the home to its final spot, we can create beautiful, strong, and affordable spaces.',
+        'This project is a great example of how modern BIM engineering services for light-gauge-steel construction make small-scale living feel high-end. By splitting a 600 sq ft residential building in California, USA into two 300 sq ft modules, we created a layout that is easy to transport but feels like a solid, permanent home once joined — modelled from LOD 100 to LOD 500 for both light-gauge steel and timber-framed structures.'
+      ] },
+      { heading: 'Scope of Work', list: [
+        'Engineering', 'Modelling', 'Detailing', 'Permit sets', 'Foundation', 'CNC Foundation files'
+      ] },
+      { heading: '1. Strength You Can Trust', body: [
+        'Traditional homes use wood, which can warp or shrink. Instead, we use Light Gauge Steel for modular construction (LGS). For this project, we engineered a specialized floor system using steel beams and a stem-wall foundation. This creates a rock-solid foundation that feels permanent and sturdy, even though the house was built in sections.'
+      ] },
+      { heading: '2. Structural Rigidity & Load Path', image: 'assets/blog/modular-home-stem-wall.jpg', caption: 'Stem wall and floor beam detail', body: [
+        'By utilizing a concrete stem wall rather than isolated piers, we create a continuous bearing surface. This is critical for LGS engineering of a modular building, as it allows for a uniform transfer of dead and live loads from the steel frames into the footings. This setup significantly reduces point-load stress and prevents the “bouncy” floor feel often associated with modular housing.'
+      ] },
+      { heading: '3. The LGS Floor Beam Advantage', body: [
+        'Inside the two 300 sq ft modules, the floor system is engineered with high-tensile steel C-sections. Using Autodesk Revit and MWF, we modelled a reinforced “marriage line” where the two units meet. These beams are designed to be bolted back-to-back, creating a central structural spine that resists racking during transport and ensures a seamless, level floor once joined.'
+      ] },
+      { heading: '4. The Shared Gable Roof', image: 'assets/blog/modular-home-truss-shop.jpg', caption: 'Truss shop drawing', body: [
+        'Designing a gable roof across two separate modules requires high precision — the connection point where the two units meet must be perfect. Using Autodesk Revit and MWF Advance Steel, we modelled every steel truss to ensure that when the modules are bolted together on-site, the roofline is seamless and weather-tight.'
+      ] },
+      { heading: '5. Faster from Start to Finish', body: [
+        'Because the engineering and permit sets (the technical drawings for the city) are done digitally, we save weeks of time — everything is pre-calculated, with no on-site waste.'
+      ] },
+      { heading: 'Conclusion', body: [
+        'This 600 sq ft modular project demonstrates the power of precision engineering. By utilizing Autodesk Revit and MWF, we developed a digital twin that translates directly into FrameCAD CNC production files. The technical core features a concrete stem wall paired with LGS floor beams, ensuring a rigid, non-deflective foundation. We engineered a reinforced “marriage line” using back-to-back steel profiles to seamlessly join the two units under a shared gable roof. With CNC-punched service holes and sub-millimetre anchor bolt alignment, this workflow eliminates onsite errors, delivering a high-performance, two-bedroom home with the structural integrity of a permanent steel building.',
+        'UBC offers permit sets, pre-bid packages with a 3D BIM model and bill of materials for project cost estimation, modelling and detailing services, and engineering calculations for light-gauge-steel, cold-formed-steel and timber-framed building structures in California, USA.'
+      ] }
+    ]
+  },
+
+  {
+    id: 'hidden-engineering-challenges-lgsf',
+    title: 'The Hidden Engineering Challenges Behind Successful LGSF Buildings: Lessons from Real-World Projects',
+    excerpt: 'Speed and precision get the credit, but a successful LGSF building is decided earlier — in load paths, environmental design, and constructability worked out long before construction starts.',
+    tags: ['Engineering', 'LGSF', 'Hybrid structures'],
+    image: 'assets/blog/hidden-challenges-cover.jpg',
+    sections: [
+      { body: [
+        'Light Gauge Steel Framing (LGSF) has transformed modern construction with its advantages of speed, precision, sustainability, and suitability for prefabrication. However, the success of an LGSF building is not determined only by the speed of manufacturing or installation — it begins with intelligent engineering, accurate detailing, and a deep understanding of constructability.',
+        'At UBC BIM Services, our experience across residential, commercial, and hybrid LGSF projects has shown that behind every successful structure lies a series of engineering challenges that must be addressed long before construction begins.'
+      ] },
+      { heading: '1. Managing Complex Structural Load Paths', image: 'assets/blog/hidden-challenges-load-path.jpg', caption: 'LGSF load path', body: [
+        'One of the biggest challenges in LGSF design is ensuring that loads are transferred safely from the roof and upper levels to the foundation.',
+        'In a recent hybrid project, UBC engineered a structure with multiple roof elevations, where hot-rolled steel framing was integrated with LGSF systems to achieve effective load distribution and maintain structural stability.',
+        'Key takeaway: a well-planned structural system prevents overloading, reduces unnecessary material usage, and improves overall building performance.'
+      ] },
+      { heading: '2. Designing for Extreme Environmental Conditions', body: [
+        'LGSF buildings must be designed to withstand region-specific requirements such as high wind speeds, seismic forces, and heavy snow loads.',
+        'For example, in one of UBC’s multi-storey projects in Utah, USA, the structure was engineered to resist 110 mph wind loads and 135 psf ground snow loads while integrating both LGSF and red-iron systems.',
+        'Key takeaway: proper engineering ensures safety, code compliance, and long-term durability.'
+      ] },
+      { heading: '3. Balancing Manufacturing Precision with Site Constructability', body: [
+        'A model that works digitally may still create challenges during manufacturing or installation if constructability is not considered.',
+        'UBC’s engineering approach focuses on creating manufacturing-ready BIM models, detailed shop drawings, and accurate CNC production files that consider machine limitations, transportation, and site assembly requirements.',
+        'Key takeaway: good detailing bridges the gap between design intent and successful construction.'
+      ] },
+      { heading: '4. Coordinating Hybrid Building Systems', body: [
+        'Modern projects often combine LGSF with timber or hot-rolled steel to achieve better performance and efficiency. However, coordinating multiple materials requires careful planning of connections, load transfer, and sequencing.',
+        'Through various hybrid projects, UBC has used BIM-driven coordination to identify clashes early and ensure seamless integration between different structural systems.',
+        'Key takeaway: effective coordination reduces rework, delays, and unexpected costs on site.'
+      ] },
+      { heading: '5. Delivering Projects Within Tight Timelines', body: [
+        'The prefabrication industry demands faster project delivery without compromising quality.',
+        'By following a structured workflow — from understanding client requirements to engineering, detailing, quality checks, and production file delivery — UBC helps clients accelerate project timelines while maintaining accuracy.',
+        'Key takeaway: speed in prefabrication comes from an efficient engineering process, not shortcuts.'
+      ] },
+      { heading: 'Conclusion', body: [
+        'The success of an LGSF building is often measured by its final appearance, speed of installation, and long-term performance. Yet the real work happens behind the scenes — through careful engineering, intelligent BIM workflows, precise detailing, and a strong focus on constructability.',
+        'Every project presents unique challenges, but with the right combination of engineering expertise and digital technology, these challenges can be transformed into efficient, buildable, and high-performing structures.',
+        'At UBC BIM Services, we transform complex engineering challenges into practical, manufacturing-ready solutions for LGSF, timber, and hybrid building projects worldwide.'
+      ] }
+    ]
+  },
+
+  {
+    id: '12-days-of-bim',
+    title: 'From Concept to Construction: A 12-Day BIM Journey with UBC BIM',
+    date: 'Jan 13, 2026',
+    excerpt: 'A 2-storey residential build in Texas, walked day by day from first concept sketch to machine-ready Light Gauge Steel production files.',
+    tags: ['BIM workflow', 'LGSF', 'Residential'],
+    image: 'assets/blog/12-days-day1-2.jpg',
+    sections: [
+      { body: [
+        'At UBC BIM, we believe Building Information Modeling is not just about creating 3D models — it’s about delivering constructible, precise, and predictable buildings.',
+        'This 12-day journey of our 2-storey residential building in Texas, USA showcases how our BIM-driven workflow transforms an idea into machine-ready Light Gauge Steel (LGSF) construction with efficiency, accuracy, and confidence.'
+      ] },
+      { heading: 'The multi-roof truss challenge', body: [
+        'Managing multi-roof truss configurations is typically one of the most complex aspects of residential and light commercial projects. Variations in roof slopes, intersecting ridges, valleys, step-down roofs, and load transfer paths often introduce significant coordination challenges during design and detailing.',
+        'In this project, the presence of multiple roof truss systems initially posed a high level of complexity due to:'
+      ], list: [
+        'Differing roof geometries and pitches',
+        'Intersections between gable, hip, and mono roof sections',
+        'Accurate alignment of trusses with supporting walls and beams',
+        'Load continuity and proper load distribution across roof planes'
+      ] },
+      { body: [
+        'By leveraging the advanced capabilities of Vertex BD, this challenge was efficiently transformed into a streamlined and highly controlled workflow. Vertex BD’s parametric truss modeling, intelligent connection logic, and real-time clash detection enabled precise coordination between roof trusses, wall panels, and supporting structural elements.',
+        'Vertex BD allowed:'
+      ], list: [
+        'Seamless modeling of complex roof intersections',
+        'Accurate definition of truss profiles, spacing, and bearing conditions',
+        'Automatic generation of shop drawings and material take-offs',
+        'Early identification and resolution of constructability issues'
+      ] },
+      { body: ['As a result, what is traditionally a high-risk and time-consuming task became a well-coordinated, error-minimized, production-ready solution — improving design accuracy while ensuring smoother fabrication, faster installation on site, and reduced rework.'] },
+
+      { heading: 'Day 1 – BIM Kick-off: Concept to Construction', image: 'assets/blog/12-days-day1-2.jpg', body: [
+        'Every successful project starts with a strong foundation. On Day 1, our multidisciplinary BIM team initiates the kick-off by collaboratively reviewing architectural concepts, project scope, design intent, applicable codes, and constructability requirements.',
+        'Early coordination between our architects, design engineers, detailers and fabrication team converts concept drawings into GA (General Arrangement) drawings optimized specifically for Light Gauge Steel construction — ensuring fewer downstream changes and a smoother execution.'
+      ] },
+      { heading: 'Day 2 – Initial Designs', body: [
+        'With the concept aligned, our framing and BIM coordination team moves into initial layout and framing development. Preliminary LGS framing begins, and our team proactively identifies critical RFIs and shares them with the client at an early stage.',
+        'This collaborative approach eliminates ambiguity, avoids assumptions, and ensures design clarity before detailed modeling begins.'
+      ] },
+      { heading: 'Day 3 – BIM Engineering', image: 'assets/blog/12-days-day3-4.jpg', body: [
+        'Engineering is embedded directly into our BIM models by our in-house engineering team. Each structural element is analyzed for:'
+      ], list: ['Wind loads', 'Seismic forces', 'Snow loads', 'Gravity and service loads'] },
+      { body: ['By integrating engineering early, our team ensures every model is not just visually accurate but structurally compliant and site-ready — long before it reaches the field.'] },
+      { heading: 'Day 4 – 3D Modeling', body: [
+        'Once engineering parameters are confirmed, our BIM modeling team develops detailed 3D models. Walls, floors, roofs, and structural systems are modeled with precision, enabling clear visualization for stakeholders and accurate coordination across all disciplines.',
+        'This stage reflects the seamless collaboration between our designers, engineers, and detailers — bridging design intent with real-world construction.'
+      ] },
+      { heading: 'Day 5 – Hybrid Structures Done Right', image: 'assets/blog/12-days-day5-6.jpg', body: [
+        'Modern buildings often combine multiple structural systems. On Day 5, our experienced coordination team carefully integrates Light Gauge Steel, red iron, and other structural elements within a single BIM environment, ensuring alignment between all systems and preventing clashes, misfits, and costly on-site rework — especially critical in hybrid construction projects.'
+      ] },
+      { heading: 'Day 6 – Precision Detailing with Constructability', body: [
+        'This is where UBC BIM’s detailing expertise truly stands apart. Our detailers model every stud, track, truss, and connection with fabrication-level precision, considering:'
+      ], list: ['Machine constraints', 'Panel sizes', 'Transportation limitations', 'Installation sequencing'] },
+      { body: ['By working closely with fabrication requirements in mind, our team ensures components are machine-ready and easy to assemble on-site.'] },
+      { heading: 'Day 7 – Accurate Material Take-Offs', image: 'assets/blog/12-days-day7-8.jpg', body: [
+        'With models finalized, our BIM and estimation team generates highly accurate Material Take-Offs (MTOs) and Bills of Materials (BOM). Our value-engineered and optimized BOMs help:'
+      ], list: ['Reduce material waste', 'Control project costs', 'Avoid procurement surprises'] },
+      { body: ['This accuracy is the result of disciplined modeling and cross-checking by our experienced team.'] },
+      { heading: 'Day 8 – Shop Drawings', body: [
+        'Detailed shop drawings are produced by our shop drawing specialists for fabrication and installation teams. These drawings clearly communicate dimensions, profiles, connections, and assembly sequences — ensuring smooth manufacturing and efficient site execution.'
+      ] },
+      { heading: 'Day 9 – Panelization Strategy', image: 'assets/blog/12-days-day9-10.jpg', body: [
+        'At this stage, our BIM and logistics planning team optimizes the model for panelization. Walls, floors, and roof panels are efficiently divided to balance:'
+      ], list: ['Fabrication efficiency', 'Transportation feasibility', 'On-site handling and installation speed'] },
+      { body: ['This thoughtful planning reduces labor time and improves overall site productivity.'] },
+      { heading: 'Day 10 – Machine-Ready Output', body: [
+        'Our BIM team converts the finalized model into machine-compatible files for roll-forming and CNC. Final output includes shop drawings, layouts, production output files, quantities for roll purchase, panel drawings, connection details, and typical sections and elevations.',
+        'Because constructability is considered from Day 1, the transition from model to machine is seamless — no rework, no guesswork.'
+      ] },
+      { heading: 'Day 11 – Global BIM Support (24/5)', image: 'assets/blog/12-days-day11-12.jpg', body: [
+        'UBC BIM is powered by a globally distributed team delivering 24/5 support. Our round-the-clock workflow ensures:'
+      ], list: ['Faster turnarounds', 'Continuous progress across time zones', 'Immediate issue resolution'] },
+      { body: ['This allows our clients to move forward without delays, regardless of location.'] },
+      { heading: 'Day 12 – From BIM to Build Home', body: [
+        'The final result reflects the combined effort of our entire UBC BIM team — a fully coordinated, engineered, and fabrication-ready BIM package that moves effortlessly from first model to final panel.',
+        'What begins as a digital concept becomes a real, buildable, high-quality steel structure, delivered on time and on budget.'
+      ] },
+
+      { heading: 'Why UBC BIM?', list: [
+        'Specialized in Light Gauge Steel & Hybrid Structures',
+        'BIM-driven engineering and detailing',
+        'Machine-ready fabrication outputs',
+        'Fast turnaround with global support',
+        'Focus on constructability, logistics, and installation'
+      ] },
+      { heading: 'Conclusion', body: [
+        'From concept to construction, UBC BIM’s 12-day workflow demonstrates how BIM, done right, becomes a powerful engine for predictability, precision, and performance. By embedding engineering, constructability, and fabrication intelligence into every stage, we help our clients reduce risk, control costs, and deliver high-quality Light Gauge Steel buildings with confidence.',
+        'This 12-day BIM journey reflects UBC BIM’s commitment to delivering more than models — we deliver clarity, coordination, and constructible solutions, so our clients can build with certainty, efficiency, and peace of mind.'
+      ] }
+    ]
+  }
+];
 
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land; nothing else needs to change. */
