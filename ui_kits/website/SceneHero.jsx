@@ -310,11 +310,11 @@ function SceneHero({ onQuote, onGo }) {
         {/* Intro headline (fades out as you start scrolling) */}
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-5)' }}>Loading the structural model</div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--text-strong)', margin: 0, maxWidth: '15ch' }}>
-            Framing models built right the first time
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--text-strong)', margin: 0, maxWidth: '18ch' }}>
+            Cold-formed steel (CFS) and LGSF framing, detailed right the first time
           </h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
-            One coordinated model. Wall panels, roof and floor trusses, MEP coordination and permit sets, delivered as the machine files your line runs on.
+            Panel layouts, truss layouts, shop drawings and a bill of materials your line runs from — for CFS, LGSF and wood framing, all from one coordinated model.
           </p>
           <button ref={ctaRef} onClick={onQuote} {...bounceHandlers(ctaRef)} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
             Request a quote <HeroIcon name="arrow-right" size={16} />
