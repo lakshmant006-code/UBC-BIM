@@ -17,7 +17,7 @@ export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, sty
   return (
     <header {...rest} style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: scrolled ? 'rgba(245,244,241,.82)' : 'var(--surface-page)',
+      background: scrolled ? 'rgba(255,255,255,.82)' : 'var(--surface-page)',
       backdropFilter: scrolled ? 'var(--blur-panel)' : 'none',
       WebkitBackdropFilter: scrolled ? 'var(--blur-panel)' : 'none',
       borderBottom: 'var(--bw-hair) solid ' + (scrolled ? 'var(--border-subtle)' : 'transparent'),

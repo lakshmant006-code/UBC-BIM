@@ -10,7 +10,7 @@
 --ubc-navy:#17295C;--ubc-navy-2:#22377A;--ubc-navy-press:#0F1C42;--ubc-navy-tint:#E7EAF3;
 --steel:#3C4A5A;--steel-tint:#E3E7EC;
 --blueprint:#1B4DFF;--ok:#0F8F6B;--warn:#C98A00;--danger:#C42B1C;
---surface-page:var(--paper);--surface-card:var(--white);--surface-sunken:var(--paper-2);--surface-inverse:var(--ink);
+--surface-page:var(--paper);--surface-card:var(--white);--surface-sunken:var(--paper);--surface-inverse:var(--ink);
 --text-body:var(--ink-2);--text-strong:var(--ink);--text-muted:var(--ink-3);--text-faint:var(--ink-4);--text-inverse:var(--paper);--text-accent:var(--ubc-red);
 --border-subtle:var(--line);--border-strong:var(--line-strong);--border-accent:var(--ubc-red);
 --accent:var(--ubc-red);--accent-press:var(--ubc-red-press);--accent-tint:var(--ubc-red-tint);

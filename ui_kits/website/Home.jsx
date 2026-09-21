@@ -901,7 +901,12 @@ function FinalCTA({ onQuote }) {
 function Home({ onGo, onQuote }) {
   const SceneHero = window.SceneHero;
   return (
-    <div>
+    // Tighter section rhythm than the site-wide default (--section-y/-tight
+    // in tokens/spacing.css), scoped to this page only via CSS custom
+    // property override rather than touching Section itself, which every
+    // other page (About, Blogs, Careers, Contact, Services, Portfolio) also
+    // renders through.
+    <div style={{ '--section-y': 'var(--s-8)', '--section-y-tight': 'var(--s-7)' }}>
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
       <LogoWalls />
       <HowWeWork />

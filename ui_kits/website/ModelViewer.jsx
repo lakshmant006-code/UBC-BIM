@@ -267,7 +267,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
       if (!host) return;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf5f4f1);   // --paper: a white studio sweep, not the model stage's old dark stage
+      scene.background = new THREE.Color(0xffffff);   // --paper: a white studio sweep, not the model stage's old dark stage
 
       const R = radius || 12;
       // The offset direction the camera opens on and returns to on reset.
