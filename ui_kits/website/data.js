@@ -40,15 +40,14 @@ window.UBC_DATA = {
       view: { kind: 'overlay', overlay: 'bom' } },
     { n: '07', title: 'Architectural drafting', body: 'Plans, elevations and sections produced to your standards and titleblocks.', tags: ['DWG', 'PDF'],
       view: { kind: 'whole', label: 'The coordinated structure' } },
-    // Three categories from the header's "Services" dropdown with no
-    // existing row to match: real service lines, just without their real
-    // copy yet. Marked `pending` rather than given invented body text, so
-    // the UI can show an honest "content coming soon" state until it does.
+    // A real service line with no existing row to match above (it has its
+    // own real write-up in serviceArticles, just no camera view of its own
+    // on the coordinated model), marked `pending` here only because this
+    // particular list's `body` is what a "content coming soon" state would
+    // read off. Project management and training services (this list used
+    // to carry both alongside this one) were dropped from the site
+    // entirely, so they're gone from here too.
     { n: '08', title: 'Manufacture and supply of materials', body: null, pending: true, tags: [],
-      view: { kind: 'whole', label: 'The coordinated structure' } },
-    { n: '09', title: 'Project management', body: null, pending: true, tags: [],
-      view: { kind: 'whole', label: 'The coordinated structure' } },
-    { n: '10', title: 'Training services', body: null, pending: true, tags: [],
       view: { kind: 'whole', label: 'The coordinated structure' } }
   ],
   layers: [
@@ -338,6 +337,13 @@ window.UBC_DATA.videoTestimonials = [
   { id: 'client-3', src: 'assets/testimonials/client-3.mp4', poster: 'assets/testimonials/client-3-poster.jpg' },
   { id: 'client-4', src: 'assets/testimonials/client-4.mp4', poster: 'assets/testimonials/client-4-poster.jpg' }
 ];
+
+/* The Blogs page (Blogs.jsx). Empty until real posts are supplied — the
+   page itself already renders a proper card grid once this has entries
+   ({id, title, date, excerpt, tags, image}), so adding a post is just
+   adding an object here, nothing else to build. Empty shows an honest
+   "coming soon" state instead of inventing a post. */
+window.UBC_DATA.blogPosts = [];
 
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land; nothing else needs to change. */
@@ -682,65 +688,6 @@ window.UBC_DATA.serviceArticles = [
       ] },
       { body: [
         'Our facility runs on state-of-the-art machinery, operated by skilled professionals, under quality-control measures that keep every product at or above regulatory standards and client expectations — fulfilling orders promptly and consistently, from a single renovation to a multi-million-dollar development.'
-      ] }
-    ] },
-
-  { id: 'project-management', label: 'Project management', title: 'End-to-End Project Management for LGSF & Wooden Construction',
-    summary: 'Full-phase project management for Light Gauge Steel Frame and wooden construction — from estimation to final handover.',
-    regions: EXTENDED_REGIONS,
-    sections: [
-      { body: [
-        'We manage every phase of a Light Gauge Steel Frame (LGSF) or wooden construction project — from initial estimation to final handover, interior works included — with precision and seamless coordination.'
-      ] },
-      { heading: 'Scope of our project management services', list: [
-        { title: 'Estimation & costing', body: 'Complete estimations from foundation to finishing at client-standard rates, updated during execution to keep budgets aligned, with timely alerts on major variations.' },
-        { title: 'RFQ management', body: 'Competitive quotes sourced from your registered contractors and suppliers, exploring new vendors when needed to support expansion into newer areas.' },
-        { title: 'Quote validation', body: 'Every quote evaluated on pricing, contractor reliability, past experience and responsiveness to the project location, so only the most suitable vendors get recommended.' },
-        { title: 'PO management', body: 'Purchase orders issued swiftly with full transparency once approved, materials timed to arrive ahead of installation and quality-inspected, with delays escalated early so alternative plans can activate in time.' },
-        { title: 'Scheduling & coordination', body: 'Work schedules shared in advance with every stakeholder, coordinated by email, phone and your own ERP system so nothing slips through, and site readiness confirmed before trades arrive.' },
-        { title: 'Material procurement', body: 'Materials planned and procured in sync with the construction timeline, to keep delivery on time, storage needs down, and the site never waiting on downtime.' }
-      ] },
-      { heading: 'Why choose us', list: [
-        { title: 'Expert engineering support', body: 'Experienced civil engineers ensure seamless coordination and precise technical communication throughout the project.' },
-        { title: 'Integrated team approach', body: 'We work as an extension of your team, using your ERP systems and collaborating under your own project manager for smooth execution.' },
-        { title: 'High value at competitive cost', body: 'Round-the-clock service across time zones, with top-tier talent, at a highly competitive price.' }
-      ] },
-      { heading: 'Our latest projects', list: [
-        'Multi-storey steel frame buildings',
-        'Industrial facilities in harsh terrains',
-        'Infrastructure expansion in urban zones',
-        'Road and pavement reinforcement projects'
-      ] }
-    ] },
-
-  { id: 'training', label: 'Training services', title: 'Training Services for LGS and Wood-Framing BIM Software',
-    summary: 'Hands-on training on Vertex BD, MWF StructSoft, ScotSteel, FRAMECAD and Strap — customized to your team’s skill level.',
-    regions: EXTENDED_REGIONS,
-    sections: [
-      { body: [
-        'Our training helps construction and design professionals master Light Gauge Steel (LGS) and wood-framing BIM tools. Whether your team is new to a platform or already experienced, the program is customized to skill level, teaching efficient, production-ready use of the tool on real LGS projects.'
-      ] },
-      { heading: 'Platforms we train on', list: [
-        { title: 'FrameCAD', body: 'One of the most widely used BIM platforms for light steel framing design and detailing; training covers modeling, detailing and automating steel-framing workflows end to end.' },
-        { title: 'Vertex BD', body: 'The same end-to-end modeling, detailing and workflow automation training, built around Vertex BD’s own tools and conventions.' },
-        { title: 'ScotSteel', body: 'Covers truss engineering alongside 3D modeling and detailing — ScotSteel’s particular strength.' },
-        { title: 'Revit MWF StructSoft', body: 'Covers engineering, 3D modeling and detailing within Revit’s own MWF StructSoft workflow.' },
-        { title: 'Strap', body: 'Also covered as part of the same LGS BIM training program.' }
-      ] },
-      { heading: 'Who should attend', list: [
-        'Structural engineers & detailers',
-        'BIM coordinators & managers',
-        'Drafting technicians',
-        'Design-build contractors',
-        'Fabrication shop engineers'
-      ] },
-      { heading: 'What your team will learn', list: [
-        'Introduction to Vertex BD / ScotSteel / Revit MWF StructSoft / FrameCAD and LGS BIM workflows',
-        '3D modeling techniques for light-gauge steel structures',
-        'Automated generation of detailed drawings, framing plans and cut lists',
-        'Customizing project templates and part libraries',
-        'Integration with CNC fabrication machines for seamless production',
-        'Best practices for collaboration within BIM environments'
       ] }
     ] }
 ];

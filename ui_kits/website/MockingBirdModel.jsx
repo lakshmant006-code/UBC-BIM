@@ -1,10 +1,12 @@
 /*
   MockingBirdModel: the site's "Services" page. One tab strip pinned at the
-  very top of the page (every one of the 8 service categories), and the
+  very top of the page (every one of the 6 service categories), and the
   content beneath it swaps to match whichever tab is active — no separate
-  route, no popup.
+  route, no popup. (Project management and training services were dropped
+  from this list entirely, per feedback on the live page — not hidden, not
+  marked pending, just removed from window.UBC_DATA.serviceArticles.)
 
-  Seven of the eight tabs show that category's own write-up (ServicesDetail
+  Five of the six tabs show that category's own write-up (ServicesDetail
   .jsx, one article at a time — it owns no tabs of its own any more, just
   renders whichever `article` this page hands it).
 
