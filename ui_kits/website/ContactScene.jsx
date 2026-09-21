@@ -51,7 +51,7 @@ function SceneCard({ card, visible, onRoute }) {
       style={{
         position: 'absolute', ...side, top: '26%', zIndex: 4, maxWidth: 340,
         textAlign: 'left', cursor: 'pointer',
-        background: 'rgba(245,244,241,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+        background: 'rgba(255,255,255,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
         border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)',
         boxShadow: 'var(--shadow-2)',
         padding: 'var(--s-5) var(--s-5) var(--s-4)',
@@ -229,7 +229,7 @@ function ContactScene({ onRoute, onQuote }) {
             darker patches in the shot (the doorway interior, reflections)
             washed out wherever copy crosses them, the way light text over a
             photo could get away with no scrim there at all. */}
-        <div style={{ ...MEDIA_BOX, background: 'linear-gradient(180deg, rgba(245,244,241,.65), rgba(245,244,241,.5) 22%, rgba(245,244,241,.5) 55%, rgba(245,244,241,.8))', pointerEvents: 'none' }} />
+        <div style={{ ...MEDIA_BOX, background: 'linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.5) 22%, rgba(255,255,255,.5) 55%, rgba(255,255,255,.8))', pointerEvents: 'none' }} />
 
         {CS_CARDS.map((c, i) => (
           <SceneCard key={i} card={c} visible={cardShown[i]} onRoute={onRoute} />

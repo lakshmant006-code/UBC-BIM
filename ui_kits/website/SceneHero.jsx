@@ -51,7 +51,7 @@ function HeroCard({ card, visible, onGo, onQuote }) {
       style={{
         position: 'absolute', ...side, top: '28%', zIndex: 4, maxWidth: 340,
         textAlign: 'left', cursor: 'pointer',
-        background: 'rgba(245,244,241,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+        background: 'rgba(255,255,255,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
         border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)',
         boxShadow: 'var(--shadow-2)',
         padding: 'var(--s-5) var(--s-5) var(--s-4)',
@@ -124,7 +124,7 @@ function SceneHero({ onQuote, onGo }) {
 
       const R = M.radius || 11;
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf5f4f1);   // --paper: a white studio sweep, not the old dark stage
+      scene.background = new THREE.Color(0xffffff);   // --paper: a white studio sweep, not the old dark stage
 
       const camera = new THREE.PerspectiveCamera(42, 1, R / 200, R * 80);
       const stagePos = HERO_STAGES.map((s) => new THREE.Vector3(...(s.pos || [R * 1.6, R * 1.2, R * 1.9])));
@@ -300,7 +300,7 @@ function SceneHero({ onQuote, onGo }) {
             own dark member lines washed out wherever it crosses the copy,
             not just toned down the way light text over a dark model could
             get away with at a lower floor. */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(245,244,241,.78), rgba(245,244,241,.62) 22%, rgba(245,244,241,.62) 55%, rgba(245,244,241,.88))', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.62) 22%, rgba(255,255,255,.62) 55%, rgba(255,255,255,.88))', pointerEvents: 'none' }} />
 
         {/* Glassmorphic info cards, one per stage after the intro, each linking on */}
         {HERO_CARDS.map((c, i) => (
