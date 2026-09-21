@@ -326,15 +326,24 @@ window.UBC_DATA.faq = [
 /* Real client video testimonials, supplied directly by the client
    (client_testimonals.zip: one "Testimonial video.mp4" plus three
    WhatsApp-exported clips), transcoded once for the web (scaled, re-encoded,
-   a poster frame pulled from each) with no content changes. None of the
-   four names the speaker on screen or in an overlay, and there's no
-   transcript to read a name or company off of either, so each entry is
-   honestly unattributed here — swap in name/company/role for each `id`
-   once the client supplies it, rather than guessing at who's speaking. */
+   a poster frame pulled from each) with no content changes. The client
+   later supplied name/company/quote screenshots for three of the four
+   speakers (matched here in the same order the screenshots were sent, to
+   client-1/2/3); `quote` is their own words, lightly trimmed to drop the
+   self-introduction ("Hi, I'm ...") since name/role are already shown
+   alongside it — no wording was added or changed. client-4 still has no
+   name, company or transcript to attribute it to, so it stays honestly
+   unattributed rather than guessed at. */
 window.UBC_DATA.videoTestimonials = [
-  { id: 'client-1', src: 'assets/testimonials/client-1.mp4', poster: 'assets/testimonials/client-1-poster.jpg' },
-  { id: 'client-2', src: 'assets/testimonials/client-2.mp4', poster: 'assets/testimonials/client-2-poster.jpg' },
-  { id: 'client-3', src: 'assets/testimonials/client-3.mp4', poster: 'assets/testimonials/client-3-poster.jpg' },
+  { id: 'client-1', src: 'assets/testimonials/client-1.mp4', poster: 'assets/testimonials/client-1-poster.jpg',
+    name: 'Ben', role: 'Revolution Steel — Phoenix, AZ',
+    quote: 'We utilize UBC quite often for their modeling and bill-material services. They are fast, reliable, accurate, and have great communication.' },
+  { id: 'client-2', src: 'assets/testimonials/client-2.mp4', poster: 'assets/testimonials/client-2-poster.jpg',
+    name: 'Cameron', role: 'New LGSF framing business owner',
+    quote: "UBC has been incredibly supportive — helping me understand the design process and launch my projects smoothly. They're responsive, proactive, and always willing to go the extra mile." },
+  { id: 'client-3', src: 'assets/testimonials/client-3.mp4', poster: 'assets/testimonials/client-3-poster.jpg',
+    name: 'Zach Thompson', role: 'Seattle, WA',
+    quote: 'Their coordination, attention to detail, and deliverables are top-tier. They consistently bring creativity to problem-solving and help bring our projects to life.' },
   { id: 'client-4', src: 'assets/testimonials/client-4.mp4', poster: 'assets/testimonials/client-4-poster.jpg' }
 ];
 

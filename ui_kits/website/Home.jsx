@@ -676,10 +676,49 @@ function GlobalPresence() {
 // REAL VIDEO TESTIMONIALS: four clips the client sent directly
 // (client_testimonals.zip), played with the browser's own <video controls>
 // rather than autoplaying or muting anything — a testimonial is only worth
-// having with its own audio intact. Deliberately unattributed (see the
-// comment on window.UBC_DATA.videoTestimonials in data.js): no name,
-// company or role is guessed at just to fill the card.
+// having with its own audio intact. The client later sent name/company/quote
+// screenshots for three of the four speakers (see the comment on
+// window.UBC_DATA.videoTestimonials in data.js); client-4 still has neither,
+// so it plays without a hover card rather than guessing at who's speaking.
 const VIDEO_TESTIMONIALS = D.videoTestimonials || [];
+// Same three brand-tint combinations as the blog cards' gradients, just used
+// here as a translucent tint over the video on hover (rgba, not the tokens'
+// own flat tint swatches, so the video stays readable underneath).
+const VIDEO_TINTS = [
+  'linear-gradient(165deg, rgba(193,39,45,.90), rgba(193,39,45,.55) 45%, rgba(16,18,21,.82))',
+  'linear-gradient(165deg, rgba(23,41,92,.90), rgba(23,41,92,.55) 45%, rgba(16,18,21,.82))',
+  'linear-gradient(165deg, rgba(60,74,90,.90), rgba(60,74,90,.55) 45%, rgba(16,18,21,.82))'
+];
+function VideoCard({ v, index }) {
+  const [hover, setHover] = React.useState(false);
+  const attributed = Boolean(v.quote);
+  return (
+    <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{ position: 'relative', borderRadius: 'var(--r-3)', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', background: '#000' }}>
+      <video controls preload="metadata" poster={v.poster} playsInline
+        style={{ display: 'block', width: '100%', aspectRatio: '9 / 16', objectFit: 'cover' }}>
+        <source src={v.src} type="video/mp4" />
+      </video>
+      {attributed && (
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          padding: 'var(--s-5) var(--s-5) 52px', background: VIDEO_TINTS[index % VIDEO_TINTS.length],
+          opacity: hover ? 1 : 0, transition: 'opacity var(--dur-3) var(--ease-out)'
+        }}>
+          <Icon name="quote" size={20} style={{ color: 'rgba(255,255,255,.75)', marginBottom: 'var(--s-2)' }} />
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: '#fff', margin: 0 }}>
+            "{v.quote}"
+          </p>
+          <div style={{ marginTop: 'var(--s-3)' }}>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 700, color: '#fff' }}>{v.name}</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-caption)', color: 'rgba(255,255,255,.75)' }}>{v.role}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 function VideoTestimonials() {
   if (!VIDEO_TESTIMONIALS.length) return null;
   return (
@@ -688,14 +727,12 @@ function VideoTestimonials() {
         <Reveal style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>In their own words</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Clients, on camera</h2>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>Hover a clip for who's speaking.</p>
         </Reveal>
         <div className="ubc-video-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-8)' }}>
           {VIDEO_TESTIMONIALS.map((v, i) => (
             <Reveal key={v.id} delay={i * 60}>
-              <video controls preload="metadata" poster={v.poster} playsInline
-                style={{ display: 'block', width: '100%', aspectRatio: '9 / 16', objectFit: 'cover', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: '#000' }}>
-                <source src={v.src} type="video/mp4" />
-              </video>
+              <VideoCard v={v} index={i} />
             </Reveal>
           ))}
         </div>
