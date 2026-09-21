@@ -317,7 +317,7 @@ function SceneHero({ onQuote, onGo }) {
             One coordinated model. Wall panels, roof and floor trusses, MEP coordination and permit sets, delivered as the machine files your line runs on.
           </p>
           <button ref={ctaRef} onClick={onQuote} {...bounceHandlers(ctaRef)} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
-            Start your project today <HeroIcon name="arrow-right" size={16} />
+            Request a quote <HeroIcon name="arrow-right" size={16} />
           </button>
         </div>
 
