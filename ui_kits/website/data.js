@@ -226,16 +226,16 @@ window.UBC_DATA = {
 };
 
 /* Home-page sections drawn from the client's own supplied UX/UI blueprint
-   (UBC_BIM_FINAL_Website_UX_Blueprint.pdf), sections 04/06/07/12/13/14: the
+   (UBC_BIM_FINAL_Website_UX_Blueprint.pdf), sections 04/07/12/13/14: the
    buying-journey sections that page defines but the site didn't have a
    place for yet. Copy is either lifted directly from that document's own
-   bullet lists (whatWeNeed, whyUbc's six labels, whoWeServe's six roles,
-   ubcWay's four steps) or, where the blueprint only names a section and
-   this site already has the real underlying fact elsewhere (howWeWork's
-   five one-line descriptions, each role's own blurb), written to describe
-   what's already true on this site rather than a new claim. Three sections
-   the blueprint calls for need assets nobody had supplied yet — a client
-   logo wall (03), named video testimonials (11), certifications (15).
+   bullet lists (whyUbc's six labels, whoWeServe's six roles, ubcWay's four
+   steps) or, where the blueprint only names a section and this site already
+   has the real underlying fact elsewhere (howWeWork's five one-line
+   descriptions, each role's own blurb), written to describe what's already
+   true on this site rather than a new claim. Three sections the blueprint
+   calls for need assets nobody had supplied yet — a client logo wall (03),
+   named video testimonials (11), certifications (15).
    The client logo wall now has real logos (window.UBC_DATA.logos.client,
    above, from Client_Logos.zip) and Home.jsx's LogoWalls renders those —
    plus the supplied software and machine logos, which the blueprint didn't
@@ -243,19 +243,9 @@ window.UBC_DATA = {
    than a static grid. Named video testimonials and certifications still
    have nothing real behind them, so CaseStudiesNote / CompanyProofTech's
    certifications line stay explicit "coming soon" placeholders until those
-   exist too. */
+   exist too. Section 06 ("What we need from you") and the "Who we are"
+   band were removed from Home.jsx per the client's own request. */
 window.UBC_DATA.blueprint = {
-  // 06 What we need from you.
-  whatWeNeed: {
-    items: [
-      'Architectural drawings',
-      'Structural information, if you have it',
-      "Specifications or standards you're building to",
-      'Project scope and the deliverables you need',
-      'Existing BIM or CAD files, if any exist'
-    ],
-    note: "Don't have everything on that list? Send what you have — a scope comes back either way."
-  },
   // 07 How we work: the same five-stage sequence the home hero (SceneHero)
   // walks a visitor through visually, restated here as plain, readable
   // steps for anyone who scrolled past without the model loading.

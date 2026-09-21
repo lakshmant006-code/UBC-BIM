@@ -72,26 +72,6 @@ Object.assign(window, { Page, Section, Reveal, AnimatedNumber });
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
 
-// WHO WE ARE: centered serif editorial band.
-function WhoWeAre({ onGo }) {
-  return (
-    <Section>
-      <Page style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>
-        <Reveal>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>Who we are</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(32px, 4.4vw, 60px)', margin: 'var(--s-4) 0 0' }}>A detailing studio, not a drafting queue</h2>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-6) auto 0', maxWidth: '64ch' }}>
-            We work with builders, panel manufacturers and steel roll-formers on wood-frame and light-gauge-steel construction. Every drawing we issue comes out of the same coordinated model, so a revision to the frame reaches the takeoff, the permit set and the machine file together.
-          </p>
-          <div style={{ marginTop: 'var(--s-7)' }}>
-            <button onClick={() => onGo && onGo('projects')} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--ink)', background: 'transparent', border: 'var(--bw-1) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '12px 24px', cursor: 'pointer' }}>See the work</button>
-          </div>
-        </Reveal>
-      </Page>
-    </Section>
-  );
-}
-
 // LOGO CAROUSELS (blueprint section 03, "RECOGNIZE", plus two strips the
 // blueprint didn't ask for by name but the client sent real assets for
 // anyway): real logos and machine photos supplied directly
@@ -150,38 +130,8 @@ function LogoWalls() {
   );
 }
 
-// WHAT WE NEED FROM YOU + HOW WE WORK: paired "before you send anything" /
-// "here's what happens once you do" sections, both lifted straight from the
-// client's own blueprint bullet lists (window.UBC_DATA.blueprint).
-const WWN = D.blueprint && D.blueprint.whatWeNeed;
-function WhatWeNeedFromYou({ onQuote }) {
-  if (!WWN) return null;
-  return (
-    <Section>
-      <Page style={{ maxWidth: 720, marginLeft: 'auto', marginRight: 'auto' }}>
-        <Reveal style={{ textAlign: 'center' }}>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>Before you send anything</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What we need from you</h2>
-        </Reveal>
-        <Reveal delay={80}>
-          <div style={{ display: 'grid', gap: 'var(--s-4)', marginTop: 'var(--s-8)' }}>
-            {WWN.items.map((item) => (
-              <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--s-4)', padding: 'var(--s-4) var(--s-5)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
-                <Icon name="check" size={18} style={{ color: 'var(--accent)', marginTop: 2 }} />
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-strong)' }}>{item}</span>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', textAlign: 'center', margin: 'var(--s-6) 0 0' }}>{WWN.note}</p>
-          <div style={{ textAlign: 'center', marginTop: 'var(--s-6)' }}>
-            <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '12px 26px', cursor: 'pointer' }}>Send what you have</button>
-          </div>
-        </Reveal>
-      </Page>
-    </Section>
-  );
-}
-
+// HOW WE WORK: "here's what happens once you do" steps, lifted straight
+// from the client's own blueprint bullet list (window.UBC_DATA.blueprint).
 const HWW = D.blueprint && D.blueprint.howWeWork;
 function HowWeWork() {
   if (!HWW) return null;
@@ -954,8 +904,6 @@ function Home({ onGo, onQuote }) {
     <div>
       {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
       <LogoWalls />
-      <WhoWeAre onGo={onGo} />
-      <WhatWeNeedFromYou onQuote={onQuote} />
       <HowWeWork />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
