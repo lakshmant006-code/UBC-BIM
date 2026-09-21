@@ -9,28 +9,68 @@
   "coming soon" state (same convention as TrussPanelsPending) rather than
   inventing sample posts.
 */
-function BlogCard({ post, onOpen }) {
-  const { Tag } = window.UBCBIMDesignSystem_353af8;
+// Four brand-palette gradients (not the literal orange/gray/purple/green a
+// generic "gradient card" reference uses) — each pairs one of the site's own
+// tint colors (tokens/colors.css) with its own full-strength dot color for
+// the badge, cycled by card position so a page of posts doesn't read as one
+// flat repeating block.
+const BLOG_GRADIENTS = [
+  { bg: 'linear-gradient(135deg, var(--ubc-red-tint), var(--orange-tint))', dot: 'var(--ubc-red)' },
+  { bg: 'linear-gradient(135deg, var(--ubc-navy-tint), var(--steel-tint))', dot: 'var(--ubc-navy)' },
+  { bg: 'linear-gradient(135deg, var(--steel-tint), var(--paper-3))', dot: 'var(--steel)' },
+  { bg: 'linear-gradient(135deg, var(--orange-tint), var(--paper-2))', dot: 'var(--orange)' }
+];
+
+function BlogCard({ post, index, onOpen }) {
+  const { Tag, Icon } = window.UBCBIMDesignSystem_353af8;
+  const [hover, setHover] = React.useState(false);
+  const g = BLOG_GRADIENTS[index % BLOG_GRADIENTS.length];
+  const badgeText = post.date || (post.tags && post.tags[0]);
+
   return (
-    <a href="#" onClick={(e) => { e.preventDefault(); onOpen(post.id); }} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+    <a href="#" onClick={(e) => { e.preventDefault(); onOpen(post.id); }}
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{
+        display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none', color: 'inherit',
+        borderRadius: 'var(--r-4)', overflow: 'hidden', background: g.bg,
+        border: 'var(--bw-hair) solid var(--border-subtle)',
+        boxShadow: hover ? 'var(--shadow-2)' : 'var(--shadow-1)',
+        transform: hover ? 'translateY(-4px)' : 'none',
+        transition: 'transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out)'
+      }}>
       {post.image && (
-        <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-sunken)' }}>
-          <img src={post.image} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <div style={{ aspectRatio: '16 / 10', overflow: 'hidden' }}>
+          <img src={post.image} alt={post.title} style={{
+            width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+            transform: hover ? 'scale(1.06)' : 'scale(1)', transition: 'transform var(--dur-4) var(--ease-out)'
+          }} />
         </div>
       )}
-      <div style={{ marginTop: 'var(--s-4)' }}>
-        {post.date && (
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>{post.date}</div>
+      <div style={{ padding: 'var(--s-6)', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        {badgeText && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8, alignSelf: 'flex-start', marginBottom: 'var(--s-4)',
+            padding: '5px 12px', borderRadius: 'var(--r-pill)', background: 'rgba(255,255,255,.6)',
+            backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
+            fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-body)'
+          }}>
+            <span style={{ width: 8, height: 8, borderRadius: 999, background: g.dot, flexShrink: 0 }} />
+            {badgeText}
+          </div>
         )}
-        <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--fs-h3)', color: 'var(--text-strong)', marginTop: 'var(--s-2)', lineHeight: 1.2 }}>{post.title}</div>
+        <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--fs-h3)', color: 'var(--text-strong)', lineHeight: 1.2 }}>{post.title}</div>
         {post.excerpt && (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{post.excerpt}</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0', flex: 1 }}>{post.excerpt}</p>
         )}
         {post.tags && post.tags.length > 0 && (
-          <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', marginTop: 'var(--s-4)' }}>
+          <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', marginTop: 'var(--s-5)' }}>
             {post.tags.map((t) => <Tag key={t}>{t}</Tag>)}
           </div>
         )}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 'var(--s-5)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>
+          Read the write-up
+          <Icon name="arrow-right" size={15} style={{ transform: hover ? 'translateX(4px)' : 'none', transition: 'transform var(--dur-2) var(--ease-out)' }} />
+        </span>
       </div>
     </a>
   );
@@ -163,7 +203,7 @@ function Blogs() {
             <div className="ubc-blog-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-8) var(--s-7)' }}>
               {posts.map((post, i) => (
                 <Reveal key={post.id} delay={(i % 3) * 70}>
-                  <BlogCard post={post} onOpen={goTo} />
+                  <BlogCard post={post} index={i} onOpen={goTo} />
                 </Reveal>
               ))}
             </div>
