@@ -1,3 +1,4 @@
+'use client';
 /*
   SceneHero: a white-studio, cinematic hero. Scroll moves a live camera through the
   Mocking Bird Lot 2 light-gauge steel frame (assets/models/mocking-bird-lot-2.glb,
@@ -16,17 +17,21 @@
   roughly a fifth of the scroll (the "flash card" pacing), and link
   somewhere real on the site.
 
-  Depends on loadThree() from ModelViewer.jsx (loaded first in index.html),
-  shared across the page the same way Page/Section/Reveal from Home.jsx are,
-  so three.js is fetched once regardless of how many scenes on the page use
-  it.
+  Uses the same three.js helpers ModelViewer.jsx exports (studio environment,
+  ground shadow, steel recolouring) so the hero and the pages it links to
+  read as one system.
 
-  Config: window.UBC_DATA.hero: model { src, radius }, stages
+  Config: UBC_DATA.hero: model { src, radius }, stages
   [{ n, t, title, note, pos: [x,y,z] }], cards [{ t0, t1, side, ... }].
 */
-const { Icon: HeroIcon } = window.UBCBIMDesignSystem_353af8;
+import React from 'react';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Icon as HeroIcon } from '../../components/core/Icon.jsx';
+import { UBC_DATA } from './data.js';
+import { bounceHandlers, buildStudioEnvironment, makeGroundShadow, applySteelMaterials } from './ModelViewer.jsx';
 
-const HERO = (window.UBC_DATA && window.UBC_DATA.hero) || { stages: [], cards: [] };
+const HERO = (UBC_DATA && UBC_DATA.hero) || { stages: [], cards: [] };
 const HERO_STAGES = HERO.stages || [];
 const HERO_CARDS = HERO.cards || [];
 
@@ -71,7 +76,7 @@ function HeroCard({ card, visible, onGo, onQuote }) {
   );
 }
 
-function SceneHero({ onQuote, onGo }) {
+export function SceneHero({ onQuote, onGo }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const canvasHolderRef = React.useRef(null);
@@ -85,7 +90,7 @@ function SceneHero({ onQuote, onGo }) {
   const [loadPct, setLoadPct] = React.useState(0);
   const [loadError, setLoadError] = React.useState(false);
 
-  const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const n = Math.max(1, HERO_STAGES.length);
   const M = HERO.model;
 
@@ -113,12 +118,11 @@ function SceneHero({ onQuote, onGo }) {
   // progress, lerped between each stage's [x,y,z]. No OrbitControls: this
   // is a fly-through the visitor drives by scrolling, not by dragging.
   React.useEffect(() => {
-    if (!M || typeof window.loadThree !== 'function') return;
+    if (!M) return;
     let dead = false;
     let cleanup = () => {};
 
-    window.loadThree().then((THREE) => {
-      if (dead) return;
+    try {
       const host = canvasHolderRef.current;
       if (!host) return;
 
@@ -232,7 +236,7 @@ function SceneHero({ onQuote, onGo }) {
       };
       raf = requestAnimationFrame(tick);
 
-      const loader = new THREE.GLTFLoader();
+      const loader = new GLTFLoader();
       loader.load(M.src, (gltf) => {
         if (dead) return;
         const box = new THREE.Box3().setFromObject(gltf.scene);
@@ -270,7 +274,9 @@ function SceneHero({ onQuote, onGo }) {
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
       };
-    });
+    } catch (err) {
+      if (!dead) setLoadError(true);
+    }
 
     return () => { dead = true; cleanup(); };
   }, [reduce]);
@@ -359,4 +365,3 @@ function SceneHero({ onQuote, onGo }) {
   );
 }
 
-Object.assign(window, { SceneHero });

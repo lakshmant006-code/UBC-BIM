@@ -1,8 +1,21 @@
+'use client';
+import React from 'react';
+import { Button } from '../../components/core/Button.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { Tag } from '../../components/core/Tag.jsx';
+import { SectionHeading } from '../../components/core/SectionHeading.jsx';
+import { FormField } from '../../components/forms/FormField.jsx';
+import { Input } from '../../components/forms/Input.jsx';
+import { Textarea } from '../../components/forms/Textarea.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section, Reveal } from './shared.jsx';
+import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
-function Careers({ onQuote }) {
-  const { Button, SectionHeading, Icon, Tag, FormField, Input, Textarea } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, Reveal } = window;
-  const D = window.UBC_DATA;
+export function Careers() {
+  // Was a prop from the old single-page App() component; now reached
+  // through the quote-drawer context every page uses.
+  const onQuote = useQuoteDrawer();
+  const D = UBC_DATA;
   const [lit, setLit] = React.useState(false);
   return (
     <div>
@@ -80,4 +93,3 @@ function Careers({ onQuote }) {
     </div>
   );
 }
-Object.assign(window, { Careers });

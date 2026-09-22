@@ -1,5 +1,5 @@
 /* Placeholder content in the brand's voice. Figures are illustrative: replace with real UBC BIM numbers. */
-window.UBC_DATA = {
+export const UBC_DATA = {
   // Each service's `view` field once pointed Home's "What we deliver" model
   // explorer at a real part of the hub model (a class/center/radius from
   // that model's own <name>.views.json, written by tools/ifc_to_glb.py, or
@@ -65,19 +65,19 @@ window.UBC_DATA = {
     { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Structural steel',
       size: '≈ 2,390 sq ft footprint (from model)', units: '988 columns · 834 beams', location: 'Not specified',
       delivered: 'Coordinated structural model', software: ['FRAMECAD Steelwise'],
-      model: { src: 'assets/models/camping-resort.glb', radius: 11.2 } },
+      model: { src: '/assets/models/camping-resort.glb', radius: 11.2 } },
     { id: 'shita-room', name: 'Shita Room framing', type: 'Residential', system: 'Light-gauge steel',
       size: '≈ 2,020 sq ft footprint (from model)', units: '3 storeys', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
-      model: { src: 'assets/models/shita-room.glb', radius: 10.2 } },
+      model: { src: '/assets/models/shita-room.glb', radius: 10.2 } },
     { id: 'dael-4-0070', name: 'Project 4.0070', type: 'Residential', system: 'Mixed construction',
       size: '≈ 1,970 sq ft footprint (from model)', units: '4 storeys', location: 'Not specified',
       delivered: 'Coordinated architectural model', software: ['Autodesk Revit'],
-      model: { src: 'assets/models/dael-4-0070.glb', radius: 10.0 } },
+      model: { src: '/assets/models/dael-4-0070.glb', radius: 10.0 } },
     { id: 'mechanical-room', name: 'Mechanical room', type: 'Commercial', system: 'MEP',
       size: '8 elements', units: '1 storey', location: 'Not specified',
       delivered: 'Coordinated MEP model', software: ['SketchUp Pro'],
-      model: { src: 'assets/models/mechanical-room.glb', radius: 75.1 } },
+      model: { src: '/assets/models/mechanical-room.glb', radius: 75.1 } },
     // Source IFC was 456 MB (9,213 elements) — too large for git outright, so
     // it's kept as a GitHub Release asset rather than in the repo; only the
     // converted GLB below ships to the site, at full mesh detail (no
@@ -92,7 +92,7 @@ window.UBC_DATA = {
       size: '≈ 1,560 sq ft footprint (from model)', units: '2 storeys', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
       model: {
-        src: 'assets/models/mocking-bird-lot-2.glb', radius: 9.2,
+        src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2,
         // Five red pulsing hotspots for the dedicated model page
         // (MockingBirdModel.jsx). Position is a real element found in the
         // source IFC — not a guessed spot on the model — transformed
@@ -137,19 +137,19 @@ window.UBC_DATA = {
         // if one still doesn't frame well, that's the value to adjust.
         hotspots: [
           { id: 'corner-stud', label: 'Corner stud', position: [-7.518, 1.063, 4.641], viewAngle: [-1.6, 1.0, 1.4],
-            image: 'assets/details/corner-stud.jpg',
+            image: '/assets/details/corner-stud.jpg',
             body: 'Where two exterior walls meet, the corner is framed from grouped studs (or ladder blocking, per the framing plan) so both wall panels have something solid to fasten into. Panel-to-panel seams like this one are joined with paired hex-head screws, per the project’s typical panel connection detail.' },
           { id: 'hold-down', label: 'Hold-down', position: [-6.040, -2.371, -4.731], viewAngle: [-1.5, 0.9, -1.3],
-            image: 'assets/details/hold-down.jpg',
+            image: '/assets/details/hold-down.jpg',
             body: 'A hold-down bracket ties the end stud of a shear wall down to the foundation, resisting the wall trying to lift or rotate under lateral (wind or seismic) load. Sized per the project’s own hold-down schedule, one sits at each end of a shear wall panel, fastened through the base track.' },
           { id: 'anchor-bolt', label: 'Anchor bolt', position: [-6.078, -2.252, -0.616], viewAngle: [-1.8, 0.9, 0.5],
-            image: 'assets/details/anchor-bolt.jpg',
+            image: '/assets/details/anchor-bolt.jpg',
             body: 'The base track is bolted straight through to the concrete slab at each location called out on the plan, holding the wall’s bottom track against sliding and uplift before any stud or sheathing load is even applied.' },
           { id: 'truss', label: 'Truss', position: [3.331, 2.440, -2.419], viewAngle: [0.8, 0.5, 1.8],
-            image: 'assets/details/truss.jpg',
+            image: '/assets/details/truss.jpg',
             body: 'An open-web roof truss, engineered separately on its own truss drawings, lands directly on the wall’s top plate and is screwed down at 24 in. o.c. Where two trusses share a bearing wall, their heels are screwed to each other too, so the roof diaphragm and the wall below act as one assembly rather than two separately-fastened parts.' },
           { id: 'bracing', label: 'Bracing', position: [-7.518, 1.335, 2.057], viewAngle: [-1.8, 0.9, 0.6],
-            image: 'assets/details/bracing.jpg',
+            image: '/assets/details/bracing.jpg',
             body: 'A horizontal brace runs across the wall’s studs partway up its height, screwed through every stud it crosses, to keep them from twisting or buckling sideways between the base track and the top plate.' }
         ]
       } }
@@ -175,38 +175,38 @@ window.UBC_DATA = {
   // each image actually shows rather than calling a machine photo a logo.
   logos: {
     client: [
-      { src: 'assets/logos/client/revolution-steel.jpg', alt: 'Revolution Steel' },
-      { src: 'assets/logos/client/lgs-framing.jpg', alt: 'LGS Framing' },
-      { src: 'assets/logos/client/accurate-steel-fab.jpg', alt: 'Accurate Steel Fab' },
-      { src: 'assets/logos/client/steel-tek-framing.jpg', alt: 'Steel Tek Framing' },
-      { src: 'assets/logos/client/offsitek.jpg', alt: 'OffsiteK' },
-      { src: 'assets/logos/client/taynr.jpg', alt: 'TAYNR' },
-      { src: 'assets/logos/client/conqst.jpg', alt: 'CONQST' },
-      { src: 'assets/logos/client/my-barndo-plans.jpg', alt: 'My Barndo Plans' },
-      { src: 'assets/logos/client/evolusion-innovation.jpg', alt: 'Evolusion Innovation' },
-      { src: 'assets/logos/client/beattie.jpg', alt: 'Beattie' },
-      { src: 'assets/logos/client/expertise.jpg', alt: 'Expertise' },
-      { src: 'assets/logos/client/innovative-living-design.jpg', alt: 'Innovative Living Design Inc.' },
-      { src: 'assets/logos/client/indan-planning-systems.jpg', alt: 'INDAN Planning Systems Ltd.' }
+      { src: '/assets/logos/client/revolution-steel.jpg', alt: 'Revolution Steel' },
+      { src: '/assets/logos/client/lgs-framing.jpg', alt: 'LGS Framing' },
+      { src: '/assets/logos/client/accurate-steel-fab.jpg', alt: 'Accurate Steel Fab' },
+      { src: '/assets/logos/client/steel-tek-framing.jpg', alt: 'Steel Tek Framing' },
+      { src: '/assets/logos/client/offsitek.jpg', alt: 'OffsiteK' },
+      { src: '/assets/logos/client/taynr.jpg', alt: 'TAYNR' },
+      { src: '/assets/logos/client/conqst.jpg', alt: 'CONQST' },
+      { src: '/assets/logos/client/my-barndo-plans.jpg', alt: 'My Barndo Plans' },
+      { src: '/assets/logos/client/evolusion-innovation.jpg', alt: 'Evolusion Innovation' },
+      { src: '/assets/logos/client/beattie.jpg', alt: 'Beattie' },
+      { src: '/assets/logos/client/expertise.jpg', alt: 'Expertise' },
+      { src: '/assets/logos/client/innovative-living-design.jpg', alt: 'Innovative Living Design Inc.' },
+      { src: '/assets/logos/client/indan-planning-systems.jpg', alt: 'INDAN Planning Systems Ltd.' }
     ],
     software: [
-      { src: 'assets/logos/software/framecad.jpg', alt: 'FrameCAD' },
-      { src: 'assets/logos/software/mwf-pro-metal.png', alt: 'MWF Pro Metal' },
-      { src: 'assets/logos/software/autodesk-revit.jpg', alt: 'Autodesk Revit' },
-      { src: 'assets/logos/software/scottsdale.jpg', alt: 'Scottsdale' },
-      { src: 'assets/logos/software/vertex-bd.jpg', alt: 'Vertex BD' }
+      { src: '/assets/logos/software/framecad.jpg', alt: 'FrameCAD' },
+      { src: '/assets/logos/software/mwf-pro-metal.png', alt: 'MWF Pro Metal' },
+      { src: '/assets/logos/software/autodesk-revit.jpg', alt: 'Autodesk Revit' },
+      { src: '/assets/logos/software/scottsdale.jpg', alt: 'Scottsdale' },
+      { src: '/assets/logos/software/vertex-bd.jpg', alt: 'Vertex BD' }
     ],
     machine: [
-      { src: 'assets/logos/machine/arkitech.jpg', alt: 'Arkitech' },
-      { src: 'assets/logos/machine/framecad-machine.jpg', alt: 'FrameCAD roll-forming line' },
-      { src: 'assets/logos/machine/howick-machine.png', alt: 'Howick roll-forming line' },
-      { src: 'assets/logos/machine/knudson-machine.jpg', alt: 'Knudson roll-forming line' },
-      { src: 'assets/logos/machine/pinnacle.jpg', alt: 'Pinnacle Light Gauge Steel' },
-      { src: 'assets/logos/machine/scottsdale-machine.jpg', alt: 'Scottsdale roll-forming line' },
-      { src: 'assets/logos/machine/ams-controls.jpg', alt: 'AMS Controls' },
-      { src: 'assets/logos/machine/beck-automation.png', alt: 'Beck Automation' },
-      { src: 'assets/logos/machine/framemac.jpg', alt: 'FrameMac' },
-      { src: 'assets/logos/machine/pinnacle-machine.jpg', alt: 'Pinnacle roll-forming line' }
+      { src: '/assets/logos/machine/arkitech.jpg', alt: 'Arkitech' },
+      { src: '/assets/logos/machine/framecad-machine.jpg', alt: 'FrameCAD roll-forming line' },
+      { src: '/assets/logos/machine/howick-machine.png', alt: 'Howick roll-forming line' },
+      { src: '/assets/logos/machine/knudson-machine.jpg', alt: 'Knudson roll-forming line' },
+      { src: '/assets/logos/machine/pinnacle.jpg', alt: 'Pinnacle Light Gauge Steel' },
+      { src: '/assets/logos/machine/scottsdale-machine.jpg', alt: 'Scottsdale roll-forming line' },
+      { src: '/assets/logos/machine/ams-controls.jpg', alt: 'AMS Controls' },
+      { src: '/assets/logos/machine/beck-automation.png', alt: 'Beck Automation' },
+      { src: '/assets/logos/machine/framemac.jpg', alt: 'FrameMac' },
+      { src: '/assets/logos/machine/pinnacle-machine.jpg', alt: 'Pinnacle roll-forming line' }
     ]
   },
   // Real figures, from ubcbim.com itself: 783 projects, 12 countries, 224
@@ -245,7 +245,7 @@ window.UBC_DATA = {
    certifications line stay explicit "coming soon" placeholders until those
    exist too. Section 06 ("What we need from you") and the "Who we are"
    band were removed from Home.jsx per the client's own request. */
-window.UBC_DATA.blueprint = {
+UBC_DATA.blueprint = {
   // 07 How we work: the same five-stage sequence the home hero (SceneHero)
   // walks a visitor through visually, restated here as plain, readable
   // steps for anyone who scrolled past without the model loading.
@@ -294,7 +294,7 @@ window.UBC_DATA.blueprint = {
    for the bot. Answers are paraphrased from data already on the site (the
    service list above, `capability`, `stats`, `hero.stages[0]` and the
    contact `cards`), not new claims. */
-window.UBC_DATA.faq = [
+UBC_DATA.faq = [
   { q: 'What services do you offer?',
     a: 'Seven, all drawn from one coordinated model: wall panel detailing, roof and floor trusses, engineering, MEP detailing and clash detection, permit documents, Bill of Materials and machine CSV, and architectural drafting.' },
   { q: 'Do you work with wood frame or light-gauge steel?',
@@ -324,15 +324,15 @@ window.UBC_DATA.faq = [
    alongside it — no wording was added or changed. client-3 still has no
    name, company or transcript to attribute it to, so it stays honestly
    unattributed rather than guessed at. */
-window.UBC_DATA.videoTestimonials = [
-  { id: 'client-1', src: 'assets/testimonials/client-1.mp4', poster: 'assets/testimonials/client-1-poster.jpg',
+UBC_DATA.videoTestimonials = [
+  { id: 'client-1', src: '/assets/testimonials/client-1.mp4', poster: '/assets/testimonials/client-1-poster.jpg',
     name: 'Ben', role: 'Revolution Steel — Phoenix, AZ',
     quote: 'We utilize UBC quite often for their modeling and bill-material services. They are fast, reliable, accurate, and have great communication.' },
-  { id: 'client-2', src: 'assets/testimonials/client-2.mp4', poster: 'assets/testimonials/client-2-poster.jpg',
+  { id: 'client-2', src: '/assets/testimonials/client-2.mp4', poster: '/assets/testimonials/client-2-poster.jpg',
     name: 'Cameron', role: 'New LGSF framing business owner',
     quote: "UBC has been incredibly supportive — helping me understand the design process and launch my projects smoothly. They're responsive, proactive, and always willing to go the extra mile." },
-  { id: 'client-3', src: 'assets/testimonials/client-3.mp4', poster: 'assets/testimonials/client-3-poster.jpg' },
-  { id: 'client-4', src: 'assets/testimonials/client-4.mp4', poster: 'assets/testimonials/client-4-poster.jpg',
+  { id: 'client-3', src: '/assets/testimonials/client-3.mp4', poster: '/assets/testimonials/client-3-poster.jpg' },
+  { id: 'client-4', src: '/assets/testimonials/client-4.mp4', poster: '/assets/testimonials/client-4-poster.jpg',
     name: 'Zach Thompson', role: 'Seattle, WA',
     quote: 'Their coordination, attention to detail, and deliverables are top-tier. They consistently bring creativity to problem-solving and help bring our projects to life.' }
 ];
@@ -348,13 +348,13 @@ window.UBC_DATA.videoTestimonials = [
    filename supplied one (12_days_of_BIM_posted_on_13-01-2026.docx); the
    other four don't carry a date in the source document, so `date` is left
    unset for those rather than guessed. */
-window.UBC_DATA.blogPosts = [
+UBC_DATA.blogPosts = [
   {
     id: 'climbing-wall-lgsf',
     title: 'Engineering Innovation in Light Gauge Steel: Custom 30-Foot Climbing Wall for a Commercial Building',
     excerpt: 'A client asked for a 30-foot climbing wall panel inside a light-gauge-steel commercial building — three times the height LGSF walls are normally engineered for. Here’s how strap connections made it work.',
     tags: ['Engineering', 'Light-gauge steel', 'Commercial'],
-    image: 'assets/blog/climbing-wall-cover.jpg',
+    image: '/assets/blog/climbing-wall-cover.jpg',
     sections: [
       { body: [
         'Modern commercial construction demands flexibility, precision, and engineering creativity. At UBC, every project is approached with a solution-driven mindset — especially when client requirements go beyond standard design practices.',
@@ -399,7 +399,7 @@ window.UBC_DATA.blogPosts = [
     title: 'The Complete Software Stack for LGSF Detailing in 2026',
     excerpt: 'A working detailer’s guide to the five platforms that actually ship light-gauge steel framing projects today — Vertex BD, Framecad, Scottsdale Scottsteel, Revit with MWF, and StaadPro.',
     tags: ['Software', 'LGSF', 'BIM'],
-    image: 'assets/blog/software-stack-cover.jpg',
+    image: '/assets/blog/software-stack-cover.jpg',
     sections: [
       { body: [
         'A working detailer’s guide to the 5 platforms that actually ship light-gauge steel framing projects today.',
@@ -466,7 +466,7 @@ window.UBC_DATA.blogPosts = [
     title: 'Building the Future: Why Steel-Framed Modular Homes are a Game Changer',
     excerpt: 'Splitting a 600 sq ft California home into two 300 sq ft light-gauge-steel modules, engineered to bolt together into one seamless, permanent-feeling house.',
     tags: ['Modular', 'Light-gauge steel', 'Residential'],
-    image: 'assets/blog/modular-home-cover.jpg',
+    image: '/assets/blog/modular-home-cover.jpg',
     sections: [
       { body: [
         'Modular building is changing how we think about high-quality housing. By building in a controlled environment and then moving the home to its final spot, we can create beautiful, strong, and affordable spaces.',
@@ -478,13 +478,13 @@ window.UBC_DATA.blogPosts = [
       { heading: '1. Strength You Can Trust', body: [
         'Traditional homes use wood, which can warp or shrink. Instead, we use Light Gauge Steel for modular construction (LGS). For this project, we engineered a specialized floor system using steel beams and a stem-wall foundation. This creates a rock-solid foundation that feels permanent and sturdy, even though the house was built in sections.'
       ] },
-      { heading: '2. Structural Rigidity & Load Path', image: 'assets/blog/modular-home-stem-wall.jpg', caption: 'Stem wall and floor beam detail', body: [
+      { heading: '2. Structural Rigidity & Load Path', image: '/assets/blog/modular-home-stem-wall.jpg', caption: 'Stem wall and floor beam detail', body: [
         'By utilizing a concrete stem wall rather than isolated piers, we create a continuous bearing surface. This is critical for LGS engineering of a modular building, as it allows for a uniform transfer of dead and live loads from the steel frames into the footings. This setup significantly reduces point-load stress and prevents the “bouncy” floor feel often associated with modular housing.'
       ] },
       { heading: '3. The LGS Floor Beam Advantage', body: [
         'Inside the two 300 sq ft modules, the floor system is engineered with high-tensile steel C-sections. Using Autodesk Revit and MWF, we modelled a reinforced “marriage line” where the two units meet. These beams are designed to be bolted back-to-back, creating a central structural spine that resists racking during transport and ensures a seamless, level floor once joined.'
       ] },
-      { heading: '4. The Shared Gable Roof', image: 'assets/blog/modular-home-truss-shop.jpg', caption: 'Truss shop drawing', body: [
+      { heading: '4. The Shared Gable Roof', image: '/assets/blog/modular-home-truss-shop.jpg', caption: 'Truss shop drawing', body: [
         'Designing a gable roof across two separate modules requires high precision — the connection point where the two units meet must be perfect. Using Autodesk Revit and MWF Advance Steel, we modelled every steel truss to ensure that when the modules are bolted together on-site, the roofline is seamless and weather-tight.'
       ] },
       { heading: '5. Faster from Start to Finish', body: [
@@ -502,13 +502,13 @@ window.UBC_DATA.blogPosts = [
     title: 'The Hidden Engineering Challenges Behind Successful LGSF Buildings: Lessons from Real-World Projects',
     excerpt: 'Speed and precision get the credit, but a successful LGSF building is decided earlier — in load paths, environmental design, and constructability worked out long before construction starts.',
     tags: ['Engineering', 'LGSF', 'Hybrid structures'],
-    image: 'assets/blog/hidden-challenges-cover.jpg',
+    image: '/assets/blog/hidden-challenges-cover.jpg',
     sections: [
       { body: [
         'Light Gauge Steel Framing (LGSF) has transformed modern construction with its advantages of speed, precision, sustainability, and suitability for prefabrication. However, the success of an LGSF building is not determined only by the speed of manufacturing or installation — it begins with intelligent engineering, accurate detailing, and a deep understanding of constructability.',
         'At UBC BIM Services, our experience across residential, commercial, and hybrid LGSF projects has shown that behind every successful structure lies a series of engineering challenges that must be addressed long before construction begins.'
       ] },
-      { heading: '1. Managing Complex Structural Load Paths', image: 'assets/blog/hidden-challenges-load-path.jpg', caption: 'LGSF load path', body: [
+      { heading: '1. Managing Complex Structural Load Paths', image: '/assets/blog/hidden-challenges-load-path.jpg', caption: 'LGSF load path', body: [
         'One of the biggest challenges in LGSF design is ensuring that loads are transferred safely from the roof and upper levels to the foundation.',
         'In a recent hybrid project, UBC engineered a structure with multiple roof elevations, where hot-rolled steel framing was integrated with LGSF systems to achieve effective load distribution and maintain structural stability.',
         'Key takeaway: a well-planned structural system prevents overloading, reduces unnecessary material usage, and improves overall building performance.'
@@ -547,7 +547,7 @@ window.UBC_DATA.blogPosts = [
     date: 'Jan 13, 2026',
     excerpt: 'A 2-storey residential build in Texas, walked day by day from first concept sketch to machine-ready Light Gauge Steel production files.',
     tags: ['BIM workflow', 'LGSF', 'Residential'],
-    image: 'assets/blog/12-days-day1-2.jpg',
+    image: '/assets/blog/12-days-day1-2.jpg',
     sections: [
       { body: [
         'At UBC BIM, we believe Building Information Modeling is not just about creating 3D models — it’s about delivering constructible, precise, and predictable buildings.',
@@ -573,7 +573,7 @@ window.UBC_DATA.blogPosts = [
       ] },
       { body: ['As a result, what is traditionally a high-risk and time-consuming task became a well-coordinated, error-minimized, production-ready solution — improving design accuracy while ensuring smoother fabrication, faster installation on site, and reduced rework.'] },
 
-      { heading: 'Day 1 – BIM Kick-off: Concept to Construction', image: 'assets/blog/12-days-day1-2.jpg', body: [
+      { heading: 'Day 1 – BIM Kick-off: Concept to Construction', image: '/assets/blog/12-days-day1-2.jpg', body: [
         'Every successful project starts with a strong foundation. On Day 1, our multidisciplinary BIM team initiates the kick-off by collaboratively reviewing architectural concepts, project scope, design intent, applicable codes, and constructability requirements.',
         'Early coordination between our architects, design engineers, detailers and fabrication team converts concept drawings into GA (General Arrangement) drawings optimized specifically for Light Gauge Steel construction — ensuring fewer downstream changes and a smoother execution.'
       ] },
@@ -581,7 +581,7 @@ window.UBC_DATA.blogPosts = [
         'With the concept aligned, our framing and BIM coordination team moves into initial layout and framing development. Preliminary LGS framing begins, and our team proactively identifies critical RFIs and shares them with the client at an early stage.',
         'This collaborative approach eliminates ambiguity, avoids assumptions, and ensures design clarity before detailed modeling begins.'
       ] },
-      { heading: 'Day 3 – BIM Engineering', image: 'assets/blog/12-days-day3-4.jpg', body: [
+      { heading: 'Day 3 – BIM Engineering', image: '/assets/blog/12-days-day3-4.jpg', body: [
         'Engineering is embedded directly into our BIM models by our in-house engineering team. Each structural element is analyzed for:'
       ], list: ['Wind loads', 'Seismic forces', 'Snow loads', 'Gravity and service loads'] },
       { body: ['By integrating engineering early, our team ensures every model is not just visually accurate but structurally compliant and site-ready — long before it reaches the field.'] },
@@ -589,21 +589,21 @@ window.UBC_DATA.blogPosts = [
         'Once engineering parameters are confirmed, our BIM modeling team develops detailed 3D models. Walls, floors, roofs, and structural systems are modeled with precision, enabling clear visualization for stakeholders and accurate coordination across all disciplines.',
         'This stage reflects the seamless collaboration between our designers, engineers, and detailers — bridging design intent with real-world construction.'
       ] },
-      { heading: 'Day 5 – Hybrid Structures Done Right', image: 'assets/blog/12-days-day5-6.jpg', body: [
+      { heading: 'Day 5 – Hybrid Structures Done Right', image: '/assets/blog/12-days-day5-6.jpg', body: [
         'Modern buildings often combine multiple structural systems. On Day 5, our experienced coordination team carefully integrates Light Gauge Steel, red iron, and other structural elements within a single BIM environment, ensuring alignment between all systems and preventing clashes, misfits, and costly on-site rework — especially critical in hybrid construction projects.'
       ] },
       { heading: 'Day 6 – Precision Detailing with Constructability', body: [
         'This is where UBC BIM’s detailing expertise truly stands apart. Our detailers model every stud, track, truss, and connection with fabrication-level precision, considering:'
       ], list: ['Machine constraints', 'Panel sizes', 'Transportation limitations', 'Installation sequencing'] },
       { body: ['By working closely with fabrication requirements in mind, our team ensures components are machine-ready and easy to assemble on-site.'] },
-      { heading: 'Day 7 – Accurate Material Take-Offs', image: 'assets/blog/12-days-day7-8.jpg', body: [
+      { heading: 'Day 7 – Accurate Material Take-Offs', image: '/assets/blog/12-days-day7-8.jpg', body: [
         'With models finalized, our BIM and estimation team generates highly accurate Material Take-Offs (MTOs) and Bills of Materials (BOM). Our value-engineered and optimized BOMs help:'
       ], list: ['Reduce material waste', 'Control project costs', 'Avoid procurement surprises'] },
       { body: ['This accuracy is the result of disciplined modeling and cross-checking by our experienced team.'] },
       { heading: 'Day 8 – Shop Drawings', body: [
         'Detailed shop drawings are produced by our shop drawing specialists for fabrication and installation teams. These drawings clearly communicate dimensions, profiles, connections, and assembly sequences — ensuring smooth manufacturing and efficient site execution.'
       ] },
-      { heading: 'Day 9 – Panelization Strategy', image: 'assets/blog/12-days-day9-10.jpg', body: [
+      { heading: 'Day 9 – Panelization Strategy', image: '/assets/blog/12-days-day9-10.jpg', body: [
         'At this stage, our BIM and logistics planning team optimizes the model for panelization. Walls, floors, and roof panels are efficiently divided to balance:'
       ], list: ['Fabrication efficiency', 'Transportation feasibility', 'On-site handling and installation speed'] },
       { body: ['This thoughtful planning reduces labor time and improves overall site productivity.'] },
@@ -611,7 +611,7 @@ window.UBC_DATA.blogPosts = [
         'Our BIM team converts the finalized model into machine-compatible files for roll-forming and CNC. Final output includes shop drawings, layouts, production output files, quantities for roll purchase, panel drawings, connection details, and typical sections and elevations.',
         'Because constructability is considered from Day 1, the transition from model to machine is seamless — no rework, no guesswork.'
       ] },
-      { heading: 'Day 11 – Global BIM Support (24/5)', image: 'assets/blog/12-days-day11-12.jpg', body: [
+      { heading: 'Day 11 – Global BIM Support (24/5)', image: '/assets/blog/12-days-day11-12.jpg', body: [
         'UBC BIM is powered by a globally distributed team delivering 24/5 support. Our round-the-clock workflow ensures:'
       ], list: ['Faster turnarounds', 'Continuous progress across time zones', 'Immediate issue resolution'] },
       { body: ['This allows our clients to move forward without delays, regardless of location.'] },
@@ -637,12 +637,12 @@ window.UBC_DATA.blogPosts = [
 
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land; nothing else needs to change. */
-window.UBC_DATA.beforeAfter = {
+UBC_DATA.beforeAfter = {
   eyebrow: 'Compare systems',
   title: 'The same house, framed both ways',
   standfirst: 'Drag to compare a wood-frame structure with the same house in light-gauge steel, both detailed from one coordinated model.',
-  before: 'assets/frames/wood.jpg',
-  after: 'assets/frames/steel.jpg',
+  before: '/assets/frames/wood.jpg',
+  after: '/assets/frames/steel.jpg',
   beforeLabel: 'Wood frame',
   afterLabel: 'Light-gauge steel',
   aspect: '5 / 4',
@@ -653,10 +653,10 @@ window.UBC_DATA.beforeAfter = {
    walked into the studio, extracted to a frame sequence and scrubbed by
    scroll, exactly like the home-page build sequence. `route` on a card is
    handed back to the Contact page, which owns what each route does. */
-window.UBC_DATA.contactScene = {
-  seq: { prefix: 'assets/seq-contact/f_', count: 236, pad: 3, ext: '.jpg' },
-  seqMobile: { prefix: 'assets/seq-contact-m/f_', count: 236, pad: 3, ext: '.jpg' },
-  poster: 'assets/seq-contact/f_001.jpg',
+UBC_DATA.contactScene = {
+  seq: { prefix: '/assets/seq-contact/f_', count: 236, pad: 3, ext: '.jpg' },
+  seqMobile: { prefix: '/assets/seq-contact-m/f_', count: 236, pad: 3, ext: '.jpg' },
+  poster: '/assets/seq-contact/f_001.jpg',
   // `t` is each stage's position along the scroll, read off the sequence:
   // greeting to about frame 20, the door held open around 90, inside from 121,
   // and the model table from roughly 196 on.
@@ -706,8 +706,8 @@ window.UBC_DATA.contactScene = {
    the scroll position (0..1) each stage's angle and caption take over at;
    the last stage is given real room (0.78-1.0) rather than a sliver, since
    a stage whose `t` is 1.0 has no scroll left to actually show it. */
-window.UBC_DATA.hero = {
-  model: { src: 'assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
+UBC_DATA.hero = {
+  model: { src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
   stages: [
     { n: '01', t: 0.00, pos: [14.70, 11.99, 17.50], term: null,
       title: 'One coordinated model', note: 'Everything downstream (the panel layouts, the truss drawings, the permit set) is drawn from this single 3D model, not redrawn for each one.' },
@@ -861,24 +861,24 @@ window.UBC_DATA.hero = {
    image in VERTEX_IMAGE.pdf either (top-track only appears as a label on
    that same full elevation; sheathing isn't drawn on it at all), so those
    two keep their original TYPICAL_DETAILS.pdf crops too. */
-window.UBC_DATA.wallPanelModel = {
-  src: 'assets/models/m2-wall-panel.glb', radius: 4.17,
+UBC_DATA.wallPanelModel = {
+  src: '/assets/models/m2-wall-panel.glb', radius: 4.17,
   restAngle: [-2.52, 1.42, -2.20],
   hotspots: [
     { id: 'hold-down', label: 'Hold-down', position: [-2.852, -1.742, -2.057], viewAngle: [-1.6, 0.9, -1.4],
-      image: 'assets/details/wp-hold-down.jpg',
+      image: '/assets/details/wp-hold-down.jpg',
       body: 'A Simpson Strong-Tie HTT5 hold-down — a metal bracket bolted to the stud above and anchored to what’s below. Its job is simple: keep this corner of the wall from lifting up or twisting loose when wind or an earthquake pushes on the building.' },
     { id: 'anchor', label: 'Anchor bolt', position: [0.455, -2.012, -2.057], viewAngle: [1.2, 0.9, -1.6],
-      image: 'assets/details/wp-anchor.jpg',
+      image: '/assets/details/wp-anchor.jpg',
       body: 'One of six anchor bolts along the bottom of this panel, fixing it straight into the concrete floor or foundation below. It keeps the wall from sliding or lifting off its base — the connection everything else in the wall is ultimately standing on.' },
     { id: 'bolt', label: 'Structural bolt', position: [-0.057, 1.106, 2.058], viewAngle: [0.6, 0.9, 1.8],
-      image: 'assets/details/wp-bolt.jpg',
+      image: '/assets/details/wp-bolt.jpg',
       body: 'A heavy-duty A325 bolt, 12 mm thick and 200 mm long, that joins this wall panel to the one next to it. It passes through a hole already punched in the metal stud for exactly this purpose, so two panels bolt together into one solid wall instead of standing as separate pieces. One connection elsewhere on this same panel uses an even heavier bolt, at the one spot built to need it.' },
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
-      image: 'assets/details/wp-top-track.jpg',
+      image: '/assets/details/wp-top-track.jpg',
       body: 'The metal rail running along the very top of the wall — the longest single piece in this panel, spanning nearly its full 4.25 m length. Every stud underneath screws into it, which is what turns a row of separate studs into one solid wall frame.' },
     { id: 'sheathing', label: 'Sheathing', position: [0.203, 1.833, -2.057], viewAngle: [0.8, 0.6, -1.7],
-      image: 'assets/details/wp-sheathing.jpg',
+      image: '/assets/details/wp-sheathing.jpg',
       body: 'The flat panel skin fastened over the studs, covering nearly the full 6.17 m width of the wall in one continuous piece. It ties the whole frame together into one stiff surface, which is what actually gives the wall its strength against being pushed sideways.' }
   ]
 };
@@ -886,7 +886,7 @@ window.UBC_DATA.wallPanelModel = {
 const CORE_REGIONS = ['South Carolina', 'Florida', 'Texas', 'California', 'Australia', 'New Zealand', 'Chile', 'Hyderabad, India', 'Dubai, UAE'];
 const EXTENDED_REGIONS = [...CORE_REGIONS, 'UK', 'Europe', 'Canada', 'Israel'];
 
-window.UBC_DATA.serviceArticles = [
+UBC_DATA.serviceArticles = [
   { id: 'drafting-architectural', label: 'Drafting and architectural', title: 'Drafting & Architectural Services',
     summary: 'Technical drawings and architectural documentation that turn a design into a buildable, coordinated construction set.',
     regions: CORE_REGIONS,

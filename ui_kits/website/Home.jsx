@@ -1,73 +1,17 @@
-const { Button, Tag, Card, SpecRow, SectionHeading, Wordmark, Stat, Icon, Header, Footer, FilterBar, StickyQuote, FormField, Input, Textarea, Select, Checkbox, ModelStage, Hotspot, SpecPanel, LayerRail, CapabilityMatrix } = window.UBCBIMDesignSystem_353af8;
-const D = window.UBC_DATA;
+'use client';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import createGlobe from 'cobe';
+import { Tag } from '../../components/core/Tag.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { CapabilityMatrix } from '../../components/model/CapabilityMatrix.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section, Reveal, AnimatedNumber } from './shared.jsx';
+import { ModelViewer } from './ModelViewer.jsx';
+import { SceneHero } from './SceneHero.jsx';
+import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
-const Page = ({ children, style }) => <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', ...style }}>{children}</div>;
-const Section = ({ children, sunken, tight, style }) => (
-  <section className="ubc-section" style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
-);
-// anime.js-driven entrance, in place of the old CSS opacity/translateY
-// transition: same shape (fade up 22px, once, on scroll into view) and the
-// same --ease-out curve and --dur-4 length as tokens/motion.css, just
-// choreographed in JS so multiple elements can stagger against each other
-// rather than each firing its own isolated CSS transition.
-function Reveal({ children, delay = 0, style }) {
-  const ref = React.useRef(null);
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  React.useEffect(() => {
-    const el = ref.current; if (!el) return;
-    if (reduceMotion || typeof window.anime !== 'function') { el.style.opacity = 1; el.style.transform = 'none'; return; }
-    const io = new IntersectionObserver((e) => {
-      if (!e[0].isIntersecting) return;
-      io.disconnect();
-      window.anime({
-        targets: el, opacity: [0, 1], translateY: [22, 0], duration: 620, delay, easing: 'cubicBezier(.16,1,.3,1)',
-        // Every section on the page goes through this component, so a
-        // starved tween (heavy concurrent 3D render eating its rAF ticks)
-        // leaving content stuck invisible is the worst version of this bug
-        // on the whole site; force the resting state once complete fires
-        // regardless of what update() managed to apply.
-        complete: () => { el.style.opacity = 1; el.style.transform = 'none'; }
-      });
-    }, { threshold: 0.15 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return <div ref={ref} style={{ opacity: reduceMotion ? 1 : 0, ...style }}>{children}</div>;
-}
-// Counts every number embedded in `value` up from zero once it scrolls into
-// view, keeping any surrounding characters (an en dash in a range like
-// "3–5", a unit) exactly where they are. Zero-pads the "before" state to the
-// same digit width so nothing reflows when the digits fill in.
-function AnimatedNumber({ value }) {
-  const ref = React.useRef(null);
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  React.useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const nums = String(value).match(/\d+/g);
-    if (reduceMotion || typeof window.anime !== 'function' || !nums) { el.textContent = value; return; }
-    el.textContent = value.replace(/\d+/g, (m) => '0'.repeat(m.length));
-    const io = new IntersectionObserver((e) => {
-      if (!e[0].isIntersecting) return;
-      io.disconnect();
-      const counters = nums.map(() => ({ v: 0 }));
-      window.anime({
-        targets: counters, v: (t, i) => Number(nums[i]), round: 1, duration: 1300, delay: 150,
-        easing: 'cubicBezier(.16,1,.3,1)',
-        update: () => { let i = 0; el.textContent = value.replace(/\d+/g, () => String(counters[i++].v)); },
-        // A heavy concurrent render (a 3D scene animating in the same
-        // viewport) can starve this tween's own rAF ticks badly enough on a
-        // slow device that update() never gets a chance to run before
-        // complete fires; forcing the real string here guarantees the
-        // count-up never gets stuck on its zero-padded starting state.
-        complete: () => { el.textContent = value; }
-      });
-    }, { threshold: 0.4 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return <span ref={ref}>{value}</span>;
-}
-Object.assign(window, { Page, Section, Reveal, AnimatedNumber });
+const D = UBC_DATA;
 
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
@@ -86,7 +30,7 @@ const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1
 // logo row without pre-computing any distance. Pauses on hover/focus
 // (responsive.css) and holds still under prefers-reduced-motion.
 function LogoCarousel({ images, reverse, height = 64 }) {
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
     <div className="ubc-logo-track-wrap" style={{ overflow: 'hidden', WebkitMaskImage: 'linear-gradient(90deg, transparent, black 6%, black 94%, transparent)', maskImage: 'linear-gradient(90deg, transparent, black 6%, black 94%, transparent)' }}>
       <div className="ubc-logo-track" style={{
@@ -160,7 +104,7 @@ function HowWeWork() {
 // The reveal is driven by clip-path on a full-size image (rather than shrinking
 // a wrapper), so the "before" image never squashes and the whole thing stays
 // responsive. Drag writes styles directly on rAF: no per-frame React renders.
-const BA = window.UBC_DATA.beforeAfter || {};
+const BA = UBC_DATA.beforeAfter || {};
 function BeforeAfterSlider() {
   const sliderRef = React.useRef(null);
   const beforeRef = React.useRef(null);
@@ -313,10 +257,10 @@ function ProjectsGrid({ onGo }) {
                     firing the navigate-to-project click below. */}
                 <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
                   onClick={(e) => { if (p.model) e.stopPropagation(); }}>
-                  {p.model && window.ModelViewer ? (
-                    <window.ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
+                  {p.model ? (
+                    <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
                   ) : (
-                    <img src={'assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   )}
                 </div>
                 <a onClick={() => onGo && onGo('projects')} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)', cursor: 'pointer', textDecoration: 'none' }}>
@@ -424,19 +368,15 @@ const MARKERS = [
 ];
 
 // GLOBAL PRESENCE: rendered with cobe (github.com/shuding/cobe, MIT), a
-// small WebGL globe library vendored locally at assets/vendor/cobe.js (its
-// real published dist file, converted from its original ES-module export
-// to a plain `window.createGlobe` global — the same loading pattern
-// index.html already uses for React, three.js and anime.js — rather than
-// an ES-module dynamic import(), the one part of that first attempt this
-// session had no way to test end to end). No CDN dependency at request
-// time either way, and one this session could actually download and read
-// in full before shipping it (unlike the Framer component turned down
-// earlier: unpkg/esm.sh are unreachable from this sandbox, but the real
-// npm registry is, so the published package itself, not a guess at its
-// API, is what's vendored here). Its built-in world texture stands in for
-// the hand-rolled Natural Earth point cloud the previous three.js version
-// sampled itself; both are
+// small WebGL globe library. Installed as a real npm dependency now (see
+// package.json) and imported directly at the top of this file — the old
+// no-build-step setup vendored its published dist file locally at
+// ui_kits/website/assets/vendor/cobe.js and exposed it as a plain
+// `window.createGlobe` global (the same loading pattern index.html used for
+// React, three.js and anime.js); that vendored file is left in place
+// untouched but is no longer referenced now that a real import exists. Its
+// built-in world texture stands in for the hand-rolled Natural Earth point
+// cloud the previous three.js version sampled itself; both are
 // real Earth data, just packaged differently. Paired with the same
 // countries/projects figures already on the About page stats. Drag to look
 // around; when nobody's touching it, it turns slowly on its own — see the
@@ -458,15 +398,14 @@ function GlobalPresence() {
       if (!entries[0].isIntersecting) return;
       io.disconnect();
 
-      // cobe.js (a plain global-exposing script, loaded in index.html the
-      // same way as every other vendor dependency on this site) sets
-      // window.createGlobe well before this component's effect can run, so
-      // there's no load-on-demand step or promise to fail silently here.
-      const createGlobe = window.createGlobe;
+      // cobe ships as a real npm dependency now (imported at the top of this
+      // file), so there's no load-on-demand step or promise to fail silently
+      // here — createGlobe is always the real function by the time this
+      // effect can run.
       const canvas = canvasRef.current;
       const host = hostRef.current;
       if (typeof createGlobe === 'function' && canvas && host) {
-        const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
         // tokens/colors.css, normalised to 0-1: --white, --paper, --ubc-red.
@@ -745,7 +684,7 @@ function TestimonialColumn({ reverse, reduceMotion, ariaHidden }) {
   );
 }
 function Testimonials() {
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
     <Section style={{ paddingTop: 0 }}>
       {/* Full-bleed on purpose: a direct child of Section (which has no
@@ -898,8 +837,15 @@ function FinalCTA({ onQuote }) {
   );
 }
 
-function Home({ onGo, onQuote }) {
-  const SceneHero = window.SceneHero;
+export function Home() {
+  // Was passed down from the old single-page App() component's own state;
+  // now that every page is a real route, Home reaches the same two things
+  // itself: real navigation (next/navigation) and the quote drawer, opened
+  // through the same context AppChrome (app/AppChrome.jsx) provides to
+  // every page.
+  const router = useRouter();
+  const onQuote = useQuoteDrawer();
+  const onGo = (id) => router.push(id === 'home' ? '/' : '/' + id);
   return (
     // Tighter section rhythm than the site-wide default (--section-y/-tight
     // in tokens/spacing.css), scoped to this page only via CSS custom
@@ -907,7 +853,7 @@ function Home({ onGo, onQuote }) {
     // other page (About, Blogs, Careers, Contact, Services, Portfolio) also
     // renders through.
     <div style={{ '--section-y': 'var(--s-8)', '--section-y-tight': 'var(--s-7)' }}>
-      {SceneHero && <SceneHero onQuote={onQuote} onGo={onGo} />}
+      <SceneHero onQuote={onQuote} onGo={onGo} />
       <LogoWalls />
       <HowWeWork />
       <BeforeAfterSlider />
@@ -925,4 +871,3 @@ function Home({ onGo, onQuote }) {
     </div>
   );
 }
-Object.assign(window, { Home });

@@ -1,7 +1,20 @@
+'use client';
+import React from 'react';
+import { Button } from '../../components/core/Button.jsx';
+import { Tag } from '../../components/core/Tag.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { SectionHeading } from '../../components/core/SectionHeading.jsx';
+import { Card } from '../../components/core/Card.jsx';
+import { ModelStage } from '../../components/model/ModelStage.jsx';
+import { Hotspot } from '../../components/model/Hotspot.jsx';
+import { SpecPanel } from '../../components/model/SpecPanel.jsx';
+import { FilterBar } from '../../components/navigation/FilterBar.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section, Reveal } from './shared.jsx';
+import { ModelViewer } from './ModelViewer.jsx';
+import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
 function ProjectDetail({ project, onBack, onQuote }) {
-  const { Button, Tag, SpecPanel, ModelStage, Hotspot, SectionHeading, Icon } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section } = window;
   return (
     <div>
       <Page style={{ paddingTop: 'var(--s-7)' }}>
@@ -13,8 +26,8 @@ function ProjectDetail({ project, onBack, onQuote }) {
       <div className="ubc-model-row" style={{ marginTop: 'var(--s-7)', position: 'relative' }}>
         {/* A real IFC, converted to glTF, gets the orbitable viewer; everything
             else keeps the placeholder stage until its own model is in hand. */}
-        {project.model && window.ModelViewer ? (
-          <window.ModelViewer src={project.model.src} radius={project.model.radius} title={project.name} height={560} />
+        {project.model ? (
+          <ModelViewer src={project.model.src} radius={project.model.radius} title={project.name} height={560} />
         ) : (
           <ModelStage className="ubc-model-viewer" height={560} caption={project.name + ' · framing model'}>
             <Hotspot x="30%" y="42%" label="Wall panel" />
@@ -67,13 +80,18 @@ function ProjectDetail({ project, onBack, onQuote }) {
   );
 }
 
-function Portfolio({ onQuote }) {
-  const { Card, Tag, FilterBar, SectionHeading } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, Reveal } = window;
-  const D = window.UBC_DATA;
+export function Portfolio() {
+  // Was a prop from the old single-page App() component; now reached
+  // through the same quote-drawer context every page uses (see
+  // app/AppChrome.jsx / app/QuoteContext.jsx).
+  const onQuote = useQuoteDrawer();
+  const D = UBC_DATA;
   // One-shot deep link: another page can set window.UBC_NAV_FILTER before
   // navigating here (e.g. the LGSF tab on the build-sequence hero).
-  const [filter, setFilter] = React.useState(() => { const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null; return f || 'All'; });
+  const [filter, setFilter] = React.useState(() => {
+    if (typeof window === 'undefined') return 'All';
+    const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null; return f || 'All';
+  });
   const [open, setOpen] = React.useState(null);
   const list = D.projects.filter((p) => filter === 'All' || p.type === filter || p.system === filter);
   // Opening a project is local state, not a page change, so nothing else
@@ -102,8 +120,8 @@ function Portfolio({ onQuote }) {
                 // A real IFC gets the live, orbitable model right on the card
                 // (not a photo of it). stopPropagation keeps a drag-to-orbit
                 // from also firing the card's own "open this project" click.
-                media={p.model && window.ModelViewer
-                  ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><window.ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact /></div>
+                media={p.model
+                  ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact /></div>
                   : null}
                 mediaLabel={p.name + ': model render pending'}
                 eyebrow={p.type} title={p.name} meta={p.size + ' · ' + p.location}
@@ -118,4 +136,3 @@ function Portfolio({ onQuote }) {
     </Section>
   );
 }
-Object.assign(window, { Portfolio, ProjectDetail });

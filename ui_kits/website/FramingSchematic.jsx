@@ -1,9 +1,13 @@
 /* Schematic framing line work: deliberately a diagram, not a render.
-   Real UBC BIM model exports replace this. */
+   Real UBC BIM model exports replace this.
+
+   Not currently rendered by any page (same as before this migration —
+   nothing in Home.jsx, MockingBirdModel.jsx or elsewhere mounts it), kept
+   here as a real ES module for parity with the rest of ui_kits/website. */
 const framingLine = (o) => ({ position: 'absolute', background: 'rgba(245,244,241,.42)', ...o });
 const framingActive = { background: 'var(--accent)' };
 
-function FramingSchematic({ layer = 0 }) {
+export function FramingSchematic({ layer = 0 }) {
   const on = (i) => layer >= i;
   const cur = (i) => layer === i;
   const fade = (i) => ({
@@ -60,4 +64,3 @@ function FramingSchematic({ layer = 0 }) {
     </div>
   );
 }
-Object.assign(window, { FramingSchematic });

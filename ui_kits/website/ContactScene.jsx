@@ -1,3 +1,4 @@
+'use client';
 /*
   ContactScene: the welcome sequence at the top of the Contact page. Scroll
   SCRUBS a JPEG frame sequence on a canvas: a UBC BIM lead meets two visitors at
@@ -5,7 +6,7 @@
   Same mechanics as the home-page build sequence (canvas + preloader + frame
   windows), so there is no <video> element and no codec or seek quirks.
 
-  Config: window.UBC_DATA.contactScene
+  Config: UBC_DATA.contactScene
     seq / seqMobile { prefix, count, pad, ext }   frame sequences
     poster                                        first-paint still
     stages [{ n, t, title, note }]                captions along the scroll
@@ -15,9 +16,12 @@
   Each card carries a `route` id; the page owns what a route does (open the
   scheduler, the quote drawer, mail, WhatsApp) via the onRoute prop.
 */
-const { Icon: CSIcon } = window.UBCBIMDesignSystem_353af8;
+import React from 'react';
+import { Icon as CSIcon } from '../../components/core/Icon.jsx';
+import { UBC_DATA } from './data.js';
+import { bounceHandlers } from './ModelViewer.jsx';
 
-const CS = (window.UBC_DATA && window.UBC_DATA.contactScene) || null;
+const CS = (UBC_DATA && UBC_DATA.contactScene) || null;
 const CS_STAGES = (CS && CS.stages) || [];
 const CS_CARDS = (CS && CS.cards) || [];
 const CS_NARROW = typeof window !== 'undefined' && window.matchMedia
@@ -71,7 +75,7 @@ function SceneCard({ card, visible, onRoute }) {
   );
 }
 
-function ContactScene({ onRoute, onQuote }) {
+export function ContactScene({ onRoute, onQuote }) {
   const wrapRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const imagesRef = React.useRef([]);
@@ -95,7 +99,7 @@ function ContactScene({ onRoute, onQuote }) {
     probe.src = csFrameUrl(1);
   }, []);
 
-  const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = CS_SEQ ? CS_SEQ.count : 0;
   const n = Math.max(1, CS_STAGES.length);
 
@@ -279,4 +283,3 @@ function ContactScene({ onRoute, onQuote }) {
   );
 }
 
-Object.assign(window, { ContactScene });
