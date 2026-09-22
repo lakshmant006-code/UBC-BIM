@@ -1,6 +1,6 @@
 /*
   ServicesDetail: the full write-up for one of the site's 8 service
-  categories (window.UBC_DATA.serviceArticles). This is the client's own
+  categories (UBC_DATA.serviceArticles). This is the client's own
   real copy — see the comment above that array in data.js for exactly what
   editing was and wasn't done to it.
 
@@ -10,9 +10,11 @@
   the Modeling and detailing tab's own Wall panels/Truss panels dropdown)
   and hands this component whichever article is currently selected.
 */
-function ServicesDetail({ article, onQuote }) {
-  const { Button, Tag } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, Reveal } = window;
+import { Button } from '../../components/core/Button.jsx';
+import { Tag } from '../../components/core/Tag.jsx';
+import { Page, Section, Reveal } from './shared.jsx';
+
+export function ServicesDetail({ article, onQuote }) {
   const a = article;
   if (!a) return null;
 
@@ -81,4 +83,3 @@ function ServicesDetail({ article, onQuote }) {
     </Section>
   );
 }
-Object.assign(window, { ServicesDetail });

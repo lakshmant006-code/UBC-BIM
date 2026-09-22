@@ -1,8 +1,14 @@
+'use client';
+import React from 'react';
+import { Button } from '../../components/core/Button.jsx';
+import { Stat } from '../../components/core/Stat.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { SectionHeading } from '../../components/core/SectionHeading.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section, Reveal, AnimatedNumber } from './shared.jsx';
 
-function About() {
-  const { Button, SectionHeading, Stat, Icon, Tag } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, Reveal } = window;
-  const D = window.UBC_DATA;
+export function About() {
+  const D = UBC_DATA;
   const [drawn, setDrawn] = React.useState(false);
   const ref = React.useRef(null);
   React.useEffect(() => {
@@ -79,4 +85,3 @@ function About() {
     </div>
   );
 }
-Object.assign(window, { About });

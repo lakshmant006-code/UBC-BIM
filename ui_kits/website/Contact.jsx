@@ -1,7 +1,22 @@
+'use client';
+import React from 'react';
+import { Button } from '../../components/core/Button.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { SectionHeading } from '../../components/core/SectionHeading.jsx';
+import { FormField } from '../../components/forms/FormField.jsx';
+import { Input } from '../../components/forms/Input.jsx';
+import { Textarea } from '../../components/forms/Textarea.jsx';
+import { Select } from '../../components/forms/Select.jsx';
+import { Checkbox } from '../../components/forms/Checkbox.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section } from './shared.jsx';
+import { ContactScene } from './ContactScene.jsx';
+import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
-function Contact({ onQuote }) {
-  const { Button, SectionHeading, Icon, FormField, Input, Textarea, Select, Checkbox, Tag } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, ContactScene } = window;
+export function Contact() {
+  // Was a prop from the old single-page App() component; now reached
+  // through the quote-drawer context every page uses.
+  const onQuote = useQuoteDrawer();
   const [rung, setRung] = React.useState(false);
   const [sent, setSent] = React.useState(false);
   // Which contact route the scroll scene last pointed at. It scrolls that card
@@ -20,7 +35,7 @@ function Contact({ onQuote }) {
   };
   return (
     <div>
-      {ContactScene && <ContactScene onRoute={goRoute} onQuote={onQuote} />}
+      <ContactScene onRoute={goRoute} onQuote={onQuote} />
       <Page style={{ paddingTop: 'var(--s-9)' }}>
         <SectionHeading eyebrow="Contact us" title="Ring the bell" size="lg"
           standfirst="Press the bell and pick how you want to reach us. Every route lands in our CRM, tagged with where it came from." />
@@ -86,7 +101,7 @@ function Contact({ onQuote }) {
                     <FormField label="Name" required><Input placeholder="Your name" required /></FormField>
                     <FormField label="Work email" required><Input type="email" placeholder="you@company.com" required /></FormField>
                     <FormField label="Building type"><Select placeholder="Select building type" options={['Residential', 'Commercial', 'Multifamily', 'Light-gauge steel', 'Wood']} /></FormField>
-                    <FormField label="Service"><Select placeholder="Select a service" options={window.UBC_DATA.services.map((s) => s.title)} /></FormField>
+                    <FormField label="Service"><Select placeholder="Select a service" options={UBC_DATA.services.map((s) => s.title)} /></FormField>
                     <FormField label="What you need modelled" style={{ gridColumn: '1 / -1' }}>
                       <Textarea rows={3} placeholder="Building type, square footage, what you need modelled." />
                     </FormField>
@@ -104,4 +119,3 @@ function Contact({ onQuote }) {
     </div>
   );
 }
-Object.assign(window, { Contact });

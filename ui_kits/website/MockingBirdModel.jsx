@@ -1,10 +1,11 @@
+'use client';
 /*
   MockingBirdModel: the site's "Services" page. One tab strip pinned at the
   very top of the page (every one of the 6 service categories), and the
   content beneath it swaps to match whichever tab is active — no separate
   route, no popup. (Project management and training services were dropped
   from this list entirely, per feedback on the live page — not hidden, not
-  marked pending, just removed from window.UBC_DATA.serviceArticles.)
+  marked pending, just removed from UBC_DATA.serviceArticles.)
 
   Five of the six tabs show that category's own write-up (ServicesDetail
   .jsx, one article at a time — it owns no tabs of its own any more, just
@@ -15,7 +16,7 @@
   sub-items, Wall panels and Truss panels. Clicking the "Modeling and
   detailing" label itself, same as any other tab, shows its write-up.
   Clicking "Wall panels" instead shows a dedicated, panel-scale model —
-  window.UBC_DATA.wallPanelModel, a real IFC supplied specifically for this
+  UBC_DATA.wallPanelModel, a real IFC supplied specifically for this
   view rather than a crop of the whole-building Mocking Bird Lot 2 model —
   full-bleed, locked to hotspot-driven navigation rather than free orbit,
   resting on a wide shot from the hold-down's own side (restAngle — the
@@ -39,10 +40,17 @@
   back to the resting frame. `bare` drops every bit of
   caption/hint/Reset-view chrome — just the model.
 
-  Reads wallPanelModel and its articles from window.UBC_DATA.serviceArticles
+  Reads wallPanelModel and its articles from UBC_DATA.serviceArticles
   straight out of data.js rather than hardcoding either, so a future model
   or article-content swap only ever has to happen in one place.
 */
+import React from 'react';
+import { Icon } from '../../components/core/Icon.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section } from './shared.jsx';
+import { ModelViewer } from './ModelViewer.jsx';
+import { ServicesDetail } from './ServicesDetail.jsx';
+import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
 // Which top-level tabs carry their own dropdown, and what's in it. Only
 // Modeling and detailing has one today; a future category gaining its own
@@ -60,8 +68,6 @@ const SERVICE_SUB_TABS = {
 // FilterBar itself, since FilterBar only knows a flat list of labels — this
 // bar also has to carry the one tab with a dropdown hanging off it.
 function ServiceTabs({ articles, selection, onSelectArticle, onSelectSub }) {
-  const { Icon } = window.UBCBIMDesignSystem_353af8;
-  const { Page } = window;
   const [openId, setOpenId] = React.useState(null);
   const closeTimer = React.useRef(null);
   const openNow = (id) => { if (closeTimer.current) window.clearTimeout(closeTimer.current); setOpenId(id); };
@@ -135,7 +141,6 @@ function ServiceTabs({ articles, selection, onSelectArticle, onSelectSub }) {
 // (same idea as HotspotCard's own `pending` fallback below) rather than
 // standing in Wall panels' model or inventing copy for it.
 function TrussPanelsPending() {
-  const { Page, Section } = window;
   return (
     <Section>
       <Page>
@@ -153,7 +158,6 @@ function TrussPanelsPending() {
 }
 
 function HotspotCard({ hotspot, onClose }) {
-  const { Icon } = window.UBCBIMDesignSystem_353af8;
   return (
     <div role="dialog" aria-label={hotspot.label} style={{
       position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 60,
@@ -201,7 +205,6 @@ function HotspotCard({ hotspot, onClose }) {
 // frame they actually want to see rather than trusting the page's own
 // reasoned-but-unrendered restAngle numbers.
 function FreeRotateToggle({ on, onToggle }) {
-  const { Icon } = window.UBCBIMDesignSystem_353af8;
   return (
     <button onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{
       position: 'fixed', right: 'var(--gutter)', top: 'calc(84px + var(--s-5))', zIndex: 55,
@@ -222,8 +225,11 @@ function FreeRotateToggle({ on, onToggle }) {
 // tighter than a whole-building model's own hotspot zoom would be.
 const HOTSPOT_ZOOM_RADIUS = 0.8;
 
-function MockingBirdModel({ onQuote }) {
-  const D = window.UBC_DATA;
+export function MockingBirdModel() {
+  // Was a prop from the old single-page App() component; now reached
+  // through the quote-drawer context every page uses.
+  const onQuote = useQuoteDrawer();
+  const D = UBC_DATA;
   const wallPanel = D.wallPanelModel;
   const articles = D.serviceArticles || [];
   const [selection, setSelection] = React.useState({ type: 'article', id: (articles[0] && articles[0].id) || null });
@@ -235,7 +241,7 @@ function MockingBirdModel({ onQuote }) {
   // whoever's checking the framing) can switch this on to drag/scroll the
   // model freely and see the real thing rather than trusting the math.
   const [freeRotate, setFreeRotate] = React.useState(false);
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Leaving the Wall panels view tears down that ModelViewer instance;
   // clear its stale api/open-card/free-rotate state so returning to it
@@ -292,23 +298,22 @@ function MockingBirdModel({ onQuote }) {
         onSelectSub={(parentId, subId) => setSelection({ type: subId, parentId })} />
 
       {selection.type === 'wall-panels' ? (
-        wallPanel && window.ModelViewer ? (
+        wallPanel ? (
           <>
-            <window.ModelViewer src={wallPanel.src} radius={wallPanel.radius}
+            <ModelViewer src={wallPanel.src} radius={wallPanel.radius}
               height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={wallPanel.restAngle}
               hotspots={wallPanel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
             <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
             {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
           </>
         ) : (
-          <window.Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></window.Page>
+          <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
         )
       ) : selection.type === 'truss-panels' ? (
         <TrussPanelsPending />
       ) : (
-        activeArticle && window.ServicesDetail && <window.ServicesDetail article={activeArticle} onQuote={onQuote} />
+        activeArticle && <ServicesDetail article={activeArticle} onQuote={onQuote} />
       )}
     </div>
   );
 }
-Object.assign(window, { MockingBirdModel });

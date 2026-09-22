@@ -1,16 +1,22 @@
+'use client';
+/*
+  Quick-answers panel behind the header/StickyQuote "Quick answers" button
+  (message-square icon). Predefined questions only — there's no backend
+  here to answer anything open-ended, so this doesn't pretend to be a live
+  agent or a real AI: the greeting says so up front, and every answer comes
+  straight from data.js's `faq` array, itself paraphrased from data already
+  on the site rather than invented for the bot. Panel opens/closes with a
+  plain opacity+translateY fade (no bounce/scale), matching the "long, slow,
+  single-axis" motion rule the rest of the site's entrances use.
+*/
+import React from 'react';
+import { Button } from '../../components/core/Button.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { UBC_DATA } from './data.js';
 
-// Quick-answers panel behind the header/StickyQuote "Quick answers" button
-// (message-square icon). Predefined questions only — there's no backend
-// here to answer anything open-ended, so this doesn't pretend to be a live
-// agent or a real AI: the greeting says so up front, and every answer comes
-// straight from data.js's `faq` array, itself paraphrased from data already
-// on the site rather than invented for the bot. Panel opens/closes with a
-// plain opacity+translateY fade (no bounce/scale), matching the "long, slow,
-// single-axis" motion rule the rest of the site's entrances use.
-function ChatBot({ open, onClose, onQuote }) {
-  const { Button, Icon } = window.UBCBIMDesignSystem_353af8;
-  const D = window.UBC_DATA;
-  const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+export function ChatBot({ open, onClose, onQuote }) {
+  const D = UBC_DATA;
+  const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [shown, setShown] = React.useState(false);
   const [asked, setAsked] = React.useState([]);
   const scrollRef = React.useRef(null);
@@ -83,4 +89,3 @@ function ChatBot({ open, onClose, onQuote }) {
     </div>
   );
 }
-Object.assign(window, { ChatBot });

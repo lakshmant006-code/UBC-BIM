@@ -1,4 +1,6 @@
+'use client';
 import React from 'react';
+import Link from 'next/link';
 import { Wordmark } from '../core/Wordmark.jsx';
 import { Button } from '../core/Button.jsx';
 import { Icon } from '../core/Icon.jsx';
@@ -11,6 +13,11 @@ const NAV = [
   { label: 'Contact', id: 'contact' }
 ];
 const SOCIAL = ['linkedin', 'youtube', 'message-circle'];
+
+// A nav item's `id` (services/projects/about/careers/blogs/contact) doubles
+// as its real route segment now that every page has a real URL — 'home' is
+// the one exception, for the logo link back to '/'.
+const idToHref = (id) => (id === 'home' ? '/' : '/' + id);
 
 export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, style, ...rest }) {
   const [hover, setHover] = React.useState(null);
@@ -29,23 +36,21 @@ export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, sty
         height: scrolled ? 64 : 76, display: 'flex', alignItems: 'center', gap: 'var(--s-7)',
         transition: 'height var(--dur-2) var(--ease-out)'
       }}>
-        <a href="#" onClick={(e) => { e.preventDefault(); onNavigate && onNavigate('home'); }}
-           style={{ borderBottom: 'none', display: 'flex' }}>
+        <Link href="/" style={{ borderBottom: 'none', display: 'flex' }}>
           <Wordmark size={21} />
-        </a>
+        </Link>
         <nav style={{ display: 'flex', gap: 'var(--s-6)', marginLeft: 'var(--s-4)' }}>
           {items.map((it) => {
             const on = active === it.id;
             return (
-              <a key={it.id} href={'#' + it.id}
-                 onClick={(e) => { e.preventDefault(); onNavigate && onNavigate(it.id); }}
+              <Link key={it.id} href={idToHref(it.id)}
                  onMouseEnter={() => setHover(it.id)} onMouseLeave={() => setHover(null)}
                  style={{
                    fontSize: 'var(--fs-body-sm)', fontWeight: 'var(--fw-medium)',
                    color: on ? 'var(--text-strong)' : (hover === it.id ? 'var(--accent)' : 'var(--text-muted)'),
                    paddingBottom: 4, borderBottom: 'var(--bw-2) solid ' + (on ? 'var(--accent)' : 'transparent'),
                    transition: 'var(--t-hover)'
-                 }}>{it.label}</a>
+                 }}>{it.label}</Link>
             );
           })}
         </nav>

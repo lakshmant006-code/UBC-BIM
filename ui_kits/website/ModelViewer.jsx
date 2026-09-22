@@ -1,3 +1,4 @@
+'use client';
 /*
   ModelViewer: a live, orbitable 3D model. Drag to rotate, scroll or pinch to
   zoom, right-drag or two-finger drag to pan. This is the model itself on
@@ -7,15 +8,18 @@
 
   The models are authored as IFC and converted once by tools/ifc_to_glb.py, so
   the browser loads one glTF binary instead of parsing megabytes of IFC through
-  a WASM kernel. three.js is fetched only when a viewer actually mounts, so the
-  rest of the site never pays for it.
+  a WASM kernel. three.js itself ships as a real npm dependency now (see
+  package.json); only the WebGL context/scene/GLB are still deferred until a
+  viewer actually mounts, so a grid of these costs nothing until the visitor
+  scrolls to it.
 
-  Mounting is lazy: nothing (not three.js, not the GLB) loads until the viewer
-  scrolls near the viewport, so a grid of these costs nothing until the visitor
-  scrolls to it. Once mounted it stays mounted (re-loading the model every
-  time a card scrolls in and out would be worse than the cost of keeping it),
-  but the render loop pauses while off-screen, so an unattended grid of
-  viewers does not spend GPU time on cards nobody is looking at.
+  Mounting is lazy: nothing (not the WebGL context, not the GLB) loads until
+  the viewer scrolls near the viewport, so a grid of these costs nothing
+  until the visitor scrolls to it. Once mounted it stays mounted (re-loading
+  the model every time a card scrolls in and out would be worse than the
+  cost of keeping it), but the render loop pauses while off-screen, so an
+  unattended grid of viewers does not spend GPU time on cards nobody is
+  looking at.
 
   Props:
     src      GLB url
@@ -35,37 +39,11 @@
              own flyTo/reset calls (MockingBirdModel.jsx, for a guided,
              hotspot-driven view rather than a free-roam one).
 */
-
-// three r147 is the last release that ships the plain-script builds, which is
-// what a no-build-step page can use. Loaded once and shared by every viewer.
-const THREE_SRC = [
-  'https://unpkg.com/three@0.147.0/build/three.min.js',
-  'https://unpkg.com/three@0.147.0/examples/js/controls/OrbitControls.js',
-  'https://unpkg.com/three@0.147.0/examples/js/loaders/GLTFLoader.js'
-];
-
-function loadScriptOnce(src) {
-  loadScriptOnce._m = loadScriptOnce._m || {};
-  if (loadScriptOnce._m[src]) return loadScriptOnce._m[src];
-  loadScriptOnce._m[src] = new Promise((res, rej) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.async = false;             // keep the three -> examples order
-    s.onload = res;
-    s.onerror = () => rej(new Error('could not load ' + src));
-    document.head.appendChild(s);
-  });
-  return loadScriptOnce._m[src];
-}
-
-// The examples builds attach themselves to window.THREE, so they must run in
-// order and after the core build.
-function loadThree() {
-  if (loadThree._p) return loadThree._p;
-  loadThree._p = THREE_SRC.reduce((p, s) => p.then(() => loadScriptOnce(s)), Promise.resolve())
-    .then(() => window.THREE);
-  return loadThree._p;
-}
+import React from 'react';
+import anime from 'animejs';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // A handful of the source IFC/BIM exports carry a software-default
 // visualization colour on their structural steel members rather than what
@@ -118,7 +96,7 @@ function makeSteelMaterial(THREE) {
     clearcoat: 0.35, clearcoatRoughness: 0.25, envMapIntensity: 1.1
   });
 }
-function applySteelMaterials(THREE, root) {
+export function applySteelMaterials(THREE, root) {
   root.traverse((o) => {
     if (!o.isMesh || !o.material) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
@@ -148,7 +126,7 @@ function applySteelMaterials(THREE, root) {
 // SceneHero mount stands up its own renderer and its own context, so a
 // texture built for one is invalid (renders black) handed to another. The
 // caller owns the returned render target and must dispose() it on cleanup.
-function buildStudioEnvironment(THREE, renderer) {
+export function buildStudioEnvironment(THREE, renderer) {
   const pmrem = new THREE.PMREMGenerator(renderer);
 
   // A metal this close to pure metalness has no diffuse term at all: it is
@@ -186,7 +164,7 @@ function buildStudioEnvironment(THREE, renderer) {
 // technical gridlines. THREE.ShadowMaterial is transparent everywhere except
 // where a shadow actually falls, so the paper scene.background shows through
 // as the floor itself and only the cast shadow darkens it.
-function makeGroundShadow(THREE, R) {
+export function makeGroundShadow(THREE, R) {
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(R * 12, R * 12), new THREE.ShadowMaterial({ opacity: 0.22 }));
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
@@ -199,18 +177,18 @@ function makeGroundShadow(THREE, R) {
 // laid out over a 3D canvas, not a normal page flow). Animates the
 // standalone CSS `scale` property rather than `transform`, so it never
 // collides with React's own inline style writes on every re-render.
-function bounceHandlers(ref) {
+export function bounceHandlers(ref) {
   const play = (keyframes, duration) => {
     const el = ref.current;
-    if (!el || typeof window.anime !== 'function') return;
-    if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    window.anime.remove(el);
-    window.anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)', complete: () => { el.style.scale = ''; } });
+    if (!el) return;
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    anime.remove(el);
+    anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)', complete: () => { el.style.scale = ''; } });
   };
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }
 
-function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady }) {
+export function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -261,8 +239,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
     setState('loading');
     setPct(0);
 
-    loadThree().then((THREE) => {
-      if (dead) return;
+    try {
       const host = hostRef.current;
       if (!host) return;
 
@@ -331,7 +308,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
 
       scene.add(makeGroundShadow(THREE, R));
 
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
       controls.minDistance = R * 0.25;
@@ -424,7 +401,7 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         : null;
       if (vio) vio.observe(host); else visibleRef.current = true;
 
-      const loader = new THREE.GLTFLoader();
+      const loader = new GLTFLoader();
       loader.load(src, (gltf) => {
         if (dead) return;
         // The converter already recentred and rotated the model, so it drops
@@ -484,7 +461,9 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
         rendererRef.current = null;
         if (onReady) onReady(null);
       };
-    }).catch(() => { if (!dead) setState('error'); });
+    } catch (err) {
+      if (!dead) setState('error');
+    }
 
     return () => { dead = true; cleanup(); };
     // onReady deliberately left out: it is a fresh arrow function on every
@@ -588,4 +567,3 @@ function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, 
   );
 }
 
-Object.assign(window, { ModelViewer });
