@@ -1,28 +1,24 @@
 'use client';
 /*
-  SceneHero: a white-studio, cinematic hero. Scroll moves a live camera through the
+  SceneHero: a white-studio, cinematic hero. The camera holds one fixed,
+  wide establishing shot (the first configured stage position, if any); the
   Mocking Bird Lot 2 light-gauge steel frame (assets/models/mocking-bird-lot-2.glb,
-  rendered with three.js): as you scroll, the ANGLE changes, from a wide aerial, along the
-  column grid, up into the roof beams, in among the bays, out to a full
-  reveal. This is the model rendered live, not a pre-shot video: there is no
-  frame sequence, no <video> element, nothing to re-record if the model
-  changes. The camera's path between stages rides a Catmull-Rom curve
-  through all five stage positions (see camCurve below), not a straight
-  line segment-by-segment, so scrolling through it reads as one continuous,
-  smooth flight rather than a series of kinks at each stage.
-
-  An intro headline shows first and fades out; then the STAGE captions + a
-  numbered rail track the scroll, same as they did over the old frame
-  sequence. Four glassmorphic info cards appear one per stage, each one
-  roughly a fifth of the scroll (the "flash card" pacing), and link
-  somewhere real on the site.
+  rendered with three.js) does the moving instead — it hovers just above the
+  ground shadow and continuously revolves 360° around its own vertical axis,
+  anchored through its own base centre (recentred on load), like a product
+  on a slowly turning, slightly levitating platform. Scroll no longer drives
+  the camera or the model; it still drives the STAGE captions, numbered
+  rail and glassmorphic info cards below (four, one per stage, roughly a
+  fifth of the scroll each), same as before.
 
   Uses the same three.js helpers ModelViewer.jsx exports (studio environment,
   ground shadow, steel recolouring) so the hero and the pages it links to
   read as one system.
 
   Config: UBC_DATA.hero: model { src, radius }, stages
-  [{ n, t, title, note, pos: [x,y,z] }], cards [{ t0, t1, side, ... }].
+  [{ n, t, title, note, pos: [x,y,z] }] (pos, if present on stage 0, sets the
+  fixed camera framing; other stages' pos is unused now), cards [{ t0, t1,
+  side, ... }].
 */
 import React from 'react';
 import * as THREE from 'three';
@@ -81,8 +77,6 @@ export function SceneHero({ onQuote, onGo }) {
   const hostRef = React.useRef(null);
   const canvasHolderRef = React.useRef(null);
   const ctaRef = React.useRef(null);
-  const targetRef = React.useRef(0);       // scroll progress 0..1
-  const smoothRef = React.useRef(0);       // eased progress driving the camera
   const visibleRef = React.useRef(true);
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
@@ -102,7 +96,6 @@ export function SceneHero({ onQuote, onGo }) {
       const total = r.height - window.innerHeight;
       if (total <= 0) return;
       const p = Math.min(1, Math.max(0, -r.top / total));
-      targetRef.current = p;
       setProgress(p);
       let s = 0;
       for (let i = 0; i < HERO_STAGES.length; i++) { if (p >= (HERO_STAGES[i].t || 0) - 0.0001) s = i; }
@@ -131,17 +124,14 @@ export function SceneHero({ onQuote, onGo }) {
       scene.background = new THREE.Color(0xffffff);   // --paper: a white studio sweep, not the old dark stage
 
       const camera = new THREE.PerspectiveCamera(42, 1, R / 200, R * 80);
-      const stagePos = HERO_STAGES.map((s) => new THREE.Vector3(...(s.pos || [R * 1.6, R * 1.2, R * 1.9])));
-      // A Catmull-Rom curve through all five stage positions, not just a
-      // straight line between whichever pair is current: cameraAt below
-      // still walks the exact same per-stage timing (the t breakpoints),
-      // but samples a point off this curve instead of lerping, so the
-      // camera glides through each waypoint on a continuous, rounded path
-      // rather than visibly changing direction in a straight-line kink at
-      // every stage. THREE.CatmullRomCurve3 is core three.js (bundled in
-      // three.min.js), not an examples/ addon, so no extra script needed.
-      const camCurve = stagePos.length > 2 ? new THREE.CatmullRomCurve3(stagePos, false, 'catmullrom', 0.5) : null;
-      camera.position.copy(stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9));
+      // Fixed establishing shot — the model does the moving now, not the
+      // camera. Reuses stage 0's own configured position (the original
+      // "wide aerial" framing) if the data has one, rather than inventing
+      // a new angle from scratch.
+      const camPos = (HERO_STAGES[0] && HERO_STAGES[0].pos)
+        ? new THREE.Vector3(...HERO_STAGES[0].pos)
+        : new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
+      camera.position.copy(camPos);
       camera.lookAt(0, 0, 0);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -205,31 +195,31 @@ export function SceneHero({ onQuote, onGo }) {
         : null;
       if (vio) vio.observe(host); else visibleRef.current = true;
 
-      // Find which pair of stage keyframes the (eased) scroll position falls
-      // between, and how far along that pair: the same "index by t" search
-      // the numbered rail uses. With camCurve available, i + local becomes
-      // one continuous parameter along the whole curve (0 at stage 0, 1 at
-      // the last stage) rather than a per-segment straight-line lerp, so
-      // the exact same per-stage timing now walks a smooth path instead of
-      // a piecewise-linear one.
-      const cameraAt = (p) => {
-        if (stagePos.length < 2) return stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
-        let i = 0;
-        for (; i < HERO_STAGES.length - 2; i++) if (p < (HERO_STAGES[i + 1].t || 0)) break;
-        const t0 = HERO_STAGES[i].t || 0, t1 = HERO_STAGES[i + 1].t || 1;
-        const local = t1 > t0 ? Math.min(1, Math.max(0, (p - t0) / (t1 - t0))) : 0;
-        if (!camCurve) return new THREE.Vector3().lerpVectors(stagePos[i], stagePos[i + 1], local);
-        const u = Math.min(1, Math.max(0, (i + local) / (stagePos.length - 1)));
-        return camCurve.getPoint(u);
-      };
+      // Levitate + revolve, in place of the old scroll-driven camera fly-
+      // through: a slow 360° spin around the model's own vertical
+      // centreline (recentred on load, see below) plus a gentle sinusoidal
+      // hover, both driven by elapsed time rather than scroll position.
+      // One full revolution every ~22s — a deliberate, unhurried turntable
+      // pace, not a demo-reel spin. Reduced-motion holds the model still.
+      const ROTATE_PERIOD = 22;
+      const BOB_PERIOD = 4.5;
+      const BOB_AMPLITUDE = R * 0.02;
+      const HOVER_GAP = R * 0.05;
+      let modelGroup = null;
+      let baseY = 0;
+      let elapsed = 0;
+      const clock = new THREE.Clock();
 
       let raf = 0;
       const tick = () => {
         if (visibleRef.current) {
-          const t = targetRef.current;
-          smoothRef.current = reduce ? t : smoothRef.current + (t - smoothRef.current) * 0.08;
-          camera.position.copy(cameraAt(smoothRef.current));
-          camera.lookAt(0, 0, 0);
+          if (modelGroup && !reduce) {
+            elapsed += clock.getDelta();
+            modelGroup.rotation.y = (elapsed / ROTATE_PERIOD) * Math.PI * 2;
+            modelGroup.position.y = baseY + Math.sin((elapsed / BOB_PERIOD) * Math.PI * 2) * BOB_AMPLITUDE;
+          } else {
+            clock.getDelta();
+          }
           renderer.render(scene, camera);
         }
         raf = requestAnimationFrame(tick);
@@ -240,10 +230,21 @@ export function SceneHero({ onQuote, onGo }) {
       loader.load(M.src, (gltf) => {
         if (dead) return;
         const box = new THREE.Box3().setFromObject(gltf.scene);
+        const center = box.getCenter(new THREE.Vector3());
+        // Recentre the model's own footprint onto the world's vertical
+        // axis and rest its base on the ground plane, so the continuous
+        // spin below turns around the model's own centreline (anchored at
+        // its bottom) rather than wherever its source geometry happened to
+        // sit.
+        gltf.scene.position.x -= center.x;
+        gltf.scene.position.z -= center.z;
         gltf.scene.position.y -= box.min.y;
+        baseY = gltf.scene.position.y + HOVER_GAP;
+        gltf.scene.position.y = baseY;
         applySteelMaterials(THREE, gltf.scene);
         gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
         scene.add(gltf.scene);
+        modelGroup = gltf.scene;
         setReady(true);
       }, (evt) => {
         // This model is the one asset on the site heavy enough (44 MB) that
