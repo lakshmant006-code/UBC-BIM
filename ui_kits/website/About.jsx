@@ -43,7 +43,7 @@ import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 const D = UBC_DATA;
 
 const eyebrowStyle = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
-const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.05, letterSpacing: '-0.01em', color: 'var(--text-strong)' };
+const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)' };
 
 // ---------------------------------------------------------------------
 // HERO — exact copy from the brief.

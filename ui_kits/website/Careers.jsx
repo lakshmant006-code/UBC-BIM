@@ -51,9 +51,9 @@ export function Careers() {
                 boxShadow: 'var(--shadow-3)'
               }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', opacity: .72 }}>Hire me</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 6vw, 26px)', fontWeight: 'var(--fw-bold)', letterSpacing: '-.03em', marginTop: 'var(--s-3)', lineHeight: 1.1 }}>UBC BIM</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 6vw, 26px)', fontWeight: 'var(--fw-bold)', letterSpacing: '0.12em', marginTop: 'var(--s-3)', lineHeight: 1.5 }}>UBC BIM</div>
                 <div style={{ height: 1, background: 'currentColor', opacity: .3, margin: 'var(--s-4) 0' }} />
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '.06em', opacity: .8 }}>Wood · LGS · MEP</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.12em', opacity: .8 }}>Wood · LGS · MEP</div>
               </div>
             </div>
           </div>
