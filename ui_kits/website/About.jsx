@@ -50,16 +50,16 @@ const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1
 // ---------------------------------------------------------------------
 function AboutHero({ onQuote }) {
   return (
-    <Page style={{ paddingTop: 'var(--s-9)', textAlign: 'center', maxWidth: 860, marginLeft: 'auto', marginRight: 'auto' }}>
+    <Page style={{ paddingTop: 'var(--s-9)', textAlign: 'center', maxWidth: 1080, marginLeft: 'auto', marginRight: 'auto' }}>
       <Reveal>
         <div style={{ ...eyebrowStyle, display: 'inline-block' }}>About UBC BIM</div>
         <h1 style={{ ...serifH, fontSize: 'clamp(36px, 5.2vw, 64px)', margin: 'var(--s-4) 0 0' }}>
           Engineering Collaboration Behind Every Coordinated Model
         </h1>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-5) auto 0', maxWidth: '68ch' }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-hero-text) auto 0', maxWidth: '68ch' }}>
           UBC BIM is a technical services partner for CFS, LGSF, and wood-framed projects. Our project coordinators, BIM specialists, detailers, structural engineers, and quality reviewers work within one controlled process to turn project requirements into coordinated models and construction documentation.
         </p>
-        <div style={{ display: 'flex', gap: 'var(--s-4)', justifyContent: 'center', flexWrap: 'wrap', marginTop: 'var(--s-7)' }}>
+        <div style={{ display: 'flex', gap: 'var(--s-4)', justifyContent: 'center', flexWrap: 'wrap', marginTop: 'var(--space-text-cta)' }}>
           <a href="#how-we-work-together" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', background: 'transparent', border: 'var(--bw-1) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '14px 28px', textDecoration: 'none' }}>
             See How We Work
           </a>
@@ -351,7 +351,7 @@ function TeamBehindModel() {
             Named team members and approved photography go here once available.
           </p>
         </Reveal>
-        <div className="ubc-team-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-team-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--space-head-content)' }}>
           {DISCIPLINES.map((d, i) => (
             <Reveal key={d.title} delay={i * 60}>
               <div style={{ padding: 'var(--s-5)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
@@ -408,7 +408,7 @@ function WhatClientsReceive() {
           <div style={{ ...eyebrowStyle, display: 'inline-block' }}>What clients receive</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Coordinated technical deliverables</h2>
         </Reveal>
-        <div className="ubc-deliverables-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-4)', marginTop: 'var(--s-8)' }}>
+        <div className="ubc-deliverables-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {DELIVERABLES.map((d, i) => (
             <Reveal key={d} delay={(i % 4) * 60}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', padding: 'var(--s-4) var(--s-5)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
@@ -442,13 +442,13 @@ function QualityAccountability() {
           <div style={{ ...eyebrowStyle, display: 'inline-block' }}>Quality and accountability</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Checked before it ever reaches you</h2>
         </Reveal>
-        <div className="ubc-qa-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-qa-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {QA_ITEMS.map((q, i) => (
             <Reveal key={q.title} delay={(i % 3) * 70}>
-              <div style={{ padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
+              <div style={{ padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
                 <Icon name={q.icon} size={20} style={{ color: 'var(--accent)' }} />
                 <div style={{ ...serifH, fontSize: 'var(--fs-h4)', marginTop: 'var(--s-3)' }}>{q.title}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', marginTop: 'var(--s-2)' }}>{q.body}</p>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', marginTop: 'var(--space-title-text)' }}>{q.body}</p>
               </div>
             </Reveal>
           ))}
@@ -481,7 +481,7 @@ function CompanyProof() {
           <div style={{ ...eyebrowStyle, display: 'inline-block' }}>Company proof</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Verified figures, not claims</h2>
         </Reveal>
-        <div className="ubc-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-8)' }}>
+        <div className="ubc-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 70}>
               <Stat value={<AnimatedNumber value={s.value} />} label={s.label} unit={s.unit} />
@@ -492,12 +492,12 @@ function CompanyProof() {
           ))}
         </div>
         {cap && (
-          <Reveal delay={140} style={{ marginTop: 'var(--s-9)' }}>
+          <Reveal delay={140} style={{ marginTop: 'var(--space-head-content)' }}>
             <div style={{ ...eyebrowStyle, textAlign: 'center', marginBottom: 'var(--s-2)' }}>Software and machine capability</div>
             <CapabilityMatrix columns={cap.columns} rows={cap.rows} />
           </Reveal>
         )}
-        <Reveal delay={200} style={{ textAlign: 'center', marginTop: 'var(--s-8)' }}>
+        <Reveal delay={200} style={{ textAlign: 'center', marginTop: 'var(--space-head-content)' }}>
           <div style={eyebrowStyle}>Memberships and certifications</div>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-2) 0 0' }}>
             Listed here once issued.

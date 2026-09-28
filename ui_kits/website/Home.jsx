@@ -133,13 +133,13 @@ function ServicesOverview({ onGo }) {
           </div>
           <button onClick={() => onGo && onGo('services')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All services <Icon name="arrow-right" size={15} /></button>
         </Reveal>
-        <div className="ubc-svc-overview-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-svc-overview-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {services.map((s, i) => (
             <Reveal key={s.n} delay={(i % 3) * 70}>
-              <button onClick={() => onGo && onGo('services')} style={{ display: 'block', width: '100%', textAlign: 'left', padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', cursor: 'pointer' }}>
+              <button onClick={() => onGo && onGo('services')} style={{ display: 'block', width: '100%', textAlign: 'left', padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', cursor: 'pointer' }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{s.n}</div>
                 <div style={{ ...serifH, fontSize: 'var(--fs-h3)', margin: 'var(--s-2) 0 0' }}>{s.title}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{s.body}</p>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
               </button>
             </Reveal>
           ))}
@@ -161,12 +161,12 @@ function HowWeWork() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>How we work</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>From what you send to what ships</h2>
         </Reveal>
-        <div className="ubc-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {HWW.map((step, i) => (
             <Reveal key={step.n} delay={i * 60}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{step.n}</div>
               <div style={{ ...serifH, fontSize: 'var(--fs-h3)', margin: 'var(--s-2) 0 0' }}>{step.title}</div>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{step.body}</p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{step.body}</p>
             </Reveal>
           ))}
         </div>
@@ -264,7 +264,7 @@ function BeforeAfterSlider() {
   return (
     <Section>
       <Page>
-        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)', gap: 'var(--s-9)', alignItems: 'center' }}>
+        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)', gap: 'var(--space-split)', alignItems: 'center' }}>
           <Reveal>
             {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
             {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
@@ -322,7 +322,7 @@ function ProjectsGrid({ onGo }) {
           </div>
           <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
         </Reveal>
-        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--space-head-content)' }}>
           {D.projects.map((p, i) => (
             <Reveal key={p.id} delay={(i % 2) * 80}>
               <div style={{ display: 'block' }}>
@@ -386,12 +386,12 @@ function WhyUBC() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>Why UBC</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What one coordinated model actually buys you</h2>
         </Reveal>
-        <div className="ubc-why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-7)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {WHY.map((w, i) => (
             <Reveal key={w.title} delay={(i % 3) * 70}>
-              <div style={{ padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
+              <div style={{ padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
                 <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{w.title}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{w.body}</p>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{w.body}</p>
               </div>
             </Reveal>
           ))}
@@ -596,7 +596,7 @@ function GlobalPresence() {
   return (
     <Section sunken>
       <Page>
-        <div className="ubc-globe-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 'var(--s-9)', alignItems: 'center' }}>
+        <div className="ubc-globe-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)', gap: 'var(--space-split)', alignItems: 'center' }}>
           <Reveal>
             <div style={{ ...eyebrow, display: 'inline-block' }}>Global reach</div>
             <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>The same process, wherever the drawing ships</h2>
@@ -693,7 +693,7 @@ function VideoTestimonials() {
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Clients, on camera</h2>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>Hover a clip for who's speaking.</p>
         </Reveal>
-        <div className="ubc-video-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-8)' }}>
+        <div className="ubc-video-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {VIDEO_TESTIMONIALS.map((v, i) => (
             <Reveal key={v.id} delay={i * 60}>
               <VideoCard v={v} index={i} />
@@ -718,12 +718,12 @@ function WhoWeServe() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>Who we serve</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Built around who's actually asking</h2>
         </Reveal>
-        <div className="ubc-serve-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-7)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-serve-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {WWS.map((r, i) => (
             <Reveal key={r.role} delay={(i % 3) * 70}>
-              <div style={{ padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
+              <div style={{ padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
                 <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{r.role}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{r.body}</p>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{r.body}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)', marginTop: 'var(--s-4)' }}>
                   {r.serviceIndexes.map((si) => D.services[si] && <Tag key={si}>{D.services[si].title}</Tag>)}
                 </div>
@@ -752,7 +752,7 @@ function CompanyProofTech() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>Technology</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What runs behind the model</h2>
         </Reveal>
-        <Reveal delay={80} style={{ marginTop: 'var(--s-8)' }}>
+        <Reveal delay={80} style={{ marginTop: 'var(--space-head-content)' }}>
           <CapabilityMatrix columns={cap.columns} rows={cap.rows} />
         </Reveal>
         <Reveal delay={140} style={{ textAlign: 'center', marginTop: 'var(--s-7)' }}>
@@ -774,18 +774,18 @@ function FAQSection() {
   if (!faq.length) return null;
   return (
     <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-      <Page style={{ maxWidth: 780, marginLeft: 'auto', marginRight: 'auto' }}>
+      <Page>
         <Reveal style={{ textAlign: 'center' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>FAQ</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Common questions</h2>
         </Reveal>
-        <div style={{ marginTop: 'var(--s-8)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+        <div style={{ marginTop: 'var(--space-head-content)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
           {faq.map((item, i) => {
             const isOpen = open === i;
             return (
               <div key={item.q} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
                 <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--s-4)', padding: 'var(--s-5) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--s-4)', padding: 'var(--space-row-y) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
                   <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)' }}>{item.q}</span>
                   <Icon name={isOpen ? 'minus' : 'plus'} size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                 </button>
@@ -831,18 +831,13 @@ export function Home() {
   const onQuote = useQuoteDrawer();
   const onGo = (id) => router.push(id === 'home' ? '/' : '/' + id);
   return (
-    // Tighter section rhythm than the site-wide default (--section-y/-tight
-    // in tokens/spacing.css), scoped to this page only via CSS custom
-    // property override rather than touching Section itself, which every
-    // other page (About, Blogs, Careers, Contact, Services, Portfolio) also
-    // renders through.
     // Section order follows the Homepage Redesign brief's own numbered list
     // (hero / logos+stats / what-we-do / who-we-serve / 4-stage workflow /
     // services overview / deliverables gallery / case studies / QA &
     // coordination / team & global capability / verified testimonials /
     // FAQ / project-intake form), not the order these sections were
     // originally written in.
-    <div style={{ '--section-y': 'var(--s-8)', '--section-y-tight': 'var(--s-7)' }}>
+    <div>
       <SceneHero onQuote={onQuote} onGo={onGo} />
       <LogoWalls />
       <WhatWeDo />

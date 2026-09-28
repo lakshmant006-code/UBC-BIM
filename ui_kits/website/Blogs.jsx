@@ -68,7 +68,7 @@ function BlogCard({ post, index, onOpen }) {
         )}
         <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--fs-h3)', color: 'var(--text-strong)', lineHeight: 1.5 }}>{post.title}</div>
         {post.excerpt && (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0', flex: 1 }}>{post.excerpt}</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0', flex: 1 }}>{post.excerpt}</p>
         )}
         {post.tags && post.tags.length > 0 && (
           <div style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap', marginTop: 'var(--s-5)' }}>
