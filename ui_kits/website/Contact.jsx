@@ -89,7 +89,7 @@ export function Contact() {
                 ))}
               </div>
               <div style={{ marginTop: 'var(--s-6)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)', padding: 'var(--s-6)', boxShadow: 'var(--shadow-1)' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Request a quote</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Start a project</div>
                 {sent ? (
                   <div style={{ padding: 'var(--s-7) 0', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)' }}>Enquiry received</div>
@@ -107,7 +107,7 @@ export function Contact() {
                     </FormField>
                     <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--s-4)', flexWrap: 'wrap' }}>
                       <Checkbox checked onChange={() => {}} label="Send me the sample Bill of Materials and machine CSV." />
-                      <Button type="submit">Request a quote</Button>
+                      <Button type="submit">Start a Project</Button>
                     </div>
                   </form>
                 )}

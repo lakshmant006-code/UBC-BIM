@@ -12,10 +12,10 @@ export const metadata = {
 
 // Same keyframes index.html's own inline <style> block defined, for the
 // Contact page's bell (ubcRing/ubcPulse), the ChatBot quick-answers caret
-// nobody currently uses (ubcCaret, left as-is for parity), and the two logo
-// / testimonial marquees (ubcMarqueeV/ubcMarqueeH) and hotspot pulse
-// (ubcHotspotPulse) used across Home, Portfolio, MockingBirdModel.
-const KEYFRAMES = `@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}@keyframes ubcCaret{0%,49%{opacity:1}50%,100%{opacity:0}}@keyframes ubcMarqueeV{from{transform:translateY(0)}to{transform:translateY(calc(-100% - var(--ubc-mq-gap)))}}@keyframes ubcMarqueeH{from{transform:translateX(0)}to{transform:translateX(-50%)}}@keyframes ubcHotspotPulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}`;
+// nobody currently uses (ubcCaret, left as-is for parity), the logo
+// carousels (ubcMarqueeH) and hotspot pulse (ubcHotspotPulse) used across
+// Home, Portfolio, MockingBirdModel.
+const KEYFRAMES = `@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}@keyframes ubcCaret{0%,49%{opacity:1}50%,100%{opacity:0}}@keyframes ubcMarqueeH{from{transform:translateX(0)}to{transform:translateX(-50%)}}@keyframes ubcHotspotPulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}`;
 
 // The same ProfessionalService JSON-LD index.html already carried — Phase 1
 // preserves existing schema as-is; adding anything beyond this is Phase 4.

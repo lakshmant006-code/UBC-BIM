@@ -25,10 +25,9 @@ const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1
 // UBC models in, and the roll-forming lines UBC's own machine files run on.
 // Each is a duplicated-content CSS marquee — two copies of the same row
 // back to back, animated by exactly translateX(-50%) (ubcMarqueeH,
-// index.html) — the same technique the Testimonials marquee below already
-// uses vertically, chosen because it loops seamlessly for a mixed-width
-// logo row without pre-computing any distance. Pauses on hover/focus
-// (responsive.css) and holds still under prefers-reduced-motion.
+// app/layout.jsx) — loops seamlessly for a mixed-width logo row without
+// pre-computing any distance. Pauses on hover/focus (responsive.css) and
+// holds still under prefers-reduced-motion.
 function LogoCarousel({ images, reverse, height = 64 }) {
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
@@ -50,6 +49,25 @@ function LogoCarousel({ images, reverse, height = 64 }) {
 }
 
 const LOGOS = D.logos;
+// "Approved client logos and verified statistics" as one combined section
+// (Homepage Redesign brief, position 3): the same real, already-verified
+// figures About.jsx's own stat grid uses (window.UBC_DATA.stats — "Real
+// figures, from ubcbim.com itself"), placed here too rather than only on
+// About, plus the existing real logo carousels below them.
+function StatsRow() {
+  const stats = D.stats;
+  if (!stats || !stats.length) return null;
+  return (
+    <div className="ubc-home-stats" style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 'var(--s-8)', marginBottom: 'var(--s-7)' }}>
+      {stats.map((s) => (
+        <div key={s.label} style={{ textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--fs-h1)', color: 'var(--text-strong)' }}><AnimatedNumber value={s.value} /></div>
+          <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>{s.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 function LogoWalls() {
   if (!LOGOS) return null;
   const strip = (label, images, reverse) => images && images.length > 0 && (
@@ -62,6 +80,7 @@ function LogoWalls() {
     <Section tight>
       <Page>
         <Reveal style={{ textAlign: 'center' }}>
+          <StatsRow />
           <div style={eyebrow}>Trusted by teams across the building industry</div>
         </Reveal>
         <Reveal delay={80}>
@@ -69,6 +88,62 @@ function LogoWalls() {
           {strip('Software we model in', LOGOS.software, true)}
           {strip("Machines our files run on", LOGOS.machine)}
         </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+// "Clear 'What We Do' statement" (Homepage Redesign brief, position 4): the
+// same one-line company description already established site-wide (meta
+// description, JSON-LD in app/layout.jsx) as a proper heading section,
+// rather than new copy invented for this one spot.
+function WhatWeDo() {
+  return (
+    <Section>
+      <Page style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+        <Reveal>
+          <div style={{ ...eyebrow, display: 'inline-block' }}>What we do</div>
+          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>
+            CFS and LGSF (light-gauge steel framing) and wood-frame BIM detailing
+          </h2>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) auto 0', maxWidth: '64ch' }}>
+            Wall panels, roof and floor trusses, MEP coordination, permit sets and machine files — all from one coordinated model, delivered as documentation your team and your line can build from directly.
+          </p>
+        </Reveal>
+      </Page>
+    </Section>
+  );
+}
+
+// "Services overview" (Homepage Redesign brief, position 7): a condensed
+// pass over the same real service rows the Services page details in full
+// (window.UBC_DATA.services), linking out there rather than repeating each
+// one's full write-up here — the brief's own "do not duplicate services in
+// multiple homepage sections" rule.
+function ServicesOverview({ onGo }) {
+  const services = D.services;
+  if (!services || !services.length) return null;
+  return (
+    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+      <Page>
+        <Reveal style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--s-5)' }}>
+          <div>
+            <div style={eyebrow}>Services</div>
+            <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Every discipline, one coordinated model</h2>
+          </div>
+          <button onClick={() => onGo && onGo('services')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All services <Icon name="arrow-right" size={15} /></button>
+        </Reveal>
+        <div className="ubc-svc-overview-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
+          {services.map((s, i) => (
+            <Reveal key={s.n} delay={(i % 3) * 70}>
+              <button onClick={() => onGo && onGo('services')} style={{ display: 'block', width: '100%', textAlign: 'left', padding: 'var(--s-6)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', cursor: 'pointer' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{s.n}</div>
+                <div style={{ ...serifH, fontSize: 'var(--fs-h3)', margin: 'var(--s-2) 0 0' }}>{s.title}</div>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{s.body}</p>
+              </button>
+            </Reveal>
+          ))}
+        </div>
       </Page>
     </Section>
   );
@@ -86,7 +161,7 @@ function HowWeWork() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>How we work</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>From what you send to what ships</h2>
         </Reveal>
-        <div className="ubc-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
+        <div className="ubc-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--s-6)', marginTop: 'var(--s-9)' }}>
           {HWW.map((step, i) => (
             <Reveal key={step.n} delay={i * 60}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{step.n}</div>
@@ -630,97 +705,6 @@ function VideoTestimonials() {
   );
 }
 
-// Placeholder testimonials in the brand voice, describing the real service
-// (panel layouts, coordinated models, clash detection, permit sets) without
-// inventing named people, companies or photos: replace with real client
-// quotes, attribution and (if supplied) photos when they're in hand.
-const TESTIMONIALS = [
-  { quote: 'They turned our IFC model into shop-ready panel layouts in days, not weeks. The machine files were exactly what our line needed, first pass.', name: 'Panel fabricator', role: 'Light-gauge steel' },
-  { quote: 'We hand over a plan set and get back a coordinated model with the clashes already resolved. That alone has saved us weeks on every project since.', name: 'Project manager', role: 'Residential builder' },
-  { quote: 'What they quote is what we get. The drawings match the model down to the bolt, every time.', name: 'Estimator', role: 'Commercial contractor' },
-  { quote: 'Truss layouts came back engineered, not just drafted. Spans, bracing, hangers, all of it matched the frame the first time we checked it against the model.', name: 'Truss designer', role: 'Multifamily builder' },
-  { quote: 'Every clash they caught was one our crew never found out about on site. Fourteen hard clashes resolved before a single beam was cut.', name: 'MEP coordinator', role: 'Design-build firm' },
-  { quote: 'Our permit set came out of the same model as the shop drawings, so nothing drifted between what the city stamped and what actually got built.', name: 'Permit expediter', role: 'Municipal reviewer' }
-];
-
-// A 3D-tilted, four-column testimonial marquee: an explicit request, not a
-// house-style default. This site's own motion rule otherwise bans exactly
-// this shape of thing (an unattended, continuously looping carousel) — see
-// the rule's exception in design.md. Each column is CSS-only (a real
-// three.js/anime.js dependency would be overkill for a translateY loop):
-// the visible content is duplicated MARQUEE_REPEAT times back-to-back per
-// column so the loop wraps seamlessly, with every copy after the first
-// marked aria-hidden so a screen reader hits each quote once per column,
-// not four times over.
-const MARQUEE_REPEAT = 3;
-function TestimonialCard({ t }) {
-  return (
-    <div className="ubc-tmn-card" style={{ width: 260, flexShrink: 0, background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-1)', padding: 'var(--s-5)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)' }}>
-        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--ubc-navy-tint)', color: 'var(--ubc-navy)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-mono)', fontWeight: 700, flexShrink: 0 }}>{t.name.charAt(0)}</div>
-        <div>
-          <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>{t.name}</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>{t.role}</div>
-        </div>
-      </div>
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--s-4) 0 0' }}>“{t.quote}”</p>
-    </div>
-  );
-}
-function TestimonialColumn({ reverse, reduceMotion, ariaHidden }) {
-  return (
-    <div className="ubc-tmn-col" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s-5)', overflow: 'visible' }}>
-      {Array.from({ length: MARQUEE_REPEAT }, (_, g) => (
-        <div key={g} className="ubc-tmn-track" aria-hidden={g > 0 || ariaHidden || undefined}
-          style={{
-            display: 'flex', flexDirection: 'column', gap: 'var(--s-5)',
-            animation: reduceMotion ? 'none' : 'ubcMarqueeV 42s linear infinite',
-            animationDirection: reverse ? 'reverse' : 'normal'
-          }}>
-          {TESTIMONIALS.map((t, i) => <TestimonialCard key={i} t={t} />)}
-        </div>
-      ))}
-    </div>
-  );
-}
-function Testimonials() {
-  const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  return (
-    <Section style={{ paddingTop: 0 }}>
-      {/* Full-bleed on purpose: a direct child of Section (which has no
-          max-width of its own), not nested inside Page, so it spans the
-          whole viewport edge to edge instead of sitting in a bordered card.
-          The heading sits inside the frame as a side panel over the
-          marquee rather than as its own centered block above it; it stacks
-          back above the marquee on narrower screens (responsive.css),
-          where there isn't room for a side-by-side layout. paddingTop: 0
-          above (rather than the section's usual --section-y) since the
-          marquee no longer has its own heading pushing it down first —
-          the section before this one already closes with its own bottom
-          padding, so stacking a second full top padding on top of that
-          was just dead air between the two. */}
-      <Reveal delay={80}>
-        <div className="ubc-tmn-stage" style={{ position: 'relative', height: 440, overflow: 'hidden', background: 'var(--surface-sunken)', '--ubc-mq-gap': 'var(--s-5)', perspective: 900 }}>
-          <div className="ubc-tmn-caption" style={{ position: 'absolute', inset: '0 auto 0 0', width: 'min(380px, 38%)', zIndex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'var(--s-8)' }}>
-            <div style={{ ...eyebrow, display: 'inline-block' }}>Client feedback</div>
-            <h2 style={{ ...serifH, fontSize: 'clamp(26px, 2.6vw, 40px)', margin: 'var(--s-3) 0 0' }}>What builders say once the model lands</h2>
-          </div>
-          <div className="ubc-tmn-tilt" style={{ display: 'flex', gap: 'var(--s-4)', width: 'max-content', margin: '0 auto', paddingTop: 'var(--s-6)', transform: 'rotateX(14deg) rotateY(-8deg) rotateZ(10deg)', transformStyle: 'preserve-3d' }}>
-            <TestimonialColumn reduceMotion={reduceMotion} />
-            <TestimonialColumn reduceMotion={reduceMotion} reverse ariaHidden />
-            <TestimonialColumn reduceMotion={reduceMotion} ariaHidden />
-            <TestimonialColumn reduceMotion={reduceMotion} reverse ariaHidden />
-          </div>
-          <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '25%', background: 'linear-gradient(var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', inset: 'auto 0 0 0', height: '25%', background: 'linear-gradient(transparent, var(--surface-sunken))', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', inset: '0 auto 0 0', width: 'min(420px, 42%)', background: 'linear-gradient(90deg, var(--surface-sunken) 40%, transparent)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', inset: '0 0 0 auto', width: '12%', background: 'linear-gradient(270deg, var(--surface-sunken), transparent)', pointerEvents: 'none' }} />
-        </div>
-      </Reveal>
-    </Section>
-  );
-}
-
 // WHO WE SERVE: the blueprint's six roles, each pointed at the real service
 // rows most relevant to it (Tag chips reuse D.services' own titles, so this
 // never drifts from what those service names actually say elsewhere).
@@ -829,7 +813,7 @@ function FinalCTA({ onQuote }) {
             No sales script — a modeller looks at what you send and answers directly.
           </p>
           <div style={{ marginTop: 'var(--s-7)' }}>
-            <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 32px', cursor: 'pointer' }}>Request a quote</button>
+            <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 32px', cursor: 'pointer' }}>Start a Project</button>
           </div>
         </Reveal>
       </Page>
@@ -852,20 +836,27 @@ export function Home() {
     // property override rather than touching Section itself, which every
     // other page (About, Blogs, Careers, Contact, Services, Portfolio) also
     // renders through.
+    // Section order follows the Homepage Redesign brief's own numbered list
+    // (hero / logos+stats / what-we-do / who-we-serve / 4-stage workflow /
+    // services overview / deliverables gallery / case studies / QA &
+    // coordination / team & global capability / verified testimonials /
+    // FAQ / project-intake form), not the order these sections were
+    // originally written in.
     <div style={{ '--section-y': 'var(--s-8)', '--section-y-tight': 'var(--s-7)' }}>
       <SceneHero onQuote={onQuote} onGo={onGo} />
       <LogoWalls />
+      <WhatWeDo />
+      <WhyUBC />
+      <WhoWeServe />
       <HowWeWork />
+      <ServicesOverview onGo={onGo} />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
       <CaseStudiesNote />
-      <WhyUBC />
       <UBCWayQA />
       <GlobalPresence />
-      <VideoTestimonials />
-      <Testimonials />
-      <WhoWeServe />
       <CompanyProofTech />
+      <VideoTestimonials />
       <FAQSection />
       <FinalCTA onQuote={onQuote} />
     </div>

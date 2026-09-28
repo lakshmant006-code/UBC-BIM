@@ -231,9 +231,11 @@ export const UBC_DATA = {
    place for yet. Copy is either lifted directly from that document's own
    bullet lists (whyUbc's six labels, whoWeServe's six roles, ubcWay's four
    steps) or, where the blueprint only names a section and this site already
-   has the real underlying fact elsewhere (howWeWork's five one-line
-   descriptions, each role's own blurb), written to describe what's already
-   true on this site rather than a new claim. Three sections the blueprint
+   has the real underlying fact elsewhere (each role's own blurb), written
+   to describe what's already true on this site rather than a new claim.
+   howWeWork itself was later replaced with the Homepage Redesign brief's
+   own four-stage sequence — see the comment on it below. Three sections the
+   blueprint
    calls for need assets nobody had supplied yet — a client logo wall (03),
    named video testimonials (11), certifications (15).
    The client logo wall now has real logos (window.UBC_DATA.logos.client,
@@ -246,15 +248,15 @@ export const UBC_DATA = {
    exist too. Section 06 ("What we need from you") and the "Who we are"
    band were removed from Home.jsx per the client's own request. */
 UBC_DATA.blueprint = {
-  // 07 How we work: the same five-stage sequence the home hero (SceneHero)
-  // walks a visitor through visually, restated here as plain, readable
-  // steps for anyone who scrolled past without the model loading.
+  // Four-stage engineering workflow, verbatim from the client's own Homepage
+  // Redesign brief (its "Final 3D sequence" table) — supersedes the five
+  // plainer steps this used to hold, same underlying real process, just the
+  // client's own final wording and stage count.
   howWeWork: [
-    { n: '01', title: 'Input', body: 'Send what you have: a plan set, a Revit model, an IFC, or photos of a marked-up print.' },
-    { n: '02', title: 'Model', body: 'We build the one coordinated 3D model every drawing and machine file downstream will come from.' },
-    { n: '03', title: 'Coordinate', body: 'Structure, MEP and architecture are checked against each other inside that model, before anything ships.' },
-    { n: '04', title: 'Document', body: 'Panel layouts, truss drawings, permit sets and machine files are drawn straight from the same coordinated model.' },
-    { n: '05', title: 'Deliver', body: 'A scope-matched set comes back: drawings, BOM and machine-ready files, coordinated with each other by construction.' }
+    { n: '01', title: 'Project Inputs', body: 'Your Project Requirements — Share your architectural drawings, structural criteria, specifications, and required deliverables.' },
+    { n: '02', title: 'BIM Detailing', body: 'Detailed to Your Standards — We develop coordinated CFS, LGSF, and wood-framing models around your standards and project requirements.' },
+    { n: '03', title: 'Engineering and Coordination', body: 'Engineered and Coordinated — Engineering, detailing, and coordination are integrated to identify critical conditions before construction.' },
+    { n: '04', title: 'Documentation', body: 'Ready for Construction — Receive coordinated models, engineering documents, shop drawings, permit sets, schedules, and material quantities.' }
   ],
   // 12 Why UBC / client value — the blueprint's own six labels, each given
   // one line tying it to a real mechanism already on this site (the
@@ -681,9 +683,9 @@ UBC_DATA.contactScene = {
       body: 'Architectural PDFs, a Revit model, or photos of a marked-up print: whatever you have is enough to start.',
       cta: 'Email us' },
     { frame: 214, span: 22, side: 'left', route: 'quote',
-      eyebrow: 'Request a quote', title: 'Tell us about the project',
+      eyebrow: 'Start a project', title: 'Tell us about the project',
       body: 'Building type, square footage and what you need modelled. You get a scope and a price, not a call-back.',
-      cta: 'Request a quote' }
+      cta: 'Start a Project' }
   ]
 };
 
@@ -734,7 +736,7 @@ UBC_DATA.hero = {
     { t0: 0.40, t1: 0.60, side: 'left',
       eyebrow: 'Term · Span', title: 'How far a beam can carry',
       body: 'The unsupported distance a beam covers between supports. A longer span needs a deeper beam or closer bracing, decided here in the model, not guessed on site.',
-      cta: 'Request a quote', quote: true },
+      cta: 'Start a Project', quote: true },
 
     { t0: 0.60, t1: 0.78, side: 'right',
       eyebrow: 'Term · Bracing', title: 'What keeps the frame from racking',

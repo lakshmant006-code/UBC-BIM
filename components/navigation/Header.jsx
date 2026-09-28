@@ -65,7 +65,7 @@ export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, sty
           </div>
           <span style={{ width: 1, height: 22, background: 'var(--border-subtle)' }} />
           <Button size="sm" variant="secondary" onClick={() => onNavigate && onNavigate('contact')}>Book a call</Button>
-          <Button size="sm" onClick={onQuote}>Request a quote</Button>
+          <Button size="sm" onClick={onQuote}>Start a Project</Button>
         </div>
       </div>
     </header>

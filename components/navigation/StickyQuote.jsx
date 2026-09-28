@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '../core/Button.jsx';
 import { Icon } from '../core/Icon.jsx';
 
-export function StickyQuote({ onQuote, onChat, label = 'Request a quote', style, ...rest }) {
+export function StickyQuote({ onQuote, onChat, label = 'Start a Project', style, ...rest }) {
   return (
     <div {...rest} style={{
       position: 'fixed', right: 'var(--s-6)', bottom: 'var(--s-6)', zIndex: 50,

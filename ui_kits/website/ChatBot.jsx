@@ -84,7 +84,7 @@ export function ChatBot({ open, onClose, onQuote }) {
       </div>
 
       <div style={{ padding: 'var(--s-5) var(--s-6)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-        <Button full size="sm" onClick={() => { onClose(); onQuote && onQuote(); }}>Request a quote</Button>
+        <Button full size="sm" onClick={() => { onClose(); onQuote && onQuote(); }}>Start a Project</Button>
       </div>
     </div>
   );

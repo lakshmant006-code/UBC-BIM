@@ -75,7 +75,7 @@ export function ServicesDetail({ article, onQuote }) {
             )}
 
             <div style={{ marginTop: 'var(--s-7)' }}>
-              <Button onClick={onQuote}>Request a quote</Button>
+              <Button onClick={onQuote}>Start a Project</Button>
             </div>
           </Reveal>
         </div>

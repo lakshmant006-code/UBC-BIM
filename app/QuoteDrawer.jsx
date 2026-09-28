@@ -33,14 +33,14 @@ export function QuoteDrawer({ open, onClose }) {
         animation: 'none', borderLeft: 'var(--bw-hair) solid var(--border-subtle)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--s-4)' }}>
-          <SectionHeading eyebrow="Request a quote" title="Tell us about the project" size="sm" />
+          <SectionHeading eyebrow="Start a project" title="Tell us about the project" size="sm" />
           <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}><Icon name="x" size={20} /></button>
         </div>
         {sent ? (
           <div style={{ marginTop: 'var(--s-8)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)' }}>Quote request received</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)' }}>Project request received</div>
             <p style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>
-              Logged to the CRM and tagged Website · Sticky quote. We reply within one working day.
+              Logged to the CRM and tagged Website · Start a project. We reply within one working day.
             </p>
             <Button variant="secondary" size="sm" style={{ marginTop: 'var(--s-5)' }} onClick={onClose}>Close</Button>
           </div>
@@ -51,7 +51,7 @@ export function QuoteDrawer({ open, onClose }) {
             <FormField label="Building type"><Select placeholder="Select building type" options={['Residential', 'Commercial', 'Multifamily', 'Light-gauge steel', 'Wood']} /></FormField>
             <FormField label="Service"><Select placeholder="Select a service" options={UBC_DATA.services.map((s) => s.title)} /></FormField>
             <FormField label="Scope" hint="Square footage, unit count, what you need modelled."><Textarea rows={4} placeholder="Building type, square footage, what you need modelled." /></FormField>
-            <Button type="submit" full>Request a quote</Button>
+            <Button type="submit" full>Start a Project</Button>
           </form>
         )}
       </div>
