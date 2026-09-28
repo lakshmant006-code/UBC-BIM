@@ -1,5 +1,6 @@
+'use client';
 /*
-  Blogs: the site's "Blogs" page. Reads window.UBC_DATA.blogPosts — real
+  Blogs: the site's "Blogs" page. Reads UBC_DATA.blogPosts — real
   client-supplied write-ups (see the comment on that array in data.js for
   exactly what each post's own source document was) — and renders them as
   a card grid; clicking a card opens that post's own full write-up in
@@ -9,6 +10,14 @@
   "coming soon" state (same convention as TrussPanelsPending) rather than
   inventing sample posts.
 */
+import React from 'react';
+import { Tag } from '../../components/core/Tag.jsx';
+import { Icon } from '../../components/core/Icon.jsx';
+import { Button } from '../../components/core/Button.jsx';
+import { SectionHeading } from '../../components/core/SectionHeading.jsx';
+import { UBC_DATA } from './data.js';
+import { Page, Section, Reveal } from './shared.jsx';
+
 // Four brand-palette gradients (not the literal orange/gray/purple/green a
 // generic "gradient card" reference uses) — each pairs one of the site's own
 // tint colors (tokens/colors.css) with its own full-strength dot color for
@@ -22,7 +31,6 @@ const BLOG_GRADIENTS = [
 ];
 
 function BlogCard({ post, index, onOpen }) {
-  const { Tag, Icon } = window.UBCBIMDesignSystem_353af8;
   const [hover, setHover] = React.useState(false);
   const g = BLOG_GRADIENTS[index % BLOG_GRADIENTS.length];
   const badgeText = post.date || (post.tags && post.tags[0]);
@@ -77,7 +85,6 @@ function BlogCard({ post, index, onOpen }) {
 }
 
 function BlogsPending() {
-  const { Page, Section } = window;
   return (
     <Section>
       <Page>
@@ -101,8 +108,6 @@ function BlogsPending() {
 // several of these posts carry their own real diagram or job-site photo
 // partway through, not just a cover image up top.
 function BlogPost({ post, onBack }) {
-  const { Button, Tag, Icon } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, Reveal } = window;
   return (
     <Section>
       <Page>
@@ -177,10 +182,8 @@ function BlogPost({ post, onBack }) {
   );
 }
 
-function Blogs() {
-  const { SectionHeading } = window.UBCBIMDesignSystem_353af8;
-  const { Page, Section, Reveal } = window;
-  const posts = (window.UBC_DATA && window.UBC_DATA.blogPosts) || [];
+export function Blogs() {
+  const posts = (UBC_DATA && UBC_DATA.blogPosts) || [];
   const [openId, setOpenId] = React.useState(null);
   const open = posts.find((p) => p.id === openId);
 
@@ -213,4 +216,3 @@ function Blogs() {
     </div>
   );
 }
-Object.assign(window, { Blogs });

@@ -1,23 +1,38 @@
+'use client';
 /*
-  ContactScene: the welcome sequence at the top of the Contact page. Scroll
-  SCRUBS a JPEG frame sequence on a canvas: a UBC BIM lead meets two visitors at
-  the studio door, shakes hands, holds the door, and walks them into the office.
-  Same mechanics as the home-page build sequence (canvas + preloader + frame
-  windows), so there is no <video> element and no codec or seek quirks.
+  ContactScene: the welcome sequence at the top of the Contact page. The
+  media (a UBC BIM lead meeting two visitors at the studio door, shaking
+  hands, holding the door, and walking them into the office) now PLAYS
+  through once on its own, like a real video — driven by an elapsed-time
+  clock, not by scroll position. It used to scrub frame-by-frame as you
+  scrolled; per explicit request that's gone. It's still a JPEG frame
+  sequence drawn on a canvas rather than a real <video> element (no codec
+  or seek quirks), just advanced by a ~30fps playback clock instead of a
+  scroll listener. Starts once the stage is in view, plays once, holds on
+  the last frame. Scroll still drives the STAGE captions, numbered rail
+  and glassmorphic cards below, exactly as before — only the image
+  playback itself is decoupled from it now.
 
-  Config: window.UBC_DATA.contactScene
-    seq / seqMobile { prefix, count, pad, ext }   frame sequences
-    poster                                        first-paint still
+  Config: UBC_DATA.contactScene
+    seq / seqMobile { prefix, count, pad, ext }   frame sequence played
+    poster                                        first-paint still, and
+                                                  what a reduced-motion
+                                                  visitor sees permanently
     stages [{ n, t, title, note }]                captions along the scroll
     cards  [{ frame, span, side, eyebrow, title, body, cta, route }]
-                                                  glass cards over given frames
+                                                  glass cards, still timed
+                                                  to a scroll range derived
+                                                  from their frame number
 
   Each card carries a `route` id; the page owns what a route does (open the
   scheduler, the quote drawer, mail, WhatsApp) via the onRoute prop.
 */
-const { Icon: CSIcon } = window.UBCBIMDesignSystem_353af8;
+import React from 'react';
+import { Icon as CSIcon } from '../../components/core/Icon.jsx';
+import { UBC_DATA } from './data.js';
+import { bounceHandlers } from './ModelViewer.jsx';
 
-const CS = (window.UBC_DATA && window.UBC_DATA.contactScene) || null;
+const CS = (UBC_DATA && UBC_DATA.contactScene) || null;
 const CS_STAGES = (CS && CS.stages) || [];
 const CS_CARDS = (CS && CS.cards) || [];
 const CS_NARROW = typeof window !== 'undefined' && window.matchMedia
@@ -71,22 +86,28 @@ function SceneCard({ card, visible, onRoute }) {
   );
 }
 
-function ContactScene({ onRoute, onQuote }) {
+// Playback pace for the frame sequence: chosen to read as a real, short
+// video clip rather than a slideshow. 236 frames at 30fps is ~7.9s — in the
+// same range as the hero's own signature-moment timings elsewhere on the
+// site, not an arbitrary number.
+const CS_FPS = 30;
+
+export function ContactScene({ onRoute, onQuote }) {
   const wrapRef = React.useRef(null);
+  const stageRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const imagesRef = React.useRef([]);
   const ctaRef = React.useRef(null);
-  const targetRef = React.useRef(0);
-  const smoothRef = React.useRef(0);
-  const drawnRef = React.useRef(-1);
   const rafRef = React.useRef(0);
+  const playStartRef = React.useRef(0);
+  const drawnRef = React.useRef(-1);
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
-  const [drew, setDrew] = React.useState(false);
-  // The frame sequence is a large binary asset. Until it is in the repo the
-  // first frame 404s; rather than pin a black stage over the Contact page, the
-  // scene takes itself out and the page below stands on its own. It switches
-  // on by itself the moment the frames are present.
+  const [playing, setPlaying] = React.useState(false);
+  // The sequence is a real binary asset. Until it is in the repo it 404s;
+  // rather than pin a black stage over the Contact page, the scene takes
+  // itself out and the page below stands on its own. It switches on by
+  // itself the moment the frames are present.
   const [missing, setMissing] = React.useState(false);
   React.useEffect(() => {
     if (!CS_SEQ) return;
@@ -95,67 +116,50 @@ function ContactScene({ onRoute, onQuote }) {
     probe.src = csFrameUrl(1);
   }, []);
 
-  const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = CS_SEQ ? CS_SEQ.count : 0;
   const n = Math.max(1, CS_STAGES.length);
 
-  // Preload: coarse skeleton first, then fill outward from where the viewer is.
+  // Start playback once the stage actually scrolls into view, same "play
+  // once" idea as the hero's own signature animation — not tied to scroll
+  // position past that, just its trigger. Reduced-motion visitors never
+  // play it at all; they get the static poster frame below instead.
+  React.useEffect(() => {
+    if (!CS_SEQ || reduce) return;
+    const el = stageRef.current; if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) { setPlaying(true); io.disconnect(); }
+    }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduce]);
+
+  // Load every frame in order. Simple sequential preload (not the old
+  // "outward from wherever scroll is" strategy) since playback now always
+  // starts at frame 0 and only ever moves forward.
   React.useEffect(() => {
     if (!CS_SEQ) return;
     const imgs = imagesRef.current;
-    const load = (i) => { if (imgs[i]) return false; const im = new Image(); im.src = csFrameUrl(i + 1); imgs[i] = im; return true; };
-    load(0);
     let stop = false;
     const CONCURRENT = 6;
-    const tick = () => {
-      if (stop) return;
-      let issued = 0;
-      for (let i = 0; i < count && issued < CONCURRENT; i += 8) if (load(i)) issued++;
-      if (issued === 0) {
-        const here = Math.round(targetRef.current * (count - 1));
-        for (let d = 0; d < count && issued < CONCURRENT; d++) {
-          const lo = here - d, hi = here + d;
-          if (lo >= 0 && load(lo)) issued++;
-          if (issued < CONCURRENT && hi < count && load(hi)) issued++;
-        }
-      }
-      if (issued > 0) setTimeout(tick, 40);
+    let next = 0;
+    const loadOne = () => {
+      if (stop || next >= count) return;
+      const i = next++;
+      const im = new Image();
+      im.src = csFrameUrl(i + 1);
+      imgs[i] = im;
+      im.onload = im.onerror = loadOne;
     };
-    tick();
+    for (let c = 0; c < CONCURRENT; c++) loadOne();
     return () => { stop = true; };
   }, [count]);
 
-  // Scroll -> progress + active stage.
+  // Playback clock: advances the frame index by elapsed time, not scroll.
+  // Holds on the last frame once played through, rather than looping —
+  // this is a one-time "you're walking in" moment, not ambient motion.
   React.useEffect(() => {
-    if (!CS_SEQ) return;
-    const onScroll = () => {
-      const el = wrapRef.current; if (!el) return;
-      const r = el.getBoundingClientRect();
-      const total = r.height - window.innerHeight;
-      if (total <= 0) return;
-      const p = Math.min(1, Math.max(0, -r.top / total));
-      targetRef.current = p;
-      setProgress(p);
-      let s = 0;
-      for (let i = 0; i < CS_STAGES.length; i++) { if (p >= (CS_STAGES[i].t || 0) - 0.0001) s = i; }
-      setStage(s);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    onScroll();
-    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
-  }, []);
-
-  // Cover on wide screens; fit-to-width and letterbox when the stage is
-  // narrower than the frame, so a phone still sees the whole room.
-  const placement = (boxW, boxH, iw, ih) => {
-    const s = (boxW / boxH) < (iw / ih) ? (boxW / iw) : Math.max(boxW / iw, boxH / ih);
-    const w = iw * s, h = ih * s;
-    return { x: (boxW - w) / 2, y: (boxH - h) / 2, w, h };
-  };
-
-  React.useEffect(() => {
-    if (!CS_SEQ) return;
+    if (!CS_SEQ || !playing) return;
     const cvs = canvasRef.current; if (!cvs) return;
     const ctx = cvs.getContext('2d');
     const dpr = () => (window.devicePixelRatio > 1 ? 1.5 : 1);
@@ -168,33 +172,58 @@ function ContactScene({ onRoute, onQuote }) {
     window.addEventListener('resize', fit);
     const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
     if (ro) ro.observe(cvs);
+
+    const placement = (boxW, boxH, iw, ih) => {
+      const s = (boxW / boxH) < (iw / ih) ? (boxW / iw) : Math.max(boxW / iw, boxH / ih);
+      const w = iw * s, h = ih * s;
+      return { x: (boxW - w) / 2, y: (boxH - h) / 2, w, h };
+    };
+
+    playStartRef.current = performance.now();
     const draw = () => {
-      const t = targetRef.current;
-      smoothRef.current = reduce ? t : smoothRef.current + (t - smoothRef.current) * 0.18;
-      let idx = Math.round(smoothRef.current * (count - 1));
-      idx = Math.max(0, Math.min(count - 1, idx));
+      const elapsed = (performance.now() - playStartRef.current) / 1000;
+      let idx = Math.min(count - 1, Math.floor(elapsed * CS_FPS));
       const imgs = imagesRef.current;
+      // If the target frame hasn't loaded yet, hold on the latest loaded
+      // frame at or before it rather than stalling on a blank canvas.
       let use = -1;
-      for (let d = 0; d < count; d++) {
-        const lo = idx - d, hi = idx + d;
-        if (lo >= 0 && imgs[lo] && imgs[lo].complete && imgs[lo].naturalWidth) { use = lo; break; }
-        if (hi < count && imgs[hi] && imgs[hi].complete && imgs[hi].naturalWidth) { use = hi; break; }
-      }
+      for (let d = idx; d >= 0; d--) { if (imgs[d] && imgs[d].complete && imgs[d].naturalWidth) { use = d; break; } }
       if (use >= 0 && use !== drawnRef.current) {
         const im = imgs[use];
         const r = placement(cvs.width, cvs.height, im.naturalWidth, im.naturalHeight);
         ctx.clearRect(0, 0, cvs.width, cvs.height);
         ctx.drawImage(im, r.x, r.y, r.w, r.h);
         drawnRef.current = use;
-        setDrew(true);
       }
-      rafRef.current = requestAnimationFrame(draw);
+      if (idx < count - 1) rafRef.current = requestAnimationFrame(draw);
     };
     rafRef.current = requestAnimationFrame(draw);
     return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', fit); if (ro) ro.disconnect(); };
-  }, [count, reduce]);
+  }, [count, playing]);
 
-  // Nothing to scrub without a sequence: render nothing rather than an empty
+  // Scroll -> progress + active stage + which cards are in their window.
+  // Unchanged: captions/rail/cards are still scroll-driven, only the
+  // video's own playback (above) no longer is.
+  React.useEffect(() => {
+    if (!CS_SEQ) return;
+    const onScroll = () => {
+      const el = wrapRef.current; if (!el) return;
+      const r = el.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      if (total <= 0) return;
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      setProgress(p);
+      let s = 0;
+      for (let i = 0; i < CS_STAGES.length; i++) { if (p >= (CS_STAGES[i].t || 0) - 0.0001) s = i; }
+      setStage(s);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
+  }, []);
+
+  // Nothing to show without a sequence: render nothing rather than an empty
   // black hole, so the Contact page still stands on its own.
   if (!CS_SEQ || missing) return null;
 
@@ -217,10 +246,13 @@ function ContactScene({ onRoute, onQuote }) {
 
   return (
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-sunken)' }}>
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+      <div ref={stageRef} style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {CS.poster && <img src={csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
-        <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95)' }} />
+        {/* Poster shows immediately and stays put for a reduced-motion
+            visitor (playback never starts, see the effect above); once
+            playback starts, the canvas draws over it. */}
+        <img src={CS.poster || csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)', opacity: playing ? 0 : 1 }} />
+        {!reduce && <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95)' }} />}
 
         {/* Light scrim: white studio system throughout, so the dark captions
             need a paper-toned gradient under them rather than the old
@@ -245,7 +277,7 @@ function ContactScene({ onRoute, onQuote }) {
             Scroll to walk in with us. Every route below lands in our CRM, tagged with where it came from, and gets an answer within one working day.
           </p>
           <button ref={ctaRef} onClick={onQuote} {...bounceHandlers(ctaRef)} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
-            Request a quote <CSIcon name="arrow-right" size={16} />
+            Start a Project <CSIcon name="arrow-right" size={16} />
           </button>
         </div>
 
@@ -279,4 +311,3 @@ function ContactScene({ onRoute, onQuote }) {
   );
 }
 
-Object.assign(window, { ContactScene });

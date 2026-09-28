@@ -1,32 +1,33 @@
+'use client';
 /*
-  SceneHero: a white-studio, cinematic hero. Scroll moves a live camera through the
+  SceneHero: a white-studio, cinematic hero. The camera holds one fixed,
+  wide establishing shot (the first configured stage position, if any); the
   Mocking Bird Lot 2 light-gauge steel frame (assets/models/mocking-bird-lot-2.glb,
-  rendered with three.js): as you scroll, the ANGLE changes, from a wide aerial, along the
-  column grid, up into the roof beams, in among the bays, out to a full
-  reveal. This is the model rendered live, not a pre-shot video: there is no
-  frame sequence, no <video> element, nothing to re-record if the model
-  changes. The camera's path between stages rides a Catmull-Rom curve
-  through all five stage positions (see camCurve below), not a straight
-  line segment-by-segment, so scrolling through it reads as one continuous,
-  smooth flight rather than a series of kinks at each stage.
+  rendered with three.js) does the moving instead — it hovers just above the
+  ground shadow and continuously revolves 360° around its own vertical axis,
+  anchored through its own base centre (recentred on load), like a product
+  on a slowly turning, slightly levitating platform. Scroll no longer drives
+  the camera or the model; it still drives the STAGE captions, numbered
+  rail and glassmorphic info cards below (four, one per stage, roughly a
+  fifth of the scroll each), same as before.
 
-  An intro headline shows first and fades out; then the STAGE captions + a
-  numbered rail track the scroll, same as they did over the old frame
-  sequence. Four glassmorphic info cards appear one per stage, each one
-  roughly a fifth of the scroll (the "flash card" pacing), and link
-  somewhere real on the site.
+  Uses the same three.js helpers ModelViewer.jsx exports (studio environment,
+  ground shadow, steel recolouring) so the hero and the pages it links to
+  read as one system.
 
-  Depends on loadThree() from ModelViewer.jsx (loaded first in index.html),
-  shared across the page the same way Page/Section/Reveal from Home.jsx are,
-  so three.js is fetched once regardless of how many scenes on the page use
-  it.
-
-  Config: window.UBC_DATA.hero: model { src, radius }, stages
-  [{ n, t, title, note, pos: [x,y,z] }], cards [{ t0, t1, side, ... }].
+  Config: UBC_DATA.hero: model { src, radius }, stages
+  [{ n, t, title, note, pos: [x,y,z] }] (pos, if present on stage 0, sets the
+  fixed camera framing; other stages' pos is unused now), cards [{ t0, t1,
+  side, ... }].
 */
-const { Icon: HeroIcon } = window.UBCBIMDesignSystem_353af8;
+import React from 'react';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Icon as HeroIcon } from '../../components/core/Icon.jsx';
+import { UBC_DATA } from './data.js';
+import { bounceHandlers, buildStudioEnvironment, makeGroundShadow, applySteelMaterials } from './ModelViewer.jsx';
 
-const HERO = (window.UBC_DATA && window.UBC_DATA.hero) || { stages: [], cards: [] };
+const HERO = (UBC_DATA && UBC_DATA.hero) || { stages: [], cards: [] };
 const HERO_STAGES = HERO.stages || [];
 const HERO_CARDS = HERO.cards || [];
 
@@ -71,13 +72,11 @@ function HeroCard({ card, visible, onGo, onQuote }) {
   );
 }
 
-function SceneHero({ onQuote, onGo }) {
+export function SceneHero({ onQuote, onGo }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const canvasHolderRef = React.useRef(null);
   const ctaRef = React.useRef(null);
-  const targetRef = React.useRef(0);       // scroll progress 0..1
-  const smoothRef = React.useRef(0);       // eased progress driving the camera
   const visibleRef = React.useRef(true);
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
@@ -85,7 +84,7 @@ function SceneHero({ onQuote, onGo }) {
   const [loadPct, setLoadPct] = React.useState(0);
   const [loadError, setLoadError] = React.useState(false);
 
-  const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const n = Math.max(1, HERO_STAGES.length);
   const M = HERO.model;
 
@@ -97,7 +96,6 @@ function SceneHero({ onQuote, onGo }) {
       const total = r.height - window.innerHeight;
       if (total <= 0) return;
       const p = Math.min(1, Math.max(0, -r.top / total));
-      targetRef.current = p;
       setProgress(p);
       let s = 0;
       for (let i = 0; i < HERO_STAGES.length; i++) { if (p >= (HERO_STAGES[i].t || 0) - 0.0001) s = i; }
@@ -113,12 +111,11 @@ function SceneHero({ onQuote, onGo }) {
   // progress, lerped between each stage's [x,y,z]. No OrbitControls: this
   // is a fly-through the visitor drives by scrolling, not by dragging.
   React.useEffect(() => {
-    if (!M || typeof window.loadThree !== 'function') return;
+    if (!M) return;
     let dead = false;
     let cleanup = () => {};
 
-    window.loadThree().then((THREE) => {
-      if (dead) return;
+    try {
       const host = canvasHolderRef.current;
       if (!host) return;
 
@@ -127,17 +124,14 @@ function SceneHero({ onQuote, onGo }) {
       scene.background = new THREE.Color(0xffffff);   // --paper: a white studio sweep, not the old dark stage
 
       const camera = new THREE.PerspectiveCamera(42, 1, R / 200, R * 80);
-      const stagePos = HERO_STAGES.map((s) => new THREE.Vector3(...(s.pos || [R * 1.6, R * 1.2, R * 1.9])));
-      // A Catmull-Rom curve through all five stage positions, not just a
-      // straight line between whichever pair is current: cameraAt below
-      // still walks the exact same per-stage timing (the t breakpoints),
-      // but samples a point off this curve instead of lerping, so the
-      // camera glides through each waypoint on a continuous, rounded path
-      // rather than visibly changing direction in a straight-line kink at
-      // every stage. THREE.CatmullRomCurve3 is core three.js (bundled in
-      // three.min.js), not an examples/ addon, so no extra script needed.
-      const camCurve = stagePos.length > 2 ? new THREE.CatmullRomCurve3(stagePos, false, 'catmullrom', 0.5) : null;
-      camera.position.copy(stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9));
+      // Fixed establishing shot — the model does the moving now, not the
+      // camera. Reuses stage 0's own configured position (the original
+      // "wide aerial" framing) if the data has one, rather than inventing
+      // a new angle from scratch.
+      const camPos = (HERO_STAGES[0] && HERO_STAGES[0].pos)
+        ? new THREE.Vector3(...HERO_STAGES[0].pos)
+        : new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
+      camera.position.copy(camPos);
       camera.lookAt(0, 0, 0);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -201,45 +195,56 @@ function SceneHero({ onQuote, onGo }) {
         : null;
       if (vio) vio.observe(host); else visibleRef.current = true;
 
-      // Find which pair of stage keyframes the (eased) scroll position falls
-      // between, and how far along that pair: the same "index by t" search
-      // the numbered rail uses. With camCurve available, i + local becomes
-      // one continuous parameter along the whole curve (0 at stage 0, 1 at
-      // the last stage) rather than a per-segment straight-line lerp, so
-      // the exact same per-stage timing now walks a smooth path instead of
-      // a piecewise-linear one.
-      const cameraAt = (p) => {
-        if (stagePos.length < 2) return stagePos[0] || new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
-        let i = 0;
-        for (; i < HERO_STAGES.length - 2; i++) if (p < (HERO_STAGES[i + 1].t || 0)) break;
-        const t0 = HERO_STAGES[i].t || 0, t1 = HERO_STAGES[i + 1].t || 1;
-        const local = t1 > t0 ? Math.min(1, Math.max(0, (p - t0) / (t1 - t0))) : 0;
-        if (!camCurve) return new THREE.Vector3().lerpVectors(stagePos[i], stagePos[i + 1], local);
-        const u = Math.min(1, Math.max(0, (i + local) / (stagePos.length - 1)));
-        return camCurve.getPoint(u);
-      };
+      // Levitate + revolve, in place of the old scroll-driven camera fly-
+      // through: a slow 360° spin around the model's own vertical
+      // centreline (recentred on load, see below) plus a gentle sinusoidal
+      // hover, both driven by elapsed time rather than scroll position.
+      // One full revolution every ~22s — a deliberate, unhurried turntable
+      // pace, not a demo-reel spin. Reduced-motion holds the model still.
+      const ROTATE_PERIOD = 22;
+      const BOB_PERIOD = 4.5;
+      const BOB_AMPLITUDE = R * 0.02;
+      const HOVER_GAP = R * 0.05;
+      let modelGroup = null;
+      let baseY = 0;
+      let elapsed = 0;
+      const clock = new THREE.Clock();
 
       let raf = 0;
       const tick = () => {
         if (visibleRef.current) {
-          const t = targetRef.current;
-          smoothRef.current = reduce ? t : smoothRef.current + (t - smoothRef.current) * 0.08;
-          camera.position.copy(cameraAt(smoothRef.current));
-          camera.lookAt(0, 0, 0);
+          if (modelGroup && !reduce) {
+            elapsed += clock.getDelta();
+            modelGroup.rotation.y = (elapsed / ROTATE_PERIOD) * Math.PI * 2;
+            modelGroup.position.y = baseY + Math.sin((elapsed / BOB_PERIOD) * Math.PI * 2) * BOB_AMPLITUDE;
+          } else {
+            clock.getDelta();
+          }
           renderer.render(scene, camera);
         }
         raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
 
-      const loader = new THREE.GLTFLoader();
+      const loader = new GLTFLoader();
       loader.load(M.src, (gltf) => {
         if (dead) return;
         const box = new THREE.Box3().setFromObject(gltf.scene);
+        const center = box.getCenter(new THREE.Vector3());
+        // Recentre the model's own footprint onto the world's vertical
+        // axis and rest its base on the ground plane, so the continuous
+        // spin below turns around the model's own centreline (anchored at
+        // its bottom) rather than wherever its source geometry happened to
+        // sit.
+        gltf.scene.position.x -= center.x;
+        gltf.scene.position.z -= center.z;
         gltf.scene.position.y -= box.min.y;
+        baseY = gltf.scene.position.y + HOVER_GAP;
+        gltf.scene.position.y = baseY;
         applySteelMaterials(THREE, gltf.scene);
         gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
         scene.add(gltf.scene);
+        modelGroup = gltf.scene;
         setReady(true);
       }, (evt) => {
         // This model is the one asset on the site heavy enough (44 MB) that
@@ -270,7 +275,9 @@ function SceneHero({ onQuote, onGo }) {
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
       };
-    });
+    } catch (err) {
+      if (!dead) setLoadError(true);
+    }
 
     return () => { dead = true; cleanup(); };
   }, [reduce]);
@@ -311,14 +318,19 @@ function SceneHero({ onQuote, onGo }) {
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-5)' }}>Loading the structural model</div>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--text-strong)', margin: 0, maxWidth: '18ch' }}>
-            Cold-formed steel (CFS) and LGSF framing, detailed right the first time
+            CFS and LGSF Engineering and Detailing Services
           </h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
-            Panel layouts, truss layouts, shop drawings and a bill of materials your line runs from — for CFS, LGSF and wood framing, all from one coordinated model.
+            UBC BIM helps contractors, builders, manufacturers, architects and engineers turn project requirements into coordinated BIM models, engineering documents, shop drawings, permit sets and accurate material quantities.
           </p>
-          <button ref={ctaRef} onClick={onQuote} {...bounceHandlers(ctaRef)} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
-            Request a quote <HeroIcon name="arrow-right" size={16} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-4)', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button ref={ctaRef} onClick={onQuote} {...bounceHandlers(ctaRef)} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
+              Start a Project <HeroIcon name="arrow-right" size={16} />
+            </button>
+            <button onClick={() => onGo && onGo('services')} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', background: 'transparent', border: 'var(--bw-1) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer' }}>
+              Explore Our Services
+            </button>
+          </div>
         </div>
 
         {/* Stage label (bottom-left): active.term surfaces the one word this
@@ -359,4 +371,3 @@ function SceneHero({ onQuote, onGo }) {
   );
 }
 
-Object.assign(window, { SceneHero });

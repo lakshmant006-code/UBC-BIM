@@ -41,12 +41,18 @@
      progressively taller and more distorted instead of scaling down with it. */
   .ubc-model-viewer { height: 420px !important; min-height: 420px !important; }
 
-  /* How we work: five steps, three per row before stacking to one */
-  .ubc-how-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  /* How we work: four stages, two per row before stacking to one */
+  .ubc-how-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
-  /* Why UBC / Who we serve: three cards -> two */
+  /* Why UBC / Who we serve / Services overview: three cards -> two */
   .ubc-why-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .ubc-serve-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .ubc-svc-overview-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* About: team (five) / deliverables (eight) / QA (six) -> narrower grids */
+  .ubc-team-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .ubc-deliverables-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .ubc-qa-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Client video testimonials: four portrait clips -> two per row */
   .ubc-video-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -101,10 +107,14 @@
   .ubc-door-panel { min-height: 300px !important; }
   .ubc-model-viewer { height: 300px !important; min-height: 300px !important; }
 
-  /* How we work / Why UBC / Who we serve: down to one column on a phone */
+  /* How we work / Why UBC / Who we serve / Services overview: down to one column on a phone */
   .ubc-how-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
   .ubc-why-grid { grid-template-columns: 1fr !important; }
   .ubc-serve-grid { grid-template-columns: 1fr !important; }
+  .ubc-team-grid { grid-template-columns: 1fr !important; }
+  .ubc-deliverables-grid { grid-template-columns: 1fr !important; }
+  .ubc-qa-grid { grid-template-columns: 1fr !important; }
+  .ubc-svc-overview-grid { grid-template-columns: 1fr !important; }
 
   /* Client video testimonials: two portrait clips -> one, full width */
   .ubc-video-grid { grid-template-columns: 1fr !important; max-width: 360px !important; margin-left: auto !important; margin-right: auto !important; }
@@ -181,19 +191,6 @@
   }
 }
 
-/* ---------- Testimonials marquee ----------
-   Four 3D-tilted columns need real width (4 * 260px cards plus gaps) that a
-   tablet or phone doesn't have; rather than let `overflow: hidden` just
-   clip most of it away, the tilt flattens and the column count drops so
-   what's left is still fully visible and readable. Pause-on-hover is per
-   column (matching the four independently-scrolling tracks), not the
-   whole stage at once. The caption is a side-by-side overlay on a desktop
-   stage; below 900px there's no width to spare for that, so it drops out
-   of absolute positioning and stacks in normal flow above the marquee
-   instead (it's already first in the DOM for exactly this reason), and the
-   stage grows taller to give the now-stacked marquee room to still read. */
-.ubc-tmn-col:hover .ubc-tmn-track { animation-play-state: paused; }
-
 /* ---------- Logo carousels (clients / software / machines) ----------
    Pause-on-hover-or-focus so a visitor can actually read a logo without it
    scrolling out from under the pointer; keyboard focus gets the same
@@ -201,17 +198,6 @@
    inside the track to :focus directly. */
 .ubc-logo-track-wrap:hover .ubc-logo-track,
 .ubc-logo-track-wrap:focus-within .ubc-logo-track { animation-play-state: paused; }
-
-@media (max-width: 900px) {
-  .ubc-tmn-caption { position: static !important; width: auto !important; text-align: center; padding: var(--s-7) var(--gutter) 0 !important; }
-  .ubc-tmn-tilt { transform: none !important; }
-  .ubc-tmn-tilt > div:nth-child(n+3) { display: none !important; }
-  .ubc-tmn-stage { height: 560px !important; }
-}
-@media (max-width: 640px) {
-  .ubc-tmn-tilt > div:nth-child(n+2) { display: none !important; }
-  .ubc-tmn-card { width: 220px !important; }
-}
 
 /* ---------- Header nav dropdown ----------
    A nav item's hover panel (currently just "Services"). Hover-highlight
