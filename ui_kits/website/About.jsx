@@ -89,6 +89,11 @@ const ROOM_STAGES = [
 const ROOM_TOTAL_MS = 6500;
 const ROOM_CONDITIONS = ['Connection', 'Opening', 'Load path'];
 const ROOM_DELIVERABLES = ['Coordinated model', 'Engineering package', 'Shop drawings', 'Permit documentation', 'Schedules', 'Bill of Materials'];
+// The real submitted build-sequence photos (public/assets/frames), the same
+// ones Home's own build-sequence hero draws from — cycled behind stages 1-3
+// instead of one static frame, so the "coordinated model" is an actual
+// moving sequence of real project photography rather than a single still.
+const ROOM_FRAMES = ['01-foundation', '02-steel-begins', '03-steel-skeleton', '04-sheathing', '05-facade', '06-living-room', '07-kitchen', '08-open-doors', '09-backyard'];
 
 function stageIndexAt(ms) {
   let i = 0;
@@ -107,6 +112,8 @@ function CoordinationRoomAnimation() {
   const [running, setRunning] = React.useState(false);
   const [paused, setPaused] = React.useState(false);
   const [stageIdx, setStageIdx] = React.useState(0);
+  const [frameIdx, setFrameIdx] = React.useState(0);
+  const [loopCount, setLoopCount] = React.useState(0);
 
   React.useEffect(() => {
     setReduce(typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -116,7 +123,7 @@ function CoordinationRoomAnimation() {
   // Reduced-motion visitors get the final frame immediately — no timers,
   // no controls, nothing to play.
   React.useEffect(() => {
-    if (reduce) { setStageIdx(ROOM_STAGES.length - 1); setPlayed(true); }
+    if (reduce) { setStageIdx(ROOM_STAGES.length - 1); setFrameIdx(ROOM_FRAMES.length - 1); setPlayed(true); }
   }, [reduce]);
 
   // Start automatically at 60% visibility, then loop until paused/skipped.
@@ -131,13 +138,18 @@ function CoordinationRoomAnimation() {
   }, [reduce, narrow, played]);
 
   // Loops continuously once started — a real, repeating sequence rather
-  // than a one-shot that freezes on its last frame.
+  // than a one-shot that freezes on its last frame. `raw` keeps counting up
+  // (not wrapped) so the loop number can drive the curtain's key below;
+  // `elapsed` is that same clock wrapped to one cycle's length.
   React.useEffect(() => {
     if (!running || paused) return;
     playStartRef.current = performance.now();
     const tick = () => {
-      const elapsed = (elapsedAtPauseRef.current + (performance.now() - playStartRef.current)) % ROOM_TOTAL_MS;
+      const raw = elapsedAtPauseRef.current + (performance.now() - playStartRef.current);
+      const elapsed = raw % ROOM_TOTAL_MS;
       setStageIdx(stageIndexAt(elapsed));
+      setFrameIdx(Math.floor((elapsed / ROOM_TOTAL_MS) * ROOM_FRAMES.length) % ROOM_FRAMES.length);
+      setLoopCount(Math.floor(raw / ROOM_TOTAL_MS));
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
@@ -147,7 +159,7 @@ function CoordinationRoomAnimation() {
   const togglePause = () => {
     if (!running) return;
     if (!paused) {
-      elapsedAtPauseRef.current = (elapsedAtPauseRef.current + (performance.now() - playStartRef.current)) % ROOM_TOTAL_MS;
+      elapsedAtPauseRef.current += performance.now() - playStartRef.current;
       cancelAnimationFrame(rafRef.current);
     }
     setPaused((p) => !p);
@@ -213,8 +225,8 @@ function CoordinationRoomAnimation() {
           from this site's own asset library, not stock imagery), role
           labels, condition hotspots, deliverables. */}
       <div style={{ position: 'absolute', inset: 0, opacity: showModel ? 1 : 0, transition: 'opacity 500ms var(--ease-out)' }}>
-        <img src="/assets/frames/03-steel-skeleton.jpg" alt="" aria-hidden="true"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.85) brightness(.7)' }} />
+        <img key={frameIdx} src={`/assets/frames/${ROOM_FRAMES[frameIdx]}.jpg`} alt="" aria-hidden="true"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(.85) brightness(.7)', ...(reduce ? null : { animation: 'ubcRoomFadeIn 350ms var(--ease-out)' }) }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(16,18,21,.35), rgba(16,18,21,.55))' }} />
 
         {/* Role labels settle around the model (stage 1). */}
@@ -260,9 +272,22 @@ function CoordinationRoomAnimation() {
         </div>
       )}
 
+      {/* White curtain: closed at the start of every loop, then opens like
+          theater curtains over the first ~700ms — masks the hard jump-cut
+          back to stage 0 each time the sequence repeats, and gives the
+          very first play the same "reveal" opening rather than starting
+          mid-scene. Keyed by loopCount so the animation restarts fresh
+          every cycle, including the first. */}
+      {!reduce && (
+        <div key={loopCount} style={{ position: 'absolute', inset: 0, display: 'flex', pointerEvents: 'none', zIndex: 1 }}>
+          <div style={{ flex: 1, background: 'var(--paper)', animation: 'ubcCurtainOpenLeft 700ms var(--ease-out) forwards' }} />
+          <div style={{ flex: 1, background: 'var(--paper)', animation: 'ubcCurtainOpenRight 700ms var(--ease-out) forwards' }} />
+        </div>
+      )}
+
       {/* Caption + controls. Headline/CTA live outside this frame (in
           AboutHero above), unaffected by animation state, per the brief. */}
-      <div style={{ position: 'absolute', left: 'var(--s-6)', top: 'var(--s-6)', right: 'var(--s-6)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--s-4)' }}>
+      <div style={{ position: 'absolute', left: 'var(--s-6)', top: 'var(--s-6)', right: 'var(--s-6)', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--s-4)' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)', maxWidth: '70%' }}>{message}</div>
         {!played && (
           <div style={{ display: 'flex', gap: 'var(--s-2)', flexShrink: 0 }}>
