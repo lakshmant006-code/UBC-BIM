@@ -879,42 +879,20 @@ UBC_DATA.wallPanelModel = {
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
       image: '/assets/details/wp-top-track.jpg',
       body: 'The metal rail running along the very top of the wall — the longest single piece in this panel, spanning nearly its full 4.25 m length. Every stud underneath screws into it, which is what turns a row of separate studs into one solid wall frame.' },
-    { id: 'sheathing', label: 'Sheathing', position: [0.203, 1.833, -2.057], viewAngle: [0.8, 0.6, -1.7],
+    { id: 'sheathing', label: 'Sheathing', position: [-0.923, 0.453, -2.057], viewAngle: [0.8, 0.6, -1.7],
       image: '/assets/details/wp-sheathing.jpg',
       body: 'The flat panel skin fastened over the studs, covering nearly the full 6.17 m width of the wall in one continuous piece. It ties the whole frame together into one stiff surface, which is what actually gives the wall its strength against being pushed sideways.' }
   ]
 };
 
-/* Truss panels has no dedicated 3D model of its own yet (no truss-bearing
-   IFC has been supplied), so unlike wallPanelModel above this isn't an
-   orbitable scene with hotspots at real 3D coordinates. Instead it reuses
-   the same "click a marker, see a real detail photo and a plain-language
-   description" interaction against real crops from the client's own
-   TYPICAL_DETAILS.pdf structural sheet set (S640/S650/S661/S662/S664) —
-   the same source document wallPanelModel's own anchor/panel-to-panel
-   images above were drawn from. Marker positions are placed by eye over
-   this one reference photo, not measured off a model, so they mark general
-   areas of interest rather than an exact pixel-for-pixel callout. */
-UBC_DATA.trussPanelDetails = {
-  background: '/assets/details/truss-roof-to-panel.jpg',
-  hotspots: [
-    { id: 'anatomy', label: 'Truss anatomy', x: '58%', y: '28%',
-      image: '/assets/details/truss-roof-anatomy.jpg',
-      body: 'Every roof truss is built from the same three parts: a sloped top chord and a flat bottom chord, tied together by a web of diagonal members running between them. Those webs are what let a truss span a wide roof using far less material than a solid rafter would need.' },
-    { id: 'floor-truss', label: 'Floor truss', x: '38%', y: '46%',
-      image: '/assets/details/truss-floor-anatomy.jpg',
-      body: 'A floor truss uses the same top-chord / web / bottom-chord structure as a roof truss, except both chords run flat and parallel instead of sloping to a peak — built to carry a level floor deck, with a side reinforcement plate added at select panel points for extra strength.' },
-    { id: 'bearing', label: 'Truss-to-wall bearing', x: '20%', y: '58%',
-      image: '/assets/details/truss-to-wall-panel.jpg',
-      body: 'Where a truss’s bottom chord lands directly on a wall panel’s top track — the point where the load a truss carries from the roof or floor above passes down into the wall panel below it.' },
-    { id: 'panel-built-for-truss', label: 'Panel built for the truss', x: '75%', y: '62%',
-      image: '/assets/details/truss-panel-connection.jpg',
-      body: 'A wall panel detailed specifically to receive a truss directly above it — its studs and top track positioned to match the truss layout above, so the two pieces land together on site without field adjustment.' },
-    { id: 'rca-clip', label: 'RCA clip connection', x: '48%', y: '78%',
-      image: '/assets/details/truss-rca-clip.jpg',
-      body: 'A truss-to-wall connection made with an RCA clip — a fabricated steel bracket (shown here tying the yellow truss to the magenta wall studs) that gives every truss-to-wall connection on a project the same fixed, repeatable detail instead of a one-off site cut.' }
-  ]
-};
+// Truss panels has no dedicated 3D model of its own yet, so per request it
+// reuses this exact wallPanelModel scene and hotspots (MockingBirdModel.jsx
+// renders the same ModelViewer for either sub-tab) rather than a "coming
+// soon" placeholder. Real crops from the client's own TYPICAL_DETAILS.pdf
+// structural sheet set (roof/floor truss anatomy, truss-to-wall bearing, a
+// panel built for the truss above it, an RCA clip connection) are already
+// sitting in public/assets/details/truss-*.jpg, unused for now, ready for
+// a dedicated truss UBC_DATA entry once a real truss-bearing IFC arrives.
 
 const CORE_REGIONS = ['South Carolina', 'Florida', 'Texas', 'California', 'Australia', 'New Zealand', 'Chile', 'Hyderabad, India', 'Dubai, UAE'];
 const EXTENDED_REGIONS = [...CORE_REGIONS, 'UK', 'Europe', 'Canada', 'Israel'];

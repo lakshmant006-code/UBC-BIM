@@ -32,14 +32,12 @@
   we considered" idea the client asked for, and the template for the other
   seven categories' own models as those arrive.
 
-  Truss panels has no orbitable 3D model yet (no truss-bearing IFC has been
-  supplied), so it reuses the same marker-and-card interaction against a
-  real reference photo instead — UBC_DATA.trussPanelDetails, crops from the
-  client's own TYPICAL_DETAILS.pdf structural sheet set, the same source
-  document some of Wall panels' own hotspot images (anchor bolt, panel to
-  panel) were drawn from. Clicking a marker opens the same HotspotCard used
-  above, just without a camera fly-in first, since there's no 3D camera to
-  move — a flat photo, not a scene.
+  Truss panels has no dedicated truss-bearing IFC of its own yet, so — per
+  request — it shows this exact same wallPanelModel scene and hotspots
+  rather than a "coming soon" placeholder: `onModelView` below is true for
+  either sub-tab, and both render the identical ModelViewer/hotspot/card
+  stack. This is a real wall panel, not truss structure; swap in a
+  dedicated truss model here (its own UBC_DATA entry) once one exists.
 
   `locked` on ModelViewer turns off free drag/scroll orbiting, so the camera
   only ever moves via a hotspot's own flyTo or back out via reset — closing
@@ -53,7 +51,6 @@
 */
 import React from 'react';
 import { Icon } from '../../components/core/Icon.jsx';
-import { Hotspot } from '../../components/model/Hotspot.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
@@ -145,24 +142,6 @@ function ServiceTabs({ articles, selection, onSelectArticle, onSelectSub }) {
   );
 }
 
-// Truss panels: no orbitable 3D model yet, so this is a real reference
-// photo (UBC_DATA.trussPanelDetails.background) with the same red pulsing
-// markers as Wall panels laid over it. Clicking one opens the same
-// HotspotCard `onOpen` hands back up to MockingBirdModel, just without a
-// camera fly-in — `onHotspotClick` here skips straight to opening the
-// card, since there's no 3D camera to wait on.
-function TrussPanelsDetail({ details, onHotspotClick }) {
-  if (!details) return null;
-  return (
-    <div className="ubc-model-viewer" style={{ position: 'relative', height: 'calc(100vh - 84px)', overflow: 'hidden', background: 'var(--surface-sunken)' }}>
-      <img src={details.background} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-      {(details.hotspots || []).map((hs) => (
-        <Hotspot key={hs.id} x={hs.x} y={hs.y} label={hs.label} onClick={() => onHotspotClick(hs)} />
-      ))}
-    </div>
-  );
-}
-
 function HotspotCard({ hotspot, onClose }) {
   return (
     <div role="dialog" aria-label={hotspot.label} style={{
@@ -249,12 +228,15 @@ export function MockingBirdModel() {
   const [freeRotate, setFreeRotate] = React.useState(false);
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Leaving the Wall panels view tears down that ModelViewer instance;
-  // clear its stale api/open-card/free-rotate state so returning to it
-  // later starts clean instead of picking up wherever it was left.
+  // Truss panels shares this same model and hotspots (no dedicated
+  // truss-bearing IFC has been supplied yet), so both tabs count as "the
+  // model view" here. Leaving both tears down the ModelViewer instance;
+  // clear its stale api/open-card/free-rotate state so coming back later
+  // starts clean instead of picking up wherever it was left.
+  const onModelView = selection.type === 'wall-panels' || selection.type === 'truss-panels';
   React.useEffect(() => {
-    if (selection.type !== 'wall-panels') { setApi(null); setOpenHotspot(null); setFreeRotate(false); }
-  }, [selection.type]);
+    if (!onModelView) { setApi(null); setOpenHotspot(null); setFreeRotate(false); }
+  }, [onModelView]);
 
   // Switching back to the guided view snaps the camera back to the
   // resting frame, so turning free rotate off always leaves the
@@ -278,9 +260,6 @@ export function MockingBirdModel() {
     if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
   };
-  // Truss panels' markers sit on a flat reference photo, not a 3D scene —
-  // no camera to fly, so the card opens straight away.
-  const handleTrussHotspotClick = (hs) => setOpenHotspot(hs);
 
   // The model is `locked` (no free drag/scroll) precisely so the camera is
   // only ever where a hotspot put it or back at the resting frame — so
@@ -306,7 +285,7 @@ export function MockingBirdModel() {
         onSelectArticle={(id) => setSelection({ type: 'article', id })}
         onSelectSub={(parentId, subId) => setSelection({ type: subId, parentId })} />
 
-      {selection.type === 'wall-panels' ? (
+      {onModelView ? (
         wallPanel ? (
           <>
             <ModelViewer src={wallPanel.src} radius={wallPanel.radius}
@@ -318,11 +297,6 @@ export function MockingBirdModel() {
         ) : (
           <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
         )
-      ) : selection.type === 'truss-panels' ? (
-        <>
-          <TrussPanelsDetail details={D.trussPanelDetails} onHotspotClick={handleTrussHotspotClick} />
-          {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
-        </>
       ) : (
         activeArticle && <ServicesDetail article={activeArticle} onQuote={onQuote} />
       )}
