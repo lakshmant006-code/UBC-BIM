@@ -32,12 +32,11 @@
   we considered" idea the client asked for, and the template for the other
   seven categories' own models as those arrive.
 
-  Truss panels has no dedicated truss-bearing IFC of its own yet, so — per
-  request — it shows this exact same wallPanelModel scene and hotspots
-  rather than a "coming soon" placeholder: `onModelView` below is true for
-  either sub-tab, and both render the identical ModelViewer/hotspot/card
-  stack. This is a real wall panel, not truss structure; swap in a
-  dedicated truss model here (its own UBC_DATA entry) once one exists.
+  Truss panels uses the same GLB — the model carries a real truss system
+  across its top — but its own UBC_DATA.trussPanelModel hotspot set, placed
+  on that truss geometry, with cards drawn only from the client's truss
+  details in TYPICAL_DETAILS.pdf. `onModelView` is true for either sub-tab;
+  the ModelViewer is keyed by tab so switching remounts it cleanly.
 
   `locked` on ModelViewer turns off free drag/scroll orbiting, so the camera
   only ever moves via a hotspot's own flyTo or back out via reset — closing
@@ -228,15 +227,15 @@ export function MockingBirdModel() {
   const [freeRotate, setFreeRotate] = React.useState(false);
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Truss panels shares this same model and hotspots (no dedicated
-  // truss-bearing IFC has been supplied yet), so both tabs count as "the
-  // model view" here. Leaving both tears down the ModelViewer instance;
-  // clear its stale api/open-card/free-rotate state so coming back later
-  // starts clean instead of picking up wherever it was left.
+  // Both sub-tabs are "the model view" (same GLB, different hotspot set).
+  // Any tab change clears the open card and free-rotate so each view starts
+  // from its resting frame; leaving both also drops the stale viewer api.
   const onModelView = selection.type === 'wall-panels' || selection.type === 'truss-panels';
+  const activeModel = selection.type === 'truss-panels' ? D.trussPanelModel : wallPanel;
   React.useEffect(() => {
-    if (!onModelView) { setApi(null); setOpenHotspot(null); setFreeRotate(false); }
-  }, [onModelView]);
+    setOpenHotspot(null); setFreeRotate(false);
+    if (!onModelView) setApi(null);
+  }, [selection.type, onModelView]);
 
   // Switching back to the guided view snaps the camera back to the
   // resting frame, so turning free rotate off always leaves the
@@ -286,11 +285,11 @@ export function MockingBirdModel() {
         onSelectSub={(parentId, subId) => setSelection({ type: subId, parentId })} />
 
       {onModelView ? (
-        wallPanel ? (
+        activeModel ? (
           <>
-            <ModelViewer src={wallPanel.src} radius={wallPanel.radius}
-              height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={wallPanel.restAngle}
-              hotspots={wallPanel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
+            <ModelViewer key={selection.type} src={activeModel.src} radius={activeModel.radius}
+              height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle}
+              hotspots={activeModel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
             <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
             {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
           </>
