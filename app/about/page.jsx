@@ -1,8 +1,8 @@
 import { About } from '../../ui_kits/website/About.jsx';
 
 export const metadata = {
-  title: 'About | UBC BIM',
-  description: 'UBC BIM produces framing models and the documents built from them for builders, panel manufacturers and steel roll-formers in 12 countries.'
+  title: 'About UBC BIM | CFS and LGSF Engineering Team',
+  description: 'Meet the UBC BIM engineering, BIM, detailing, coordination, and QA team supporting CFS, LGSF, and wood-framed projects for US clients.'
 };
 
 export default function AboutPage() {

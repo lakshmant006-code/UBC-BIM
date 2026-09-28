@@ -11,8 +11,8 @@ import React from 'react';
 import anime from 'animejs';
 
 export const Page = ({ children, style }) => <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', ...style }}>{children}</div>;
-export const Section = ({ children, sunken, tight, style }) => (
-  <section className="ubc-section" style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
+export const Section = ({ children, sunken, tight, id, style }) => (
+  <section id={id} className="ubc-section" style={{ padding: (tight ? 'var(--s-9)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
 );
 // anime.js-driven entrance, in place of the old CSS opacity/translateY
 // transition: same shape (fade up 22px, once, on scroll into view) and the
