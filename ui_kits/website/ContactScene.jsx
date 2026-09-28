@@ -1,17 +1,25 @@
 'use client';
 /*
-  ContactScene: the welcome sequence at the top of the Contact page. Scroll
-  SCRUBS a JPEG frame sequence on a canvas: a UBC BIM lead meets two visitors at
-  the studio door, shakes hands, holds the door, and walks them into the office.
-  Same mechanics as the home-page build sequence (canvas + preloader + frame
-  windows), so there is no <video> element and no codec or seek quirks.
+  ContactScene: the welcome sequence at the top of the Contact page. The
+  media is a single static still (frame 1 of the same JPEG sequence this
+  used to scrub through) — no scroll-driven scrubbing any more, per
+  explicit request. Scroll still drives the STAGE captions, numbered rail
+  and glassmorphic cards below, same as before; only the image itself is
+  now fixed rather than changing frame as you scroll.
 
   Config: UBC_DATA.contactScene
-    seq / seqMobile { prefix, count, pad, ext }   frame sequences
-    poster                                        first-paint still
+    seq / seqMobile { prefix, count, pad, ext }   frame sequence (frame 1 is
+                                                  the still shown; `count`
+                                                  is still used to convert
+                                                  each card's configured
+                                                  frame/span into a scroll
+                                                  range, below)
+    poster                                        whether a still exists
     stages [{ n, t, title, note }]                captions along the scroll
     cards  [{ frame, span, side, eyebrow, title, body, cta, route }]
-                                                  glass cards over given frames
+                                                  glass cards, still timed
+                                                  to a scroll range derived
+                                                  from their frame number
 
   Each card carries a `route` id; the page owns what a route does (open the
   scheduler, the quote drawer, mail, WhatsApp) via the onRoute prop.
@@ -77,20 +85,13 @@ function SceneCard({ card, visible, onRoute }) {
 
 export function ContactScene({ onRoute, onQuote }) {
   const wrapRef = React.useRef(null);
-  const canvasRef = React.useRef(null);
-  const imagesRef = React.useRef([]);
   const ctaRef = React.useRef(null);
-  const targetRef = React.useRef(0);
-  const smoothRef = React.useRef(0);
-  const drawnRef = React.useRef(-1);
-  const rafRef = React.useRef(0);
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
-  const [drew, setDrew] = React.useState(false);
-  // The frame sequence is a large binary asset. Until it is in the repo the
-  // first frame 404s; rather than pin a black stage over the Contact page, the
-  // scene takes itself out and the page below stands on its own. It switches
-  // on by itself the moment the frames are present.
+  // The still is a real binary asset. Until it is in the repo it 404s;
+  // rather than pin a black stage over the Contact page, the scene takes
+  // itself out and the page below stands on its own. It switches on by
+  // itself the moment the image is present.
   const [missing, setMissing] = React.useState(false);
   React.useEffect(() => {
     if (!CS_SEQ) return;
@@ -99,37 +100,12 @@ export function ContactScene({ onRoute, onQuote }) {
     probe.src = csFrameUrl(1);
   }, []);
 
-  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = CS_SEQ ? CS_SEQ.count : 0;
   const n = Math.max(1, CS_STAGES.length);
 
-  // Preload: coarse skeleton first, then fill outward from where the viewer is.
-  React.useEffect(() => {
-    if (!CS_SEQ) return;
-    const imgs = imagesRef.current;
-    const load = (i) => { if (imgs[i]) return false; const im = new Image(); im.src = csFrameUrl(i + 1); imgs[i] = im; return true; };
-    load(0);
-    let stop = false;
-    const CONCURRENT = 6;
-    const tick = () => {
-      if (stop) return;
-      let issued = 0;
-      for (let i = 0; i < count && issued < CONCURRENT; i += 8) if (load(i)) issued++;
-      if (issued === 0) {
-        const here = Math.round(targetRef.current * (count - 1));
-        for (let d = 0; d < count && issued < CONCURRENT; d++) {
-          const lo = here - d, hi = here + d;
-          if (lo >= 0 && load(lo)) issued++;
-          if (issued < CONCURRENT && hi < count && load(hi)) issued++;
-        }
-      }
-      if (issued > 0) setTimeout(tick, 40);
-    };
-    tick();
-    return () => { stop = true; };
-  }, [count]);
-
-  // Scroll -> progress + active stage.
+  // Scroll -> progress + active stage + which cards are in their window.
+  // The image itself no longer moves with this; only the captions/rail/
+  // cards below still do.
   React.useEffect(() => {
     if (!CS_SEQ) return;
     const onScroll = () => {
@@ -138,7 +114,6 @@ export function ContactScene({ onRoute, onQuote }) {
       const total = r.height - window.innerHeight;
       if (total <= 0) return;
       const p = Math.min(1, Math.max(0, -r.top / total));
-      targetRef.current = p;
       setProgress(p);
       let s = 0;
       for (let i = 0; i < CS_STAGES.length; i++) { if (p >= (CS_STAGES[i].t || 0) - 0.0001) s = i; }
@@ -150,55 +125,7 @@ export function ContactScene({ onRoute, onQuote }) {
     return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
   }, []);
 
-  // Cover on wide screens; fit-to-width and letterbox when the stage is
-  // narrower than the frame, so a phone still sees the whole room.
-  const placement = (boxW, boxH, iw, ih) => {
-    const s = (boxW / boxH) < (iw / ih) ? (boxW / iw) : Math.max(boxW / iw, boxH / ih);
-    const w = iw * s, h = ih * s;
-    return { x: (boxW - w) / 2, y: (boxH - h) / 2, w, h };
-  };
-
-  React.useEffect(() => {
-    if (!CS_SEQ) return;
-    const cvs = canvasRef.current; if (!cvs) return;
-    const ctx = cvs.getContext('2d');
-    const dpr = () => (window.devicePixelRatio > 1 ? 1.5 : 1);
-    const fit = () => {
-      cvs.width = cvs.clientWidth * dpr();
-      cvs.height = cvs.clientHeight * dpr();
-      drawnRef.current = -1;
-    };
-    fit();
-    window.addEventListener('resize', fit);
-    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
-    if (ro) ro.observe(cvs);
-    const draw = () => {
-      const t = targetRef.current;
-      smoothRef.current = reduce ? t : smoothRef.current + (t - smoothRef.current) * 0.18;
-      let idx = Math.round(smoothRef.current * (count - 1));
-      idx = Math.max(0, Math.min(count - 1, idx));
-      const imgs = imagesRef.current;
-      let use = -1;
-      for (let d = 0; d < count; d++) {
-        const lo = idx - d, hi = idx + d;
-        if (lo >= 0 && imgs[lo] && imgs[lo].complete && imgs[lo].naturalWidth) { use = lo; break; }
-        if (hi < count && imgs[hi] && imgs[hi].complete && imgs[hi].naturalWidth) { use = hi; break; }
-      }
-      if (use >= 0 && use !== drawnRef.current) {
-        const im = imgs[use];
-        const r = placement(cvs.width, cvs.height, im.naturalWidth, im.naturalHeight);
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
-        ctx.drawImage(im, r.x, r.y, r.w, r.h);
-        drawnRef.current = use;
-        setDrew(true);
-      }
-      rafRef.current = requestAnimationFrame(draw);
-    };
-    rafRef.current = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', fit); if (ro) ro.disconnect(); };
-  }, [count, reduce]);
-
-  // Nothing to scrub without a sequence: render nothing rather than an empty
+  // Nothing to show without a sequence: render nothing rather than an empty
   // black hole, so the Contact page still stands on its own.
   if (!CS_SEQ || missing) return null;
 
@@ -223,8 +150,7 @@ export function ContactScene({ onRoute, onQuote }) {
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-sunken)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {CS.poster && <img src={csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)', opacity: drew ? 0 : 1, transition: 'opacity var(--dur-2) linear' }} />}
-        <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95)' }} />
+        <img src={CS.poster || csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)' }} />
 
         {/* Light scrim: white studio system throughout, so the dark captions
             need a paper-toned gradient under them rather than the old
