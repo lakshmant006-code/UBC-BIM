@@ -483,53 +483,6 @@ function CompanyProof() {
 }
 
 // ---------------------------------------------------------------------
-// HUMAN PROOF — one real, already-attributed client testimonial (from
-// the site's own verified video testimonials) and a link to the real
-// Projects page in place of a per-project case-study write-up (none
-// exists yet — see Home's own CaseStudiesNote for the same honest gap).
-// The real office/team photograph the brief also asks for here doesn't
-// exist yet either.
-// ---------------------------------------------------------------------
-function HumanProof() {
-  const testimonial = (D.videoTestimonials || []).find((v) => v.quote && v.name);
-  return (
-    <Section>
-      <Page>
-        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
-          <div style={{ ...eyebrowStyle, display: 'inline-block' }}>Human proof</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Real people, on the record</h2>
-        </Reveal>
-        <div className="ubc-human-proof-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)', marginTop: 'var(--s-8)', alignItems: 'start' }}>
-          {testimonial && (
-            <Reveal>
-              <video controls preload="metadata" poster={testimonial.poster} playsInline
-                style={{ display: 'block', width: '100%', aspectRatio: '9 / 16', objectFit: 'cover', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: '#000' }}>
-                <source src={testimonial.src} type="video/mp4" />
-              </video>
-              <div style={{ marginTop: 'var(--s-3)' }}>
-                <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 700, color: 'var(--text-strong)' }}>{testimonial.name}</div>
-                <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-caption)', color: 'var(--text-muted)' }}>{testimonial.role}</div>
-              </div>
-            </Reveal>
-          )}
-          <Reveal delay={80}>
-            <div style={{ padding: 'var(--s-6)', background: 'var(--surface-card)', border: 'var(--bw-hair) dashed var(--border-strong)', borderRadius: 'var(--r-3)', marginBottom: 'var(--s-5)' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', color: 'var(--text-faint)' }}>Real office and team photography pending approval.</div>
-            </div>
-            <a href="/projects" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', textDecoration: 'none', borderBottom: 'var(--bw-hair) solid var(--border-strong)', paddingBottom: 2 }}>
-              See real project models <Icon name="arrow-right" size={15} />
-            </a>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-3) 0 0' }}>
-              Full project-specific case-study write-ups are coming soon.
-            </p>
-          </Reveal>
-        </div>
-      </Page>
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------
 // FINAL CONVERSION — exact copy from the brief.
 // ---------------------------------------------------------------------
 function FinalConversion({ onQuote }) {
@@ -566,7 +519,6 @@ export function About() {
       <WhatClientsReceive />
       <QualityAccountability />
       <CompanyProof />
-      <HumanProof />
       <FinalConversion onQuote={onQuote} />
     </div>
   );

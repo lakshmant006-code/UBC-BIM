@@ -53,7 +53,6 @@
   .ubc-team-grid { grid-template-columns: repeat(3, 1fr) !important; }
   .ubc-deliverables-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .ubc-qa-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .ubc-human-proof-grid { grid-template-columns: 1fr !important; }
 
   /* Client video testimonials: four portrait clips -> two per row */
   .ubc-video-grid { grid-template-columns: repeat(2, 1fr) !important; }
