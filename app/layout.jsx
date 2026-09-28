@@ -25,7 +25,7 @@ const ORG_SCHEMA = {
   name: 'UBC BIM',
   description: 'CFS and LGSF (light-gauge steel framing) and wood-frame BIM detailing: wall panels, roof and floor trusses, MEP coordination, permit sets and machine files.',
   url: 'https://ubc-bim.vercel.app/',
-  image: 'https://ubc-bim.vercel.app/ui_kits/website/assets/frames/05-facade.jpg',
+  image: 'https://ubc-bim.vercel.app/assets/frames/05-facade.jpg',
   areaServed: 'Worldwide',
   knowsAbout: ['Building Information Modelling', 'Cold-formed steel (CFS) framing', 'Light-gauge steel framing (LGSF)', 'Wood frame construction', 'Roof and floor trusses', 'MEP clash detection', 'Permit documentation'],
   serviceType: ['Wall panel detailing', 'Roof and floor trusses', 'Engineering of walls and trusses', 'MEP detailing and clash detection', 'Permit documents', 'Bill of Materials and machine CSV', 'Architectural drafting']
