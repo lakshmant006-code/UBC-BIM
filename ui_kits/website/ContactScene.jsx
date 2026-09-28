@@ -1,20 +1,23 @@
 'use client';
 /*
   ContactScene: the welcome sequence at the top of the Contact page. The
-  media is a single static still (frame 1 of the same JPEG sequence this
-  used to scrub through) — no scroll-driven scrubbing any more, per
-  explicit request. Scroll still drives the STAGE captions, numbered rail
-  and glassmorphic cards below, same as before; only the image itself is
-  now fixed rather than changing frame as you scroll.
+  media (a UBC BIM lead meeting two visitors at the studio door, shaking
+  hands, holding the door, and walking them into the office) now PLAYS
+  through once on its own, like a real video — driven by an elapsed-time
+  clock, not by scroll position. It used to scrub frame-by-frame as you
+  scrolled; per explicit request that's gone. It's still a JPEG frame
+  sequence drawn on a canvas rather than a real <video> element (no codec
+  or seek quirks), just advanced by a ~30fps playback clock instead of a
+  scroll listener. Starts once the stage is in view, plays once, holds on
+  the last frame. Scroll still drives the STAGE captions, numbered rail
+  and glassmorphic cards below, exactly as before — only the image
+  playback itself is decoupled from it now.
 
   Config: UBC_DATA.contactScene
-    seq / seqMobile { prefix, count, pad, ext }   frame sequence (frame 1 is
-                                                  the still shown; `count`
-                                                  is still used to convert
-                                                  each card's configured
-                                                  frame/span into a scroll
-                                                  range, below)
-    poster                                        whether a still exists
+    seq / seqMobile { prefix, count, pad, ext }   frame sequence played
+    poster                                        first-paint still, and
+                                                  what a reduced-motion
+                                                  visitor sees permanently
     stages [{ n, t, title, note }]                captions along the scroll
     cards  [{ frame, span, side, eyebrow, title, body, cta, route }]
                                                   glass cards, still timed
@@ -83,15 +86,28 @@ function SceneCard({ card, visible, onRoute }) {
   );
 }
 
+// Playback pace for the frame sequence: chosen to read as a real, short
+// video clip rather than a slideshow. 236 frames at 30fps is ~7.9s — in the
+// same range as the hero's own signature-moment timings elsewhere on the
+// site, not an arbitrary number.
+const CS_FPS = 30;
+
 export function ContactScene({ onRoute, onQuote }) {
   const wrapRef = React.useRef(null);
+  const stageRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
+  const imagesRef = React.useRef([]);
   const ctaRef = React.useRef(null);
+  const rafRef = React.useRef(0);
+  const playStartRef = React.useRef(0);
+  const drawnRef = React.useRef(-1);
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
-  // The still is a real binary asset. Until it is in the repo it 404s;
+  const [playing, setPlaying] = React.useState(false);
+  // The sequence is a real binary asset. Until it is in the repo it 404s;
   // rather than pin a black stage over the Contact page, the scene takes
   // itself out and the page below stands on its own. It switches on by
-  // itself the moment the image is present.
+  // itself the moment the frames are present.
   const [missing, setMissing] = React.useState(false);
   React.useEffect(() => {
     if (!CS_SEQ) return;
@@ -100,12 +116,94 @@ export function ContactScene({ onRoute, onQuote }) {
     probe.src = csFrameUrl(1);
   }, []);
 
+  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = CS_SEQ ? CS_SEQ.count : 0;
   const n = Math.max(1, CS_STAGES.length);
 
+  // Start playback once the stage actually scrolls into view, same "play
+  // once" idea as the hero's own signature animation — not tied to scroll
+  // position past that, just its trigger. Reduced-motion visitors never
+  // play it at all; they get the static poster frame below instead.
+  React.useEffect(() => {
+    if (!CS_SEQ || reduce) return;
+    const el = stageRef.current; if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) { setPlaying(true); io.disconnect(); }
+    }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduce]);
+
+  // Load every frame in order. Simple sequential preload (not the old
+  // "outward from wherever scroll is" strategy) since playback now always
+  // starts at frame 0 and only ever moves forward.
+  React.useEffect(() => {
+    if (!CS_SEQ) return;
+    const imgs = imagesRef.current;
+    let stop = false;
+    const CONCURRENT = 6;
+    let next = 0;
+    const loadOne = () => {
+      if (stop || next >= count) return;
+      const i = next++;
+      const im = new Image();
+      im.src = csFrameUrl(i + 1);
+      imgs[i] = im;
+      im.onload = im.onerror = loadOne;
+    };
+    for (let c = 0; c < CONCURRENT; c++) loadOne();
+    return () => { stop = true; };
+  }, [count]);
+
+  // Playback clock: advances the frame index by elapsed time, not scroll.
+  // Holds on the last frame once played through, rather than looping —
+  // this is a one-time "you're walking in" moment, not ambient motion.
+  React.useEffect(() => {
+    if (!CS_SEQ || !playing) return;
+    const cvs = canvasRef.current; if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    const dpr = () => (window.devicePixelRatio > 1 ? 1.5 : 1);
+    const fit = () => {
+      cvs.width = cvs.clientWidth * dpr();
+      cvs.height = cvs.clientHeight * dpr();
+      drawnRef.current = -1;
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
+    if (ro) ro.observe(cvs);
+
+    const placement = (boxW, boxH, iw, ih) => {
+      const s = (boxW / boxH) < (iw / ih) ? (boxW / iw) : Math.max(boxW / iw, boxH / ih);
+      const w = iw * s, h = ih * s;
+      return { x: (boxW - w) / 2, y: (boxH - h) / 2, w, h };
+    };
+
+    playStartRef.current = performance.now();
+    const draw = () => {
+      const elapsed = (performance.now() - playStartRef.current) / 1000;
+      let idx = Math.min(count - 1, Math.floor(elapsed * CS_FPS));
+      const imgs = imagesRef.current;
+      // If the target frame hasn't loaded yet, hold on the latest loaded
+      // frame at or before it rather than stalling on a blank canvas.
+      let use = -1;
+      for (let d = idx; d >= 0; d--) { if (imgs[d] && imgs[d].complete && imgs[d].naturalWidth) { use = d; break; } }
+      if (use >= 0 && use !== drawnRef.current) {
+        const im = imgs[use];
+        const r = placement(cvs.width, cvs.height, im.naturalWidth, im.naturalHeight);
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        ctx.drawImage(im, r.x, r.y, r.w, r.h);
+        drawnRef.current = use;
+      }
+      if (idx < count - 1) rafRef.current = requestAnimationFrame(draw);
+    };
+    rafRef.current = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', fit); if (ro) ro.disconnect(); };
+  }, [count, playing]);
+
   // Scroll -> progress + active stage + which cards are in their window.
-  // The image itself no longer moves with this; only the captions/rail/
-  // cards below still do.
+  // Unchanged: captions/rail/cards are still scroll-driven, only the
+  // video's own playback (above) no longer is.
   React.useEffect(() => {
     if (!CS_SEQ) return;
     const onScroll = () => {
@@ -148,9 +246,13 @@ export function ContactScene({ onRoute, onQuote }) {
 
   return (
     <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-sunken)' }}>
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+      <div ref={stageRef} style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        <img src={CS.poster || csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)' }} />
+        {/* Poster shows immediately and stays put for a reduced-motion
+            visitor (playback never starts, see the effect above); once
+            playback starts, the canvas draws over it. */}
+        <img src={CS.poster || csFrameUrl(1)} alt="" aria-hidden="true" style={{ ...MEDIA_BOX, width: '100%', objectFit: 'cover', filter: 'saturate(.95)', opacity: playing ? 0 : 1 }} />
+        {!reduce && <canvas ref={canvasRef} style={{ ...MEDIA_BOX, width: '100%', filter: 'saturate(.95)' }} />}
 
         {/* Light scrim: white studio system throughout, so the dark captions
             need a paper-toned gradient under them rather than the old
