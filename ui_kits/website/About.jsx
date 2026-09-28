@@ -119,7 +119,7 @@ function CoordinationRoomAnimation() {
     if (reduce) { setStageIdx(ROOM_STAGES.length - 1); setPlayed(true); }
   }, [reduce]);
 
-  // Start automatically at 60% visibility; play once only.
+  // Start automatically at 60% visibility, then loop until paused/skipped.
   React.useEffect(() => {
     if (reduce || narrow || played) return;
     const el = hostRef.current; if (!el) return;
@@ -130,13 +130,14 @@ function CoordinationRoomAnimation() {
     return () => io.disconnect();
   }, [reduce, narrow, played]);
 
+  // Loops continuously once started — a real, repeating sequence rather
+  // than a one-shot that freezes on its last frame.
   React.useEffect(() => {
     if (!running || paused) return;
     playStartRef.current = performance.now();
     const tick = () => {
-      const elapsed = elapsedAtPauseRef.current + (performance.now() - playStartRef.current);
-      setStageIdx(stageIndexAt(Math.min(elapsed, ROOM_TOTAL_MS)));
-      if (elapsed >= ROOM_TOTAL_MS) { setPlayed(true); setRunning(false); return; }
+      const elapsed = (elapsedAtPauseRef.current + (performance.now() - playStartRef.current)) % ROOM_TOTAL_MS;
+      setStageIdx(stageIndexAt(elapsed));
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
@@ -146,7 +147,7 @@ function CoordinationRoomAnimation() {
   const togglePause = () => {
     if (!running) return;
     if (!paused) {
-      elapsedAtPauseRef.current += performance.now() - playStartRef.current;
+      elapsedAtPauseRef.current = (elapsedAtPauseRef.current + (performance.now() - playStartRef.current)) % ROOM_TOTAL_MS;
       cancelAnimationFrame(rafRef.current);
     }
     setPaused((p) => !p);
