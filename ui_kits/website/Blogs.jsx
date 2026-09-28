@@ -66,7 +66,7 @@ function BlogCard({ post, index, onOpen }) {
             {badgeText}
           </div>
         )}
-        <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--fs-h3)', color: 'var(--text-strong)', lineHeight: 1.2 }}>{post.title}</div>
+        <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--fs-h3)', color: 'var(--text-strong)', lineHeight: 1.5 }}>{post.title}</div>
         {post.excerpt && (
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0', flex: 1 }}>{post.excerpt}</p>
         )}
@@ -120,7 +120,7 @@ function BlogPost({ post, onBack }) {
             {post.date && (
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginTop: 'var(--s-5)' }}>{post.date}</div>
             )}
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.1, letterSpacing: '-0.01em', color: 'var(--text-strong)', fontSize: 'clamp(28px, 3.8vw, 48px)', margin: 'var(--s-3) 0 0' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: 'clamp(28px, 3.8vw, 48px)', margin: 'var(--s-3) 0 0' }}>
               {post.title}
             </h1>
             {post.tags && post.tags.length > 0 && (

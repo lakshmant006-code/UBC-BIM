@@ -1,5 +1,5 @@
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--surface-page);color:var(--text-body);font:var(--type-body);letter-spacing:var(--ls-body);-webkit-font-smoothing:antialiased;text-wrap:pretty}
+body{margin:0;background:var(--surface-page);color:var(--text-body);font:var(--type-body);letter-spacing:var(--ls-body);word-spacing:var(--ws-body);-webkit-font-smoothing:antialiased;text-wrap:pretty}
 h1,h2,h3,h4{font-family:var(--font-display);color:var(--text-strong);letter-spacing:var(--ls-heading);margin:0}
 a{color:var(--text-strong);text-decoration:none;border-bottom:1px solid var(--border-accent);transition:var(--t-hover)}
 a:hover{color:var(--accent)}
@@ -7,3 +7,15 @@ a:hover{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ubc-grid{background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:var(--s-6) var(--s-6)}
 .ubc-label{font:var(--type-label);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-muted)}
+/* Accessibility floor (WCAG 1.4.12 text spacing, 2.5.8 target size): form
+   controls don't inherit text spacing by default, and every button gets a
+   44x44 minimum hit area. :where() keeps specificity at zero so a
+   component's own larger values still win. */
+/* em-based spacing computes to px where declared and inherits as px, so a
+   64px heading would inherit body-size spacing; set it on every element. */
+:where(*){letter-spacing:var(--ls-body);word-spacing:var(--ws-body)}
+:where(button,input,select,textarea){line-height:1.5}
+:where(button,[role="button"],select){min-width:44px;min-height:44px}
+:where(input[type="checkbox"],input[type="radio"]){min-width:24px;min-height:24px}
+:where(header a){display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px}
+:where(footer a){display:inline-flex;align-items:center;min-height:24px;min-width:24px}

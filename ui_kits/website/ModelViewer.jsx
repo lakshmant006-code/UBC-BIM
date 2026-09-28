@@ -507,7 +507,7 @@ export function ModelViewer({ src, radius, title, height, compact, bare, initial
             onHotspotClick({ ...hs, position: [p[0], p[1] + floorOffsetRef.current, p[2]] });
           }}
           aria-label={hs.label} title={hs.label}
-          className="ubc-hotspot" style={{ position: 'absolute', display: 'none', width: 22, height: 22, marginLeft: -11, marginTop: -11, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}>
+          className="ubc-hotspot" style={{ position: 'absolute', display: 'none', width: 44, height: 44, marginLeft: -22, marginTop: -22, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}>
           <span aria-hidden="true" className="ubc-hotspot-ring" style={{ position: 'absolute', left: '50%', top: '50%', width: 34, height: 34, marginLeft: -17, marginTop: -17, borderRadius: 999, border: '1.5px solid var(--accent)', animation: 'ubcHotspotPulse 1.8s ease-out infinite' }} />
           <span aria-hidden="true" style={{ position: 'absolute', left: '50%', top: '50%', width: 12, height: 12, marginLeft: -6, marginTop: -6, borderRadius: 999, background: 'var(--accent)', boxShadow: '0 0 0 2px rgba(245,244,241,.9)' }} />
         </button>

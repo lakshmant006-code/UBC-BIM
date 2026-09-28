@@ -61,7 +61,7 @@ function HeroCard({ card, visible, onGo, onQuote }) {
         transition: 'opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out)'
       }}>
       {card.eyebrow && <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{card.eyebrow}</span>}
-      <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.15, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{card.title}</span>
+      <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.5, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{card.title}</span>
       {card.body && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>{card.body}</span>}
       {card.cta && (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid var(--border-strong)', paddingBottom: 2 }}>
@@ -317,7 +317,7 @@ export function SceneHero({ onQuote, onGo }) {
         {/* Intro headline (fades out as you start scrolling) */}
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-5)' }}>Loading the structural model</div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.02, letterSpacing: '-0.01em', color: 'var(--text-strong)', margin: 0, maxWidth: '18ch' }}>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)', margin: 0, maxWidth: '18ch' }}>
             CFS and LGSF Engineering and Detailing Services
           </h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '54ch', margin: 'var(--s-6) 0 var(--s-7)' }}>
@@ -338,7 +338,7 @@ export function SceneHero({ onQuote, onGo }) {
             than requiring the whole note to be read to find it. */}
         <div className="ubc-stage-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '42ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Stage {active.n}</div>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.05, color: 'var(--text-strong)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.5, color: 'var(--text-strong)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
           {active.term && (
             <span style={{ display: 'inline-block', marginTop: 'var(--s-3)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '5px 12px' }}>
               {active.term}

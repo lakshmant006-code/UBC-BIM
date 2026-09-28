@@ -879,20 +879,44 @@ UBC_DATA.wallPanelModel = {
     { id: 'top-track', label: 'Top track', position: [-2.953, 1.54, 0.0], viewAngle: [-1.7, 0.7, 0.9],
       image: '/assets/details/wp-top-track.jpg',
       body: 'The metal rail running along the very top of the wall — the longest single piece in this panel, spanning nearly its full 4.25 m length. Every stud underneath screws into it, which is what turns a row of separate studs into one solid wall frame.' },
-    { id: 'sheathing', label: 'Sheathing', position: [-0.923, 0.453, -2.057], viewAngle: [0.8, 0.6, -1.7],
+    { id: 'sheathing', label: 'Sheathing', position: [-0.933, 0.321, -2.057], viewAngle: [0.8, 0.6, -1.7],
       image: '/assets/details/wp-sheathing.jpg',
       body: 'The flat panel skin fastened over the studs, covering nearly the full 6.17 m width of the wall in one continuous piece. It ties the whole frame together into one stiff surface, which is what actually gives the wall its strength against being pushed sideways.' }
   ]
 };
 
-// Truss panels has no dedicated 3D model of its own yet, so per request it
-// reuses this exact wallPanelModel scene and hotspots (MockingBirdModel.jsx
-// renders the same ModelViewer for either sub-tab) rather than a "coming
-// soon" placeholder. Real crops from the client's own TYPICAL_DETAILS.pdf
-// structural sheet set (roof/floor truss anatomy, truss-to-wall bearing, a
-// panel built for the truss above it, an RCA clip connection) are already
-// sitting in public/assets/details/truss-*.jpg, unused for now, ready for
-// a dedicated truss UBC_DATA entry once a real truss-bearing IFC arrives.
+/* Truss panels: same GLB as wallPanelModel — that model carries a real
+   truss system across its top: ten parallel-chord trusses at ~0.61 m
+   (24") centres, each 0.58 m deep (top chord y≈1.67, bottom chord y≈1.17,
+   webs between), spanning 4.25 m between the front and back walls
+   (z≈±2.06), with full-depth blocking in every bay over the front wall.
+   Every marker below sits on that truss geometry, found by splitting the
+   GLB into connected components, and every card's image and wording is
+   from the client's own TYPICAL_DETAILS.pdf (sheets S640, S650, S662,
+   S663) — truss details only, nothing from the wall-panel set above.
+   Positions were checked through the viewer's own camera projection so
+   no two markers land within 44 px of each other at the resting frame. */
+UBC_DATA.trussPanelModel = {
+  src: UBC_DATA.wallPanelModel.src, radius: UBC_DATA.wallPanelModel.radius,
+  restAngle: UBC_DATA.wallPanelModel.restAngle,
+  hotspots: [
+    { id: 'top-chord', label: 'Top chord', position: [2.37, 1.667, 0.5], viewAngle: [-1.0, 1.6, -1.0],
+      image: '/assets/details/truss-floor-anatomy.jpg',
+      body: 'The top rail of each truss, running its full 4.25 m span. The client’s typical floor-truss detail (S663) builds every truss the same way: a top chord and a bottom chord held apart by a zig-zag of webs, with side reinforcement added where the design needs it.' },
+    { id: 'webs', label: 'Webs', position: [-1.187, 1.419, 1.028], viewAngle: [-0.4, 1.8, -0.6],
+      image: '/assets/details/truss-roof-anatomy.jpg',
+      body: 'The diagonal and vertical members between the top and bottom chords, as labelled in the typical roof-truss detail (S662). They tie the two chords together into one deep, stiff frame that spans from wall to wall.' },
+    { id: 'bottom-chord', label: 'Bottom chord', position: [0.03, 1.17, -1.2], viewAngle: [-0.7, 1.2, -1.2],
+      image: '/assets/details/truss-s650-flush.jpg',
+      body: 'The lower rail of the truss, and the part that sits on the wall. Per the typical flush detail (S650, detail 6), the wall’s top plate is attached to the truss bottom chord with a minimum of two #10 ¾" screws.' },
+    { id: 'bearing', label: 'Truss to wall', position: [-2.41, 1.13, -2.08], viewAngle: [-1.4, 0.8, -1.4],
+      image: '/assets/details/truss-to-wall-panel.jpg',
+      body: 'Where each truss lands on the wall panel below. The typical load-bearing detail (S650, detail 4) fixes the wall’s top plate to the truss with two #10 × ¾" screws at 24" on centre, the same 24" spacing the trusses themselves are set at in this model.' },
+    { id: 'blocking', label: 'Blocking', position: [0.835, 1.419, -2.082], viewAngle: [0.2, 0.6, -1.9],
+      image: '/assets/details/truss-s640-blocking.jpg',
+      body: 'Full-depth blocking fitted between the trusses directly over the wall, so the roof and the shear wall below act together against sideways loads. The typical detail (S640) fastens it with four #12-¾" hex-head screws at every 24" on centre.' }
+  ]
+};
 
 const CORE_REGIONS = ['South Carolina', 'Florida', 'Texas', 'California', 'Australia', 'New Zealand', 'Chile', 'Hyderabad, India', 'Dubai, UAE'];
 const EXTENDED_REGIONS = [...CORE_REGIONS, 'UK', 'Europe', 'Canada', 'Israel'];
