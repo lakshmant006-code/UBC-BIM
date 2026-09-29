@@ -71,8 +71,6 @@
 
 /* ---------- Phones ---------- */
 @media (max-width: 640px) {
-  /* Section rhythm tightens up so the page is not endless on a small screen */
-  .ubc-section { padding: var(--s-9) 0 !important; }
 
   /* Blog grid: two columns -> one */
   .ubc-blog-grid { grid-template-columns: 1fr !important; }
