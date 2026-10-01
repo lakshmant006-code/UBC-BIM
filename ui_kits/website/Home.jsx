@@ -11,6 +11,7 @@ import { ModelViewer } from './ModelViewer.jsx';
 import { SceneHero } from './SceneHero.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 import { ProjectForm } from './ProjectForm.jsx';
+import { IntegrationCard, FlowDiagram } from '../../components/ui/IntegrationCard.jsx';
 import MACHINES from './content/machines.json';
 
 const D = UBC_DATA;
@@ -796,6 +797,19 @@ function UBCWay() {
   );
 }
 
+// Lucide glyph for a flow node, matched on the label's wording.
+function flowIcon(label) {
+  const l = label.toLowerCase();
+  if (l.includes('architectural')) return 'file-text';
+  if (l.includes('structural')) return 'ruler';
+  if (l.includes('scope')) return 'clipboard-list';
+  if (l.includes('shop')) return 'pencil-ruler';
+  if (l.includes('bom') || l.includes('cut list')) return 'list-checks';
+  if (l.includes('assembly')) return 'layers';
+  if (l.includes('csv')) return 'file-spreadsheet';
+  return 'cpu';
+}
+
 // TECHNOLOGY (handoff section 6): interactive machine selector, inside a
 // blue frame per the client's own mock-up. Rows come from
 // content/machines.json so marketing can edit them without code changes.
@@ -804,9 +818,7 @@ function Technology({ onQuote }) {
   const rows = MACHINES.rows;
   const [sel, setSel] = React.useState(MACHINES.default || (rows[0] && rows[0].machine));
   const row = rows.find((r) => r.machine === sel) || rows[0];
-  const panel = { background: 'rgba(255,255,255,.08)', border: 'var(--bw-hair) solid rgba(255,255,255,.28)', borderRadius: 'var(--r-3)', padding: 'var(--space-card-pad)', height: '100%' };
   const label = { ...eyebrow, color: 'rgba(255,255,255,.78)' };
-  const list = { listStyle: 'none', margin: 'var(--s-3) 0 0', padding: 0, display: 'grid', gap: 'var(--s-2)', color: 'var(--white)', fontSize: 'var(--fs-body-sm)' };
   return (
     <Section framed id="technology">
       <Page>
@@ -829,27 +841,25 @@ function Technology({ onQuote }) {
               );
             })}
           </div>
-          <div className="ubc-tech-panels" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 48px minmax(0,1fr) 48px minmax(0,1fr)', alignItems: 'stretch', marginTop: 'var(--s-6)' }}>
-            <div style={panel}>
-              <div style={label}>What you send</div>
-              <ul style={list}>{T.youSend.map((x) => <li key={x}>{x}</li>)}</ul>
-            </div>
-            <div className="ubc-tech-link" aria-hidden="true"><span /></div>
-            <div style={panel} aria-live="polite">
-              <div style={label}>Modelled in</div>
-              <ul style={list}>{row.modelledIn.map((x) => <li key={x} style={{ fontWeight: 600 }}>{x}</li>)}</ul>
-            </div>
-            <div className="ubc-tech-link" aria-hidden="true"><span /></div>
-            <div style={panel} aria-live="polite">
-              <div style={label}>What your line receives</div>
-              <ul style={{ ...list, display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)' }}>
-                {row.files.map((x) => <li key={x} style={{ border: 'var(--bw-hair) solid rgba(255,255,255,.45)', borderRadius: 'var(--r-pill)', padding: '3px 10px', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)' }}>{x}</li>)}
-              </ul>
-              <button onClick={() => onQuote && onQuote({ machine: H.machineOptions.includes(row.machine) ? row.machine : 'Other / not sure' })} style={{
-                marginTop: 'var(--s-5)', minHeight: 44, padding: '0 var(--s-5)', borderRadius: 'var(--r-pill)', border: 'none', cursor: 'pointer',
-                background: 'var(--accent)', color: 'var(--white)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600
-              }}>Send Your Project {'→'}</button>
-            </div>
+          <div style={{ marginTop: 'var(--s-6)' }}>
+            <IntegrationCard
+              visual={
+                <FlowDiagram
+                  inputsTitle="What you send"
+                  inputs={T.youSend.map((x) => ({ label: x, icon: flowIcon(x) }))}
+                  hubLabel="Modelled in"
+                  hubItems={row.modelledIn}
+                  outputsTitle={'Your ' + row.machine + ' line receives'}
+                  outputs={row.files.map((x) => ({ label: x, icon: flowIcon(x) }))}
+                  outputsKey={row.machine}
+                />
+              }
+              title={'Files your ' + row.machine + ' line can run'}
+              description={'Modelled in ' + row.modelledIn.join(' and ') + ', delivered in the formats your ' + row.machine + ' line already reads \u2014 straight to production, no re-draw on your side.'}
+              action={
+                <button className="ubc-int-cta" onClick={() => onQuote && onQuote({ machine: H.machineOptions.includes(row.machine) ? row.machine : 'Other / not sure' })}>Send Your Project {'\u2192'}</button>
+              }
+            />
           </div>
           <p style={{ ...label, textAlign: 'center', margin: 'var(--s-6) 0 0', lineHeight: 'var(--lh-relaxed)' }}>
             Every project ships with: {T.shipsWith.join(' · ')}
