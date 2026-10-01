@@ -134,13 +134,17 @@ export function IntegrationCard({ visual, title, description, action }) {
   return (
     <div className="ubc-int-card">
       <VisualContainer>{visual}</VisualContainer>
-      <div className="ubc-int-content">
-        <div>
-          <h3 className="ubc-int-title">{title}</h3>
-          <p className="ubc-int-desc">{description}</p>
+      {(title || description || action) && (
+        <div className="ubc-int-content">
+          {(title || description) && (
+            <div>
+              {title && <h3 className="ubc-int-title">{title}</h3>}
+              {description && <p className="ubc-int-desc">{description}</p>}
+            </div>
+          )}
+          {action}
         </div>
-        {action}
-      </div>
+      )}
     </div>
   );
 }

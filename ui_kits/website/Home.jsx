@@ -815,7 +815,7 @@ function flowIcon(label) {
 // TECHNOLOGY (handoff section 6): interactive machine selector, inside a
 // blue frame per the client's own mock-up. Rows come from
 // content/machines.json so marketing can edit them without code changes.
-function Technology({ onQuote }) {
+function Technology() {
   const T = H.technology;
   const rows = MACHINES.rows;
   const [sel, setSel] = React.useState(MACHINES.default || (rows[0] && rows[0].machine));
@@ -856,17 +856,8 @@ function Technology({ onQuote }) {
                   outputsKey={row.machine}
                 />
               }
-              title={'Files your ' + row.machine + ' line can run'}
-              description={'Modelled in ' + row.modelledIn.join(' and ') + ', delivered in the formats your ' + row.machine + ' line already reads \u2014 straight to production, no re-draw on your side.'}
-              action={
-                <button className="ubc-int-cta" onClick={() => onQuote && onQuote({ machine: H.machineOptions.includes(row.machine) ? row.machine : 'Other / not sure' })}>Send Your Project {'\u2192'}</button>
-              }
             />
           </div>
-          <p style={{ ...label, textAlign: 'center', margin: 'var(--s-6) 0 0', lineHeight: 'var(--lh-relaxed)' }}>
-            Every project ships with: {T.shipsWith.join(' · ')}
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(255,255,255,.88)', textAlign: 'center', margin: 'var(--s-3) 0 0' }}>{T.footer}</p>
         </div>
       </Page>
     </Section>
@@ -919,7 +910,7 @@ export function Home() {
       <ProjectsGrid onGo={onGo} />
       <UBCWay />
       <GlobalPresence />
-      <Technology onQuote={onQuote} />
+      <Technology />
       <VideoTestimonials />
       <FAQSection />
       <FinalCTA />
