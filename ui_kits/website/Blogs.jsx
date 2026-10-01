@@ -36,7 +36,7 @@ function BlogCard({ post, index, onOpen }) {
   const badgeText = post.date || (post.tags && post.tags[0]);
 
   return (
-    <a href="#" onClick={(e) => { e.preventDefault(); onOpen(post.id); }}
+    <a href="#" className="ubc-glow" onClick={(e) => { e.preventDefault(); onOpen(post.id); }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none', color: 'inherit',

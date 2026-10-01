@@ -78,20 +78,22 @@ export function FlowDiagram({ inputsTitle, inputs, hubLabel, hubItems, outputsTi
     ro.observe(box);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let io;
+    let io, done;
     if (!reduce) {
       setAnim('pending');
-      io = new IntersectionObserver((e) => { if (e[0].isIntersecting) { setAnim('in'); io.disconnect(); } }, { threshold: 0.25 });
+      // Nodes pop in once, the first time the diagram is seen; after that
+      // ('done') switching machines updates them in place, no re-animation.
+      io = new IntersectionObserver((e) => { if (e[0].isIntersecting) { setAnim('in'); io.disconnect(); done = setTimeout(() => setAnim('done'), 1600); } }, { threshold: 0.25 });
       io.observe(box);
     }
-    return () => { ro.disconnect(); if (io) io.disconnect(); };
+    return () => { ro.disconnect(); if (io) io.disconnect(); clearTimeout(done); };
   }, [measure]);
 
   return (
     <div ref={ref} className="ubc-int-flow" data-anim={anim}>
       <svg className="ubc-int-lines" aria-hidden="true" focusable="false">
         {paths.map((d, i) => (
-          <g key={outputsKey + ':' + i}>
+          <g key={i}>
             <path d={d} className="ubc-int-line" />
             <path d={d} className="ubc-int-pulse" style={{ animationDelay: (i * 0.55) % 2.2 + 's' }} />
           </g>
@@ -112,7 +114,7 @@ export function FlowDiagram({ inputsTitle, inputs, hubLabel, hubItems, outputsTi
       </div>
       <div className="ubc-int-col ubc-int-col-out" aria-live="polite">
         <div className="ubc-int-head">{outputsTitle}</div>
-        <ul>{outputs.map((it, i) => <Node key={outputsKey + it.label} item={it} kind="out" index={i + inputs.length} />)}</ul>
+        <ul>{outputs.map((it, i) => <Node key={i} item={it} kind="out" index={i + inputs.length} />)}</ul>
       </div>
     </div>
   );

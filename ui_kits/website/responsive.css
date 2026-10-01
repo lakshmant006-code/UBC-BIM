@@ -203,24 +203,69 @@
 }
 .ubc-frame-blue a { color: var(--text-strong); }
 
-/* ---------- Cards: hover / focus ---------- */
+/* ---------- Cards: hover / focus gradient ----------
+   Every content card (.ubc-card, blog and project cards via .ubc-glow)
+   fades in a red / blue / white mesh on hover or focus. Same recipe as the
+   21st.dev "Almoayyed" gradient (eased 1 / .844 / .5 / .156 / 0 radial
+   stops at its four anchor points, plus its fractal-noise grain in overlay
+   blend), recoloured to the brand and lightened so the darkest inks stay
+   >= 4.5:1 on top of it. Inside a blue frame the card turns white first.
+   The colour tokens are registered so the text switch animates. */
+@property --text-strong { syntax: '<color>'; inherits: true; initial-value: #0E1318; }
+@property --text-body { syntax: '<color>'; inherits: true; initial-value: #2C3037; }
+@property --text-muted { syntax: '<color>'; inherits: true; initial-value: #5A6069; }
 .ubc-card {
-  position: relative; overflow: hidden; background: var(--surface-card);
+  background: var(--surface-card);
   border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-3);
-  transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out), border-color 260ms var(--ease-out);
 }
-.ubc-card::before {
-  content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 3px; background: var(--accent);
-  transform: scaleX(0); transform-origin: left; transition: transform 360ms var(--ease-out);
+.ubc-card, .ubc-glow {
+  position: relative; overflow: hidden; isolation: isolate;
+  transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out), border-color 260ms var(--ease-out),
+    background-color 360ms var(--ease-out), --text-strong 360ms var(--ease-out), --text-body 360ms var(--ease-out), --text-muted 360ms var(--ease-out);
 }
-.ubc-card h3 { transition: color 200ms var(--ease-out); }
-.ubc-card:hover, .ubc-card:focus-within { transform: translateY(-4px); box-shadow: 0 20px 40px -20px rgba(14,19,24,.38); border-color: var(--border-strong); }
-.ubc-card:hover::before, .ubc-card:focus-within::before { transform: scaleX(1); }
-.ubc-card:hover h3, .ubc-card:focus-within h3 { color: var(--text-accent); }
-.ubc-frame-blue .ubc-card:hover, .ubc-frame-blue .ubc-card:focus-within { box-shadow: 0 20px 40px -20px rgba(0,0,0,.45); }
+.ubc-card::before, .ubc-glow::before,
+.ubc-card::after, .ubc-glow::after {
+  content: ""; position: absolute; z-index: -1; pointer-events: none; opacity: 0;
+  transition: opacity 420ms var(--ease-out);
+}
+.ubc-card::before, .ubc-glow::before {
+  inset: -12%;
+  background-color: #FFFFFF;
+  background-image:
+    radial-gradient(circle at 66.94% 46.43%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 19.02%, rgba(255,255,255,0.5) 38.05%, rgba(255,255,255,0.156) 57.07%, rgba(255,255,255,0) 76.1%),
+    radial-gradient(circle at 34.69% 66.31%, rgba(38,89,250,0.62) 0%, rgba(38,89,250,0.523) 12.73%, rgba(38,89,250,0.31) 25.45%, rgba(38,89,250,0.097) 38.18%, rgba(38,89,250,0.0) 50.9%),
+    radial-gradient(circle at 48.93% 19.32%, rgba(249,87,95,0.62) 0%, rgba(249,87,95,0.523) 16.75%, rgba(249,87,95,0.31) 33.5%, rgba(249,87,95,0.097) 50.25%, rgba(249,87,95,0.0) 67%),
+    radial-gradient(circle at 80.23% 87.54%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 10.28%, rgba(255,255,255,0.5) 20.55%, rgba(255,255,255,0.156) 30.83%, rgba(255,255,255,0) 41.1%);
+  animation: ubcGlowDrift 9s ease-in-out infinite alternate paused;
+}
+.ubc-card::after, .ubc-glow::after {
+  inset: 0; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
+.ubc-card:hover, .ubc-card:focus-within, .ubc-glow:hover, .ubc-glow:focus-within {
+  transform: translateY(-4px); box-shadow: 0 20px 40px -20px rgba(14,19,24,.38); border-color: var(--border-strong);
+  background-color: #FFFFFF;
+  --text-strong: #0E1318; --text-body: #0E1318; --text-muted: #2C3037; --text-faint: #2C3037; --text-accent: #0E1318;
+  --border-subtle: var(--line); --border-strong: var(--line-strong);
+}
+.ubc-card:hover::before, .ubc-card:focus-within::before, .ubc-glow:hover::before, .ubc-glow:focus-within::before {
+  opacity: 1; animation-play-state: running;
+}
+.ubc-card:hover::after, .ubc-card:focus-within::after, .ubc-glow:hover::after, .ubc-glow:focus-within::after { opacity: .28; }
+.ubc-frame-blue .ubc-card:hover, .ubc-frame-blue .ubc-card:focus-within { box-shadow: 0 24px 48px -20px rgba(0,0,0,.5); color: #0E1318; }
+/* The project form's card keeps still: it is focused for as long as
+   someone is typing in it. */
+.ubc-card.ubc-card--still::before, .ubc-card.ubc-card--still::after { display: none; }
+.ubc-card.ubc-card--still:hover, .ubc-card.ubc-card--still:focus-within { transform: none; }
+@keyframes ubcGlowDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-6%, 4%) scale(1.06); }
+  100% { transform: translate(5%, -4%) scale(1.03); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .ubc-card, .ubc-card::before, .ubc-card h3 { transition: none; }
-  .ubc-card:hover, .ubc-card:focus-within { transform: none; }
+  .ubc-card, .ubc-glow, .ubc-card::before, .ubc-glow::before, .ubc-card::after, .ubc-glow::after { transition: none; animation: none; }
+  .ubc-card:hover, .ubc-card:focus-within, .ubc-glow:hover, .ubc-glow:focus-within { transform: none; }
 }
 
 /* ---------- Globe: hover labels on the red dots ---------- */

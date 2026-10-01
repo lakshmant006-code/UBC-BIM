@@ -891,7 +891,7 @@ function FinalCTA() {
             </p>
           </Reveal>
           <Reveal delay={80}>
-            <div className="ubc-card" style={{ padding: 'var(--space-card-pad)' }}>
+            <div className="ubc-card ubc-card--still" style={{ padding: 'var(--space-card-pad)' }}>
               <ProjectForm source="final-cta" />
             </div>
           </Reveal>
