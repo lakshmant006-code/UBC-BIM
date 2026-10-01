@@ -1,20 +1,23 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import createGlobe from 'cobe';
 import { Tag } from '../../components/core/Tag.jsx';
 import { Icon } from '../../components/core/Icon.jsx';
-import { CapabilityMatrix } from '../../components/model/CapabilityMatrix.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal, AnimatedNumber } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { SceneHero } from './SceneHero.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
+import { ProjectForm } from './ProjectForm.jsx';
+import { IntegrationCard, FlowDiagram } from '../../components/ui/IntegrationCard.jsx';
+import MACHINES from './content/machines.json';
 
 const D = UBC_DATA;
 
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
-const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)' };
+const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)' };
 
 // LOGO CAROUSELS (blueprint section 03, "RECOGNIZE", plus two strips the
 // blueprint didn't ask for by name but the client sent real assets for
@@ -47,6 +50,11 @@ function LogoCarousel({ images, reverse, height = 64 }) {
     </div>
   );
 }
+
+const H = D.home;
+const h2Style = { ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' };
+const cardTitle = { ...serifH, fontSize: 'var(--fs-h3)', margin: 0 };
+const cardBody = { fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' };
 
 const LOGOS = D.logos;
 // "Approved client logos and verified statistics" as one combined section
@@ -88,88 +96,6 @@ function LogoWalls() {
           {strip('Software we model in', LOGOS.software, true)}
           {strip("Machines our files run on", LOGOS.machine)}
         </Reveal>
-      </Page>
-    </Section>
-  );
-}
-
-// "Clear 'What We Do' statement" (Homepage Redesign brief, position 4): the
-// same one-line company description already established site-wide (meta
-// description, JSON-LD in app/layout.jsx) as a proper heading section,
-// rather than new copy invented for this one spot.
-function WhatWeDo() {
-  return (
-    <Section>
-      <Page style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
-        <Reveal>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>What we do</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>
-            CFS and LGSF (light-gauge steel framing) and wood-frame BIM detailing
-          </h2>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) auto 0', maxWidth: '64ch' }}>
-            Wall panels, roof and floor trusses, MEP coordination, permit sets and machine files — all from one coordinated model, delivered as documentation your team and your line can build from directly.
-          </p>
-        </Reveal>
-      </Page>
-    </Section>
-  );
-}
-
-// "Services overview" (Homepage Redesign brief, position 7): a condensed
-// pass over the same real service rows the Services page details in full
-// (window.UBC_DATA.services), linking out there rather than repeating each
-// one's full write-up here — the brief's own "do not duplicate services in
-// multiple homepage sections" rule.
-function ServicesOverview({ onGo }) {
-  const services = D.services;
-  if (!services || !services.length) return null;
-  return (
-    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-      <Page>
-        <Reveal style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--s-5)' }}>
-          <div>
-            <div style={eyebrow}>Services</div>
-            <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Every discipline, one coordinated model</h2>
-          </div>
-          <button onClick={() => onGo && onGo('services')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All services <Icon name="arrow-right" size={15} /></button>
-        </Reveal>
-        <div className="ubc-svc-overview-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
-          {services.map((s, i) => (
-            <Reveal key={s.n} delay={(i % 3) * 70}>
-              <button onClick={() => onGo && onGo('services')} style={{ display: 'block', width: '100%', textAlign: 'left', padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', cursor: 'pointer' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{s.n}</div>
-                <div style={{ ...serifH, fontSize: 'var(--fs-h3)', margin: 'var(--s-2) 0 0' }}>{s.title}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
-              </button>
-            </Reveal>
-          ))}
-        </div>
-      </Page>
-    </Section>
-  );
-}
-
-// HOW WE WORK: "here's what happens once you do" steps, lifted straight
-// from the client's own blueprint bullet list (window.UBC_DATA.blueprint).
-const HWW = D.blueprint && D.blueprint.howWeWork;
-function HowWeWork() {
-  if (!HWW) return null;
-  return (
-    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-      <Page>
-        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>How we work</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>From what you send to what ships</h2>
-        </Reveal>
-        <div className="ubc-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
-          {HWW.map((step, i) => (
-            <Reveal key={step.n} delay={i * 60}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{step.n}</div>
-              <div style={{ ...serifH, fontSize: 'var(--fs-h3)', margin: 'var(--s-2) 0 0' }}>{step.title}</div>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{step.body}</p>
-            </Reveal>
-          ))}
-        </div>
       </Page>
     </Section>
   );
@@ -262,13 +188,13 @@ function BeforeAfterSlider() {
   );
 
   return (
-    <Section>
+    <Section framed>
       <Page>
-        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)', gap: 'var(--space-split)', alignItems: 'center' }}>
+        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 'var(--space-split)', alignItems: 'center', maxWidth: 1040, margin: '0 auto' }}>
           <Reveal>
             {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
-            {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
-            {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0', maxWidth: '46ch' }}>{BA.standfirst}</p>}
+            {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(24px, 2.8vw, 36px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
+            {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0', maxWidth: '42ch' }}>{BA.standfirst}</p>}
           </Reveal>
           <Reveal delay={80}>
             <div
@@ -286,7 +212,7 @@ function BeforeAfterSlider() {
               onPointerCancel={onUp}
               onKeyDown={onKeyDown}
               style={{
-                position: 'relative', width: '100%',
+                position: 'relative', width: '100%', maxWidth: 520, margin: '0 auto',
                 aspectRatio: BA.aspect || '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
                 borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
                 background: 'var(--surface-sunken)'
@@ -323,7 +249,9 @@ function ProjectsGrid({ onGo }) {
           <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
         </Reveal>
         <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--space-head-content)' }}>
-          {D.projects.map((p, i) => (
+          {/* The homepage keeps its 2 x 2 grid of four live models; the rest
+              are one click away on /projects. */}
+          {D.projects.slice(0, 4).map((p, i) => (
             <Reveal key={p.id} delay={(i % 2) * 80}>
               <div style={{ display: 'block' }}>
                 {/* A project with a real IFC gets the live model here, on the
@@ -338,37 +266,17 @@ function ProjectsGrid({ onGo }) {
                     <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   )}
                 </div>
-                <a onClick={() => onGo && onGo('projects')} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)', cursor: 'pointer', textDecoration: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)' }}>
                   <div>
-                    <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{p.name}</div>
-                    <div style={{ ...eyebrow, marginTop: 'var(--s-2)' }}>{p.location.split(',')[0]} · {p.system}</div>
+                    <h3 style={cardTitle}>{p.name}</h3>
+                    <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{String(i + 1).padStart(2, '0')}</div>
-                </a>
+                  <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
+                </div>
               </div>
             </Reveal>
           ))}
         </div>
-      </Page>
-    </Section>
-  );
-}
-
-// CASE STUDIES NOTE (blueprint section 10): the real projects above already
-// show the actual model, but the narrative fields the blueprint asks for
-// (client requirement, UBC's own scope, the outcome) aren't data this site
-// has for any of them yet — rather than write that narrative up as if it
-// were on file, this says plainly that it's coming.
-function CaseStudiesNote() {
-  return (
-    <Section tight sunken>
-      <Page style={{ textAlign: 'center' }}>
-        <Reveal>
-          <div style={eyebrow}>Case studies</div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-3) auto 0', maxWidth: '58ch' }}>
-            Full write-ups for these projects — the client's requirement, UBC's own scope and the outcome — are coming soon.
-          </p>
-        </Reveal>
       </Page>
     </Section>
   );
@@ -380,48 +288,22 @@ const WHY = D.blueprint && D.blueprint.whyUbc;
 function WhyUBC() {
   if (!WHY) return null;
   return (
-    <Section>
+    <Section framed>
       <Page>
         <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>Why UBC</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What one coordinated model actually buys you</h2>
+          <h2 style={h2Style}>{H.whyTitle}</h2>
         </Reveal>
         <div className="ubc-why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {WHY.map((w, i) => (
             <Reveal key={w.title} delay={(i % 3) * 70}>
-              <div style={{ padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
-                <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{w.title}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{w.body}</p>
+              <div className="ubc-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
+                <h3 style={cardTitle}>{w.title}</h3>
+                <p style={cardBody}>{w.body}</p>
               </div>
             </Reveal>
           ))}
         </div>
-      </Page>
-    </Section>
-  );
-}
-
-// THE UBC WAY: a four-step culture framing plus the one QA claim this site
-// can make honestly (a real check every drawing goes through, not a named
-// certification nobody has supplied).
-const UW = D.blueprint && D.blueprint.ubcWay;
-function UBCWayQA() {
-  if (!UW) return null;
-  return (
-    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-      <Page style={{ maxWidth: 860, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>
-        <Reveal>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>The UBC way</div>
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 'var(--s-3)', marginTop: 'var(--s-5)' }}>
-            {UW.steps.map((s, i) => (
-              <React.Fragment key={s}>
-                <span style={{ ...serifH, fontSize: 'clamp(20px, 2.4vw, 30px)' }}>{s}</span>
-                {i < UW.steps.length - 1 && <Icon name="arrow-right" size={18} style={{ color: 'var(--text-faint)', alignSelf: 'center' }} />}
-              </React.Fragment>
-            ))}
-          </div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-6) auto 0', maxWidth: '60ch' }}>{UW.qa}</p>
-        </Reveal>
       </Page>
     </Section>
   );
@@ -462,6 +344,7 @@ function GlobalPresence() {
   const hostRef = React.useRef(null);
   const wrapRef = React.useRef(null);
   const canvasRef = React.useRef(null);
+  const pinRefs = React.useRef([]);
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
@@ -485,8 +368,8 @@ function GlobalPresence() {
 
         // tokens/colors.css, normalised to 0-1: --white, --paper, --ubc-red.
         const WHITE = [1, 1, 1];
-        const PAPER = [0.961, 0.957, 0.945];
-        const RED = [0.757, 0.153, 0.176];
+        const PAPER = [0.953, 0.945, 0.925];
+        const RED = [0.839, 0.212, 0.122];
         // Radians per frame at a nominal 60fps: one full turn roughly every
         // 4 minutes — slow enough to read as "idle", not spinning.
         const ROTATE_SPEED = 0.0018;
@@ -567,7 +450,26 @@ function GlobalPresence() {
             const wave = reduceMotion ? 0 : (Math.sin(((t + phase) / 2.6) * Math.PI * 2) + 1) / 2;
             return { location: [m.lat, m.lng], size: 0.045 + 0.035 * wave };
           });
-          globe.update({ phi: phi + dragPhi, theta: clamp(theta + dragTheta, -1.2, 1.2), markers });
+          const P = phi + dragPhi;
+          const TH = clamp(theta + dragTheta, -1.2, 1.2);
+          globe.update({ phi: P, theta: TH, markers });
+          // Same projection cobe itself uses to place a marker (its internal
+          // U/O functions: radius 0.8 + markerElevation, scale 1, square
+          // canvas), so each hover label sits exactly on its red dot.
+          const cp = Math.cos(P), sp = Math.sin(P), ct = Math.cos(TH), st = Math.sin(TH);
+          MARKERS.forEach((m, i) => {
+            const el = pinRefs.current[i];
+            if (!el) return;
+            const la = (m.lat * Math.PI) / 180, lo = (m.lng * Math.PI) / 180 - Math.PI, cl = Math.cos(la);
+            const r = 0.82;
+            const x = -cl * Math.cos(lo) * r, y = Math.sin(la) * r, z = cl * Math.sin(lo) * r;
+            const c = cp * x + sp * z;
+            const sy = sp * st * x + ct * y - cp * st * z;
+            const front = -sp * ct * x + st * y + cp * ct * z >= 0;
+            el.style.left = ((c + 1) / 2) * 100 + '%';
+            el.style.top = ((-sy + 1) / 2) * 100 + '%';
+            el.style.visibility = front ? 'visible' : 'hidden';
+          });
           raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
@@ -615,10 +517,19 @@ function GlobalPresence() {
             </div>
           </Reveal>
           <Reveal delay={80}>
-            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto', overflow: 'hidden', background: 'radial-gradient(closest-side, rgba(16,18,21,.07), transparent 70%)' }}>
+            <div ref={wrapRef} style={{ position: 'relative', aspectRatio: '1 / 1', maxWidth: 460, margin: '0 auto', background: 'radial-gradient(closest-side, rgba(16,18,21,.07), transparent 70%)' }}>
               <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
                 <canvas ref={canvasRef} style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none', display: 'block' }} />
               </div>
+              {/* One hover/focus target per red dot, positioned every frame
+                  by the projection in tick(); hidden while the dot is on the
+                  far side of the globe. */}
+              {MARKERS.map((m, i) => (
+                <button key={m.name} ref={(el) => { pinRefs.current[i] = el; }} className="ubc-globe-pin"
+                  aria-label={m.name} style={{ visibility: 'hidden' }}>
+                  <span className="ubc-globe-tip" role="tooltip">{m.name}</span>
+                </button>
+              ))}
               {!ready && (
                 <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>Loading</span>
@@ -649,7 +560,7 @@ const VIDEO_TESTIMONIALS = D.videoTestimonials || [];
 // here as a translucent tint over the video on hover (rgba, not the tokens'
 // own flat tint swatches, so the video stays readable underneath).
 const VIDEO_TINTS = [
-  'linear-gradient(165deg, rgba(193,39,45,.90), rgba(193,39,45,.55) 45%, rgba(16,18,21,.82))',
+  'linear-gradient(165deg, rgba(214,54,31,.90), rgba(214,54,31,.55) 45%, rgba(16,18,21,.82))',
   'linear-gradient(165deg, rgba(23,41,92,.90), rgba(23,41,92,.55) 45%, rgba(16,18,21,.82))',
   'linear-gradient(165deg, rgba(60,74,90,.90), rgba(60,74,90,.55) 45%, rgba(16,18,21,.82))'
 ];
@@ -721,9 +632,9 @@ function WhoWeServe() {
         <div className="ubc-serve-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {WWS.map((r, i) => (
             <Reveal key={r.role} delay={(i % 3) * 70}>
-              <div style={{ padding: 'var(--space-card-pad)', height: '100%', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)' }}>
-                <div style={{ ...serifH, fontSize: 'var(--fs-h3)' }}>{r.role}</div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{r.body}</p>
+              <div className="ubc-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
+                <h3 style={cardTitle}>{r.role}</h3>
+                <p style={cardBody}>{r.body}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)', marginTop: 'var(--s-4)' }}>
                   {r.serviceIndexes.map((si) => D.services[si] && <Tag key={si}>{D.services[si].title}</Tag>)}
                 </div>
@@ -736,36 +647,6 @@ function WhoWeServe() {
   );
 }
 
-// COMPANY PROOF + TECHNOLOGY (blueprint section 15): the real
-// machine/software table already sitting unused in window.UBC_DATA.capability
-// (CapabilityMatrix itself was imported at the top of this file but never
-// actually rendered anywhere before now), paired with a certifications line
-// that's left an honest "coming soon" rather than naming a standard nobody
-// has supplied — see the blueprint object's own note in data.js.
-function CompanyProofTech() {
-  const cap = D.capability;
-  if (!cap) return null;
-  return (
-    <Section>
-      <Page>
-        <Reveal style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
-          <div style={{ ...eyebrow, display: 'inline-block' }}>Technology</div>
-          <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>What runs behind the model</h2>
-        </Reveal>
-        <Reveal delay={80} style={{ marginTop: 'var(--space-head-content)' }}>
-          <CapabilityMatrix columns={cap.columns} rows={cap.rows} />
-        </Reveal>
-        <Reveal delay={140} style={{ textAlign: 'center', marginTop: 'var(--s-7)' }}>
-          <div style={eyebrow}>Certifications & standards</div>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-faint)', fontStyle: 'italic', margin: 'var(--s-2) 0 0' }}>
-            Listed here once issued.
-          </p>
-        </Reveal>
-      </Page>
-    </Section>
-  );
-}
-
 // FAQ: the same real Q&A already answering the chatbot widget, surfaced here
 // as a plain accordion for anyone who never opens that widget.
 function FAQSection() {
@@ -773,7 +654,7 @@ function FAQSection() {
   const faq = D.faq || [];
   if (!faq.length) return null;
   return (
-    <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
+    <Section framed>
       <Page>
         <Reveal style={{ textAlign: 'center' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>FAQ</div>
@@ -801,59 +682,247 @@ function FAQSection() {
   );
 }
 
-// FINAL CTA: the buying journey's own close, reusing the same onQuote flow
-// every other call to action on the site already opens.
-function FinalCTA({ onQuote }) {
+
+// WHAT SETS US APART (handoff section 5): the About-us summary, the About Us
+// video once supplied, and six USP cards.
+function WhatSetsUsApart() {
+  const a = H.aboutUs;
   return (
-    <Section style={{ textAlign: 'center' }}>
-      <Page style={{ maxWidth: 640 }}>
-        <Reveal>
-          <h2 style={{ ...serifH, fontSize: 'clamp(30px, 4vw, 52px)', margin: 0 }}>Send what you have. Get a scope back.</h2>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-5) 0 0' }}>
-            No sales script — a modeller looks at what you send and answers directly.
-          </p>
-          <div style={{ marginTop: 'var(--s-7)' }}>
-            <button onClick={onQuote} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--paper)', background: 'var(--ink)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 32px', cursor: 'pointer' }}>Start a Project</button>
+    <Section id="about-us">
+      <Page>
+        <Reveal style={{ display: 'grid', gridTemplateColumns: a.video ? 'minmax(0,1fr) minmax(0,1fr)' : '1fr', gap: 'var(--space-split)', alignItems: 'center' }} className="ubc-compare-grid">
+          <div style={{ maxWidth: a.video ? 'none' : 760 }}>
+            <div style={eyebrow}>{a.eyebrow}</div>
+            <h2 style={h2Style}>{a.title}</h2>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--space-head-text) 0 0' }}>{a.body}</p>
           </div>
+          {a.video && (
+            <video controls preload="metadata" poster={a.video.poster} playsInline style={{ width: '100%', borderRadius: 'var(--r-3)', background: '#000' }}>
+              <source src={a.video.src} type="video/mp4" />
+              {a.video.captions && <track kind="captions" src={a.video.captions} srcLang="en" label="English" default />}
+            </video>
+          )}
         </Reveal>
+        <div className="ubc-why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
+          {H.usps.map((u, i) => (
+            <Reveal key={u.title} delay={(i % 3) * 70}>
+              <div className="ubc-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
+                <h3 style={cardTitle}>{u.title}</h3>
+                <p style={cardBody}>{u.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// THE UBC WAY (handoff section 7): three step buttons with progress bars.
+// Auto-advances every 5s until the visitor clicks a step; reduced motion
+// never auto-advances.
+const UBC_WAY_MS = 5000;
+function UBCWay() {
+  const W = H.ubcWay;
+  const [active, setActive] = React.useState(0);
+  const [auto, setAuto] = React.useState(true);
+  const [cycle, setCycle] = React.useState(0);
+  const [reduce, setReduce] = React.useState(false);
+  const [inView, setInView] = React.useState(false);
+  const ref = React.useRef(null);
+  React.useEffect(() => { setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches); }, []);
+  React.useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver((e) => setInView(e[0].isIntersecting), { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const running = auto && !reduce && inView;
+  React.useEffect(() => {
+    if (!running) return;
+    const t = window.setTimeout(() => { setActive((a) => (a + 1) % W.steps.length); setCycle((c) => c + 1); }, UBC_WAY_MS);
+    return () => window.clearTimeout(t);
+  }, [running, active, cycle]);
+  const pick = (i) => { setAuto(false); setActive(i); };
+  const step = W.steps[active];
+  return (
+    <Section framed id="the-ubc-way">
+      <Page>
+        <div ref={ref}>
+          <Reveal style={{ maxWidth: 760 }}>
+            <div style={eyebrow}>{W.eyebrow}</div>
+            <h2 style={h2Style}>{W.title}</h2>
+          </Reveal>
+          <div role="tablist" aria-label="The UBC Way steps" className="ubc-way-tabs" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
+            {W.steps.map((st, i) => {
+              const on = i === active;
+              return (
+                <button key={st.n} role="tab" id={'ubc-way-tab-' + i} aria-selected={on} aria-controls="ubc-way-panel" onClick={() => pick(i)}
+                  style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--s-3) 0', minHeight: 44 }}>
+                  <span style={{ display: 'block', height: 3, background: 'var(--border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
+                    <span key={on ? 'run-' + cycle + '-' + running : 'idle'} style={{
+                      display: 'block', height: '100%', background: 'var(--text-accent)',
+                      width: on ? (running ? '100%' : '100%') : (i < active ? '100%' : '0%'),
+                      opacity: i <= active ? 1 : 0,
+                      animation: on && running ? `ubcWayFill ${UBC_WAY_MS}ms linear` : 'none'
+                    }} />
+                  </span>
+                  <span style={{ display: 'block', ...eyebrow, color: on ? 'var(--text-accent)' : 'var(--text-muted)', marginTop: 'var(--s-3)' }}>{st.n} {st.name}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div id="ubc-way-panel" role="tabpanel" aria-labelledby={'ubc-way-tab-' + active} className="ubc-way-panel"
+            style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0, 1.3fr) minmax(0, 1fr)', gap: 'var(--space-split)', alignItems: 'start', marginTop: 'var(--s-6)' }}>
+            <div aria-hidden="true" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(56px, 8vw, 112px)', lineHeight: 'var(--lh-tight)', color: 'var(--text-accent)' }}>{step.n}</div>
+            <div>
+              <h3 style={{ ...serifH, fontSize: 'clamp(22px, 2.4vw, 30px)', margin: 0 }}>{step.headline}</h3>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--space-head-text) 0 0' }}>{step.body}</p>
+            </div>
+            <div>
+              <div style={eyebrow}>You receive</div>
+              <ul style={{ margin: 'var(--s-2) 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 'var(--s-2)' }}>
+                {step.receive.map((r) => (
+                  <li key={r} style={{ display: 'flex', gap: 'var(--s-2)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-strong)' }}><Icon name="check" size={16} style={{ color: 'var(--text-accent)', flexShrink: 0, marginTop: 4 }} />{r}</li>
+                ))}
+              </ul>
+              <div style={{ marginTop: 'var(--s-4)', padding: 'var(--s-3) var(--s-4)', border: 'var(--bw-hair) solid var(--border-strong)', borderLeft: '3px solid var(--text-accent)', borderRadius: 'var(--r-2)', background: 'var(--surface-card)' }}>
+                <div style={eyebrow}>Checkpoint</div>
+                <div style={{ fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', marginTop: 'var(--s-1)' }}>{step.checkpoint}</div>
+              </div>
+            </div>
+          </div>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--s-6) 0 0', paddingTop: 'var(--s-4)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>{W.footer}</p>
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// Lucide glyph for a flow node, matched on the label's wording.
+function flowIcon(label) {
+  const l = label.toLowerCase();
+  if (l.includes('architectural')) return 'file-text';
+  if (l.includes('structural')) return 'ruler';
+  if (l.includes('scope')) return 'clipboard-list';
+  if (l.includes('shop')) return 'pencil-ruler';
+  if (l.includes('bom') || l.includes('cut list')) return 'list-checks';
+  if (l.includes('assembly')) return 'layers';
+  if (l.includes('csv')) return 'file-spreadsheet';
+  return 'cpu';
+}
+
+// TECHNOLOGY (handoff section 6): interactive machine selector, inside a
+// blue frame per the client's own mock-up. Rows come from
+// content/machines.json so marketing can edit them without code changes.
+function Technology({ onQuote }) {
+  const T = H.technology;
+  const rows = MACHINES.rows;
+  const [sel, setSel] = React.useState(MACHINES.default || (rows[0] && rows[0].machine));
+  const row = rows.find((r) => r.machine === sel) || rows[0];
+  const label = { ...eyebrow, color: 'rgba(255,255,255,.78)' };
+  return (
+    <Section framed id="technology">
+      <Page>
+        <div>
+          <Reveal style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto' }}>
+            <div style={label}>{T.eyebrow}</div>
+            <h2 style={{ ...h2Style, color: 'var(--white)' }}>{T.title}</h2>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>
+          </Reveal>
+          <div role="group" aria-label="Choose your roll-former" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--s-2)', marginTop: 'var(--space-head-content)' }}>
+            {rows.map((r) => {
+              const on = r.machine === sel;
+              return (
+                <button key={r.machine} aria-pressed={on} onClick={() => setSel(r.machine)} style={{
+                  minHeight: 44, padding: '0 var(--s-4)', borderRadius: 'var(--r-pill)', cursor: 'pointer',
+                  fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600,
+                  background: on ? 'var(--white)' : 'transparent', color: on ? 'var(--frame-blue)' : 'var(--white)',
+                  border: 'var(--bw-1) solid ' + (on ? 'var(--white)' : 'rgba(255,255,255,.5)')
+                }}>{r.machine}</button>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 'var(--s-6)' }}>
+            <IntegrationCard
+              visual={
+                <FlowDiagram
+                  inputsTitle="What you send"
+                  inputs={T.youSend.map((x) => ({ label: x, icon: flowIcon(x) }))}
+                  hubLabel="Modelled in"
+                  hubItems={row.modelledIn}
+                  outputsTitle={'Your ' + row.machine + ' line receives'}
+                  outputs={row.files.map((x) => ({ label: x, icon: flowIcon(x) }))}
+                  outputsKey={row.machine}
+                />
+              }
+              title={'Files your ' + row.machine + ' line can run'}
+              description={'Modelled in ' + row.modelledIn.join(' and ') + ', delivered in the formats your ' + row.machine + ' line already reads \u2014 straight to production, no re-draw on your side.'}
+              action={
+                <button className="ubc-int-cta" onClick={() => onQuote && onQuote({ machine: H.machineOptions.includes(row.machine) ? row.machine : 'Other / not sure' })}>Send Your Project {'\u2192'}</button>
+              }
+            />
+          </div>
+          <p style={{ ...label, textAlign: 'center', margin: 'var(--s-6) 0 0', lineHeight: 'var(--lh-relaxed)' }}>
+            Every project ships with: {T.shipsWith.join(' · ')}
+          </p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(255,255,255,.88)', textAlign: 'center', margin: 'var(--s-3) 0 0' }}>{T.footer}</p>
+        </div>
+      </Page>
+    </Section>
+  );
+}
+
+// FINAL CTA (handoff section 8): copy, trust points and the project form.
+function FinalCTA() {
+  const F = H.finalCta;
+  return (
+    <Section id="send-your-project">
+      <Page>
+        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 'var(--space-split)', alignItems: 'start' }}>
+          <Reveal>
+            <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 0 }}>{F.title}</h2>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--space-head-text) 0 0' }}>{F.body}</p>
+            <ul style={{ listStyle: 'none', margin: 'var(--s-5) 0 0', padding: 0, display: 'grid', gap: 'var(--s-2)' }}>
+              {F.trust.map((t) => (
+                <li key={t} style={{ display: 'flex', gap: 'var(--s-2)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-strong)' }}><Icon name="check" size={16} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 4 }} />{t}</li>
+              ))}
+            </ul>
+            <p style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--s-5) 0 0' }}>
+              <Link href="/contact" style={{ color: 'var(--text-strong)', display: 'inline-flex', minHeight: 44, alignItems: 'center' }}>{F.talk}</Link>
+            </p>
+          </Reveal>
+          <Reveal delay={80}>
+            <div className="ubc-card ubc-card--still" style={{ padding: 'var(--space-card-pad)' }}>
+              <ProjectForm source="final-cta" />
+            </div>
+          </Reveal>
+        </div>
       </Page>
     </Section>
   );
 }
 
 export function Home() {
-  // Was passed down from the old single-page App() component's own state;
-  // now that every page is a real route, Home reaches the same two things
-  // itself: real navigation (next/navigation) and the quote drawer, opened
-  // through the same context AppChrome (app/AppChrome.jsx) provides to
-  // every page.
   const router = useRouter();
   const onQuote = useQuoteDrawer();
   const onGo = (id) => router.push(id === 'home' ? '/' : '/' + id);
+  // Section order per the homepage developer handoff, section 1.
   return (
-    // Section order follows the Homepage Redesign brief's own numbered list
-    // (hero / logos+stats / what-we-do / who-we-serve / 4-stage workflow /
-    // services overview / deliverables gallery / case studies / QA &
-    // coordination / team & global capability / verified testimonials /
-    // FAQ / project-intake form), not the order these sections were
-    // originally written in.
     <div>
       <SceneHero onQuote={onQuote} onGo={onGo} />
       <LogoWalls />
-      <WhatWeDo />
+      <WhatSetsUsApart />
       <WhyUBC />
       <WhoWeServe />
-      <HowWeWork />
-      <ServicesOverview onGo={onGo} />
       <BeforeAfterSlider />
       <ProjectsGrid onGo={onGo} />
-      <CaseStudiesNote />
-      <UBCWayQA />
+      <UBCWay />
       <GlobalPresence />
-      <CompanyProofTech />
+      <Technology onQuote={onQuote} />
       <VideoTestimonials />
       <FAQSection />
-      <FinalCTA onQuote={onQuote} />
+      <FinalCTA />
     </div>
   );
 }

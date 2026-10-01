@@ -3,14 +3,9 @@ import React from 'react';
 import { Button } from '../../components/core/Button.jsx';
 import { Icon } from '../../components/core/Icon.jsx';
 import { SectionHeading } from '../../components/core/SectionHeading.jsx';
-import { FormField } from '../../components/forms/FormField.jsx';
-import { Input } from '../../components/forms/Input.jsx';
-import { Textarea } from '../../components/forms/Textarea.jsx';
-import { Select } from '../../components/forms/Select.jsx';
-import { Checkbox } from '../../components/forms/Checkbox.jsx';
-import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ContactScene } from './ContactScene.jsx';
+import { ProjectForm } from './ProjectForm.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
 export function Contact() {
@@ -18,7 +13,6 @@ export function Contact() {
   // through the quote-drawer context every page uses.
   const onQuote = useQuoteDrawer();
   const [rung, setRung] = React.useState(false);
-  const [sent, setSent] = React.useState(false);
   // Which contact route the scroll scene last pointed at. It scrolls that card
   // into view and rings it for a moment, so pressing a card in the scene lands
   // the visitor on the real thing rather than just somewhere near it.
@@ -89,28 +83,8 @@ export function Contact() {
                 ))}
               </div>
               <div style={{ marginTop: 'var(--s-6)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)', padding: 'var(--space-card-pad)', boxShadow: 'var(--shadow-1)' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Start a project</div>
-                {sent ? (
-                  <div style={{ padding: 'var(--s-7) 0', textAlign: 'center' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)' }}>Enquiry received</div>
-                    <p style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', marginTop: 'var(--s-3)' }}>Logged to the CRM and tagged Website · Contact. We reply within one working day.</p>
-                    <Button variant="secondary" size="sm" style={{ marginTop: 'var(--s-4)' }} onClick={() => setSent(false)}>Send another</Button>
-                  </div>
-                ) : (
-                  <form onSubmit={(e) => { e.preventDefault(); setSent(true); }} className="ubc-route-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-4)', marginTop: 'var(--s-5)' }}>
-                    <FormField label="Name" required><Input placeholder="Your name" required /></FormField>
-                    <FormField label="Work email" required><Input type="email" placeholder="you@company.com" required /></FormField>
-                    <FormField label="Building type"><Select placeholder="Select building type" options={['Residential', 'Commercial', 'Multifamily', 'Light-gauge steel', 'Wood']} /></FormField>
-                    <FormField label="Service"><Select placeholder="Select a service" options={UBC_DATA.services.map((s) => s.title)} /></FormField>
-                    <FormField label="What you need modelled" style={{ gridColumn: '1 / -1' }}>
-                      <Textarea rows={3} placeholder="Building type, square footage, what you need modelled." />
-                    </FormField>
-                    <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--s-4)', flexWrap: 'wrap' }}>
-                      <Checkbox checked onChange={() => {}} label="Send me the sample Bill of Materials and machine CSV." />
-                      <Button type="submit">Start a Project</Button>
-                    </div>
-                  </form>
-                )}
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Send your project</div>
+                <div style={{ marginTop: 'var(--s-5)' }}><ProjectForm source="contact" /></div>
               </div>
             </div>
           </div>

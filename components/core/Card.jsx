@@ -40,7 +40,7 @@ export function Card({ as: As = 'div', href, interactive, media, mediaLabel, eye
         {eyebrow && (
           <div style={{
             fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)',
-            textTransform: 'uppercase', color: h && hot ? 'var(--accent)' : 'var(--text-muted)',
+            textTransform: 'uppercase', color: h && hot ? 'var(--text-accent)' : 'var(--text-muted)',
             transition: 'var(--t-hover)'
           }}>{eyebrow}</div>
         )}

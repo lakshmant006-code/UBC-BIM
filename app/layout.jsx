@@ -14,11 +14,9 @@ export const metadata = {
 // Contact page's bell (ubcRing/ubcPulse), the ChatBot quick-answers caret
 // nobody currently uses (ubcCaret, left as-is for parity), the logo
 // carousels (ubcMarqueeH) and hotspot pulse (ubcHotspotPulse) used across
-// Home, Portfolio, MockingBirdModel. ubcRoomFadeIn and the two
-// ubcCurtainOpen* keyframes are new, for the About page's "Inside the
-// Coordination Room" animation (About.jsx) — a white curtain that opens
-// left/right off the frame at the start of every loop.
-const KEYFRAMES = `@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}@keyframes ubcCaret{0%,49%{opacity:1}50%,100%{opacity:0}}@keyframes ubcMarqueeH{from{transform:translateX(0)}to{transform:translateX(-50%)}}@keyframes ubcHotspotPulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}@keyframes ubcRoomFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes ubcCurtainOpenLeft{from{transform:translateX(0)}to{transform:translateX(-100%)}}@keyframes ubcCurtainOpenRight{from{transform:translateX(0)}to{transform:translateX(100%)}}`;
+// Home, Portfolio, MockingBirdModel;
+// ubcWayFill (The UBC Way progress bars) on Home.
+const KEYFRAMES = `@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18%{transform:translateX(-50%) rotate(-13deg)}38%{transform:translateX(-50%) rotate(11deg)}58%{transform:translateX(-50%) rotate(-7deg)}78%{transform:translateX(-50%) rotate(4deg)}100%{transform:translateX(-50%) rotate(0)}}@keyframes ubcPulse{0%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(2.6)}}@keyframes ubcCaret{0%,49%{opacity:1}50%,100%{opacity:0}}@keyframes ubcMarqueeH{from{transform:translateX(0)}to{transform:translateX(-50%)}}@keyframes ubcHotspotPulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}@keyframes ubcWayFill{from{width:0}to{width:100%}}`;
 
 // The same ProfessionalService JSON-LD index.html already carried — Phase 1
 // preserves existing schema as-is; adding anything beyond this is Phase 4.

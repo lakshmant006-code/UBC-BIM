@@ -1,137 +1,173 @@
 'use client';
 /*
-  SceneHero: a white-studio, cinematic hero. The camera holds one fixed,
-  wide establishing shot (the first configured stage position, if any); the
-  Mocking Bird Lot 2 light-gauge steel frame (assets/models/mocking-bird-lot-2.glb,
-  rendered with three.js) does the moving instead — it hovers just above the
-  ground shadow and continuously revolves 360° around its own vertical axis,
-  anchored through its own base centre (recentred on load), like a product
-  on a slowly turning, slightly levitating platform. Scroll no longer drives
-  the camera or the model; it still drives the STAGE captions, numbered
-  rail and glassmorphic info cards below (four, one per stage, roughly a
-  fifth of the scroll each), same as before.
+  SceneHero: the homepage hero and its 3D walkthrough (Stages 01-04), per
+  the homepage developer handoff, sections 3 and 4.
 
-  Uses the same three.js helpers ModelViewer.jsx exports (studio environment,
-  ground shadow, steel recolouring) so the hero and the pages it links to
-  read as one system.
+  Desktop: the Mocking Bird Lot 2 frame is pinned while the page scrolls.
+  The first stretch of scroll shows the hero copy over the slowly turning
+  model; the rest scrubs through four model states (UBC_DATA.hero.stages):
+  complete, framing highlighted, coordination colours, and the parts
+  separating while the output chain (BIM Model → … → Machine Files) appears.
+  A 01–04 indicator tracks progress. Every stage title (H3) and body is in
+  the server-rendered HTML at all times; scroll only changes which is shown.
 
-  Config: UBC_DATA.hero: model { src, radius }, stages
-  [{ n, t, title, note, pos: [x,y,z] }] (pos, if present on stage 0, sets the
-  fixed camera framing; other stages' pos is unused now), cards [{ t0, t1,
-  side, ... }].
+  Phones and prefers-reduced-motion: nothing is pinned or scroll-scrubbed and
+  the 44 MB model is never fetched. The hero copy sits in normal flow and the
+  stages become four stacked cards, each with a pre-rendered still.
+
+  The model's GLB carries five material groups and no IFC class names, so
+  the states work on those groups: steel framing (the material
+  applySteelMaterials recolours) versus everything else.
 */
 import React from 'react';
+import Link from 'next/link';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Icon as HeroIcon } from '../../components/core/Icon.jsx';
 import { UBC_DATA } from './data.js';
 import { bounceHandlers, buildStudioEnvironment, makeGroundShadow, applySteelMaterials } from './ModelViewer.jsx';
 
-const HERO = (UBC_DATA && UBC_DATA.hero) || { stages: [], cards: [] };
-const HERO_STAGES = HERO.stages || [];
-const HERO_CARDS = HERO.cards || [];
+const HERO = UBC_DATA.hero;
+const STAGES = HERO.stages;
+const INTRO = HERO.intro;
+const OUTPUTS = HERO.outputs || [];
+const PAPER = 0xf3f1ec;
+const INTRO_END = 0.16;
+const STAGE_SPAN = (1 - INTRO_END) / STAGES.length;
+const COORD_COLORS = [0x2a5fbe, 0xd6361f, 0xd99a00, 0x1e9e6a, 0x7a5af8];
 
-// Glassmorphic info card, visible for one span of scroll progress rather than
-// one span of frames, otherwise identical to the walkthrough's card: one
-// action each, `go` (+ optional Projects filter) navigates, `quote` opens
-// the drawer.
-function HeroCard({ card, visible, onGo, onQuote }) {
-  const side = card.side === 'left' ? { left: 'var(--gutter)' } : { right: 'var(--gutter)' };
-  const act = () => {
-    if (card.quote) { onQuote && onQuote(); return; }
-    if (card.go) {
-      if (card.filter) window.UBC_NAV_FILTER = card.filter;
-      onGo && onGo(card.go);
-    }
-  };
+function stageAt(p) {
+  if (p < INTRO_END) return -1;
+  return Math.min(STAGES.length - 1, Math.floor((p - INTRO_END) / STAGE_SPAN));
+}
+
+const eyebrowStyle = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
+
+function HeroCopy({ onQuote, onGo, ctaRef }) {
   return (
-    <button
-      onClick={act}
-      aria-label={card.cta || card.title}
-      className="ubc-lgsf-tab"
-      style={{
-        position: 'absolute', ...side, top: '28%', zIndex: 4, maxWidth: 340,
-        textAlign: 'left', cursor: 'pointer',
-        background: 'rgba(255,255,255,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-        border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-3)',
-        boxShadow: 'var(--shadow-2)',
-        padding: 'var(--s-5) var(--s-5) var(--s-4)',
-        opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(10px)',
-        pointerEvents: visible ? 'auto' : 'none',
-        transition: 'opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out)'
-      }}>
-      {card.eyebrow && <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>{card.eyebrow}</span>}
-      <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 'var(--fs-h3)', fontWeight: 500, lineHeight: 1.5, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{card.title}</span>
-      {card.body && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{card.body}</span>}
-      {card.cta && (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)', marginTop: 'var(--s-4)', borderBottom: 'var(--bw-hair) solid var(--border-strong)', paddingBottom: 2 }}>
-          {card.cta} <HeroIcon name="arrow-right" size={13} />
-        </span>
+    <>
+      {INTRO.eyebrow && <p style={{ ...eyebrowStyle, color: 'var(--text-accent)', margin: 0 }}>{INTRO.eyebrow}</p>}
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(34px, 5.4vw, 76px)', fontWeight: 700, lineHeight: 'var(--lh-tight)', color: 'var(--text-strong)', margin: 'var(--s-3) 0 0', maxWidth: '20ch' }}>
+        {INTRO.h1}
+      </h1>
+      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', maxWidth: '60ch', margin: 'var(--space-hero-text) 0 0' }}>
+        {INTRO.sub}
+      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-5)', flexWrap: 'wrap', justifyContent: 'inherit', marginTop: 'var(--space-text-cta)' }}>
+        <button ref={ctaRef} onClick={onQuote} {...(ctaRef ? bounceHandlers(ctaRef) : {})} style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(214,54,31,.55)' }}>
+          {INTRO.primary}
+        </button>
+        <a href="/services" onClick={(e) => { if (onGo) { e.preventDefault(); onGo('services'); } }} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
+          {INTRO.secondary}
+        </a>
+      </div>
+      {INTRO.proof && (
+        <p style={{ ...eyebrowStyle, margin: 'var(--space-text-cta) 0 0' }}>{INTRO.proof.join(' · ')}</p>
       )}
-    </button>
+    </>
+  );
+}
+
+function OutputChain({ shown, animate }) {
+  return (
+    <ol aria-label="What the model becomes" style={{ listStyle: 'none', margin: 'var(--s-4) 0 0', padding: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--s-2)' }}>
+      {OUTPUTS.map((o, i) => (
+        <li key={o} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--s-2)',
+          opacity: shown ? 1 : 0, transform: shown ? 'none' : 'translateY(6px)',
+          transition: animate ? `opacity 320ms ${i * 140}ms var(--ease-out), transform 320ms ${i * 140}ms var(--ease-out)` : 'none' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', color: 'var(--text-strong)', background: 'var(--white)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '4px 10px' }}>{o}</span>
+          {i < OUTPUTS.length - 1 && <span aria-hidden="true" style={{ color: 'var(--text-faint)' }}>{'→'}</span>}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+const seeHow = (
+  <a href="#the-ubc-way" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)' }}>
+    See How It Works {'→'}
+  </a>
+);
+
+// Phones / reduced motion: no pinned scene, no model download.
+function StaticHero({ onQuote, onGo }) {
+  return (
+    <div style={{ background: 'var(--surface-page)' }}>
+      <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: 'var(--section-y) var(--gutter) 0' }}>
+        <HeroCopy onQuote={onQuote} onGo={onGo} />
+      </div>
+      <section aria-labelledby="stages-title" style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: 'var(--section-y) var(--gutter) 0' }}>
+        <h2 id="stages-title" style={eyebrowStyle}>How a project moves through the model</h2>
+        <div style={{ display: 'grid', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
+          {STAGES.map((s) => (
+            <article key={s.n} style={{ background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden' }}>
+              {s.still && <img src={s.still} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover' }} />}
+              <div style={{ padding: 'var(--space-card-pad)' }}>
+                <div style={{ ...eyebrowStyle, color: 'var(--text-accent)' }}>Stage {s.n}</div>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
+                {s.state === 'outputs' && <OutputChain shown animate={false} />}
+              </div>
+            </article>
+          ))}
+        </div>
+        <div style={{ marginTop: 'var(--s-4)' }}>{seeHow}</div>
+      </section>
+    </div>
   );
 }
 
 export function SceneHero({ onQuote, onGo }) {
   const wrapRef = React.useRef(null);
-  const hostRef = React.useRef(null);
   const canvasHolderRef = React.useRef(null);
   const ctaRef = React.useRef(null);
   const visibleRef = React.useRef(true);
+  const targetStateRef = React.useRef('complete');
   const [progress, setProgress] = React.useState(0);
-  const [stage, setStage] = React.useState(0);
   const [ready, setReady] = React.useState(false);
-  const [loadPct, setLoadPct] = React.useState(0);
   const [loadError, setLoadError] = React.useState(false);
+  const [mode, setMode] = React.useState('pinned'); // pinned | static
 
-  const reduce = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const n = Math.max(1, HERO_STAGES.length);
-  const M = HERO.model;
-
-  // Scroll -> target progress + active stage.
   React.useEffect(() => {
+    const narrow = window.matchMedia('(max-width: 700px)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (narrow || reduce) setMode('static');
+  }, []);
+
+  const stage = stageAt(progress);
+  targetStateRef.current = stage < 0 ? 'complete' : STAGES[stage].state;
+
+  React.useEffect(() => {
+    if (mode !== 'pinned') return;
     const onScroll = () => {
       const el = wrapRef.current; if (!el) return;
       const r = el.getBoundingClientRect();
       const total = r.height - window.innerHeight;
       if (total <= 0) return;
-      const p = Math.min(1, Math.max(0, -r.top / total));
-      setProgress(p);
-      let s = 0;
-      for (let i = 0; i < HERO_STAGES.length; i++) { if (p >= (HERO_STAGES[i].t || 0) - 0.0001) s = i; }
-      setStage(s);
+      setProgress(Math.min(1, Math.max(0, -r.top / total)));
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     onScroll();
     return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
-  }, []);
+  }, [mode]);
 
-  // Live three.js scene: camera position is a pure function of scroll
-  // progress, lerped between each stage's [x,y,z]. No OrbitControls: this
-  // is a fly-through the visitor drives by scrolling, not by dragging.
   React.useEffect(() => {
-    if (!M) return;
+    if (mode !== 'pinned' || !HERO.model) return;
     let dead = false;
     let cleanup = () => {};
-
-    try {
+    // Let the poster and copy paint first; the model is the page's heaviest
+    // asset by far.
+    const idle = window.requestIdleCallback || ((cb) => window.setTimeout(cb, 200));
+    const cancelIdle = window.cancelIdleCallback || window.clearTimeout;
+    const idleId = idle(() => {
+      if (dead) return;
       const host = canvasHolderRef.current;
       if (!host) return;
-
-      const R = M.radius || 11;
+      const R = HERO.model.radius || 9.2;
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xffffff);   // --paper: a white studio sweep, not the old dark stage
-
+      scene.background = new THREE.Color(PAPER);
       const camera = new THREE.PerspectiveCamera(42, 1, R / 200, R * 80);
-      // Fixed establishing shot — the model does the moving now, not the
-      // camera. Reuses stage 0's own configured position (the original
-      // "wide aerial" framing) if the data has one, rather than inventing
-      // a new angle from scratch.
-      const camPos = (HERO_STAGES[0] && HERO_STAGES[0].pos)
-        ? new THREE.Vector3(...HERO_STAGES[0].pos)
-        : new THREE.Vector3(R * 1.6, R * 1.2, R * 1.9);
-      camera.position.copy(camPos);
+      camera.position.set(...HERO.camPos);
       camera.lookAt(0, 0, 0);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -142,40 +178,21 @@ export function SceneHero({ onQuote, onGo }) {
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       host.appendChild(renderer.domElement);
-      renderer.domElement.style.display = 'block';
-      // See the matching comment in Home.jsx's GlobalPresence: setSize(...,
-      // false) skips three.js's own style.width/height writes, so without
-      // this the canvas falls back to its width/height attributes (set to
-      // w/h * devicePixelRatio for a sharp buffer) as its literal CSS size,
-      // rendering at 2-3x the intended box on any non-1x-pixel-ratio screen.
-      renderer.domElement.style.width = '100%';
-      renderer.domElement.style.height = '100%';
+      Object.assign(renderer.domElement.style, { display: 'block', width: '100%', height: '100%' });
 
-      // Same studio lighting recipe as the Projects model viewer, so the
-      // hero and the pages it links to read as one system. The hemisphere's
-      // ground colour is a paper tone, not black, matching a white floor.
       scene.add(new THREE.HemisphereLight(0xffffff, 0xcfcdc5, 0.9));
       const key = new THREE.DirectionalLight(0xffffff, 1.2);
       key.position.set(R, R * 1.8, R * 1.4);
       key.castShadow = true;
       key.shadow.mapSize.set(1024, 1024);
-      key.shadow.camera.left = -R * 1.6; key.shadow.camera.right = R * 1.6;
-      key.shadow.camera.top = R * 1.6; key.shadow.camera.bottom = -R * 1.6;
-      key.shadow.camera.near = R * 0.1; key.shadow.camera.far = R * 6;
+      Object.assign(key.shadow.camera, { left: -R * 1.6, right: R * 1.6, top: R * 1.6, bottom: -R * 1.6, near: R * 0.1, far: R * 6 });
       key.shadow.bias = -0.0015;
       scene.add(key);
       const fill = new THREE.DirectionalLight(0x9fb4cc, 0.5);
       fill.position.set(-R * 1.2, R * 0.6, -R);
       scene.add(fill);
-      // Same reflection recipe as ModelViewer.jsx, built fresh for this
-      // scene's own WebGL context (see the comment on buildStudioEnvironment
-      // for why it can't be shared across viewers), so the hero's steel
-      // reads as metal rather than a flat colour fill.
       const envRT = buildStudioEnvironment(THREE, renderer);
       scene.environment = envRT.texture;
-
-      // Same shadow-mapped floor as ModelViewer.jsx, in place of the old
-      // drafting grid.
       scene.add(makeGroundShadow(THREE, R));
 
       const fit = () => {
@@ -189,36 +206,44 @@ export function SceneHero({ onQuote, onGo }) {
       const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
       if (ro) ro.observe(host);
       window.addEventListener('resize', fit);
+      const vio = new IntersectionObserver((entries) => { visibleRef.current = entries[0].isIntersecting; }, { rootMargin: '200px 0px' });
+      vio.observe(host);
 
-      const vio = typeof IntersectionObserver === 'function'
-        ? new IntersectionObserver((entries) => { visibleRef.current = entries[0].isIntersecting; }, { rootMargin: '200px 0px', threshold: 0 })
-        : null;
-      if (vio) vio.observe(host); else visibleRef.current = true;
-
-      // Levitate + revolve, in place of the old scroll-driven camera fly-
-      // through: a slow 360° spin around the model's own vertical
-      // centreline (recentred on load, see below) plus a gentle sinusoidal
-      // hover, both driven by elapsed time rather than scroll position.
-      // One full revolution every ~22s — a deliberate, unhurried turntable
-      // pace, not a demo-reel spin. Reduced-motion holds the model still.
-      const ROTATE_PERIOD = 22;
-      const BOB_PERIOD = 4.5;
-      const BOB_AMPLITUDE = R * 0.02;
-      const HOVER_GAP = R * 0.05;
+      // Each part keeps its own working material; every frame eases its
+      // colour, opacity and vertical offset towards the active state.
+      let parts = [];
       let modelGroup = null;
       let baseY = 0;
-      let elapsed = 0;
-      const clock = new THREE.Clock();
+      const tmp = new THREE.Color();
+      const accent = new THREE.Color(0xd6361f);
+      const targetFor = (part, i, state) => {
+        if (state === 'framing') return part.framing ? { color: accent, opacity: 1, lift: 0 } : { color: part.base, opacity: 0.12, lift: 0 };
+        if (state === 'coordinated') return { color: tmp.setHex(COORD_COLORS[i % COORD_COLORS.length]).clone(), opacity: 1, lift: 0 };
+        // Outputs keeps the model whole and in place (the output chain in the
+        // copy carries that stage); pulling parts apart floated the small
+        // hardware group above the frame and dropped the frame below it.
+        return { color: part.base, opacity: part.baseOpacity, lift: 0 };
+      };
 
+      const clock = new THREE.Clock();
+      let elapsed = 0;
       let raf = 0;
       const tick = () => {
+        const dt = Math.min(0.05, clock.getDelta());
         if (visibleRef.current) {
-          if (modelGroup && !reduce) {
-            elapsed += clock.getDelta();
-            modelGroup.rotation.y = (elapsed / ROTATE_PERIOD) * Math.PI * 2;
-            modelGroup.position.y = baseY + Math.sin((elapsed / BOB_PERIOD) * Math.PI * 2) * BOB_AMPLITUDE;
-          } else {
-            clock.getDelta();
+          if (modelGroup) {
+            elapsed += dt;
+            modelGroup.rotation.y = (elapsed / 30) * Math.PI * 2;
+            const k = 1 - Math.pow(0.002, dt);
+            const state = targetStateRef.current;
+            parts.forEach((part, i) => {
+              const t = targetFor(part, i, state);
+              part.mat.color.lerp(t.color, k);
+              part.mat.opacity += (t.opacity - part.mat.opacity) * k;
+              part.mat.transparent = part.mat.opacity < 0.999 || part.baseTransparent;
+              part.mat.depthWrite = part.mat.opacity > 0.5;
+              part.mesh.position.y += (part.y0 + t.lift - part.mesh.position.y) * k;
+            });
           }
           renderer.render(scene, camera);
         }
@@ -226,47 +251,34 @@ export function SceneHero({ onQuote, onGo }) {
       };
       raf = requestAnimationFrame(tick);
 
-      const loader = new GLTFLoader();
-      loader.load(M.src, (gltf) => {
+      new GLTFLoader().load(HERO.model.src, (gltf) => {
         if (dead) return;
         const box = new THREE.Box3().setFromObject(gltf.scene);
         const center = box.getCenter(new THREE.Vector3());
-        // Recentre the model's own footprint onto the world's vertical
-        // axis and rest its base on the ground plane, so the continuous
-        // spin below turns around the model's own centreline (anchored at
-        // its bottom) rather than wherever its source geometry happened to
-        // sit.
         gltf.scene.position.x -= center.x;
         gltf.scene.position.z -= center.z;
         gltf.scene.position.y -= box.min.y;
-        baseY = gltf.scene.position.y + HOVER_GAP;
+        baseY = gltf.scene.position.y + R * 0.05;
         gltf.scene.position.y = baseY;
         applySteelMaterials(THREE, gltf.scene);
-        gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+        gltf.scene.traverse((o) => {
+          if (!o.isMesh) return;
+          o.castShadow = true; o.receiveShadow = true;
+          const src = Array.isArray(o.material) ? o.material[0] : o.material;
+          const mat = src.clone();
+          o.material = mat;
+          parts.push({ mesh: o, mat, framing: src.type === 'MeshPhysicalMaterial', base: mat.color.clone(), baseOpacity: mat.opacity, baseTransparent: mat.transparent, y0: o.position.y });
+        });
         scene.add(gltf.scene);
         modelGroup = gltf.scene;
         setReady(true);
-      }, (evt) => {
-        // This model is the one asset on the site heavy enough (44 MB) that
-        // a visitor can sit on a bare "Loading" caption for real seconds, not
-        // a blink — lengthComputable is false only if the server ever drops
-        // Content-Length, which every static host here does send.
-        if (!dead && evt.lengthComputable) setLoadPct(Math.round((evt.loaded / evt.total) * 100));
-      }, () => {
-        // Without this, any real failure (network drop, a host that
-        // doesn't serve range/Content-Length right) leaves `ready` false
-        // forever and the caption below reads "Loading" with no way to
-        // tell a slow fetch from a dead one — the exact silent-failure
-        // shape this hero has already shipped once (see the cobe globe's
-        // stuck-loading bug this same build fixed elsewhere).
-        if (!dead) setLoadError(true);
-      });
+      }, undefined, () => { if (!dead) setLoadError(true); });
 
       cleanup = () => {
         cancelAnimationFrame(raf);
         window.removeEventListener('resize', fit);
         if (ro) ro.disconnect();
-        if (vio) vio.disconnect();
+        vio.disconnect();
         envRT.dispose();
         scene.traverse((o) => {
           if (o.geometry) o.geometry.dispose();
@@ -275,99 +287,72 @@ export function SceneHero({ onQuote, onGo }) {
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
       };
-    } catch (err) {
-      if (!dead) setLoadError(true);
-    }
+    });
+    return () => { dead = true; cancelIdle(idleId); cleanup(); };
+  }, [mode]);
 
-    return () => { dead = true; cleanup(); };
-  }, [reduce]);
+  if (mode === 'static') return <StaticHero onQuote={onQuote} onGo={onGo} />;
 
-  const active = HERO_STAGES[stage] || {};
-  const introOp = Math.max(0, 1 - progress / 0.09);
-  const introOn = progress < 0.12;
-  const cardShown = HERO_CARDS.map((c) => progress >= (c.t0 || 0) && progress < (c.t1 == null ? 1.001 : c.t1));
+  const introOp = Math.max(0, 1 - progress / (INTRO_END * 0.7));
+  const stageOn = stage >= 0;
+  const posterStage = stageOn ? stage : 0;
 
   return (
-    <div ref={wrapRef} style={{ height: (n * 100) + 'vh', position: 'relative', background: 'var(--surface-sunken)' }}>
+    <div ref={wrapRef} style={{ height: ((STAGES.length + 1) * 100) + 'vh', position: 'relative', background: 'var(--surface-page)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-
-        <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0, filter: 'saturate(.9) brightness(.95)' }} />
-        {!ready && (
-          <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: loadError ? 'var(--accent)' : 'var(--text-faint)' }}>
-              {loadError ? 'The model could not be loaded' : loadPct > 0 ? `Loading the structural model — ${loadPct}%` : 'Loading the structural model'}
-            </span>
-          </div>
+        {/* Poster until the live model is ready */}
+        <img src={STAGES[posterStage].still} alt="" aria-hidden="true"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: ready ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
+        <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0 }} />
+        {loadError && (
+          <span style={{ ...eyebrowStyle, position: 'absolute', right: 'var(--gutter)', top: 'var(--s-9)', color: 'var(--text-accent)' }}>The live model could not be loaded</span>
         )}
 
-        {/* Scrims: top for the header, bottom for the labels. A white studio
-            sweep instead of the old dark stage, so the dark headline and
-            captions need a light scrim under them, not a dark one. The
-            middle floor sits high (.62) because dark text needs the model's
-            own dark member lines washed out wherever it crosses the copy,
-            not just toned down the way light text over a dark model could
-            get away with at a lower floor. */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.62) 22%, rgba(255,255,255,.62) 55%, rgba(255,255,255,.88))', pointerEvents: 'none' }} />
+        {/* Paper scrim behind the copy, lighter once the stages take over */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'opacity 300ms', opacity: stageOn ? 0.55 : 1, background: 'linear-gradient(90deg, rgba(243,241,236,.94) 0%, rgba(243,241,236,.82) 38%, rgba(243,241,236,.2) 70%, rgba(243,241,236,0) 100%)' }} />
 
-        {/* Glassmorphic info cards, one per stage after the intro, each linking on */}
-        {HERO_CARDS.map((c, i) => (
-          <HeroCard key={i} card={c} visible={cardShown[i]} onGo={onGo} onQuote={onQuote} />
-        ))}
-
-        {/* Intro headline (fades out as you start scrolling) */}
-        <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 var(--gutter)', opacity: introOp, pointerEvents: introOn ? 'auto' : 'none' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-5)' }}>Loading the structural model</div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6.4vw, 92px)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)', margin: 0, maxWidth: '18ch' }}>
-            CFS and LGSF Engineering and Detailing Services
-          </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '54ch', margin: 'var(--space-hero-text) 0 var(--space-text-cta)' }}>
-            UBC BIM helps contractors, builders, manufacturers, architects and engineers turn project requirements into coordinated BIM models, engineering documents, shop drawings, permit sets and accurate material quantities.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-4)', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <button ref={ctaRef} onClick={onQuote} {...bounceHandlers(ctaRef)} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(193,39,45,.55)' }}>
-              Start a Project <HeroIcon name="arrow-right" size={16} />
-            </button>
-            <button onClick={() => onGo && onGo('services')} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', background: 'transparent', border: 'var(--bw-1) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer' }}>
-              Explore Our Services
-            </button>
+        {/* Hero */}
+        <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', alignItems: 'center', opacity: introOp, pointerEvents: stageOn ? 'none' : 'auto' }}>
+          <div style={{ width: '100%', maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', justifyContent: 'flex-start' }}>
+            <HeroCopy onQuote={onQuote} onGo={onGo} ctaRef={ctaRef} />
           </div>
         </div>
 
-        {/* Stage label (bottom-left): active.term surfaces the one word this
-            stage is teaching as a small pill, so it reads at a glance rather
-            than requiring the whole note to be read to find it. */}
-        <div className="ubc-stage-label" style={{ position: 'absolute', left: 'var(--gutter)', bottom: 'var(--s-9)', maxWidth: '42ch', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Stage {active.n}</div>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 3.4vw, 46px)', fontWeight: 500, lineHeight: 1.5, color: 'var(--text-strong)', margin: 'var(--s-3) 0 0' }}>{active.title}</h2>
-          {active.term && (
-            <span style={{ display: 'inline-block', marginTop: 'var(--s-3)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)', border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-pill)', padding: '5px 12px' }}>
-              {active.term}
-            </span>
-          )}
-          {active.note && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', lineHeight: 'var(--lh-relaxed)', marginTop: 'var(--s-3)' }}>{active.note}</p>}
-        </div>
-
-        {/* Numbered rail (right) */}
-        <div className="ubc-stage-rail" style={{ position: 'absolute', right: 'var(--gutter)', bottom: 'var(--s-9)', display: 'flex', flexDirection: 'column', gap: 'var(--s-3)', opacity: 1 - introOp, transition: 'opacity var(--dur-2) var(--ease-out)' }}>
-          {HERO_STAGES.map((s, i) => {
-            const on = i === stage;
-            return (
-              <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', justifyContent: 'flex-end' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', color: on ? 'var(--text-strong)' : 'var(--text-faint)' }}>{s.n}</span>
-                <span style={{ width: on ? 44 : 22, height: 1, background: on ? 'var(--accent)' : 'var(--border-strong)', transition: 'width var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out)' }} />
+        {/* Stages 01-04: all present in the markup, one shown at a time */}
+        <section aria-labelledby="stages-title" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: stageOn ? 1 : 0, transition: 'opacity 300ms var(--ease-out)' }}>
+          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 'var(--s-8)', maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'var(--s-6)' }}>
+            <div style={{ position: 'relative', maxWidth: '46ch', flex: '1 1 auto', pointerEvents: stageOn ? 'auto' : 'none' }}>
+              <h2 id="stages-title" style={eyebrowStyle}>How a project moves through the model</h2>
+              <div style={{ display: 'grid' }}>
+                {STAGES.map((s, i) => {
+                  const on = i === stage;
+                  return (
+                    <div key={s.n} aria-hidden={!on} style={{ gridArea: '1 / 1', opacity: on ? 1 : 0, transform: on ? 'none' : 'translateY(8px)', transition: 'opacity 300ms var(--ease-out), transform 300ms var(--ease-out)', visibility: on ? 'visible' : 'hidden' }}>
+                      <div style={{ ...eyebrowStyle, color: 'var(--text-accent)', marginTop: 'var(--s-3)' }}>Stage {s.n}</div>
+                      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(26px, 3vw, 40px)', fontWeight: 700, lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-body)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
+                      {s.state === 'outputs' && <OutputChain shown={on} animate />}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-
-        {/* Scroll cue during intro */}
-        {introOn && (
-          <div style={{ position: 'absolute', left: '50%', bottom: 'var(--s-5)', transform: 'translateX(-50%)', opacity: introOp, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase' }}>
-            Scroll<HeroIcon name="chevron-down" size={18} />
+              <div style={{ marginTop: 'var(--s-3)' }}>{seeHow}</div>
+            </div>
+            {/* 01-04 progress indicator */}
+            <ol aria-label="Stage progress" className="ubc-stage-rail" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--s-2)' }}>
+              {STAGES.map((s, i) => {
+                const on = i === stage;
+                return (
+                  <li key={s.n} aria-current={on ? 'step' : undefined} style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', justifyContent: 'flex-end' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: on ? 'var(--text-strong)' : 'var(--text-faint)' }}>{s.n}</span>
+                    <span style={{ width: on ? 44 : 22, height: 2, background: i <= stage ? 'var(--accent)' : 'var(--border-strong)', transition: 'width 300ms var(--ease-out)' }} />
+                  </li>
+                );
+              })}
+            </ol>
           </div>
-        )}
+        </section>
       </div>
     </div>
   );
 }
-

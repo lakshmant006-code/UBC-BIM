@@ -50,7 +50,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
               { label: 'Delivered', value: project.delivered }
             ]}
             tags={project.software.map((s) => <Tag key={s}>{s}</Tag>)}
-            actions={<><Button full size="sm" onClick={onQuote}>Start a similar project</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
+            actions={<><Button full size="sm" onClick={onQuote}>Send Your Project →</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
         </div>
       </div>
       <Section tight>
@@ -116,7 +116,7 @@ export function Portfolio() {
         <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-7)' }}>
           {list.map((p, i) => (
             <Reveal key={p.id} delay={i * 60}>
-              <Card interactive
+              <Card interactive className="ubc-glow"
                 // A real IFC gets the live, orbitable model right on the card
                 // (not a photo of it). stopPropagation keeps a drag-to-orbit
                 // from also firing the card's own "open this project" click.

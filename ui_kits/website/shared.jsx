@@ -11,9 +11,26 @@ import React from 'react';
 import anime from 'animejs';
 
 export const Page = ({ children, style }) => <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', ...style }}>{children}</div>;
-export const Section = ({ children, sunken, tight, id, style }) => (
-  <section id={id} className="ubc-section" style={{ padding: (tight ? 'var(--section-y-tight)' : 'var(--section-y)') + ' 0', background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
-);
+// `framed` sets the whole section inside a rounded blue panel (the client's
+// own mock-up); responsive.css's .ubc-frame-blue re-points the text, border
+// and card tokens to light-on-blue values, so the section's own inline
+// var(--text-*) styles recolour without per-component changes.
+export const Section = ({ children, sunken, tight, framed, id, style }) => {
+  const pad = (tight ? 'var(--section-y-tight)' : 'var(--section-y)') + ' 0';
+  if (framed) {
+    const { borderTop, background, ...rest } = style || {};
+    return (
+      <section id={id} className="ubc-section" style={{ padding: pad, ...rest }}>
+        <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)' }}>
+          <div className="ubc-frame-blue" style={{ borderRadius: 'var(--r-4)', padding: 'clamp(28px, 4vw, 56px) clamp(0px, 2vw, 24px)' }}>{children}</div>
+        </div>
+      </section>
+    );
+  }
+  return (
+    <section id={id} className="ubc-section" style={{ padding: pad, background: sunken ? 'var(--surface-sunken)' : 'transparent', ...style }}>{children}</section>
+  );
+};
 // anime.js-driven entrance, in place of the old CSS opacity/translateY
 // transition: same shape (fade up 22px, once, on scroll into view) and the
 // same --ease-out curve and --dur-4 length as tokens/motion.css, just

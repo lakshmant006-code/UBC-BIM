@@ -1,13 +1,11 @@
 :root{
 --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;--s-8:64px;--s-9:96px;--s-10:128px;--s-11:160px;
---gutter:24px;--page-max:1264px;--content-max:760px;--section-y:clamp(80px,10vw,144px);--section-y-tight:clamp(64px,7vw,96px);
-/* Layout rhythm measured off the client's reference recording (cluely.com,
-   1914px capture, box-to-box): 1216px content column, ~144px section
-   padding, 48px from a section heading to its content, 16px card title to
-   body, 24px heading to its paragraph, 32px hero text to buttons, 72px
-   buttons (or text) to a media block, 40px card padding, 28px between
-   cards, ~68px FAQ rows. Pages use these names, not raw --s-* steps. */
---space-head-content:48px;--space-head-text:24px;--space-hero-text:32px;--space-text-cta:32px;--space-cta-media:72px;--space-split:72px;--space-card-pad:40px;--space-card-gap:28px;--space-title-text:16px;--space-row-y:22px;
+--gutter:24px;--page-max:1264px;--content-max:760px;--section-y:clamp(48px,6vw,88px);--section-y-tight:clamp(36px,4.5vw,56px);
+/* Layout rhythm: the content column and proportions follow the client's
+   reference recording (cluely.com), tightened on the client's later request
+   for smaller section gaps and less space between lines of copy. Pages use
+   these names, not raw --s-* steps. */
+--space-head-content:32px;--space-head-text:16px;--space-hero-text:20px;--space-text-cta:24px;--space-cta-media:48px;--space-split:56px;--space-card-pad:28px;--space-card-gap:20px;--space-title-text:8px;--space-row-y:16px;
 /* --r-3/--r-4 (cards, panels, the quote drawer) were raised from 8px/12px
    to a softer, more generous radius — the "sleek" card language sites like
    openai.com use — in one token change rather than per component. --r-0/1/2
