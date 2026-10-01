@@ -1,0 +1,110 @@
+{
+  "_note": "Machine -> software -> files, per the homepage developer handoff (section 6). Marketing can edit this file without touching code. Every row is marked [CONFIRM] in the handoff: the production team must verify each one before launch. Tekla was on the old table but is left out until confirmed.",
+  "default": "FRAMECAD",
+  "rows": [
+    {
+      "machine": "FRAMECAD",
+      "modelledIn": [
+        "FRAMECAD Structure",
+        "Vertex BD"
+      ],
+      "files": [
+        "FRAMECAD native machine file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Assembly sheets"
+      ]
+    },
+    {
+      "machine": "Howick",
+      "modelledIn": [
+        "Vertex BD",
+        "MWF Pro Metal"
+      ],
+      "files": [
+        "Machine CSV",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Assembly sheets"
+      ]
+    },
+    {
+      "machine": "Scottsdale",
+      "modelledIn": [
+        "Scottsdale software",
+        "Vertex BD"
+      ],
+      "files": [
+        "Scottsdale native file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    },
+    {
+      "machine": "Pinnacle",
+      "modelledIn": [
+        "Vertex BD"
+      ],
+      "files": [
+        "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    },
+    {
+      "machine": "Knudson",
+      "modelledIn": [
+        "Vertex BD"
+      ],
+      "files": [
+        "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    },
+    {
+      "machine": "AMS Controls",
+      "modelledIn": [
+        "Vertex BD"
+      ],
+      "files": [
+        "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    },
+    {
+      "machine": "Beck Automation",
+      "modelledIn": [
+        "Vertex BD"
+      ],
+      "files": [
+        "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    },
+    {
+      "machine": "FrameMac",
+      "modelledIn": [
+        "Vertex BD"
+      ],
+      "files": [
+        "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    },
+    {
+      "machine": "Arkitech",
+      "modelledIn": [
+        "Vertex BD"
+      ],
+      "files": [
+        "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    }
+  ]
+}

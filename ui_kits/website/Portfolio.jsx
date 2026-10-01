@@ -50,7 +50,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
               { label: 'Delivered', value: project.delivered }
             ]}
             tags={project.software.map((s) => <Tag key={s}>{s}</Tag>)}
-            actions={<><Button full size="sm" onClick={onQuote}>Start a similar project</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
+            actions={<><Button full size="sm" onClick={onQuote}>Send Your Project →</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
         </div>
       </div>
       <Section tight>

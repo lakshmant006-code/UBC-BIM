@@ -57,11 +57,11 @@ export const UBC_DATA = {
     { label: 'MEP and clash detection', note: 'Services against the frame', spec: { eyebrow: 'Layer 04', title: 'MEP and clash detection', specs: [{ label: 'Disciplines', value: 'Mechanical · electrical · plumbing' }, { label: 'Clashes found', value: '14 hard · 6 soft' }, { label: 'Resolved', value: 'All hard clashes cleared' }, { label: 'Output', value: 'Clash report · coordinated model' }], tags: ['Clash report'] } }
   ],
   projects: [
-    // Five real client IFC models, converted once to glTF by tools/ifc_to_glb.py
+    // Four real client IFC models, converted once to glTF by tools/ifc_to_glb.py
     // (see that file's docstring). Unlike the placeholder cards above, `size` is
     // measured from the model geometry itself rather than invented, and
     // `software` is read from each file's own header. Everything else about
-    // these five is honestly what the model shows, not a delivery record.
+    // these four is honestly what the model shows, not a delivery record.
     { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Structural steel',
       size: '≈ 2,390 sq ft footprint (from model)', units: '988 columns · 834 beams', location: 'Not specified',
       delivered: 'Coordinated structural model', software: ['FRAMECAD Steelwise'],
@@ -74,10 +74,6 @@ export const UBC_DATA = {
       size: '≈ 1,970 sq ft footprint (from model)', units: '4 storeys', location: 'Not specified',
       delivered: 'Coordinated architectural model', software: ['Autodesk Revit'],
       model: { src: '/assets/models/dael-4-0070.glb', radius: 10.0 } },
-    { id: 'mechanical-room', name: 'Mechanical room', type: 'Commercial', system: 'MEP',
-      size: '8 elements', units: '1 storey', location: 'Not specified',
-      delivered: 'Coordinated MEP model', software: ['SketchUp Pro'],
-      model: { src: '/assets/models/mechanical-room.glb', radius: 75.1 } },
     // Source IFC was 456 MB (9,213 elements) — too large for git outright, so
     // it's kept as a GitHub Release asset rather than in the repo; only the
     // converted GLB below ships to the site, at full mesh detail (no
@@ -154,17 +150,6 @@ export const UBC_DATA = {
         ]
       } }
   ],
-  capability: {
-    columns: ['Machine / software', 'Type', 'File output'],
-    rows: [
-      ['Revit', 'Software', 'RVT · IFC · DWG'],
-      ['Vertex BD', 'Software', 'CSV · shop drawings'],
-      ['Tekla Structures', 'Software', 'IFC · NC1 · DWG'],
-      ['Navisworks', 'Software', 'Clash report · NWD'],
-      ['Roll-forming line', 'Machine', 'Machine CSV'],
-      ['Wall panel saw', 'Machine', 'Cut list · CSV']
-    ]
-  },
   // Real logo/photo assets the client supplied directly (Client_Logos.zip,
   // Software_logos.zip, Machine_logo.zip), processed once (resized, no
   // content changes) into ui_kits/website/assets/logos/. `machine` mixes
@@ -229,35 +214,12 @@ export const UBC_DATA = {
    (UBC_BIM_FINAL_Website_UX_Blueprint.pdf), sections 04/07/12/13/14: the
    buying-journey sections that page defines but the site didn't have a
    place for yet. Copy is either lifted directly from that document's own
-   bullet lists (whyUbc's six labels, whoWeServe's six roles, ubcWay's four
-   steps) or, where the blueprint only names a section and this site already
+   bullet lists (whyUbc's six labels, whoWeServe's six roles) or, where the blueprint only names a section and this site already
    has the real underlying fact elsewhere (each role's own blurb), written
    to describe what's already true on this site rather than a new claim.
-   howWeWork itself was later replaced with the Homepage Redesign brief's
-   own four-stage sequence — see the comment on it below. Three sections the
-   blueprint
-   calls for need assets nobody had supplied yet — a client logo wall (03),
-   named video testimonials (11), certifications (15).
-   The client logo wall now has real logos (window.UBC_DATA.logos.client,
-   above, from Client_Logos.zip) and Home.jsx's LogoWalls renders those —
-   plus the supplied software and machine logos, which the blueprint didn't
-   ask for by name but the client sent anyway — as running carousels rather
-   than a static grid. Named video testimonials and certifications still
-   have nothing real behind them, so CaseStudiesNote / CompanyProofTech's
-   certifications line stay explicit "coming soon" placeholders until those
-   exist too. Section 06 ("What we need from you") and the "Who we are"
-   band were removed from Home.jsx per the client's own request. */
+   The homepage developer handoff later replaced this page's How we work,
+   UBC Way, case-studies and certifications sections (see UBC_DATA.home). */
 UBC_DATA.blueprint = {
-  // Four-stage engineering workflow, verbatim from the client's own Homepage
-  // Redesign brief (its "Final 3D sequence" table) — supersedes the five
-  // plainer steps this used to hold, same underlying real process, just the
-  // client's own final wording and stage count.
-  howWeWork: [
-    { n: '01', title: 'Project Inputs', body: 'Your Project Requirements — Share your architectural drawings, structural criteria, specifications, and required deliverables.' },
-    { n: '02', title: 'BIM Detailing', body: 'Detailed to Your Standards — We develop coordinated CFS, LGSF, and wood-framing models around your standards and project requirements.' },
-    { n: '03', title: 'Engineering and Coordination', body: 'Engineered and Coordinated — Engineering, detailing, and coordination are integrated to identify critical conditions before construction.' },
-    { n: '04', title: 'Documentation', body: 'Ready for Construction — Receive coordinated models, engineering documents, shop drawings, permit sets, schedules, and material quantities.' }
-  ],
   // 12 Why UBC / client value — the blueprint's own six labels, each given
   // one line tying it to a real mechanism already on this site (the
   // coordinated model, clash detection, BOM) rather than a bare adjective.
@@ -279,22 +241,14 @@ UBC_DATA.blueprint = {
     { role: 'Engineers', body: 'Engineering support for wood and light-gauge steel, in house, from concept through permitting.', serviceIndexes: [2] },
     { role: 'Architects / design teams', body: 'Drafting and detailing that stays inside your own drawing standards and titleblocks.', serviceIndexes: [6] },
     { role: 'Developers', body: 'One coordinated model across a project, so the framing, MEP and permit set never fall out of step with each other.', serviceIndexes: [3, 4] }
-  ],
-  // 14 The UBC way + QA: the blueprint's own four-step culture framing,
-  // paired with the one QA mechanism this site can actually describe
-  // honestly (the coordinated-model check every drawing already goes
-  // through) rather than naming a formal certification nobody has supplied.
-  ubcWay: {
-    steps: ['Understand', 'Communicate', 'Coordinate', 'Deliver'],
-    qa: 'Every drawing and machine file is checked back against the same coordinated model it came from before it ships — model and drawing checks and revision control on every project, not just the large ones.'
-  }
+  ]
 };
 
 /* Quick-answers chat widget (ChatBot.jsx): predefined questions only, no
    open-ended input and no backend to answer one, so every question below is
    picked to have a real, already-true answer rather than something invented
    for the bot. Answers are paraphrased from data already on the site (the
-   service list above, `capability`, `stats`, `hero.stages[0]` and the
+   service list above, `stats`, `hero.stages[0]` and the
    contact `cards`), not new claims. */
 UBC_DATA.faq = [
   { q: 'What services do you offer?',
@@ -311,8 +265,12 @@ UBC_DATA.faq = [
     a: "Tell us the building type, square footage and what you need modelled. You'll get a scope and a price back, not a call-back." },
   { q: "What's the fastest way to reach a person?",
     a: 'Start a live chat, book a 15-minute call, or send drawings by email or WhatsApp — a modeller answers directly, no sales script.' },
+  { q: 'Which roll-formers do your files support?',
+    a: 'FRAMECAD, Howick, Scottsdale, Pinnacle, Knudson, AMS Controls, Beck Automation, FrameMac and Arkitech. Machine not listed? Tell us what you run and we\u2019ll confirm file compatibility before you commit.' },
+  { q: 'Do you stamp CFS engineering?',
+    a: 'Yes, where it\u2019s required. Every project ships with a permit set, stamped where the jurisdiction requires it.' },
   { q: 'Can I see real project examples?',
-    a: 'Yes — real client models are live on the Projects page. Drag to rotate and zoom through a steel frame, a light-gauge steel build, a mixed-construction project and an MEP coordination job.' }
+    a: 'Yes — real client models are live on the Projects page. Drag to rotate and zoom through a steel frame, a light-gauge steel build and a mixed-construction project.' }
 ];
 
 /* Real client video testimonials, supplied directly by the client
@@ -683,71 +641,140 @@ UBC_DATA.contactScene = {
       body: 'Architectural PDFs, a Revit model, or photos of a marked-up print: whatever you have is enough to start.',
       cta: 'Email us' },
     { frame: 214, span: 22, side: 'left', route: 'quote',
-      eyebrow: 'Start a project', title: 'Tell us about the project',
+      eyebrow: 'Send your project', title: 'Tell us about the project',
       body: 'Building type, square footage and what you need modelled. You get a scope and a price, not a call-back.',
-      cta: 'Start a Project' }
+      cta: 'Send Your Project \u2192' }
   ]
 };
 
-/* Landing hero: a live three.js scene (SceneHero.jsx), not a video or a
-   frame sequence. Scroll moves the camera through mocking-bird-lot-2.glb
-   (the two-storey light-gauge steel frame, also shown on Projects) between
-   the five [x,y,z] positions in `stages`, all looking at the origin the
-   model is centred on. `radius` is the converter's printed frame radius,
-   used to size the lighting and grid to the model; the stage positions
-   below are scaled to it (they were set for a radius-11.2 model, so each
-   is carried over at 9.2/11.2 of its original distance to keep the same
-   relative framing on this smaller one).
-
-   The five stages walk the actual sequence an engineer works through on a
-   project like this one: setting out, load path, framing, connections,
-   fabrication, each pinned to a real term (`term`), defined in plain
-   English in `note` rather than left as jargon. The four info cards teach a
-   second, related term each, so scrolling through the hero once is a small
-   glossary of the words that show up on every drawing set after it. `t` is
-   the scroll position (0..1) each stage's angle and caption take over at;
-   the last stage is given real room (0.78-1.0) rather than a sliver, since
-   a stage whose `t` is 1.0 has no scroll left to actually show it. */
+/* Landing hero + 3D walkthrough (SceneHero.jsx), copy per the homepage
+   developer handoff (sections 3 and 4). `intro` is the hero itself; the
+   four `stages` are scroll-scrubbed on desktop over mocking-bird-lot-2.glb,
+   each switching the model into a `state` SceneHero knows how to draw:
+     complete    - the whole model as-is
+     framing     - the steel framing highlighted, everything else dimmed
+     coordinated - every part in its own coordination colour
+     outputs     - the parts separate while `outputs` appear in sequence
+   The GLB only carries five material groups (no IFC class names), so these
+   are honest visual states of the parts it does have, not walls/MEP layers
+   it can't separate. `still` is a pre-rendered frame of each state, used as
+   the poster before the model loads and as the mobile card image (mobile
+   never pins the 3D). `camPos` is the fixed establishing shot. */
 UBC_DATA.hero = {
   model: { src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
+  camPos: [14.70, 11.99, 17.50],
+  intro: {
+    eyebrow: 'Overloaded this month? Add a detailing team without hiring one.',
+    h1: 'CFS & LGSF Detailing, Engineered for Construction',
+    sub: 'From estimating and BIM modeling to engineering, permit sets and shop drawings, UBC BIM helps manufacturers, contractors, builders and fabricators turn project requirements into accurate, construction-ready documentation.',
+    primary: 'Send Your Project \u2192',
+    secondary: 'Explore Our Services \u2192',
+    proof: ['783 projects', '224 clients', '12 countries', 'Revit', 'Vertex BD', 'FRAMECAD', 'Scottsdale']
+  },
   stages: [
-    { n: '01', t: 0.00, pos: [14.70, 11.99, 17.50], term: null,
-      title: 'One coordinated model', note: 'Everything downstream (the panel layouts, the truss drawings, the permit set) is drawn from this single 3D model, not redrawn for each one.' },
-    { n: '02', t: 0.20, pos: [18.40, 3.20, 3.70], term: 'Setting out',
-      title: 'Setting out the grid', note: '“Setting out” is transferring the design gridlines from the model to the site, so every column base plate lands exactly where it was engineered.' },
-    { n: '03', t: 0.40, pos: [2.79, 17.50, -14.70], term: 'Load path',
-      title: 'Sizing the load path', note: 'The “load path” is the route a load travels: down through the roof beams, into the columns, and out to the foundation. Every member on it must be sized for what passes through it.' },
-    { n: '04', t: 0.60, pos: [3.70, 3.12, 2.14], term: 'Moment connection',
-      title: 'Connections and bracing', note: 'Where a beam meets a column is a “connection”: pinned if it only carries load, a “moment connection” if it also has to resist the frame twisting under wind or seismic load.' },
-    { n: '05', t: 0.78, pos: [-15.61, 9.20, -12.90], term: 'Clash detection',
-      title: 'Clash-checked and fabrication-ready', note: '“Clash detection” catches two elements trying to occupy the same space (a beam through a duct run) in the model, before it turns up on site with a torch.' }
+    { n: '01', state: 'complete', still: '/assets/hero/stage-01.jpg',
+      title: 'Your Project. Our Model.',
+      body: 'Bring your architectural drawings, structural requirements and project scope. We build a coordinated CFS, LGSF or wood-frame BIM model around your project.' },
+    { n: '02', state: 'framing', still: '/assets/hero/stage-02.jpg',
+      title: 'Detailed to Your Standards',
+      body: 'We model and detail walls, floors, roofs, openings, connections and framing systems to your project standards and requirements.' },
+    { n: '03', state: 'coordinated', still: '/assets/hero/stage-03.jpg',
+      title: 'Engineered & Coordinated',
+      body: 'Engineering and coordination are integrated into the model to resolve critical conditions before they reach the field.' },
+    { n: '04', state: 'outputs', still: '/assets/hero/stage-04.jpg',
+      title: 'Ready for the Next Step',
+      body: 'Get the coordinated models, drawings, quantities and documentation your team needs for the next stage of the project.' }
   ],
-  // Glassmorphic info cards, one per stage after the intro: each teaches a
-  // second term related to that stage's, so the pair reads as a two-word
-  // vocabulary beat rather than one word repeated. `t0`/`t1` match the stage
-  // windows above exactly, so the caption and the card change together
-  // instead of drifting in and out of sync with each other.
-  cards: [
-    { t0: 0.20, t1: 0.40, side: 'right',
-      eyebrow: 'Term · Base plate', title: 'Where a column meets the ground',
-      body: 'The steel plate a column stands on, anchor-bolted to the foundation and sized so the load path this column carries doesn’t punch through the concrete under it.',
-      cta: 'View structural steel projects', go: 'projects', filter: 'Structural steel' },
+  outputs: ['BIM Model', 'Shop Drawings', 'Permit Sets', 'BOM', 'Machine Files (CSV)']
+};
 
-    { t0: 0.40, t1: 0.60, side: 'left',
-      eyebrow: 'Term · Span', title: 'How far a beam can carry',
-      body: 'The unsupported distance a beam covers between supports. A longer span needs a deeper beam or closer bracing, decided here in the model, not guessed on site.',
-      cta: 'Start a Project', quote: true },
+/* Homepage sections added or rewritten by the homepage developer handoff.
+   Every line of copy here is the handoff's own wording, except where noted.
+   `usps`: the handoff supplies the first card verbatim and asks for six;
+   the other five are each lifted from a statement the client already made
+   elsewhere (the handoff's Technology intro and final-CTA trust points, the
+   About restructure note on time zones, the Engineering service article),
+   not new claims. */
+UBC_DATA.home = {
+  aboutUs: {
+    eyebrow: 'About us',
+    title: 'What sets us apart',
+    body: 'We support contractors, builders, component manufacturers, architects, and engineers with specialist engineering, BIM, detailing, coordination, and documentation services.',
+    // Set to { src, poster, captions } once the About Us video and its
+    // captions are supplied (handoff open item); the section renders without
+    // it until then rather than showing an empty player.
+    video: null
+  },
+  usps: [
+    { title: 'A US point of contact', body: 'Talk to someone in your time zone, from first scope to final revision.' },
+    { title: 'Files your line can run', body: 'We model in the software your machine already reads, so files go straight to production without a re-draw.' },
+    { title: 'Engineering in-house', body: 'Wood and light-gauge steel engineering from concept through permitting, with no outside engineers to bring in.' },
+    { title: 'Work that moves overnight', body: 'Our production team works while you sleep, so the next revision is waiting in the morning.' },
+    { title: 'No minimum volume', body: 'One project is fine. Add a whole detailing team when the workload calls for it.' },
+    { title: 'Your drawings stay yours', body: 'NDA on request, and your files are used for your project only.' }
+  ],
+  whyTitle: 'Why CFS & LGSF manufacturers outsource detailing to UBC BIM',
+  ubcWay: {
+    eyebrow: 'The UBC Way',
+    title: 'Understand. Coordinate. Deliver. No surprises in between.',
+    steps: [
+      { n: '01', name: 'Understand', headline: 'We read your project before we draw a single stud.',
+        body: 'A detailer reviews your drawings, structural criteria, machine and software, then lists every open question up front.',
+        receive: ['Written scope, price and timeline', 'RFI list', 'Confirmed machine and file format'],
+        checkpoint: 'You approve the scope' },
+      { n: '02', name: 'Coordinate', headline: 'One model, every trade, clashes caught on screen.',
+        body: 'Framing is modelled in your software and checked against architecture, MEP and engineering before anything is cut.',
+        receive: ['Model review views', 'Clash report with resolutions', 'Engineering checks'],
+        checkpoint: 'You sign off the model' },
+      { n: '03', name: 'Deliver', headline: 'Checked against the model, then shipped.',
+        body: 'Shop drawings, permit set, BOM and machine files are generated from the approved model and QA-checked.',
+        receive: ['Machine files', 'Shop drawings and permit set', 'BOM and cut lists'],
+        checkpoint: 'Revisions tracked and re-issued together' }
+    ],
+    footer: 'Running through all three: one project lead, written updates, and every revision logged against the model.'
+  },
+  technology: {
+    eyebrow: 'Technology',
+    title: 'Pick your roll-former. See exactly what lands on your line.',
+    intro: 'We model CFS and LGSF framing in the software your machine already reads \u2014 so the files we send go straight to production, without a re-draw on your side.',
+    youSend: ['Architectural drawings (PDF, DWG)', 'Structural requirements', 'Project scope'],
+    shipsWith: ['Coordinated model (RVT \u00b7 IFC \u00b7 DWG)', 'Navisworks clash report (NWD \u00b7 PDF)', 'BOM (XLSX \u00b7 CSV)', 'Permit set (PDF, stamped where required)'],
+    footer: 'Machine not listed? Tell us what you run \u2014 we\u2019ll confirm file compatibility before you commit.'
+  },
+  finalCta: {
+    title: 'Send one wall type. Get the panel layout and BOM back.',
+    body: 'A detailer, not a salesperson, reviews your drawings and replies with a scope, price and timeline. If the file doesn\u2019t run on your line, you\u2019ve lost nothing.',
+    // "Reply within [X] business hours" is left out until the client
+    // confirms X (handoff: [CONFIRM]); the other two are the handoff's own.
+    trust: ['NDA on request \u2014 your drawings stay yours', 'No minimum volume \u2014 one project is fine'],
+    talk: 'Prefer to talk? Book a 15-minute call with our US team.'
+  },
+  machineOptions: ['FRAMECAD', 'Howick', 'Scottsdale', 'Vertex BD', 'Revit only', 'Other / not sure']
+};
 
-    { t0: 0.60, t1: 0.78, side: 'right',
-      eyebrow: 'Term · Bracing', title: 'What keeps the frame from racking',
-      body: 'Diagonal or cross members that stop a rectangular frame from leaning into a parallelogram under lateral load: wind, mostly, or seismic where it applies.',
-      cta: 'View structural steel projects', go: 'projects', filter: 'Structural steel' },
-
-    { t0: 0.78, t1: 1.001, side: 'left',
-      eyebrow: 'Term · Shop drawings', title: 'From model to machine file',
-      body: 'The fabrication-level drawings (and the machine CSV behind them) that a roll-forming line or a fabricator actually cuts from. Both come out of this same model.',
-      cta: 'See all projects', go: 'projects' }
-  ]
+/* About page, per the About page restructure note. `story`, `timeline` and
+   `leadership` stay null until the client supplies the founding year,
+   milestone dates and leadership names/photos (the note's own "content to
+   gather before build" list); their sections render only once filled in.
+   Expected shapes:
+     story:      { title, body: [paragraph, ...] }
+     timeline:   [{ year, label }, ...]
+     leadership: [{ name, role, line, photo }, ...] */
+UBC_DATA.about = {
+  story: null,
+  timeline: null,
+  leadership: null,
+  whereWeAre: {
+    eyebrow: 'Where we are',
+    title: 'A US office, and a production team that works while you sleep',
+    places: [
+      { place: 'Fort Mill, South Carolina', role: 'US office and your point of contact', body: 'Scope, questions and updates go through someone in your time zone, from the first call to the final revision.' },
+      { place: 'Hyderabad, India', role: 'Engineering and production', body: 'Modelling, detailing and engineering carry on overnight in US terms, so revisions are often back by the next morning.' }
+    ]
+  },
+  // Cameron's clip speaks to responsiveness, which is what this page asks a
+  // testimonial to cover (the homepage already covers deliverables).
+  testimonialId: 'client-2'
 };
 
 // Full service articles, one per header dropdown entry (see index.html's

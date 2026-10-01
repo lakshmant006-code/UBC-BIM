@@ -1,8 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
-/* One typeface for headline and body alike — Inter, the closest broadly-
-   available match to the clean, neutral grotesk sites like openai.com set
-   everything in — rather than a display/body pairing. --font-serif once
-   pointed at Fraunces, then at Space Grotesk; it now aliases this same
-   Inter stack too, so every headline built on var(--font-serif) follows
-   from this one change same as --font-display and --font-body do. */
-:root{--font-display:"Inter","Helvetica Neue",Arial,sans-serif;--font-body:"Inter","Helvetica Neue",Arial,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;--font-serif:"Inter","Helvetica Neue",Arial,sans-serif}
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+/* Per the homepage developer handoff: Archivo for headings, IBM Plex Sans
+   for body copy, IBM Plex Mono for labels. --font-serif is the name most
+   page headings were written against, so it aliases the heading face. */
+:root{--font-display:"Archivo","Helvetica Neue",Arial,sans-serif;--font-body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,monospace;--font-serif:"Archivo","Helvetica Neue",Arial,sans-serif}

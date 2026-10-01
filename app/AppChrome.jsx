@@ -43,6 +43,7 @@ export function AppChrome({ children }) {
   const router = useRouter();
   const [scrolled, setScrolled] = React.useState(false);
   const [quote, setQuote] = React.useState(false);
+  const [quoteMachine, setQuoteMachine] = React.useState('');
   const [chat, setChat] = React.useState(false);
 
   React.useEffect(() => {
@@ -52,7 +53,12 @@ export function AppChrome({ children }) {
   }, []);
 
   const active = pathToId(pathname);
-  const openQuote = () => setQuote(true);
+  // Buttons pass their click event straight through, so only a real
+  // { machine } options object pre-selects the form's machine field.
+  const openQuote = (opts) => {
+    setQuoteMachine(opts && typeof opts.machine === 'string' ? opts.machine : '');
+    setQuote(true);
+  };
 
   return (
     <>
@@ -64,7 +70,7 @@ export function AppChrome({ children }) {
       </QuoteDrawerProvider>
       <Footer onNavigate={() => router.push('/contact')} />
       <StickyQuote onQuote={openQuote} onChat={() => setChat((v) => !v)} />
-      <QuoteDrawer open={quote} onClose={() => setQuote(false)} />
+      <QuoteDrawer open={quote} machine={quoteMachine} onClose={() => setQuote(false)} />
       <ChatBot open={chat} onClose={() => setChat(false)} onQuote={openQuote} />
     </>
   );

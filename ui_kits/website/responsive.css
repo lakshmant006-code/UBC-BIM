@@ -5,22 +5,18 @@
 /* ---------- Tablet and below ---------- */
 @media (max-width: 900px) {
   /* Selected work: two columns -> one */
-  .ubc-proj-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+  .ubc-proj-grid { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-7) !important; }
 
   /* Blog grid: three columns -> two */
   .ubc-blog-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Compare systems: side-by-side columns -> stacked, writing above the slider */
-  .ubc-compare-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
+  .ubc-compare-grid { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-6) !important; }
 
   /* Global presence: side-by-side columns -> stacked, writing above the globe */
-  .ubc-globe-grid { grid-template-columns: 1fr !important; gap: var(--s-6) !important; }
+  .ubc-globe-grid { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-6) !important; }
 
-  /* Build-sequence hero: keep the stage caption clear of the numbered rail */
-  .ubc-stage-label { max-width: 62vw !important; }
 
-  /* The LGSF card sits over the frame; narrow it so it never runs off-screen */
-  .ubc-lgsf-tab { max-width: 46vw !important; }
 
   /* About stats: four columns is too tight once the label wraps to two words */
   .ubc-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: var(--s-6) var(--s-5) !important; }
@@ -33,7 +29,7 @@
 
   /* Careers hero: the "hire me" tag needs its own row under the copy once
      there isn't room for a 220px column beside the headline and buttons. */
-  .ubc-careers-hero { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+  .ubc-careers-hero { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-7) !important; }
 
   /* Any 3D model viewer / model-stage placeholder: the canvas's width shrinks
      with its column on a narrower screen, but height and min-height are set
@@ -41,17 +37,12 @@
      progressively taller and more distorted instead of scaling down with it. */
   .ubc-model-viewer { height: 420px !important; min-height: 420px !important; }
 
-  /* How we work: four stages, two per row before stacking to one */
-  .ubc-how-grid { grid-template-columns: repeat(2, 1fr) !important; }
-
-  /* Why UBC / Who we serve / Services overview: three cards -> two */
+  /* Why UBC / USPs / Who we serve / Where we are: three cards -> two */
   .ubc-why-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .ubc-serve-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .ubc-svc-overview-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
-  /* About: team (five) / deliverables (eight) / QA (six) -> narrower grids */
+  /* About: team (five) / QA (six) -> narrower grids */
   .ubc-team-grid { grid-template-columns: repeat(3, 1fr) !important; }
-  .ubc-deliverables-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .ubc-qa-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Client video testimonials: four portrait clips -> two per row */
@@ -73,26 +64,11 @@
 @media (max-width: 640px) {
 
   /* Blog grid: two columns -> one */
-  .ubc-blog-grid { grid-template-columns: 1fr !important; }
+  .ubc-blog-grid { grid-template-columns: minmax(0, 1fr) !important; }
 
-  /* Hero: the sticky stage runs full height, so pull the overlays in */
-  .ubc-stage-label {
-    max-width: none !important;
-    right: var(--gutter) !important;
-    bottom: var(--s-8) !important;
-  }
   /* Numbered rail would collide with the caption on a narrow screen */
   .ubc-stage-rail { display: none !important; }
 
-  /* LGSF card: full width under the caption rather than floating right */
-  .ubc-lgsf-tab {
-    left: var(--gutter) !important;
-    right: var(--gutter) !important;
-    top: auto !important;
-    bottom: 38vh !important;
-    max-width: none !important;
-    width: auto !important;
-  }
 
   /* Comparison slider: taller crop reads better in portrait */
   .ubc-ba { aspect-ratio: 4 / 5 !important; }
@@ -105,17 +81,14 @@
   .ubc-door-panel { min-height: 300px !important; }
   .ubc-model-viewer { height: 300px !important; min-height: 300px !important; }
 
-  /* How we work / Why UBC / Who we serve / Services overview: down to one column on a phone */
-  .ubc-how-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
-  .ubc-why-grid { grid-template-columns: 1fr !important; }
-  .ubc-serve-grid { grid-template-columns: 1fr !important; }
-  .ubc-team-grid { grid-template-columns: 1fr !important; }
-  .ubc-deliverables-grid { grid-template-columns: 1fr !important; }
-  .ubc-qa-grid { grid-template-columns: 1fr !important; }
-  .ubc-svc-overview-grid { grid-template-columns: 1fr !important; }
+  /* Card grids: down to one column on a phone */
+  .ubc-why-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .ubc-serve-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .ubc-team-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .ubc-qa-grid { grid-template-columns: minmax(0, 1fr) !important; }
 
   /* Client video testimonials: two portrait clips -> one, full width */
-  .ubc-video-grid { grid-template-columns: 1fr !important; max-width: 360px !important; margin-left: auto !important; margin-right: auto !important; }
+  .ubc-video-grid { grid-template-columns: minmax(0, 1fr) !important; max-width: 360px !important; margin-left: auto !important; margin-right: auto !important; }
 }
 
 /* ---------- Contact page ----------
@@ -123,10 +96,10 @@
    stack on a tablet; the paired route cards and form fields go single column
    on a phone. */
 @media (max-width: 900px) {
-  .ubc-contact-grid { grid-template-columns: 1fr !important; gap: var(--s-7) !important; }
+  .ubc-contact-grid { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-7) !important; }
 }
 @media (max-width: 560px) {
-  .ubc-route-grid { grid-template-columns: 1fr !important; }
+  .ubc-route-grid { grid-template-columns: minmax(0, 1fr) !important; }
 }
 
 /* ---------- Project detail model + spec panel ----------
@@ -210,7 +183,85 @@
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .ubc-ba img, .ubc-ba-handle, .ubc-lgsf-tab { transition: none !important; }
+  .ubc-ba img, .ubc-ba-handle { transition: none !important; }
   /* Steady ring, no loop, same as the globe's marker pulse and auto-rotate */
   .ubc-hotspot-ring { animation: none !important; opacity: .7; }
+}
+
+/* ---------- Blue framed sections (alternating, homepage) ----------
+   Re-points the colour tokens inside the frame so a section's own inline
+   var(--text-*)/var(--border-*)/var(--surface-card) styles read light on
+   blue. Muted/faint text stays at 4.6:1 or better on the blue; cards take
+   a slightly darker tint (not a lighter one) so their copy keeps that too.
+   --accent (the one solid red CTA) is deliberately left alone. */
+:root { --frame-blue: #2A5FBE; }
+.ubc-frame-blue {
+  background: var(--frame-blue); color: #fff;
+  --text-strong: #FFFFFF; --text-body: rgba(255,255,255,.94); --text-muted: rgba(255,255,255,.88); --text-faint: rgba(255,255,255,.84); --text-accent: #FFFFFF;
+  --border-subtle: rgba(255,255,255,.3); --border-strong: rgba(255,255,255,.6);
+  --surface-card: rgba(14,19,24,.14); --surface-sunken: transparent;
+}
+.ubc-frame-blue a { color: var(--text-strong); }
+
+/* ---------- Cards: hover / focus ---------- */
+.ubc-card {
+  position: relative; overflow: hidden; background: var(--surface-card);
+  border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-3);
+  transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out), border-color 260ms var(--ease-out);
+}
+.ubc-card::before {
+  content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 3px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left; transition: transform 360ms var(--ease-out);
+}
+.ubc-card h3 { transition: color 200ms var(--ease-out); }
+.ubc-card:hover, .ubc-card:focus-within { transform: translateY(-4px); box-shadow: 0 20px 40px -20px rgba(14,19,24,.38); border-color: var(--border-strong); }
+.ubc-card:hover::before, .ubc-card:focus-within::before { transform: scaleX(1); }
+.ubc-card:hover h3, .ubc-card:focus-within h3 { color: var(--text-accent); }
+.ubc-frame-blue .ubc-card:hover, .ubc-frame-blue .ubc-card:focus-within { box-shadow: 0 20px 40px -20px rgba(0,0,0,.45); }
+@media (prefers-reduced-motion: reduce) {
+  .ubc-card, .ubc-card::before, .ubc-card h3 { transition: none; }
+  .ubc-card:hover, .ubc-card:focus-within { transform: none; }
+}
+
+/* ---------- Globe: hover labels on the red dots ---------- */
+.ubc-globe-pin {
+  position: absolute; z-index: 2; width: 32px; height: 32px; min-width: 32px; min-height: 32px; margin: -16px 0 0 -16px;
+  padding: 0; border: none; border-radius: 50%; background: transparent; cursor: pointer;
+}
+.ubc-globe-pin:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ubc-globe-tip {
+  position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translate(-50%, 4px);
+  white-space: nowrap; pointer-events: none; opacity: 0;
+  background: var(--ink); color: #fff; border-radius: var(--r-2); padding: 6px 10px;
+  font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase;
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+.ubc-globe-pin:hover .ubc-globe-tip, .ubc-globe-pin:focus-visible .ubc-globe-tip { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Technology: animated dashed connectors between panels ---------- */
+.ubc-tech-link { display: flex; align-items: center; justify-content: center; }
+.ubc-tech-link span { display: block; width: 100%; height: 2px; background-image: linear-gradient(90deg, rgba(255,255,255,.85) 50%, transparent 50%); background-size: 12px 2px; animation: ubcDashX 800ms linear infinite; }
+@media (max-width: 900px) {
+  .ubc-tech-panels { grid-template-columns: minmax(0, 1fr) !important; }
+  .ubc-tech-link { height: 32px; }
+  .ubc-tech-link span { width: 2px; height: 100%; background-image: linear-gradient(180deg, rgba(255,255,255,.85) 50%, transparent 50%); background-size: 2px 12px; animation-name: ubcDashY; }
+  .ubc-way-panel { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-4) !important; }
+}
+@media (prefers-reduced-motion: reduce) { .ubc-tech-link span { animation: none; } }
+
+/* ---------- Mobile sticky bar: chat folds into "Send Your Project" ---------- */
+@media (max-width: 640px) {
+  .ubc-sticky {
+    left: var(--gutter) !important; right: var(--gutter) !important; bottom: 12px !important;
+    background: var(--white); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-pill);
+    padding: 6px; box-shadow: var(--shadow-3);
+  }
+  .ubc-sticky-chat { box-shadow: none !important; border: none !important; }
+  .ubc-sticky-cta { flex: 1; justify-content: center; box-shadow: none !important; }
+}
+
+/* About: "who you talk to" rows stack their owner/note under the step */
+@media (max-width: 760px) {
+  .ubc-who-row { grid-template-columns: 36px minmax(0, 1fr) !important; }
+  .ubc-who-row > span:nth-child(3), .ubc-who-row > span:nth-child(4) { grid-column: 2; }
 }
