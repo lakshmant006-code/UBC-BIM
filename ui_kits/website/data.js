@@ -148,7 +148,30 @@ export const UBC_DATA = {
             image: '/assets/details/bracing.jpg',
             body: 'A horizontal brace runs across the wall’s studs partway up its height, screwed through every stud it crosses, to keep them from twisting or buckling sideways between the base track and the top plate.' }
         ]
-      } }
+      } },
+    // Three Scottsdale (ScotSteel) LGSF models the client supplied as IFC,
+    // converted with tools/ifc_to_glb.py like the four above. Every figure is
+    // read from the files themselves: overall size from the model's own
+    // bounding box, levels from its IfcBuildingStorey entities, member count
+    // from its IfcMember elements, software from the IFC header
+    // (originating system "ScotSteel", author scottsdalesteelframes.com).
+    // A plan-area footprint isn't given: these are bare frames (no floor or
+    // roof sheathing), so no honest square-footage can be measured from them.
+    // The third file was supplied as "UPDATED_IFC" with no project name in it
+    // (IfcProject is the generic "SCS Project"), so it is named by what it is
+    // until the client confirms its real name.
+    { id: 'davis-farm-house', name: 'Davis Farm House', type: 'Residential', system: 'Light-gauge steel',
+      size: '\u2248 81 \u00d7 69 ft overall (from model)', units: '3 levels \u00b7 3,524 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
+      model: { src: '/assets/models/davis-farm-house.glb', radius: 13 } },
+    { id: 'putnam', name: 'Putnam', type: 'Multi-level', system: 'Light-gauge steel',
+      size: '\u2248 42 \u00d7 72 ft overall (from model)', units: '4 levels \u00b7 5,422 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
+      model: { src: '/assets/models/putnam.glb', radius: 20 } },
+    { id: 'scs-five-level', name: 'Five-level steel frame', type: 'Multi-level', system: 'Light-gauge steel',
+      size: '\u2248 39 \u00d7 68 ft overall (from model)', units: '5 levels \u00b7 12,883 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
+      model: { src: '/assets/models/scs-five-level.glb', radius: 20 } }
   ],
   // Real logo/photo assets the client supplied directly (Client_Logos.zip,
   // Software_logos.zip, Machine_logo.zip), processed once (resized, no

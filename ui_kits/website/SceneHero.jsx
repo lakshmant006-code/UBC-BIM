@@ -46,7 +46,7 @@ function HeroCopy({ onQuote, onGo, ctaRef }) {
   return (
     <>
       {INTRO.eyebrow && <p style={{ ...eyebrowStyle, color: 'var(--text-accent)', margin: 0 }}>{INTRO.eyebrow}</p>}
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(34px, 5.4vw, 76px)', fontWeight: 700, lineHeight: 1.5, color: 'var(--text-strong)', margin: 'var(--s-3) 0 0', maxWidth: '20ch' }}>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(34px, 5.4vw, 76px)', fontWeight: 700, lineHeight: 'var(--lh-tight)', color: 'var(--text-strong)', margin: 'var(--s-3) 0 0', maxWidth: '20ch' }}>
         {INTRO.h1}
       </h1>
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', maxWidth: '60ch', margin: 'var(--space-hero-text) 0 0' }}>
@@ -219,7 +219,9 @@ export function SceneHero({ onQuote, onGo }) {
       const targetFor = (part, i, state) => {
         if (state === 'framing') return part.framing ? { color: accent, opacity: 1, lift: 0 } : { color: part.base, opacity: 0.12, lift: 0 };
         if (state === 'coordinated') return { color: tmp.setHex(COORD_COLORS[i % COORD_COLORS.length]).clone(), opacity: 1, lift: 0 };
-        if (state === 'outputs') return { color: part.base, opacity: 1, lift: (i - (parts.length - 1) / 2) * R * 0.16 };
+        // Outputs keeps the model whole and in place (the output chain in the
+        // copy carries that stage); pulling parts apart floated the small
+        // hardware group above the frame and dropped the frame below it.
         return { color: part.base, opacity: part.baseOpacity, lift: 0 };
       };
 
@@ -327,7 +329,7 @@ export function SceneHero({ onQuote, onGo }) {
                   return (
                     <div key={s.n} aria-hidden={!on} style={{ gridArea: '1 / 1', opacity: on ? 1 : 0, transform: on ? 'none' : 'translateY(8px)', transition: 'opacity 300ms var(--ease-out), transform 300ms var(--ease-out)', visibility: on ? 'visible' : 'hidden' }}>
                       <div style={{ ...eyebrowStyle, color: 'var(--text-accent)', marginTop: 'var(--s-3)' }}>Stage {s.n}</div>
-                      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(26px, 3vw, 40px)', fontWeight: 700, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
+                      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(26px, 3vw, 40px)', fontWeight: 700, lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
                       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-body)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
                       {s.state === 'outputs' && <OutputChain shown={on} animate />}
                     </div>

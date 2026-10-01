@@ -7,9 +7,9 @@
   location, accountability and track record stay.
 
   Order (the note's own "final About page order"): hero, our story +
-  timeline, where we are, leadership, the team behind the model, who you
-  talk to at each step, quality and accountability, proof strip, one
-  testimonial, final CTA.
+  timeline, where we are, leadership, the team behind the model, quality
+  and accountability, proof strip, one testimonial, final CTA. ("Who you
+  talk to at each step" was removed at the client's request.)
 
   Story, timeline and leadership need content the client hasn't supplied
   yet (founding year, milestone dates, leadership names and photos; see
@@ -29,7 +29,7 @@ const D = UBC_DATA;
 const A = D.about;
 
 const eyebrowStyle = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
-const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)' };
+const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)' };
 const h2Style = { ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' };
 const bodyStyle = { fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' };
 const sendLabel = 'Send Your Project →';
@@ -162,39 +162,6 @@ function TeamBehindModel() {
   );
 }
 
-// WHO YOU TALK TO AT EACH STEP: the old seven-step process, reframed as
-// which discipline owns each step. Ownership follows the disciplines' own
-// descriptions above (coordination is the single point of contact; QA owns
-// the RFI and revision record).
-const WHO_AT_EACH_STEP = [
-  { step: 'Project review', owner: 'Project Coordination', note: 'Your coordinator reads the drawings and scope with you.' },
-  { step: 'Scope confirmation', owner: 'Project Coordination', note: 'A written scope, price and timeline for you to approve.' },
-  { step: 'Modeling and engineering', owner: 'BIM Modeling · Detailing · Structural Engineering', note: 'Handed over internally; you keep the same contact.' },
-  { step: 'Coordination', owner: 'BIM Modeling', note: 'The model is checked against architecture, MEP and engineering.' },
-  { step: 'Internal QA', owner: 'Quality Assurance', note: 'Every drawing checked against the model before you see it.' },
-  { step: 'Client review', owner: 'Project Coordination', note: 'Your coordinator brings the model back to you for sign-off.' },
-  { step: 'Final technical deliverables', owner: 'Project Coordination · Quality Assurance', note: 'Issued together, with every revision logged.' }
-];
-function WhoYouTalkTo() {
-  return (
-    <Section framed id="who-you-talk-to">
-      <Page>
-        <SectionHead eyebrow="Who you talk to at each step" title="One point of contact, with the right specialist behind each step" />
-        <ol style={{ listStyle: 'none', padding: 0, margin: 'var(--space-head-content) 0 0', display: 'grid', gap: 0 }}>
-          {WHO_AT_EACH_STEP.map((w, i) => (
-            <li key={w.step} className="ubc-who-row" style={{ display: 'grid', gridTemplateColumns: '48px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr)', gap: 'var(--s-4)', alignItems: 'baseline', padding: 'var(--s-4) 0', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', color: 'var(--text-faint)' }}>{String(i + 1).padStart(2, '0')}</span>
-              <h3 style={{ ...serifH, fontSize: 'var(--fs-h4)', margin: 0 }}>{w.step}</h3>
-              <span style={{ fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>{w.owner}</span>
-              <span style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)' }}>{w.note}</span>
-            </li>
-          ))}
-        </ol>
-      </Page>
-    </Section>
-  );
-}
-
 const QA_ITEMS = [
   { icon: 'file-search', title: 'Model and drawing checks', body: 'Every model and drawing revision is checked against the one before it.' },
   { icon: 'shield-check', title: 'Engineering review', body: 'Structural sizing, connections and load paths get a real engineering review.' },
@@ -205,7 +172,7 @@ const QA_ITEMS = [
 ];
 function QualityAccountability() {
   return (
-    <Section>
+    <Section framed>
       <Page>
         <SectionHead eyebrow="Quality and accountability" title="Checked before it ever reaches you" center />
         <div className="ubc-qa-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
@@ -229,7 +196,7 @@ function QualityAccountability() {
 function ProofStrip() {
   const stats = D.stats || [];
   return (
-    <Section framed tight>
+    <Section tight>
       <Page>
         <h2 style={{ ...eyebrowStyle, textAlign: 'center', margin: 0 }}>Track record</h2>
         <div className="ubc-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--s-4)', textAlign: 'center' }}>
@@ -254,7 +221,7 @@ function Testimonial() {
   const t = (D.videoTestimonials || []).find((v) => v.id === A.testimonialId && v.quote);
   if (!t) return null;
   return (
-    <Section>
+    <Section framed>
       <Page style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
         <Reveal>
           <h2 style={{ ...eyebrowStyle, margin: 0 }}>Working with us</h2>
@@ -272,7 +239,7 @@ function Testimonial() {
 
 function FinalConversion({ onQuote }) {
   return (
-    <Section framed style={{ textAlign: 'center' }}>
+    <Section style={{ textAlign: 'center' }}>
       <Page style={{ maxWidth: 680 }}>
         <Reveal>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 0 }}>Bring Us Your Project Requirements</h2>
@@ -297,7 +264,6 @@ export function About() {
       <WhereWeAre />
       <Leadership />
       <TeamBehindModel />
-      <WhoYouTalkTo />
       <QualityAccountability />
       <ProofStrip />
       <Testimonial />

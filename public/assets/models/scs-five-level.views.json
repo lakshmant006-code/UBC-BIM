@@ -1,0 +1,40 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 13.235
+ },
+ "byClass": {
+  "IfcMember": {
+   "center": [
+    -0.0,
+    -1.066,
+    0.393
+   ],
+   "radius": 13.913,
+   "count": 12879
+  },
+  "IfcBuildingElementProxy": {
+   "center": [
+    -0.0,
+    0.0,
+    0.387
+   ],
+   "radius": 13.544,
+   "count": 12480
+  },
+  "IfcBeam": {
+   "center": [
+    -0.966,
+    -2.666,
+    0.853
+   ],
+   "radius": 11.771,
+   "count": 81
+  }
+ },
+ "byType": {}
+}

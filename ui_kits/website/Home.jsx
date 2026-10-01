@@ -17,7 +17,7 @@ import MACHINES from './content/machines.json';
 const D = UBC_DATA;
 
 const eyebrow = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
-const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)' };
+const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)' };
 
 // LOGO CAROUSELS (blueprint section 03, "RECOGNIZE", plus two strips the
 // blueprint didn't ask for by name but the client sent real assets for
@@ -190,11 +190,11 @@ function BeforeAfterSlider() {
   return (
     <Section framed>
       <Page>
-        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)', gap: 'var(--space-split)', alignItems: 'center' }}>
+        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 'var(--space-split)', alignItems: 'center', maxWidth: 1040, margin: '0 auto' }}>
           <Reveal>
             {BA.eyebrow && <div style={{ ...eyebrow, display: 'inline-block' }}>{BA.eyebrow}</div>}
-            {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
-            {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0', maxWidth: '46ch' }}>{BA.standfirst}</p>}
+            {BA.title && <h2 style={{ ...serifH, fontSize: 'clamp(24px, 2.8vw, 36px)', margin: 'var(--s-3) 0 0' }}>{BA.title}</h2>}
+            {BA.standfirst && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0', maxWidth: '42ch' }}>{BA.standfirst}</p>}
           </Reveal>
           <Reveal delay={80}>
             <div
@@ -212,7 +212,7 @@ function BeforeAfterSlider() {
               onPointerCancel={onUp}
               onKeyDown={onKeyDown}
               style={{
-                position: 'relative', width: '100%',
+                position: 'relative', width: '100%', maxWidth: 520, margin: '0 auto',
                 aspectRatio: BA.aspect || '3 / 2', overflow: 'hidden', userSelect: 'none', touchAction: 'none',
                 borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
                 background: 'var(--surface-sunken)'
@@ -249,7 +249,9 @@ function ProjectsGrid({ onGo }) {
           <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
         </Reveal>
         <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--space-head-content)' }}>
-          {D.projects.map((p, i) => (
+          {/* The homepage keeps its 2 x 2 grid of four live models; the rest
+              are one click away on /projects. */}
+          {D.projects.slice(0, 4).map((p, i) => (
             <Reveal key={p.id} delay={(i % 2) * 80}>
               <div style={{ display: 'block' }}>
                 {/* A project with a real IFC gets the live model here, on the
@@ -772,7 +774,7 @@ function UBCWay() {
           </div>
           <div id="ubc-way-panel" role="tabpanel" aria-labelledby={'ubc-way-tab-' + active} className="ubc-way-panel"
             style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0, 1.3fr) minmax(0, 1fr)', gap: 'var(--space-split)', alignItems: 'start', marginTop: 'var(--s-6)' }}>
-            <div aria-hidden="true" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(56px, 8vw, 112px)', lineHeight: 1.5, color: 'var(--text-accent)' }}>{step.n}</div>
+            <div aria-hidden="true" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(56px, 8vw, 112px)', lineHeight: 'var(--lh-tight)', color: 'var(--text-accent)' }}>{step.n}</div>
             <div>
               <h3 style={{ ...serifH, fontSize: 'clamp(22px, 2.4vw, 30px)', margin: 0 }}>{step.headline}</h3>
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--space-head-text) 0 0' }}>{step.body}</p>

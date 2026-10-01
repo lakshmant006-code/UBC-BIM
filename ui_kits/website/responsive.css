@@ -330,7 +330,7 @@
 .ubc-int-flow[data-anim="in"] .ubc-int-node { animation: ubcIntPop 480ms var(--ease-out) var(--d, 0s) backwards; }
 
 .ubc-int-content { display: flex; flex-direction: column; gap: var(--s-5); padding: clamp(24px, 3vw, 32px); }
-.ubc-int-title { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h4); line-height: 1.5; letter-spacing: .12em; color: var(--ink); margin: 0; }
+.ubc-int-title { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h4); line-height: var(--lh-heading); letter-spacing: .12em; color: var(--ink); margin: 0; }
 .ubc-int-desc { font-family: var(--font-body); font-size: var(--fs-body); line-height: var(--lh-relaxed); color: var(--ink-3); margin: var(--s-2) 0 0; max-width: 72ch; }
 .ubc-int-cta {
   align-self: flex-start; min-height: 44px; padding: 0 var(--s-5); border: none; border-radius: var(--r-pill); cursor: pointer;
@@ -366,8 +366,3 @@
   .ubc-sticky-cta { flex: 1; justify-content: center; box-shadow: none !important; }
 }
 
-/* About: "who you talk to" rows stack their owner/note under the step */
-@media (max-width: 760px) {
-  .ubc-who-row { grid-template-columns: 36px minmax(0, 1fr) !important; }
-  .ubc-who-row > span:nth-child(3), .ubc-who-row > span:nth-child(4) { grid-column: 2; }
-}

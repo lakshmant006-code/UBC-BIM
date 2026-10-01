@@ -27,7 +27,7 @@ export function ServicesDetail({ article, onQuote }) {
               <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
               {a.label}
             </div>
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 1.5, letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>
               {a.title}
             </h1>
             {a.summary && (
