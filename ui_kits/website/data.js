@@ -1038,6 +1038,14 @@ UBC_DATA.serviceArticles = [
   { id: 'engineering', label: 'Engineering', title: 'Engineering',
     summary: 'In-house engineering for wood and light-gauge steel, from concept through permitting — no outside engineers required.',
     regions: CORE_REGIONS,
+    // The client's own engineering model images (supplied directly):
+    // the rendered member model with its supports, and two views of the
+    // analysis model (members, nodes and support points).
+    gallery: [
+      { src: '/assets/engineering/eng-rendered-model.jpg', alt: 'Rendered structural model of a light-gauge steel building: wall framing, roof trusses and posts on their supports', caption: 'Structural model: walls, trusses and posts on their supports' },
+      { src: '/assets/engineering/eng-analysis-model-1.jpg', alt: 'Wireframe analysis model of the same building, with every node and support point marked', caption: 'Analysis model: members, nodes and supports' },
+      { src: '/assets/engineering/eng-analysis-model-2.jpg', alt: 'Wireframe analysis model of the building from the opposite side', caption: 'Analysis model: opposite view' }
+    ],
     sections: [
       { body: [
         'Our engineering services support both wood and steel projects end to end, so you don’t need to bring on separate engineers or contractors. Our in-house team works with you from concept through execution, delivering engineered solutions that meet local building codes and construction standards.',

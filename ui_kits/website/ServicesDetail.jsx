@@ -2,7 +2,9 @@
   ServicesDetail: the full write-up for one of the site's 8 service
   categories (UBC_DATA.serviceArticles). This is the client's own
   real copy — see the comment above that array in data.js for exactly what
-  editing was and wasn't done to it.
+  editing was and wasn't done to it. An article may also carry a `gallery`
+  of the client's own images ({src, alt, caption}); the first spans the
+  full column, the rest sit two-up beneath it.
 
   Renders exactly one `article` at a time — it owns no tab strip and no
   "which one is active" state of its own; MockingBirdModel.jsx owns that
@@ -62,6 +64,21 @@ export function ServicesDetail({ article, onQuote }) {
                 )}
               </div>
             ))}
+
+            {a.gallery && a.gallery.length > 0 && (
+              <div className="ubc-svc-gallery" style={{ marginTop: 'var(--s-7)', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--s-4)' }}>
+                {a.gallery.map((g, gi) => (
+                  <figure key={g.src} style={{ margin: 0, gridColumn: gi === 0 ? '1 / -1' : 'auto' }}>
+                    <a href={g.src} target="_blank" rel="noopener noreferrer" aria-label={g.caption + ' (opens full size)'} style={{ display: 'block', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden', background: 'var(--white)' }}>
+                      <img src={g.src} alt={g.alt} loading="lazy" style={{ display: 'block', width: '100%', height: 'auto' }} />
+                    </a>
+                    {g.caption && (
+                      <figcaption style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', color: 'var(--text-muted)', marginTop: 'var(--s-2)' }}>{g.caption}</figcaption>
+                    )}
+                  </figure>
+                ))}
+              </div>
+            )}
 
             {a.regions && (
               <div style={{ marginTop: 'var(--s-8)', paddingTop: 'var(--s-6)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>

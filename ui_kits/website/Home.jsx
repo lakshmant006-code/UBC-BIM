@@ -248,7 +248,7 @@ function ProjectsGrid({ onGo }) {
           </div>
           <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
         </Reveal>
-        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--space-head-content)' }}>
+        <div className="ubc-home-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--s-6) var(--s-5)', marginTop: 'var(--space-head-content)' }}>
           {/* The homepage keeps its 2 x 2 grid of four live models; the rest
               are one click away on /projects. */}
           {D.projects.slice(0, 4).map((p, i) => (
@@ -266,11 +266,9 @@ function ProjectsGrid({ onGo }) {
                     <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)' }}>
-                  <div>
-                    <h3 style={cardTitle}>{p.name}</h3>
-                    <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
-                  </div>
+                <div style={{ marginTop: 'var(--s-3)' }}>
+                  <h3 style={{ ...cardTitle, fontSize: 'var(--fs-h4)' }}>{p.name}</h3>
+                  <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
                   <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
                 </div>
               </div>
