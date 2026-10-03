@@ -259,7 +259,7 @@ UBC_DATA.blueprint = {
   // `services` above) rather than a generic paragraph repeated six times.
   whoWeServe: [
     { role: 'Contractors', body: 'A coordinated model and a permit set drawn from it, so what is approved matches what your crew builds.', serviceIndexes: [4, 3] },
-    { role: 'LGSF / CFS manufacturers', body: 'Panel layouts and machine-ready CSV, sized to how your own roll-forming line actually runs.', serviceIndexes: [0, 5] },
+    { role: 'CFS, LGSF & wood manufacturers', body: 'Panel layouts and machine-ready files, sized to how your own roll-forming or wood-panel line actually runs.', serviceIndexes: [0, 5] },
     { role: 'Fabricators', body: 'Shop-ready detail, drawn from the same model as the takeoff, so a revision reaches both together.', serviceIndexes: [0, 5] },
     { role: 'Engineers', body: 'Engineering support for wood and light-gauge steel, in house, from concept through permitting.', serviceIndexes: [2] },
     { role: 'Architects / design teams', body: 'Drafting and detailing that stays inside your own drawing standards and titleblocks.', serviceIndexes: [6] },
@@ -687,7 +687,7 @@ UBC_DATA.hero = {
   model: { src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
   camPos: [14.70, 11.99, 17.50],
   intro: {
-    h1: 'CFS & LGSF Detailing, Engineered for Construction',
+    h1: 'CFS, LGSF & Wood Detailing, Engineered for Construction',
     sub: 'From estimating and BIM modeling to engineering, permit sets and shop drawings, UBC BIM helps manufacturers, contractors, builders and fabricators turn project requirements into accurate, construction-ready documentation.',
     primary: 'Send Your Project \u2192',
     secondary: 'Explore Our Services \u2192',
@@ -735,7 +735,7 @@ UBC_DATA.home = {
     { title: 'No minimum volume', body: 'One project is fine. Add a whole detailing team when the workload calls for it.' },
     { title: 'Your drawings stay yours', body: 'NDA on request, and your files are used for your project only.' }
   ],
-  whyTitle: 'Why CFS & LGSF manufacturers outsource detailing to UBC BIM',
+  whyTitle: 'Why CFS, LGSF & wood manufacturers outsource detailing to UBC BIM',
   ubcWay: {
     eyebrow: 'The UBC Way',
     title: 'Understand. Coordinate. Deliver. No surprises in between.',
@@ -758,7 +758,7 @@ UBC_DATA.home = {
   technology: {
     eyebrow: 'Technology',
     title: 'Pick your roll-former. See exactly what lands on your line.',
-    intro: 'We model CFS and LGSF framing in the software your machine already reads \u2014 so the files we send go straight to production, without a re-draw on your side.',
+    intro: 'We model CFS, LGSF and wood framing in the software your machine already reads \u2014 so the files we send go straight to production, without a re-draw on your side.',
     youSend: ['Architectural drawings (PDF, DWG)', 'Structural requirements', 'Project scope'],
     shipsWith: ['Coordinated model (RVT \u00b7 IFC \u00b7 DWG)', 'Navisworks clash report (NWD \u00b7 PDF)', 'BOM (XLSX \u00b7 CSV)', 'Permit set (PDF, stamped where required)'],
     footer: 'Machine not listed? Tell us what you run \u2014 we\u2019ll confirm file compatibility before you commit.'
