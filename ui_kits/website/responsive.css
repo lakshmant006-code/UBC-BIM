@@ -385,10 +385,15 @@
 }
 
 
-/* Services: article image gallery stacks on phones */
-@media (max-width: 640px) {
-  .ubc-svc-gallery { grid-template-columns: minmax(0, 1fr) !important; }
+/* Services: an article with images gets text left, images right;
+   below 1000px the images follow the text, two-up, then one-up on phones */
+.ubc-svc-layout { display: grid; grid-template-columns: minmax(0, 760px) minmax(0, 1fr); gap: var(--s-8); align-items: start; }
+.ubc-svc-gallery { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); padding-top: var(--s-2); }
+@media (max-width: 1000px) {
+  .ubc-svc-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); }
+  .ubc-svc-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 0; }
 }
+@media (max-width: 640px) { .ubc-svc-gallery { grid-template-columns: minmax(0, 1fr); } }
 
 /* Home "Built from the model": every project in a scroll-snap carousel,
    four visible on desktop, two on tablets, one (with a peek) on phones */
