@@ -3,8 +3,8 @@
   categories (UBC_DATA.serviceArticles). This is the client's own
   real copy — see the comment above that array in data.js for exactly what
   editing was and wasn't done to it. An article may also carry a `gallery`
-  of the client's own images ({src, alt, caption}); the first spans the
-  full column, the rest sit two-up beneath it.
+  of the client's own images ({src, alt, caption}), shown in a column
+  beside the text on wide screens and after it on narrower ones.
 
   Renders exactly one `article` at a time — it owns no tab strip and no
   "which one is active" state of its own; MockingBirdModel.jsx owns that
@@ -19,11 +19,13 @@ import { Page, Section, Reveal } from './shared.jsx';
 export function ServicesDetail({ article, onQuote }) {
   const a = article;
   if (!a) return null;
+  const hasGallery = Boolean(a.gallery && a.gallery.length);
 
   return (
     <Section>
       <Page>
-        <div style={{ maxWidth: 760 }}>
+        <div className={hasGallery ? 'ubc-svc-layout' : undefined} style={hasGallery ? undefined : { maxWidth: 760 }}>
+        <div style={{ maxWidth: 760, minWidth: 0 }}>
           <Reveal key={a.id}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
@@ -65,21 +67,6 @@ export function ServicesDetail({ article, onQuote }) {
               </div>
             ))}
 
-            {a.gallery && a.gallery.length > 0 && (
-              <div className="ubc-svc-gallery" style={{ marginTop: 'var(--s-7)', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--s-4)' }}>
-                {a.gallery.map((g, gi) => (
-                  <figure key={g.src} style={{ margin: 0, gridColumn: gi === 0 ? '1 / -1' : 'auto' }}>
-                    <a href={g.src} target="_blank" rel="noopener noreferrer" aria-label={g.caption + ' (opens full size)'} style={{ display: 'block', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden', background: 'var(--white)' }}>
-                      <img src={g.src} alt={g.alt} loading="lazy" style={{ display: 'block', width: '100%', height: 'auto' }} />
-                    </a>
-                    {g.caption && (
-                      <figcaption style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', color: 'var(--text-muted)', marginTop: 'var(--s-2)' }}>{g.caption}</figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
-            )}
-
             {a.regions && (
               <div style={{ marginTop: 'var(--s-8)', paddingTop: 'var(--s-6)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-3)' }}>
@@ -95,6 +82,23 @@ export function ServicesDetail({ article, onQuote }) {
               <Button onClick={onQuote}>Send Your Project →</Button>
             </div>
           </Reveal>
+        </div>
+        {hasGallery && (
+          // The article's own images sit beside the text on wide screens,
+          // stacked in one column; below 1000px they follow the text.
+          <aside aria-label={a.title + ' images'} className="ubc-svc-gallery">
+            {a.gallery.map((g) => (
+              <figure key={g.src} style={{ margin: 0 }}>
+                <a href={g.src} target="_blank" rel="noopener noreferrer" aria-label={g.caption + ' (opens full size)'} style={{ display: 'block', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden', background: 'var(--white)' }}>
+                  <img src={g.src} alt={g.alt} loading="lazy" style={{ display: 'block', width: '100%', height: 'auto' }} />
+                </a>
+                {g.caption && (
+                  <figcaption style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', color: 'var(--text-muted)', marginTop: 'var(--s-2)' }}>{g.caption}</figcaption>
+                )}
+              </figure>
+            ))}
+          </aside>
+        )}
         </div>
       </Page>
     </Section>

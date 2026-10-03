@@ -238,43 +238,81 @@ function BeforeAfterSlider() {
 // SELECTED WORK: serif project grid using the real frames as imagery.
 function ProjectsGrid({ onGo }) {
   const imgs = ['05-facade', '03-steel-skeleton', '04-sheathing', '09-backyard', '06-living-room', '08-open-doors'];
+  const projects = D.projects;
+  const trackRef = React.useRef(null);
+  const [edge, setEdge] = React.useState({ start: true, end: projects.length <= 1 });
+
+  // Which ends of the track are reached, so prev/next can disable there.
+  const syncEdges = React.useCallback(() => {
+    const t = trackRef.current; if (!t) return;
+    setEdge({ start: t.scrollLeft <= 2, end: t.scrollLeft + t.clientWidth >= t.scrollWidth - 2 });
+  }, []);
+  React.useEffect(() => {
+    syncEdges();
+    window.addEventListener('resize', syncEdges);
+    return () => window.removeEventListener('resize', syncEdges);
+  }, [syncEdges]);
+
+  // One card per press; scroll-snap settles it on a card edge.
+  const step = (dir) => {
+    const t = trackRef.current; if (!t) return;
+    const card = t.querySelector('li');
+    const gap = parseFloat(getComputedStyle(t).columnGap) || 0;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    t.scrollBy({ left: dir * ((card ? card.getBoundingClientRect().width : t.clientWidth) + gap), behavior: reduce ? 'auto' : 'smooth' });
+  };
+  const navBtn = (dir, disabled, label) => (
+    <button type="button" className="ubc-proj-nav" aria-controls="ubc-proj-track" aria-label={label} disabled={disabled} onClick={() => step(dir)}>
+      {/* Inline, so the carousel's only controls never wait on the icon CDN */}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+        {dir < 0 ? <path d="M19 12H5M12 19l-7-7 7-7" /> : <path d="M5 12h14M12 5l7 7-7 7" />}
+      </svg>
+    </button>
+  );
+
   return (
     <Section sunken style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
       <Page>
         <Reveal style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--s-5)' }}>
           <div>
             <div style={eyebrow}>Selected work</div>
-            <h2 style={{ ...serifH, fontSize: 'clamp(30px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>Built from the model</h2>
+            <h2 id="ubc-proj-title" style={{ ...serifH, fontSize: 'clamp(30px, 3.6vw, 48px)', margin: 'var(--s-3) 0 0' }}>Built from the model</h2>
           </div>
-          <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)' }}>
+            <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
+            {navBtn(-1, edge.start, 'Previous projects')}
+            {navBtn(1, edge.end, 'Next projects')}
+          </div>
         </Reveal>
-        <div className="ubc-home-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--s-6) var(--s-5)', marginTop: 'var(--space-head-content)' }}>
-          {/* The homepage keeps its 2 x 2 grid of four live models; the rest
-              are one click away on /projects. */}
-          {D.projects.slice(0, 4).map((p, i) => (
-            <Reveal key={p.id} delay={(i % 2) * 80}>
-              <div style={{ display: 'block' }}>
-                {/* A project with a real IFC gets the live model here, on the
-                    grid, orbitable on the spot; never a photo standing in
-                    for it. stopPropagation keeps a drag-to-orbit from also
-                    firing the navigate-to-project click below. */}
-                <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
-                  onClick={(e) => { if (p.model) e.stopPropagation(); }}>
-                  {p.model ? (
-                    <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
-                  ) : (
-                    <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  )}
-                </div>
-                <div style={{ marginTop: 'var(--s-3)' }}>
-                  <h3 style={{ ...cardTitle, fontSize: 'var(--fs-h4)' }}>{p.name}</h3>
-                  <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
-                  <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
-                </div>
+        {/* Every project, as a scroll-snap carousel. Each live model only
+            mounts once its card scrolls into view (ModelViewer's own
+            IntersectionObserver), so off-screen cards cost nothing. No
+            autoplay: a moving track fights both orbiting and screen readers. */}
+        <ul id="ubc-proj-track" ref={trackRef} className="ubc-proj-carousel" onScroll={syncEdges}
+          tabIndex={0} role="region" aria-roledescription="carousel" aria-labelledby="ubc-proj-title"
+          style={{ marginTop: 'var(--space-head-content)' }}>
+          {projects.map((p, i) => (
+            <li key={p.id} role="group" aria-roledescription="slide" aria-label={(i + 1) + ' of ' + projects.length + ': ' + p.name}>
+              {/* A project with a real IFC gets the live model here, orbitable
+                  on the spot; never a photo standing in for it.
+                  stopPropagation keeps a drag-to-orbit from also firing the
+                  navigate-to-project click below. */}
+              <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
+                onClick={(e) => { if (p.model) e.stopPropagation(); }}>
+                {p.model ? (
+                  <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
+                ) : (
+                  <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                )}
               </div>
-            </Reveal>
+              <div style={{ marginTop: 'var(--s-3)' }}>
+                <h3 style={{ ...cardTitle, fontSize: 'var(--fs-h4)' }}>{p.name}</h3>
+                <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
+                <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </Page>
     </Section>
   );
@@ -828,18 +866,21 @@ function Technology() {
             <h2 style={{ ...h2Style, color: 'var(--white)' }}>{T.title}</h2>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>
           </Reveal>
-          <div role="group" aria-label="Choose your roll-former" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--s-2)', marginTop: 'var(--space-head-content)' }}>
+          {/* One line: centred when it fits, scrolls sideways when it doesn't */}
+          <div className="ubc-pill-scroll" style={{ marginTop: 'var(--space-head-content)' }}>
+          <div role="group" aria-label="Choose your roll-former" style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, width: 'max-content', margin: '0 auto' }}>
             {rows.map((r) => {
               const on = r.machine === sel;
               return (
                 <button key={r.machine} aria-pressed={on} onClick={() => setSel(r.machine)} style={{
-                  minHeight: 44, padding: '0 var(--s-4)', borderRadius: 'var(--r-pill)', cursor: 'pointer',
+                  minHeight: 44, padding: '0 10px', borderRadius: 'var(--r-pill)', cursor: 'pointer', whiteSpace: 'nowrap', flex: '0 0 auto',
                   fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600,
                   background: on ? 'var(--white)' : 'transparent', color: on ? 'var(--frame-blue)' : 'var(--white)',
                   border: 'var(--bw-1) solid ' + (on ? 'var(--white)' : 'rgba(255,255,255,.5)')
                 }}>{r.machine}</button>
               );
             })}
+          </div>
           </div>
           <div style={{ marginTop: 'var(--s-6)' }}>
             <IntegrationCard
