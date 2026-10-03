@@ -248,7 +248,7 @@ function ProjectsGrid({ onGo }) {
           </div>
           <button onClick={() => onGo && onGo('projects')} style={{ ...eyebrow, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>All projects <Icon name="arrow-right" size={15} /></button>
         </Reveal>
-        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-8) var(--s-7)', marginTop: 'var(--space-head-content)' }}>
+        <div className="ubc-home-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--s-6) var(--s-5)', marginTop: 'var(--space-head-content)' }}>
           {/* The homepage keeps its 2 x 2 grid of four live models; the rest
               are one click away on /projects. */}
           {D.projects.slice(0, 4).map((p, i) => (
@@ -266,11 +266,9 @@ function ProjectsGrid({ onGo }) {
                     <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-4)', marginTop: 'var(--s-4)' }}>
-                  <div>
-                    <h3 style={cardTitle}>{p.name}</h3>
-                    <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
-                  </div>
+                <div style={{ marginTop: 'var(--s-3)' }}>
+                  <h3 style={{ ...cardTitle, fontSize: 'var(--fs-h4)' }}>{p.name}</h3>
+                  <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
                   <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
                 </div>
               </div>
@@ -815,7 +813,7 @@ function flowIcon(label) {
 // TECHNOLOGY (handoff section 6): interactive machine selector, inside a
 // blue frame per the client's own mock-up. Rows come from
 // content/machines.json so marketing can edit them without code changes.
-function Technology({ onQuote }) {
+function Technology() {
   const T = H.technology;
   const rows = MACHINES.rows;
   const [sel, setSel] = React.useState(MACHINES.default || (rows[0] && rows[0].machine));
@@ -856,17 +854,8 @@ function Technology({ onQuote }) {
                   outputsKey={row.machine}
                 />
               }
-              title={'Files your ' + row.machine + ' line can run'}
-              description={'Modelled in ' + row.modelledIn.join(' and ') + ', delivered in the formats your ' + row.machine + ' line already reads \u2014 straight to production, no re-draw on your side.'}
-              action={
-                <button className="ubc-int-cta" onClick={() => onQuote && onQuote({ machine: H.machineOptions.includes(row.machine) ? row.machine : 'Other / not sure' })}>Send Your Project {'\u2192'}</button>
-              }
             />
           </div>
-          <p style={{ ...label, textAlign: 'center', margin: 'var(--s-6) 0 0', lineHeight: 'var(--lh-relaxed)' }}>
-            Every project ships with: {T.shipsWith.join(' · ')}
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'rgba(255,255,255,.88)', textAlign: 'center', margin: 'var(--s-3) 0 0' }}>{T.footer}</p>
         </div>
       </Page>
     </Section>
@@ -919,7 +908,7 @@ export function Home() {
       <ProjectsGrid onGo={onGo} />
       <UBCWay />
       <GlobalPresence />
-      <Technology onQuote={onQuote} />
+      <Technology />
       <VideoTestimonials />
       <FAQSection />
       <FinalCTA />

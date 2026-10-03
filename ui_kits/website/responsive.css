@@ -228,15 +228,27 @@
   content: ""; position: absolute; z-index: -1; pointer-events: none; opacity: 0;
   transition: opacity 420ms var(--ease-out);
 }
+/* Each blob has its own registered position so it can travel on its own
+   path (blue low-left, red along the top, two white lights on the right);
+   their ranges are kept apart so blue and red never stack into a dark
+   patch under the text. */
+@property --g-lx { syntax: '<percentage>'; inherits: false; initial-value: 66.94%; }
+@property --g-ly { syntax: '<percentage>'; inherits: false; initial-value: 46.43%; }
+@property --g-bx { syntax: '<percentage>'; inherits: false; initial-value: 34.69%; }
+@property --g-by { syntax: '<percentage>'; inherits: false; initial-value: 66.31%; }
+@property --g-rx { syntax: '<percentage>'; inherits: false; initial-value: 48.93%; }
+@property --g-ry { syntax: '<percentage>'; inherits: false; initial-value: 19.32%; }
+@property --g-wx { syntax: '<percentage>'; inherits: false; initial-value: 80.23%; }
+@property --g-wy { syntax: '<percentage>'; inherits: false; initial-value: 87.54%; }
 .ubc-card::before, .ubc-glow::before {
   inset: -12%;
   background-color: #FFFFFF;
   background-image:
-    radial-gradient(circle at 66.94% 46.43%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 19.02%, rgba(255,255,255,0.5) 38.05%, rgba(255,255,255,0.156) 57.07%, rgba(255,255,255,0) 76.1%),
-    radial-gradient(circle at 34.69% 66.31%, rgba(38,89,250,0.62) 0%, rgba(38,89,250,0.523) 12.73%, rgba(38,89,250,0.31) 25.45%, rgba(38,89,250,0.097) 38.18%, rgba(38,89,250,0.0) 50.9%),
-    radial-gradient(circle at 48.93% 19.32%, rgba(249,87,95,0.62) 0%, rgba(249,87,95,0.523) 16.75%, rgba(249,87,95,0.31) 33.5%, rgba(249,87,95,0.097) 50.25%, rgba(249,87,95,0.0) 67%),
-    radial-gradient(circle at 80.23% 87.54%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 10.28%, rgba(255,255,255,0.5) 20.55%, rgba(255,255,255,0.156) 30.83%, rgba(255,255,255,0) 41.1%);
-  animation: ubcGlowDrift 9s ease-in-out infinite alternate paused;
+    radial-gradient(circle at var(--g-lx) var(--g-ly), rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 19.02%, rgba(255,255,255,0.5) 38.05%, rgba(255,255,255,0.156) 57.07%, rgba(255,255,255,0) 76.1%),
+    radial-gradient(circle at var(--g-bx) var(--g-by), rgba(38,89,250,0.62) 0%, rgba(38,89,250,0.523) 12.73%, rgba(38,89,250,0.31) 25.45%, rgba(38,89,250,0.097) 38.18%, rgba(38,89,250,0.0) 50.9%),
+    radial-gradient(circle at var(--g-rx) var(--g-ry), rgba(249,87,95,0.62) 0%, rgba(249,87,95,0.523) 16.75%, rgba(249,87,95,0.31) 33.5%, rgba(249,87,95,0.097) 50.25%, rgba(249,87,95,0.0) 67%),
+    radial-gradient(circle at var(--g-wx) var(--g-wy), rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 10.28%, rgba(255,255,255,0.5) 20.55%, rgba(255,255,255,0.156) 30.83%, rgba(255,255,255,0) 41.1%);
+  animation: ubcGlowFlow 7s ease-in-out infinite paused, ubcGlowDrift 11s ease-in-out infinite alternate paused;
 }
 .ubc-card::after, .ubc-glow::after {
   inset: 0; mix-blend-mode: overlay;
@@ -258,6 +270,12 @@
    someone is typing in it. */
 .ubc-card.ubc-card--still::before, .ubc-card.ubc-card--still::after { display: none; }
 .ubc-card.ubc-card--still:hover, .ubc-card.ubc-card--still:focus-within { transform: none; }
+@keyframes ubcGlowFlow {
+  0%, 100% { --g-lx: 66.94%; --g-ly: 46.43%; --g-bx: 34.69%; --g-by: 66.31%; --g-rx: 48.93%; --g-ry: 19.32%; --g-wx: 80.23%; --g-wy: 87.54%; }
+  25%      { --g-lx: 58%;    --g-ly: 38%;    --g-bx: 22%;    --g-by: 74%;    --g-rx: 66%;    --g-ry: 12%;    --g-wx: 90%;    --g-wy: 78%; }
+  50%      { --g-lx: 74%;    --g-ly: 56%;    --g-bx: 46%;    --g-by: 78%;    --g-rx: 36%;    --g-ry: 24%;    --g-wx: 72%;    --g-wy: 92%; }
+  75%      { --g-lx: 62%;    --g-ly: 60%;    --g-bx: 28%;    --g-by: 60%;    --g-rx: 58%;    --g-ry: 28%;    --g-wx: 86%;    --g-wy: 70%; }
+}
 @keyframes ubcGlowDrift {
   0% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(-6%, 4%) scale(1.06); }
@@ -366,3 +384,12 @@
   .ubc-sticky-cta { flex: 1; justify-content: center; box-shadow: none !important; }
 }
 
+
+/* Services: article image gallery stacks on phones */
+@media (max-width: 640px) {
+  .ubc-svc-gallery { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+/* Home "Built from the model": four across, two on tablets, one on phones */
+@media (max-width: 1100px) { .ubc-home-proj-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 640px) { .ubc-home-proj-grid { grid-template-columns: minmax(0, 1fr) !important; } }
