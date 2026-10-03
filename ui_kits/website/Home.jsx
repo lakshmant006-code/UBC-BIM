@@ -866,18 +866,21 @@ function Technology() {
             <h2 style={{ ...h2Style, color: 'var(--white)' }}>{T.title}</h2>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>
           </Reveal>
-          <div role="group" aria-label="Choose your roll-former" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--s-2)', marginTop: 'var(--space-head-content)' }}>
+          {/* One line: centred when it fits, scrolls sideways when it doesn't */}
+          <div className="ubc-pill-scroll" style={{ marginTop: 'var(--space-head-content)' }}>
+          <div role="group" aria-label="Choose your roll-former" style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, width: 'max-content', margin: '0 auto' }}>
             {rows.map((r) => {
               const on = r.machine === sel;
               return (
                 <button key={r.machine} aria-pressed={on} onClick={() => setSel(r.machine)} style={{
-                  minHeight: 44, padding: '0 var(--s-4)', borderRadius: 'var(--r-pill)', cursor: 'pointer',
+                  minHeight: 44, padding: '0 10px', borderRadius: 'var(--r-pill)', cursor: 'pointer', whiteSpace: 'nowrap', flex: '0 0 auto',
                   fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600,
                   background: on ? 'var(--white)' : 'transparent', color: on ? 'var(--frame-blue)' : 'var(--white)',
                   border: 'var(--bw-1) solid ' + (on ? 'var(--white)' : 'rgba(255,255,255,.5)')
                 }}>{r.machine}</button>
               );
             })}
+          </div>
           </div>
           <div style={{ marginTop: 'var(--s-6)' }}>
             <IntegrationCard
