@@ -687,7 +687,6 @@ UBC_DATA.hero = {
   model: { src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
   camPos: [14.70, 11.99, 17.50],
   intro: {
-    eyebrow: 'Overloaded this month? Add a detailing team without hiring one.',
     h1: 'CFS & LGSF Detailing, Engineered for Construction',
     sub: 'From estimating and BIM modeling to engineering, permit sets and shop drawings, UBC BIM helps manufacturers, contractors, builders and fabricators turn project requirements into accurate, construction-ready documentation.',
     primary: 'Send Your Project \u2192',
