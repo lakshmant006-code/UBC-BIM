@@ -73,7 +73,7 @@ export const UBC_DATA = {
     { id: 'dael-4-0070', name: 'Project 4.0070', type: 'Residential', system: 'Mixed construction',
       size: '≈ 1,970 sq ft footprint (from model)', units: '4 storeys', location: 'Not specified',
       delivered: 'Coordinated architectural model', software: ['Autodesk Revit'],
-      model: { src: '/assets/models/dael-4-0070.glb', radius: 10.0 } },
+      model: { src: '/assets/models/dael-4-0070.glb', radius: 16 } },
     // Source IFC was 456 MB (9,213 elements) — too large for git outright, so
     // it's kept as a GitHub Release asset rather than in the repo; only the
     // converted GLB below ships to the site, at full mesh detail (no
