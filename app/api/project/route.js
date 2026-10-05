@@ -1,4 +1,5 @@
-// Project intake ("Send Your Project →"). Forwards the form's fields to the
+// Project intake ("Send Your Project →") and careers applications (source
+// 'careers', from Careers.jsx). Forwards the form's fields to the
 // Zoho CRM webhook named by PROJECT_WEBHOOK_URL. Until that variable is set
 // in Vercel there is nowhere real to send a lead, so this answers 503 and
 // the form says so plainly instead of pretending the enquiry was logged.
@@ -27,6 +28,10 @@ export async function POST(request) {
     machine: String(form.get('machine') || ''),
     files: form.getAll('fileNames').map(String).slice(0, 50),
     source: String(form.get('source') || 'website'),
+    // Careers applications (source 'careers') also carry the role applied
+    // for and a short note; both are empty for project enquiries.
+    role: String(form.get('role') || '').slice(0, 120),
+    message: String(form.get('message') || '').slice(0, 4000),
     submittedAt: new Date().toISOString()
   };
   try {

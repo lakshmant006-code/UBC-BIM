@@ -572,3 +572,77 @@
   .ubc-svc-modal { width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .ubc-svc-modal[open], .ubc-svc-modal[open]::backdrop { animation: none; } }
+
+/* ---------- Careers (Careers.jsx) ---------- */
+.ubc-careers-hero { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: var(--s-8); align-items: center; }
+/* Hanging tag: pin, string and tag rotate together around the pin. */
+.ubc-tag-wrap { position: relative; display: grid; justify-items: center; padding-top: 6px; touch-action: pan-y; }
+.ubc-tag-pin { width: 14px; height: 14px; border-radius: 999px; background: var(--ink); box-shadow: 0 0 0 4px rgba(14,19,24,.08); position: relative; z-index: 2; }
+.ubc-tag-arm { display: grid; justify-items: center; margin-top: -7px; transform-origin: 50% 0; will-change: transform; }
+.ubc-tag-string { width: 1.5px; height: 64px; background: linear-gradient(var(--ink-3), var(--ink-4)); }
+.ubc-tag {
+  position: relative; display: grid; justify-items: center; gap: 2px; width: 210px; padding: 30px 20px 24px;
+  border: 0; border-radius: 14px; cursor: grab; touch-action: none; user-select: none;
+  background: var(--ink); color: #F5F4F1; text-align: center;
+  box-shadow: 0 26px 40px -22px rgba(14,19,24,.6);
+  transition: background-color 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+}
+.ubc-tag:active { cursor: grabbing; }
+.ubc-tag:hover, .ubc-tag:focus-visible { background: var(--accent); box-shadow: 0 30px 46px -22px rgba(214,54,31,.65); }
+.ubc-tag:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.ubc-tag-hole { position: absolute; top: 10px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 999px; background: var(--white); box-shadow: inset 0 0 0 2px rgba(14,19,24,.25); }
+.ubc-tag-kicker { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; opacity: .75; }
+.ubc-tag-name { font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: .12em; line-height: 1.5; margin-top: 6px; }
+.ubc-tag-rule { width: 100%; height: 1px; background: currentColor; opacity: .3; margin: 12px 0; }
+.ubc-tag-foot { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; opacity: .85; }
+.ubc-tag-hint { margin: var(--s-4) 0 0; font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: .12em; text-transform: uppercase; color: var(--text-faint); }
+@media (prefers-reduced-motion: reduce) { .ubc-tag-hint { display: none; } .ubc-tag { cursor: pointer; } }
+
+/* Filter pills with a sliding marker under the pressed one. */
+.ubc-roles-bar { display: flex; align-items: center; justify-content: center; gap: var(--s-4); flex-wrap: wrap; margin-top: var(--s-6); }
+.ubc-pills { position: relative; display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 3px; border: 1px solid #D9DFE6; border-radius: 999px; background: var(--white); }
+.ubc-pills-mark { position: absolute; top: 3px; left: 0; height: 44px; border-radius: 999px; background: var(--accent); transition: transform 420ms cubic-bezier(.22, 1.08, .36, 1), width 420ms cubic-bezier(.22, 1.08, .36, 1); }
+.ubc-pills button {
+  position: relative; z-index: 1; min-height: 44px; padding: 0 var(--s-5); border: 0; border-radius: 999px; cursor: pointer; background: transparent;
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; color: var(--text-muted); transition: color 240ms var(--ease-out);
+}
+.ubc-pills button:hover { color: var(--text-strong); }
+.ubc-pills button[aria-pressed="true"] { color: var(--white); }
+@media (max-width: 640px) { .ubc-pills { border-radius: 22px; } .ubc-pills-mark { display: none; } .ubc-pills button[aria-pressed="true"] { background: var(--accent); } }
+
+/* Role plates: Services' plate + the site hover glow; roles that don't
+   match the filter dim in place rather than reflowing the grid. */
+.ubc-role-cards { list-style: none; margin: var(--s-6) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-5); }
+.ubc-role-cards > li { transition: opacity 380ms var(--ease-out), transform 380ms var(--ease-out), filter 380ms var(--ease-out); }
+.ubc-role-cards > li.is-dim { opacity: .28; transform: scale(.97); filter: grayscale(1); }
+.ubc-role { background: transparent; }
+.ubc-role .ubc-plate-stage { position: relative; z-index: 0; }
+.ubc-role-cap { display: grid; gap: var(--s-3); padding: var(--s-4); border-top: 1px solid #D9DFE6; align-content: space-between; }
+.ubc-role-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
+@media (max-width: 1180px) { .ubc-role-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .ubc-role-cards { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .ubc-role-cards > li, .ubc-pills-mark { transition: none; } }
+
+/* Apply pop-up: role + drawing on the left, the form on the right. */
+.ubc-apply-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--s-7); align-items: start; }
+.ubc-apply-figure { margin-top: var(--s-5); border: 1px solid #D9DFE6; border-radius: 10px; overflow: hidden; background: #FFFFFF; --hairline-hi: var(--accent); }
+@media (max-width: 860px) { .ubc-apply-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); } .ubc-apply-figure { display: none; } }
+
+/* Meet the team: copy beside the About film's poster, which zooms and
+   shows a play button on hover. */
+.ubc-meet { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--s-8); align-items: center; }
+.ubc-meet-film { position: relative; display: block; border-radius: var(--r-4); overflow: hidden; aspect-ratio: 1280 / 674; background: #0E1318; box-shadow: 0 30px 60px -30px rgba(0,0,0,.55); }
+.ubc-meet-film img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease-out); }
+.ubc-meet-film:hover img, .ubc-meet-film:focus-visible img { transform: scale(1.05); }
+.ubc-meet-play { position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; display: grid; place-items: center; border-radius: 999px; background: var(--accent); color: var(--white); box-shadow: 0 0 0 10px rgba(214,54,31,.25); transition: transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out); }
+.ubc-meet-film:hover .ubc-meet-play, .ubc-meet-film:focus-visible .ubc-meet-play { transform: scale(1.08); box-shadow: 0 0 0 16px rgba(214,54,31,.2); }
+.ubc-meet-cap { position: absolute; left: 16px; bottom: 16px; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.92); color: #0E1318; font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; }
+.ubc-meet-film:focus-visible { outline: 3px solid var(--white); outline-offset: 4px; }
+@media (max-width: 900px) { .ubc-meet { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); } }
+@media (prefers-reduced-motion: reduce) { .ubc-meet-film img, .ubc-meet-play { transition: none; } }
+
+/* Speculative application + the sent state. */
+.ubc-spec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--s-8); align-items: start; }
+@media (max-width: 900px) { .ubc-spec { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); } }
+.ubc-career-sent { display: flex; gap: var(--s-4); align-items: flex-start; animation: ubcFadeIn 360ms var(--ease-out); }
+.ubc-career-tick { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; background: var(--accent); color: var(--white); }
