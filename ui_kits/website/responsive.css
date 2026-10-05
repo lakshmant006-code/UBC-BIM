@@ -55,39 +55,17 @@
    is hidden (its links are repeated in the footer). */
 .ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
 .ubc-header-row > a { justify-self: start; }
-/* Header nav pill (components/navigation/Header.jsx NavPill). Scrolled,
-   the links fade down and out and the pill springs closed to its two end
-   marks; hover, focus, a tap on the menu mark or the page top reopen it. */
+/* Header nav pill (components/navigation/Header.jsx NavPill): the links in
+   one rounded pill with a small mark at each end. */
 .ubc-navpill {
-  --spring: cubic-bezier(.22, 1.08, .36, 1);
-  --spring: linear(0, .012, .048 4%, .186 8.5%, .379 13.5%, .585 19%, .765 25.5%, .882 32%, .957 39.5%, 1.004 48%, 1.022 56%, 1.024 63%, 1.016 72%, 1.006 83%, 1);
   display: flex; align-items: center; gap: 2px; padding: 3px;
   border: 1px solid #D9DFE6; border-radius: 999px; background: rgba(255,255,255,.9);
-  transition: box-shadow 240ms var(--ease-out), border-color 240ms var(--ease-out);
 }
-.ubc-navpill.is-collapsed { box-shadow: 0 6px 18px -12px rgba(14,19,24,.35); }
-.ubc-navpill-end {
-  flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px;
-  color: var(--text-muted); background: transparent; border: 0; padding: 0;
-}
-.ubc-navpill-menu { cursor: pointer; transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out); }
+.ubc-navpill-end { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-muted); }
 .ubc-navpill-menu svg { fill: currentColor; }
-.ubc-navpill-menu:hover { color: var(--text-accent); background: #F3F5F8; }
 .ubc-navpill-dot > span { width: 18px; height: 18px; border-radius: 999px; border: 2px solid #C9D1DB; display: grid; place-items: center; }
 .ubc-navpill-dot > span::after { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
-.ubc-navpill-track {
-  overflow: hidden; display: flex; justify-content: center;
-  transition: width 820ms var(--spring);
-}
-.ubc-navpill.is-collapsed .ubc-navpill-track { transition: width 600ms var(--ease-in-out) 100ms; }
-.ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; width: max-content; flex: none; }
-.ubc-navpill-list > li {
-  transition: opacity 320ms var(--ease-out) calc(var(--i) * 30ms + 160ms), transform 520ms var(--spring) calc(var(--i) * 30ms + 160ms), visibility 0s;
-}
-.ubc-navpill.is-collapsed .ubc-navpill-list > li {
-  opacity: 0; transform: translateY(8px); visibility: hidden;
-  transition: opacity 180ms var(--ease-out), transform 240ms var(--ease-out), visibility 0s linear 260ms;
-}
+.ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
 .ubc-navpill-link {
   position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px;
   font-size: var(--fs-body-sm); font-weight: var(--fw-medium); color: var(--text-muted); white-space: nowrap;
@@ -96,9 +74,6 @@
 .ubc-navpill-link:hover { color: var(--text-accent); background: #F3F5F8; }
 .ubc-navpill-link.is-on { color: var(--text-strong); }
 .ubc-navpill-link.is-on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 7px; height: 2px; border-radius: 2px; background: var(--accent); }
-@media (prefers-reduced-motion: reduce) {
-  .ubc-navpill-track, .ubc-navpill.is-collapsed .ubc-navpill-track, .ubc-navpill-list > li, .ubc-navpill.is-collapsed .ubc-navpill-list > li { transition: none; }
-}
 
 @media (max-width: 1060px) {
   .ubc-navpill-link { padding: 0 9px; }
