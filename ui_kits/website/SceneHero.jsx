@@ -40,13 +40,17 @@ function stageAt(p) {
   return Math.min(STAGES.length - 1, Math.floor((p - INTRO_END) / STAGE_SPAN));
 }
 
+// How far right of centre the pinned hero's model sits, as a fraction of
+// the canvas width (matches .ubc-hero-poster in responsive.css).
+const heroShift = (w) => (w >= 1100 ? 0.2 : 0.12);
+
 const eyebrowStyle = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' };
 
 function HeroCopy({ onQuote, onGo, ctaRef }) {
   return (
     <>
       {INTRO.eyebrow && <p style={{ ...eyebrowStyle, color: 'var(--text-accent)', margin: 0 }}>{INTRO.eyebrow}</p>}
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(34px, 5.4vw, 76px)', fontWeight: 700, lineHeight: 'var(--lh-tight)', color: 'var(--text-strong)', margin: 'var(--s-3) 0 0', maxWidth: '20ch' }}>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(34px, 5.4vw, 76px)', fontWeight: 700, lineHeight: 1.02, letterSpacing: '0.01em', wordSpacing: '0.04em', color: 'var(--text-strong)', margin: 'var(--s-3) 0 0', maxWidth: '20ch' }}>
         {INTRO.h1}
       </h1>
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', maxWidth: '60ch', margin: 'var(--space-hero-text) 0 0' }}>
@@ -56,7 +60,7 @@ function HeroCopy({ onQuote, onGo, ctaRef }) {
         <button ref={ctaRef} onClick={onQuote} {...(ctaRef ? bounceHandlers(ctaRef) : {})} style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(214,54,31,.55)' }}>
           {INTRO.primary}
         </button>
-        <a href="/services" onClick={(e) => { if (onGo) { e.preventDefault(); onGo('services'); } }} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
+        <a href="/services" onClick={(e) => { if (onGo) { e.preventDefault(); onGo('services'); } }} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
           {INTRO.secondary}
         </a>
       </div>
@@ -83,7 +87,7 @@ function OutputChain({ shown, animate }) {
 }
 
 const seeHow = (
-  <a href="#the-ubc-way" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)' }}>
+  <a href="#the-ubc-way" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>
     See How It Works {'→'}
   </a>
 );
@@ -200,6 +204,10 @@ export function SceneHero({ onQuote, onGo }) {
         if (!w || !h) return;
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
+        // Slide the model right of the copy: a negative view offset shifts
+        // the whole render by that fraction of the width (the poster below
+        // is shifted by the same amount so the hand-off doesn't jump).
+        camera.setViewOffset(w, h, -w * heroShift(w), 0, w, h);
         camera.updateProjectionMatrix();
       };
       fit();
@@ -301,7 +309,7 @@ export function SceneHero({ onQuote, onGo }) {
     <div ref={wrapRef} style={{ height: ((STAGES.length + 1) * 100) + 'vh', position: 'relative', background: 'var(--surface-page)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
         {/* Poster until the live model is ready */}
-        <img src={STAGES[posterStage].still} alt="" aria-hidden="true"
+        <img src={STAGES[posterStage].still} alt="" aria-hidden="true" className="ubc-hero-poster"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: ready ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
         <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0 }} />
         {loadError && (

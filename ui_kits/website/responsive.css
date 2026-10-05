@@ -423,3 +423,8 @@
 
 /* Technology: roll-former pills stay on one line, scrolling if needed */
 .ubc-pill-scroll { display: flex; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.45) transparent; }
+
+/* Hero: the poster still is shifted right by the same fraction as the live
+   model's camera view offset (heroShift in SceneHero.jsx) */
+.ubc-hero-poster { transform: translateX(12%); }
+@media (min-width: 1100px) { .ubc-hero-poster { transform: translateX(20%); } }

@@ -55,7 +55,7 @@ function AboutHero({ onQuote }) {
           UBC BIM is a technical services partner for CFS, LGSF, and wood-framed projects. Our project coordinators, BIM specialists, detailers, structural engineers, and quality reviewers work within one controlled process to turn project requirements into coordinated models and construction documentation.
         </p>
         <div style={{ display: 'flex', gap: 'var(--s-5)', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginTop: 'var(--space-text-cta)' }}>
-          <a href="#team" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)' }}>
+          <a href="#team" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)' }}>
             See How We Work {'→'}
           </a>
           <button onClick={onQuote} style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(214,54,31,.55)' }}>
@@ -208,7 +208,7 @@ function ProofStrip() {
           ))}
         </div>
         <p style={{ textAlign: 'center', margin: 'var(--s-5) 0 0' }}>
-          <Link href="/#technology" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)' }}>
+          <Link href="/#technology" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>
             See the machines and file formats we support {'→'}
           </Link>
         </p>
