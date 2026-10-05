@@ -15,7 +15,7 @@
   - Apply opens the role's own pop-up with the application form already
     set to that role.
   - CareerForm posts to app/api/project/route.js tagged source 'careers'.
-    Until the CRM webhook is configured that answers 503 and the form says
+    It becomes a Zoho CRM Lead; until Zoho is configured that answers 503 and the form says
     it could not send, rather than claiming the application was received.
 
   Role descriptions aren't written yet, so none are shown; only the

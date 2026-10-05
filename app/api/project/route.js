@@ -1,14 +1,18 @@
-// Project intake ("Send Your Project →") and careers applications (source
-// 'careers', from Careers.jsx). Forwards the form's fields to the
-// Zoho CRM webhook named by PROJECT_WEBHOOK_URL. Until that variable is set
-// in Vercel there is nowhere real to send a lead, so this answers 503 and
-// the form says so plainly instead of pretending the enquiry was logged.
+import { zohoConfigured, createZohoLead } from './zoho.js';
+
+// Project intake ("Send Your Project →", on Contact and in the Request Quote
+// panel) and careers applications (source 'careers', from Careers.jsx).
+// Every submission becomes a Lead in Zoho CRM through its API (zoho.js, set
+// up with the ZOHO_* variables in Vercel). PROJECT_WEBHOOK_URL is still
+// honoured as an alternative (e.g. a Zoho Flow webhook). With neither set
+// there is nowhere real to send a lead, so this answers 503 and the form says
+// so plainly instead of pretending the enquiry was logged.
 // Uploaded files are not forwarded: drawings and RVT/IFC models routinely
 // exceed a serverless request body, so only their names travel with the
 // lead until a file store is chosen.
 export async function POST(request) {
   const target = process.env.PROJECT_WEBHOOK_URL;
-  if (!target) {
+  if (!zohoConfigured() && !target) {
     return Response.json({ ok: false, reason: 'not-configured' }, { status: 503 });
   }
   let form;
@@ -34,6 +38,15 @@ export async function POST(request) {
     message: String(form.get('message') || '').slice(0, 4000),
     submittedAt: new Date().toISOString()
   };
+  if (zohoConfigured()) {
+    try {
+      await createZohoLead(lead);
+    } catch (e) {
+      console.error(e && e.message);
+      return Response.json({ ok: false, reason: 'upstream' }, { status: 502 });
+    }
+    return Response.json({ ok: true });
+  }
   try {
     const res = await fetch(target, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) });
     if (!res.ok) return Response.json({ ok: false, reason: 'upstream' }, { status: 502 });

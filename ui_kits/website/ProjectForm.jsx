@@ -1,9 +1,9 @@
 'use client';
 // The one project-intake form ("Send Your Project →"), used inline in the
 // homepage's final CTA and inside the quote drawer every other conversion
-// button opens. Posts to app/api/project/route.js, which forwards to Zoho
-// once PROJECT_WEBHOOK_URL is configured; until then the form reports that
-// it could not send rather than claiming the enquiry was received.
+// button opens. Posts to app/api/project/route.js, which creates a Lead in
+// Zoho CRM once the ZOHO_* variables are set in Vercel; until then the form
+// reports that it could not send rather than claiming the enquiry was received.
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '../../components/core/Button.jsx';

@@ -27,7 +27,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
         {/* A real IFC, converted to glTF, gets the orbitable viewer; everything
             else keeps the placeholder stage until its own model is in hand. */}
         {project.model ? (
-          <ModelViewer src={project.model.src} radius={project.model.radius} title={project.name} height={560} />
+          <ModelViewer src={project.model.src} radius={project.model.radius} title={project.name} height={560} finish={project.system === 'Wood frame' ? 'wood' : undefined} />
         ) : (
           <ModelStage className="ubc-model-viewer" height={560} caption={project.name + ' · framing model'}>
             <Hotspot x="30%" y="42%" label="Wall panel" />
@@ -97,7 +97,7 @@ function ProjectCard({ p, onOpen }) {
       // (not a photo of it). stopPropagation keeps a drag-to-orbit
       // from also firing the card's own "open this project" click.
       media={p.model
-        ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact /></div>
+        ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact finish={p.system === 'Wood frame' ? 'wood' : undefined} /></div>
         : null}
       mediaLabel={p.name + ': model render pending'}
       eyebrow={p.type} title={p.name} meta={p.size + ' · ' + p.location}

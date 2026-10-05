@@ -300,7 +300,7 @@ function ProjectsGrid({ onGo }) {
               <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
                 onClick={(e) => { if (p.model) e.stopPropagation(); }}>
                 {p.model ? (
-                  <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
+                  <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact finish={p.system === 'Wood frame' ? 'wood' : undefined} />
                 ) : (
                   <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 )}
