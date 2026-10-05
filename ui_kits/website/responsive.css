@@ -59,8 +59,8 @@
    the links fade down and out and the pill springs closed to its two end
    marks; hover, focus, a tap on the menu mark or the page top reopen it. */
 .ubc-navpill {
-  --spring: cubic-bezier(.34, 1.56, .64, 1);
-  --spring: linear(0, .009, .035 2.1%, .141, .281 6.7%, .723 12.9%, .938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, .991, .977 51%, .974 53.8%, .975 57.1%, .997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+  --spring: cubic-bezier(.22, 1.08, .36, 1);
+  --spring: linear(0, .012, .048 4%, .186 8.5%, .379 13.5%, .585 19%, .765 25.5%, .882 32%, .957 39.5%, 1.004 48%, 1.022 56%, 1.024 63%, 1.016 72%, 1.006 83%, 1);
   display: flex; align-items: center; gap: 2px; padding: 3px; margin-left: var(--s-2);
   border: 1px solid #D9DFE6; border-radius: 999px; background: rgba(255,255,255,.9);
   transition: box-shadow 240ms var(--ease-out), border-color 240ms var(--ease-out);
@@ -77,15 +77,15 @@
 .ubc-navpill-dot > span::after { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
 .ubc-navpill-track {
   overflow: hidden; display: flex; justify-content: center;
-  transition: width 720ms var(--spring);
+  transition: width 820ms var(--spring);
 }
-.ubc-navpill.is-collapsed .ubc-navpill-track { transition: width 520ms var(--ease-out) 120ms; }
+.ubc-navpill.is-collapsed .ubc-navpill-track { transition: width 600ms var(--ease-in-out) 100ms; }
 .ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; width: max-content; flex: none; }
 .ubc-navpill-list > li {
-  transition: opacity 260ms var(--ease-out) calc(var(--i) * 30ms + 140ms), transform 420ms var(--spring) calc(var(--i) * 30ms + 140ms), visibility 0s;
+  transition: opacity 320ms var(--ease-out) calc(var(--i) * 30ms + 160ms), transform 520ms var(--spring) calc(var(--i) * 30ms + 160ms), visibility 0s;
 }
 .ubc-navpill.is-collapsed .ubc-navpill-list > li {
-  opacity: 0; transform: translateY(14px); visibility: hidden;
+  opacity: 0; transform: translateY(8px); visibility: hidden;
   transition: opacity 180ms var(--ease-out), transform 240ms var(--ease-out), visibility 0s linear 260ms;
 }
 .ubc-navpill-link {
@@ -102,7 +102,7 @@
 
 /* Mid-size screens: the nav still fits, but not the social icons and
    secondary "Book a call" beside it, so only the primary CTA stays. */
-@media (max-width: 1211px) {
+@media (max-width: 1250px) {
   header > div > div:last-child > *:not(:last-child) { display: none !important; }
 }
 @media (max-width: 1060px) {
