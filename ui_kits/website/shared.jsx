@@ -42,8 +42,14 @@ export function Reveal({ children, delay = 0, style }) {
   React.useEffect(() => {
     const el = ref.current; if (!el) return;
     if (reduceMotion) { el.style.opacity = 1; el.style.transform = 'none'; return; }
+    // Fires once 15% of the element is visible, or once it fills 15% of the
+    // viewport: a block taller than ~6.7 screens (a long blog post) can never
+    // reach a 15% ratio, and would otherwise stay invisible for good.
     const io = new IntersectionObserver((e) => {
-      if (!e[0].isIntersecting) return;
+      const x = e[0];
+      if (!x.isIntersecting) return;
+      const vh = (x.rootBounds && x.rootBounds.height) || window.innerHeight;
+      if (x.intersectionRatio < 0.15 && x.intersectionRect.height < vh * 0.15) return;
       io.disconnect();
       anime({
         targets: el, opacity: [0, 1], translateY: [22, 0], duration: 620, delay, easing: 'cubicBezier(.16,1,.3,1)',
@@ -54,7 +60,7 @@ export function Reveal({ children, delay = 0, style }) {
         // regardless of what update() managed to apply.
         complete: () => { el.style.opacity = 1; el.style.transform = 'none'; }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: [0, 0.05, 0.1, 0.15] });
     io.observe(el);
     return () => io.disconnect();
   }, []);

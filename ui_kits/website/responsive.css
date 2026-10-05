@@ -50,18 +50,53 @@
 }
 
 /* ---------- Header ----------
-   The header lays the wordmark, nav and actions out in one row, which runs
-   far wider than a phone. Below 880px drop the nav links (they are repeated
-   in the footer) and keep only the primary call to action. The header comes
-   from the design-system bundle and carries no class names, so it is targeted
-   structurally: header > div > [wordmark, nav, actions]. */
-/* Mid-size screens: the nav still fits, but not the social icons and
-   secondary "Book a call" beside it, so only the primary CTA stays. */
-@media (max-width: 1211px) {
-  header > div > div:last-child > *:not(:last-child) { display: none !important; }
+   Wordmark on the left, the nav pill centred, the standalone "Request
+   Quote" button just right of it. Below 940px the pill is hidden (its links
+   are repeated in the footer) and the button moves to the right edge. */
+.ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
+.ubc-header-row > * { pointer-events: auto; }   /* the header itself lets clicks through to the page */
+.ubc-header-row > a { justify-self: start; }
+.ubc-header-cta {
+  grid-column: 3; justify-self: start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px;
+  border: 0; border-radius: 999px; cursor: pointer; background: var(--accent); color: var(--white); white-space: nowrap;
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600;
+  transition: background-color 160ms var(--ease-out);
 }
-@media (max-width: 880px) {
-  header > div > nav { display: none !important; }
+.ubc-header-cta:hover { background: var(--accent-press); }
+.ubc-header-cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* Header nav pill (components/navigation/Header.jsx NavPill): the links in
+   one rounded pill with a small mark at each end. */
+.ubc-navpill {
+  display: flex; align-items: center; gap: 2px; padding: 3px;
+  border: 1px solid #D9DFE6; border-radius: 999px; background: var(--white);
+  box-shadow: 0 6px 18px -14px rgba(14,19,24,.35);
+}
+.ubc-navpill-end { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-muted); }
+.ubc-navpill-menu svg { fill: currentColor; }
+.ubc-navpill-dot > span { width: 18px; height: 18px; border-radius: 999px; border: 2px solid #C9D1DB; display: grid; place-items: center; }
+.ubc-navpill-dot > span::after { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
+.ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
+.ubc-navpill-link {
+  position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px;
+  font-size: var(--fs-body-sm); font-weight: var(--fw-medium); color: var(--text-muted); white-space: nowrap;
+  transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+.ubc-navpill-link:hover { color: var(--text-accent); background: #F3F5F8; }
+.ubc-navpill-link.is-on { color: var(--text-strong); }
+.ubc-navpill-link.is-on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 7px; height: 2px; border-radius: 2px; background: var(--accent); }
+
+@media (max-width: 1060px) {
+  .ubc-navpill-link { padding: 0 9px; }
+  .ubc-navpill-link.is-on::after { left: 9px; right: 9px; }
+}
+@media (max-width: 1180px) {
+  /* Not enough room to centre the pill: pill and button sit together on the right. */
+  .ubc-header-row { display: flex !important; }
+  .ubc-navpill { margin-left: auto; }
+}
+@media (max-width: 940px) {
+  .ubc-navpill { display: none !important; }
+  .ubc-header-cta { margin-left: auto; }
 }
 
 /* ---------- Phones ---------- */
@@ -319,7 +354,7 @@
   border: var(--bw-hair) solid var(--line); border-radius: var(--r-4); overflow: hidden;
   box-shadow: 0 24px 48px -28px rgba(0,0,0,.45);
 }
-.ubc-int-visual { position: relative; overflow: hidden; background: var(--paper); padding: clamp(28px, 4vw, 48px) clamp(16px, 3vw, 40px); }
+.ubc-int-visual { position: relative; overflow: hidden; background: var(--white); padding: clamp(28px, 4vw, 48px) clamp(16px, 3vw, 40px); }
 .ubc-int-dots { position: absolute; inset: 0; opacity: .2; background-image: radial-gradient(circle, var(--ink) 1px, transparent 1px); background-size: 32px 32px; }
 .ubc-int-fade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(255,255,255,.6) 10%, transparent 50%, rgba(255,255,255,.6) 90%); }
 .ubc-int-visual-body { position: relative; z-index: 1; }
@@ -368,7 +403,7 @@
 
 @media (max-width: 760px) {
   .ubc-int-flow { grid-template-columns: minmax(0, 1fr); row-gap: 48px; }
-  .ubc-int-col .ubc-int-head { display: table; margin-left: auto; margin-right: auto; padding: 0 var(--s-2); background: var(--paper); text-align: center; }
+  .ubc-int-col .ubc-int-head { display: table; margin-left: auto; margin-right: auto; padding: 0 var(--s-2); background: var(--white); text-align: center; }
   .ubc-int-col ul { flex-direction: column; align-items: center !important; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -423,3 +458,117 @@
 
 /* Technology: roll-former pills stay on one line, scrolling if needed */
 .ubc-pill-scroll { display: flex; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.45) transparent; }
+
+/* Hero: the poster still is shifted right by the same fraction as the live
+   model's camera view offset (heroShift in SceneHero.jsx) */
+.ubc-hero-poster { transform: translateX(12%); }
+@media (min-width: 1100px) { .ubc-hero-poster { transform: translateX(20%); } }
+
+/* ---------- Blogs: tilted card deck (BlogDeck in Blogs.jsx) ----------
+   Covers overlap in one row, skewed like a fanned stack of frosted
+   sheets; the hovered/focused card rises and clears. The plain grid is the
+   phone layout, so each view hides the other. */
+.ubc-blog-deck { display: block; }
+.ubc-blog-deck + .ubc-blog-grid { display: none !important; }
+.ubc-deck {
+  --card-w: clamp(160px, 17vw, 220px); --step: calc((100% - var(--card-w)) / (var(--n) - 1));
+  position: relative; list-style: none; margin: 0 auto; padding: 0; max-width: 920px;
+  height: calc(var(--card-w) * 1.25 + 80px); padding-top: 52px;
+}
+.ubc-deck > li { position: absolute; top: 52px; left: calc(var(--i) * var(--step)); width: var(--card-w); }
+.ubc-deck-card {
+  position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; padding: 0; overflow: hidden; cursor: pointer;
+  border: 1.5px solid #B8C2CE; border-radius: 14px; background: var(--white);
+  transform: skewY(10deg); transform-origin: left top;
+  box-shadow: 0 14px 28px -20px rgba(14,19,24,.45);
+  transition: transform 420ms var(--ease-out), box-shadow 420ms var(--ease-out), border-color 240ms var(--ease-out);
+}
+.ubc-deck-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ubc-deck-fallback { display: flex; align-items: center; justify-content: center; height: 100%; padding: var(--s-5); font-family: var(--font-serif); color: var(--text-strong); }
+.ubc-deck-haze {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(160deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
+  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  transition: opacity 420ms var(--ease-out);
+}
+.ubc-deck-card.is-up, .ubc-deck-card:focus-visible { transform: skewY(10deg) translateY(-44px); box-shadow: 0 28px 44px -24px rgba(14,19,24,.55); border-color: var(--accent); }
+.ubc-deck-card.is-up .ubc-deck-haze, .ubc-deck-card:focus-visible .ubc-deck-haze { opacity: 0; }
+.ubc-deck-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.ubc-deck-panel { margin: var(--s-6) auto 0; max-width: 860px; text-align: center; }
+.ubc-deck-panel > div:first-child { justify-content: center; }
+.ubc-deck-panel p { margin-left: auto !important; margin-right: auto !important; }
+@media (max-width: 760px) {
+  .ubc-blog-deck { display: none; }
+  .ubc-blog-deck + .ubc-blog-grid { display: grid !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ubc-deck-card, .ubc-deck-haze { transition: none; }
+}
+
+/* ---------- Services: hairline figure cards ("plates") ----------
+   After the Hairline Figure Library: a white plate with a hairline border,
+   a 5:4 figure stage, then a caption with a mono number, title, summary
+   and a "Read more" button that opens the write-up in a pop-up. */
+.ubc-svc-cards { list-style: none; margin: var(--space-head-content) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
+.ubc-plate {
+  height: 100%; display: grid; grid-template-rows: auto 1fr; background: #FFFFFF;
+  border: 1px solid #D9DFE6; border-radius: 10px; overflow: hidden;
+  transition: border-color 240ms var(--ease-out), box-shadow 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+.ubc-plate:hover { border-color: var(--border-strong); box-shadow: 0 18px 36px -24px rgba(14,19,24,.35); transform: translateY(-2px); }
+.ubc-plate-stage { background: #FFFFFF; --hairline-hi: var(--accent); }   /* the part the pointer picks draws in the brand red */
+.ubc-plate-cap { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; padding: var(--s-3) var(--s-4); border-top: 1px solid #D9DFE6; }
+.ubc-plate-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h4); line-height: var(--lh-heading); color: var(--text-strong); }
+.ubc-plate-no { font-family: var(--font-mono); font-weight: 400; font-size: var(--fs-label); color: var(--text-muted); margin-right: 10px; }
+.ubc-plate-btn {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-4); border-radius: 7px; cursor: pointer;
+  border: 1px solid #D9DFE6; background: #FFFFFF; color: var(--text-strong);
+  font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 500; letter-spacing: .06em;
+  transition: border-color 200ms var(--ease-out), color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+}
+.ubc-plate-btn:hover { border-color: var(--accent); color: var(--text-accent); }
+@media (max-width: 1100px) { .ubc-svc-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .ubc-svc-cards { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .ubc-plate, .ubc-plate-btn { transition: none; } .ubc-plate:hover { transform: none; } }
+.ubc-svc-subviews { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; padding-top: var(--s-6); }
+.ubc-svc-subview, .ubc-svc-back {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-5); border-radius: var(--r-pill); cursor: pointer;
+  border: var(--bw-hair) solid var(--border-strong); background: var(--white); color: var(--text-strong);
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; transition: border-color 200ms var(--ease-out);
+}
+.ubc-svc-subview:hover, .ubc-svc-back:hover { border-color: var(--text-strong); }
+/* 3D model view: Back button plus a switch between the two models. */
+.ubc-svc-modelbar { display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; }
+.ubc-svc-switch { display: inline-flex; gap: 4px; padding: 3px; border: var(--bw-hair) solid var(--border-strong); border-radius: var(--r-pill); background: var(--white); }
+.ubc-svc-switch button {
+  min-height: 44px; padding: 0 var(--s-5); border: 0; border-radius: var(--r-pill); cursor: pointer; background: transparent;
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; color: var(--text-muted);
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.ubc-svc-switch button:hover { color: var(--text-strong); }
+.ubc-svc-switch button[aria-pressed="true"] { background: var(--accent); color: var(--white); }
+
+/* Services pop-up (MockingBirdModel.jsx ServiceDialog): a native modal
+   <dialog>; the body scrolls inside it, the close button stays pinned. */
+.ubc-svc-modal {
+  width: min(1120px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 48px);
+  margin: auto; padding: 0; border: 1px solid #D9DFE6; border-radius: 14px; background: var(--white);
+  color: var(--text-body); box-shadow: 0 40px 80px -32px rgba(14,19,24,.45); overflow: auto; overscroll-behavior: contain;
+}
+.ubc-svc-modal::backdrop { background: rgba(14,19,24,.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.ubc-svc-modal[open] { animation: ubcModalIn 320ms var(--ease-out); }
+.ubc-svc-modal[open]::backdrop { animation: ubcFadeIn 320ms var(--ease-out); }
+@keyframes ubcModalIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes ubcFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.ubc-svc-modal-body { position: relative; padding: clamp(24px, 4vw, 48px); }
+.ubc-svc-modal-x {
+  position: sticky; top: 0; float: right; z-index: 2; margin: -8px -8px 0 16px;
+  width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer;
+  border: 1px solid #D9DFE6; border-radius: 999px; background: var(--white); color: var(--text-strong);
+  transition: border-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.ubc-svc-modal-x:hover { border-color: var(--accent); color: var(--text-accent); }
+@media (max-width: 640px) {
+  .ubc-svc-modal { width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .ubc-svc-modal[open], .ubc-svc-modal[open]::backdrop { animation: none; } }

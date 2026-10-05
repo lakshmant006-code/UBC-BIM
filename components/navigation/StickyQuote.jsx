@@ -2,10 +2,10 @@ import React from 'react';
 import { Button } from '../core/Button.jsx';
 import { Icon } from '../core/Icon.jsx';
 
-// Floating "Send Your Project →" button plus the quick-answers chat toggle.
+// Floating "Request Quote →" button plus the quick-answers chat toggle.
 // Below 640px (responsive.css, .ubc-sticky) it becomes a full-width bottom
 // bar with the chat toggle folded into its left edge.
-export function StickyQuote({ onQuote, onChat, label = 'Send Your Project →', style, ...rest }) {
+export function StickyQuote({ onQuote, onChat, label = 'Request Quote →', style, ...rest }) {
   return (
     <div {...rest} className="ubc-sticky" style={{
       position: 'fixed', right: 'var(--s-6)', bottom: 'var(--s-6)', zIndex: 50,

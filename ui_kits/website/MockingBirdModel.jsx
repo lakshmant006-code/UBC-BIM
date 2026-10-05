@@ -1,9 +1,11 @@
 'use client';
 /*
-  MockingBirdModel: the site's "Services" page. One tab strip pinned at the
-  very top of the page (every one of the 6 service categories), and the
-  content beneath it swaps to match whichever tab is active — no separate
-  route, no popup. (Project management and training services were dropped
+  MockingBirdModel: the site's "Services" page. No tab strip any more: the
+  6 service categories are cards (ServicesOverview), each with a live
+  construction line drawing on the Hairline engine (hairline/) that answers
+  the pointer; "Read more" opens that service's write-up in a pop-up panel
+  (ServiceDialog). Modeling and detailing's two 3D panel models (below) open
+  from buttons inside its panel, with a "Back to services" button. (Project management and training services were dropped
   from this list entirely, per feedback on the live page — not hidden, not
   marked pending, just removed from UBC_DATA.serviceArticles.)
 
@@ -54,7 +56,7 @@ import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { ServicesDetail } from './ServicesDetail.jsx';
-import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
+import { HairlineFigure } from './hairline/HairlineFigure.jsx';
 
 // Which top-level tabs carry their own dropdown, and what's in it. Only
 // Modeling and detailing has one today; a future category gaining its own
@@ -62,82 +64,104 @@ import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 const SERVICE_SUB_TABS = {
   'modeling-detailing': [
     { id: 'wall-panels', label: 'Wall panels' },
-    { id: 'truss-panels', label: 'Truss panels' }
+    { id: 'truss-panels', label: 'Roof trusses' }
   ]
 };
 
-// The tab strip itself: every service category, pinned at the top of the
-// page above whatever's currently showing beneath it. Reuses FilterBar's
-// own look (underline-tab, mono label, hover accent) by hand rather than
-// FilterBar itself, since FilterBar only knows a flat list of labels — this
-// bar also has to carry the one tab with a dropdown hanging off it.
-function ServiceTabs({ articles, selection, onSelectArticle, onSelectSub }) {
-  const [openId, setOpenId] = React.useState(null);
-  const closeTimer = React.useRef(null);
-  const openNow = (id) => { if (closeTimer.current) window.clearTimeout(closeTimer.current); setOpenId(id); };
-  // A short delay before closing on mouse-out, so moving from the tab down
-  // into its own dropdown doesn't close the very thing being reached for.
-  const closeSoon = () => { closeTimer.current = window.setTimeout(() => setOpenId(null), 180); };
-  React.useEffect(() => () => closeTimer.current && window.clearTimeout(closeTimer.current), []);
+// Services overview: no tab strip. Each service is a card ("plate", after
+// the Hairline Figure Library) with a live construction line drawing that
+// answers the pointer on the Hairline engine's physics (hairline/). Clicking
+// "Read more" opens that service's write-up in a pop-up panel; Modeling and
+// detailing's panel also opens the two guided 3D panel models.
+const SERVICE_FIGURES = {
+  'drafting-architectural': 'drafting',
+  'bom-estimation': 'bom',
+  'permit-sets': 'permit',
+  'modeling-detailing': 'modeling',
+  engineering: 'engineering',
+  manufacturing: 'manufacturing'
+};
 
-  // A sub-view (wall/truss panels) is conceptually under its parent tab, so
-  // that parent still reads as the active one while either is open.
-  const activeArticleId = selection.type === 'article' ? selection.id
-    : (SERVICE_SUB_TABS[selection.parentId] ? selection.parentId : null);
-
+function ServicesOverview({ articles, onOpen }) {
   return (
-    <Page style={{ paddingTop: 'var(--s-7)' }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--s-5)', flexWrap: 'wrap',
-        borderTop: 'var(--bw-hair) solid var(--border-subtle)', borderBottom: 'var(--bw-hair) solid var(--border-subtle)',
-        padding: 'var(--s-3) 0'
-      }}>
-        {articles.map((a) => {
-          const sub = SERVICE_SUB_TABS[a.id];
-          const on = activeArticleId === a.id;
-          return (
-            <div key={a.id} style={{ position: 'relative' }}
-              onMouseEnter={() => sub && openNow(a.id)} onMouseLeave={() => sub && closeSoon()}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button onClick={() => { onSelectArticle(a.id); setOpenId(null); }} style={{
-                  background: 'none', border: 'none', cursor: 'pointer', padding: '6px 0',
-                  fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)',
-                  textTransform: 'uppercase', color: on ? 'var(--text-strong)' : 'var(--text-muted)',
-                  borderBottom: 'var(--bw-2) solid ' + (on ? 'var(--accent)' : 'transparent'), transition: 'var(--t-hover)'
-                }}>{a.label}</button>
-                {sub && (
-                  <button aria-label={a.label + ' options'} aria-expanded={openId === a.id}
-                    onClick={(e) => { e.stopPropagation(); setOpenId(openId === a.id ? null : a.id); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: '6px 2px 6px 4px', color: on ? 'var(--text-strong)' : 'var(--text-muted)' }}>
-                    <Icon name="chevron-down" size={12} />
-                  </button>
-                )}
-              </div>
-              {sub && openId === a.id && (
-                <div role="menu" style={{
-                  position: 'absolute', top: '100%', left: 0, marginTop: 6, zIndex: 40, minWidth: 180,
-                  background: 'rgba(245,244,241,.96)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-                  border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-2)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-2) 0'
-                }}>
-                  {sub.map((s) => {
-                    const subOn = selection.type === s.id;
-                    return (
-                      <button key={s.id} role="menuitem"
-                        onClick={() => { onSelectSub(a.id, s.id); setOpenId(null); }}
-                        style={{
-                          display: 'block', width: '100%', textAlign: 'left', background: subOn ? 'var(--surface-sunken)' : 'none',
-                          border: 'none', cursor: 'pointer', padding: '8px 14px',
-                          fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: subOn ? 'var(--text-strong)' : 'var(--text-body)'
-                        }}>{s.label}</button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
+    <Section style={{ paddingTop: 'var(--s-5)' }}>
+      <Page>
+        <div style={{ maxWidth: 760 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-accent)' }}>Services</div>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>One coordinated model, every service</h1>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-head-text) 0 0' }}>
+            Six services, one workflow. Move over a card to play with it, then open it to read how we deliver it.
+          </p>
+        </div>
+        <ul className="ubc-svc-cards">
+          {articles.map((a, i) => {
+            const figure = SERVICE_FIGURES[a.id];
+            return (
+              <li key={a.id}>
+                <article className="ubc-plate" aria-labelledby={'svc-' + a.id}>
+                  <div className="ubc-plate-stage">
+                    {figure && <HairlineFigure figure={figure} intensity={0.6} label={a.title + ': interactive construction line drawing'} />}
+                  </div>
+                  <div className="ubc-plate-cap">
+                    <h2 id={'svc-' + a.id} className="ubc-plate-title"><span className="ubc-plate-no">{String(i + 1).padStart(2, '0')}</span>{a.title}</h2>
+                    <button type="button" className="ubc-plate-btn" aria-haspopup="dialog" onClick={() => onOpen(a.id)}>
+                      Read more {'\u2192'}
+                    </button>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+      </Page>
+    </Section>
+  );
+}
+
+// The pop-up panel "Read more" opens: a native modal <dialog>, so focus
+// moves into it and stays there, Escape closes it, and the page behind is
+// inert. A click on the backdrop closes it too; focus returns to the card's
+// button on close.
+function ServiceDialog({ article, onClose, onSubView }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const d = ref.current; if (!d || !article) return undefined;
+    const opener = document.activeElement;
+    if (!d.open) d.showModal();
+    d.scrollTop = 0;
+    const root = document.documentElement, prev = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => {
+      root.style.overflow = prev;
+      if (d.open) d.close();
+      // The dialog unmounts on close, so hand focus back to the card's button.
+      if (opener && opener.isConnected && typeof opener.focus === 'function') opener.focus({ preventScroll: true });
+    };
+  }, [article]);
+  if (!article) return null;
+  const subViews = SERVICE_SUB_TABS[article.id];
+  const titleId = 'svc-dialog-' + article.id;
+  return (
+    <dialog ref={ref} className="ubc-svc-modal" aria-labelledby={titleId}
+      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="ubc-svc-modal-body">
+        <button type="button" className="ubc-svc-modal-x" aria-label="Close" onClick={onClose}>
+          <Icon name="x" size={20} />
+        </button>
+        <ServicesDetail article={article} embedded titleId={titleId} />
+        {subViews && (
+          <div className="ubc-svc-subviews">
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Explore in 3D</span>
+            {subViews.map((sv) => (
+              <button key={sv.id} type="button" className="ubc-svc-subview" onClick={() => onSubView(sv.id, article.id)}>
+                {sv.label} {'\u2192'}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-    </Page>
+    </dialog>
   );
 }
 
@@ -210,13 +234,12 @@ function FreeRotateToggle({ on, onToggle }) {
 const HOTSPOT_ZOOM_RADIUS = 0.8;
 
 export function MockingBirdModel() {
-  // Was a prop from the old single-page App() component; now reached
-  // through the quote-drawer context every page uses.
-  const onQuote = useQuoteDrawer();
   const D = UBC_DATA;
   const wallPanel = D.wallPanelModel;
   const articles = D.serviceArticles || [];
-  const [selection, setSelection] = React.useState({ type: 'article', id: (articles[0] && articles[0].id) || null });
+  // { type: 'article', id } — id is the service whose pop-up is open, or
+  // null for none; 'wall-panels' / 'truss-panels' are the 3D model views.
+  const [selection, setSelection] = React.useState({ type: 'article', id: null });
   const [api, setApi] = React.useState(null);
   const [openHotspot, setOpenHotspot] = React.useState(null);
   // Off by default (the guided, hotspot-only camera this view is built
@@ -276,29 +299,49 @@ export function MockingBirdModel() {
     if (openHotspot && !e.target.closest('[role="dialog"]')) closeHotspot();
   };
 
-  const activeArticle = selection.type === 'article' ? articles.find((a) => a.id === selection.id) : null;
+  const activeArticle = selection.type === 'article' ? articles.find((a) => a.id === selection.id) || null : null;
 
   return (
     <div onClick={handleBackgroundClick}>
-      <ServiceTabs articles={articles} selection={selection}
-        onSelectArticle={(id) => setSelection({ type: 'article', id })}
-        onSelectSub={(parentId, subId) => setSelection({ type: subId, parentId })} />
-
       {onModelView ? (
-        activeModel ? (
-          <>
-            <ModelViewer key={selection.type} src={activeModel.src} radius={activeModel.radius}
-              height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle}
-              hotspots={activeModel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
-            <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
-            {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
-          </>
-        ) : (
-          <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
-        )
+        <>
+          <Page style={{ paddingTop: 'var(--s-5)', paddingBottom: 'var(--s-3)' }}>
+            <div className="ubc-svc-modelbar">
+              <button type="button" onClick={() => setSelection({ type: 'article', id: null })} className="ubc-svc-back">
+                {'\u2190'} Back to services
+              </button>
+              {/* Switch straight between the two models without going back. */}
+              <div className="ubc-svc-switch" role="group" aria-label="3D model">
+                {(SERVICE_SUB_TABS[selection.parentId] || []).map((sv) => (
+                  <button key={sv.id} type="button" aria-pressed={selection.type === sv.id}
+                    onClick={() => { if (selection.type !== sv.id) setSelection({ type: sv.id, parentId: selection.parentId }); }}>
+                    {sv.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Page>
+          {activeModel ? (
+            <>
+              <ModelViewer key={selection.type} src={activeModel.src} radius={activeModel.radius}
+                height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle}
+                hotspots={activeModel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
+              <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
+              {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
+            </>
+          ) : (
+            <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
+          )}
+        </>
       ) : (
-        activeArticle && <ServicesDetail article={activeArticle} onQuote={onQuote} />
+        <>
+          <ServicesOverview articles={articles} onOpen={(id) => setSelection({ type: 'article', id })} />
+          <ServiceDialog article={activeArticle}
+            onClose={() => setSelection({ type: 'article', id: null })}
+            onSubView={(type, parentId) => { setSelection({ type, parentId }); window.scrollTo(0, 0); }} />
+        </>
       )}
     </div>
   );
 }
+

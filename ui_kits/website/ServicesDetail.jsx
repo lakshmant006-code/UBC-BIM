@@ -6,34 +6,36 @@
   of the client's own images ({src, alt, caption}), shown in a column
   beside the text on wide screens and after it on narrower ones.
 
-  Renders exactly one `article` at a time — it owns no tab strip and no
-  "which one is active" state of its own; MockingBirdModel.jsx owns that
-  (the tab strip pinned at the top of the whole Services page, including
-  the Modeling and detailing tab's own Wall panels/Truss panels dropdown)
-  and hands this component whichever article is currently selected.
+  Renders exactly one `article` at a time — it owns no "which one is
+  active" state of its own; MockingBirdModel.jsx owns that and hands this
+  component whichever article was opened. `embedded` renders it bare (no
+  page section, an h2 title carrying `titleId`) for the Services pop-up.
 */
-import { Button } from '../../components/core/Button.jsx';
-import { Tag } from '../../components/core/Tag.jsx';
+import React from 'react';
 import { Page, Section, Reveal } from './shared.jsx';
 
-export function ServicesDetail({ article, onQuote }) {
+export function ServicesDetail({ article, embedded = false, titleId }) {
   const a = article;
   if (!a) return null;
   const hasGallery = Boolean(a.gallery && a.gallery.length);
+  const Title = embedded ? 'h2' : 'h1';
+  const Shell = embedded ? React.Fragment : Section;
+  const Inner = embedded ? React.Fragment : Page;
+  const Body = embedded ? 'div' : Reveal;
 
   return (
-    <Section>
-      <Page>
+    <Shell>
+      <Inner>
         <div className={hasGallery ? 'ubc-svc-layout' : undefined} style={hasGallery ? undefined : { maxWidth: 760 }}>
         <div style={{ maxWidth: 760, minWidth: 0 }}>
-          <Reveal key={a.id}>
+          <Body key={a.id}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
               {a.label}
             </div>
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>
+            <Title id={titleId} style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: embedded ? 'clamp(26px, 3vw, 40px)' : 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>
               {a.title}
-            </h1>
+            </Title>
             {a.summary && (
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0' }}>
                 {a.summary}
@@ -67,21 +69,7 @@ export function ServicesDetail({ article, onQuote }) {
               </div>
             ))}
 
-            {a.regions && (
-              <div style={{ marginTop: 'var(--s-8)', paddingTop: 'var(--s-6)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-3)' }}>
-                  Where we deliver
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)' }}>
-                  {a.regions.map((r) => <Tag key={r}>{r}</Tag>)}
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: 'var(--s-7)' }}>
-              <Button onClick={onQuote}>Send Your Project →</Button>
-            </div>
-          </Reveal>
+          </Body>
         </div>
         {hasGallery && (
           // The article's own images sit beside the text on wide screens,
@@ -100,7 +88,7 @@ export function ServicesDetail({ article, onQuote }) {
           </aside>
         )}
         </div>
-      </Page>
-    </Section>
+      </Inner>
+    </Shell>
   );
 }

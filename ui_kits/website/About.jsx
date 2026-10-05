@@ -6,8 +6,9 @@
   (process animation, deliverables list, software table) is gone; people,
   location, accountability and track record stay.
 
-  Order (the note's own "final About page order"): hero, our story +
-  timeline, where we are, leadership, the team behind the model, quality
+  Order (the note's own "final About page order"): hero, the company film
+  ("Step inside", added at the client's request), our story + timeline,
+  where we are, leadership, the team behind the model, quality
   and accountability, proof strip, one testimonial, final CTA. ("Who you
   talk to at each step" was removed at the client's request.)
 
@@ -55,7 +56,7 @@ function AboutHero({ onQuote }) {
           UBC BIM is a technical services partner for CFS, LGSF, and wood-framed projects. Our project coordinators, BIM specialists, detailers, structural engineers, and quality reviewers work within one controlled process to turn project requirements into coordinated models and construction documentation.
         </p>
         <div style={{ display: 'flex', gap: 'var(--s-5)', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginTop: 'var(--space-text-cta)' }}>
-          <a href="#team" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)' }}>
+          <a href="#team" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)' }}>
             See How We Work {'→'}
           </a>
           <button onClick={onQuote} style={{ display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--white)', background: 'var(--accent)', border: 'none', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'pointer', boxShadow: '0 6px 18px -6px rgba(214,54,31,.55)' }}>
@@ -64,6 +65,31 @@ function AboutHero({ onQuote }) {
         </div>
       </Reveal>
     </Page>
+  );
+}
+
+// STEP INSIDE: the client's own company film ("UBC BIM - Pioneering BIM
+// solutions for LGS & Wood", 4 min, with speech and burned-in subtitles),
+// re-encoded to 720p for the web. Sound matters, so it plays on request with
+// controls rather than auto-playing muted; preload="none" means none of it
+// downloads until someone presses play.
+function StepInside() {
+  return (
+    <Section>
+      <Page>
+        <SectionHead eyebrow="Step inside" title="Pioneering BIM solutions for LGS and wood" center />
+        <Reveal style={{ maxWidth: 1040, margin: 'var(--space-head-content) auto 0' }}>
+          <div style={{ borderRadius: 'var(--r-4)', overflow: 'hidden', border: '1px solid #D9DFE6', background: '#0E1318', boxShadow: '0 30px 60px -36px rgba(14,19,24,.45)' }}>
+            <video controls preload="none" playsInline poster="/assets/about/about-film-poster.jpg"
+              aria-label="UBC BIM company film: Pioneering BIM solutions for LGS and wood"
+              style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '1280 / 674' }}>
+              <source src="/assets/about/about-film.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <p style={{ ...bodyStyle, textAlign: 'center' }}>Our company film, 4 minutes, with sound and subtitles.</p>
+        </Reveal>
+      </Page>
+    </Section>
   );
 }
 
@@ -208,7 +234,7 @@ function ProofStrip() {
           ))}
         </div>
         <p style={{ textAlign: 'center', margin: 'var(--s-5) 0 0' }}>
-          <Link href="/#technology" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', borderBottom: 'var(--bw-hair) solid var(--border-strong)' }}>
+          <Link href="/#technology" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>
             See the machines and file formats we support {'→'}
           </Link>
         </p>
@@ -260,6 +286,7 @@ export function About() {
   return (
     <div>
       <AboutHero onQuote={onQuote} />
+      <StepInside />
       <OurStory />
       <WhereWeAre />
       <Leadership />
