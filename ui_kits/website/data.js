@@ -738,7 +738,6 @@ UBC_DATA.home = {
   technology: {
     eyebrow: 'Technology',
     title: 'Pick your roll-former. See exactly what lands on your line.',
-    intro: 'We model CFS, LGSF and wood framing in the software your machine already reads \u2014 so the files we send go straight to production, without a re-draw on your side.',
     youSend: ['Architectural drawings (PDF, DWG)', 'Structural requirements', 'Project scope'],
     shipsWith: ['Coordinated model (RVT \u00b7 IFC \u00b7 DWG)', 'Navisworks clash report (NWD \u00b7 PDF)', 'BOM (XLSX \u00b7 CSV)', 'Permit set (PDF, stamped where required)'],
     footer: 'Machine not listed? Tell us what you run \u2014 we\u2019ll confirm file compatibility before you commit.'

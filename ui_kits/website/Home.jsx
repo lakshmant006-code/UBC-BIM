@@ -864,7 +864,7 @@ function Technology() {
           <Reveal style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto' }}>
             <div style={label}>{T.eyebrow}</div>
             <h2 style={{ ...h2Style, color: 'var(--white)' }}>{T.title}</h2>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>
+            {T.intro && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>}
           </Reveal>
           {/* One line: centred when it fits, scrolls sideways when it doesn't */}
           <div className="ubc-pill-scroll" style={{ marginTop: 'var(--space-head-content)' }}>
