@@ -9,9 +9,10 @@
   complete, framing highlighted, coordination colours, and the parts
   separating while the output chain (BIM Model → … → Machine Files) appears.
   The house starts as an architectural model of this same frame (siding,
-  shingles, windows, doors: HERO.envelope, built from the M2 IFC's own studs,
-  headers and trusses); from stage 01 to stage 04 a horizontal clipping plane
-  sweeps down through it, peeling it away top-down to leave the bare frame.
+  shingles, windows, doors, a free-standing brick chimney, on a concrete
+  slab: HERO.envelope, built from the M2 IFC's own studs, headers and
+  trusses); from stage 01 to stage 04 a horizontal clipping plane sweeps down
+  through it, peeling it away top-down to leave the bare frame on its slab.
   A 01–04 indicator tracks progress. Every stage title (H3) and body is in
   the server-rendered HTML at all times; scroll only changes which is shown.
 
@@ -77,7 +78,19 @@ function envelopeTextures(THREE) {
       g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(0, r * rowH + rowH - 2.5, 256, 2.5);
     }
   });
-  return { siding, shingles };
+  const brick = mk((g) => {
+    g.fillStyle = '#D8D2C8'; g.fillRect(0, 0, 256, 256);        // mortar
+    const rowH = 256 / 13;                                       // ~75 mm courses
+    for (let r = 0; r < 13; r++) {
+      const off = (r % 2) * 28;
+      for (let x = -off; x < 256; x += 56) {
+        const k = ((r * 5 + Math.round(x / 56)) % 4);
+        g.fillStyle = ['#9A5B47', '#8E5240', '#A4644E', '#94573F'][k];
+        g.fillRect(x + 1.5, r * rowH + 1.5, 53, rowH - 3);
+      }
+    }
+  });
+  return { siding, shingles, brick };
 }
 
 function stageAt(p) {
@@ -301,7 +314,6 @@ export function SceneHero({ onQuote, onGo }) {
               let t = Math.min(1, Math.max(0, (p - PEEL_START) / (PEEL_END - PEEL_START)));
               t = t * t * (3 - 2 * t);
               clipPlane.constant = envTop + 0.3 - t * (envTop + 0.3 - (envBottom - 0.1));
-              envelope.visible = t < 0.999;
             }
             parts.forEach((part, i) => {
               const t = targetFor(part, i, state);
@@ -353,12 +365,16 @@ export function SceneHero({ onQuote, onGo }) {
               let m;
               if (name === 'siding') m = new THREE.MeshStandardMaterial({ map: tex.siding, roughness: 0.85, metalness: 0 });
               else if (name === 'roof') m = new THREE.MeshStandardMaterial({ map: tex.shingles, roughness: 0.95, metalness: 0 });
-              else if (name === 'glass') m = new THREE.MeshPhysicalMaterial({ color: 0x9db8cf, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.55, envMapIntensity: 1.4 });
+              // Tinted, mostly opaque glazing: the steel behind should read as a
+              // shadow in the room, not as a gap in the house.
+              else if (name === 'glass') m = new THREE.MeshPhysicalMaterial({ color: 0xa3b9cb, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.84, envMapIntensity: 1.4 });
               else if (name === 'door') m = new THREE.MeshStandardMaterial({ color: 0x2f3a45, roughness: 0.55, metalness: 0.05 });
+              else if (name === 'chimney') m = new THREE.MeshStandardMaterial({ map: tex.brick, roughness: 0.9, metalness: 0 });
+              else if (name === 'slab') m = new THREE.MeshStandardMaterial({ color: 0xc9c7c1, roughness: 0.95, metalness: 0 });
               else m = new THREE.MeshStandardMaterial({ color: 0xf7f6f2, roughness: 0.6, metalness: 0 });   // trim, fascia, frames
               m.side = THREE.DoubleSide;
-              m.clippingPlanes = [clipPlane];
-              m.clipShadows = true;
+              // The slab stays: the frame stands on it through every stage.
+              if (name !== 'slab') { m.clippingPlanes = [clipPlane]; m.clipShadows = true; }
               o.material = m;
               o.castShadow = name !== 'glass'; o.receiveShadow = true;
             });
@@ -367,7 +383,7 @@ export function SceneHero({ onQuote, onGo }) {
             envelope = eg.scene;
             gltf.scene.updateMatrixWorld(true);
             const eb = new THREE.Box3().setFromObject(eg.scene);
-            envTop = eb.max.y; envBottom = eb.min.y;
+            envTop = eb.max.y; envBottom = eb.min.y + 0.3;   // stop at the slab's top
           });
         }
       }, undefined, () => { if (!dead) setLoadError(true); });

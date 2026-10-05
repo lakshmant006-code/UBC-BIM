@@ -1,14 +1,25 @@
 """Step 2 of the hero envelope: build the architectural model of the M2 house
 (public/assets/models/mocking-bird-lot-2-envelope.glb) from els.pkl.
 
-Walls come from the floor-standing stud lines; an opening is a gap between
-full-height studs bridged by a header (a sill below makes it a window, no sill
-a door; wide doors become sliding glass). Exterior faces are found against
-the roof footprint. The roof follows the trusses/joists (gap-closed, then a
-local plane fit so each slope is flat) with a 0.3 m overhang and fascia.
-Materials are named (siding, roof, trim, fascia, window_frame, glass, door,
-door_frame); SceneHero.jsx textures them. Output is in the frame GLB's own
-coordinates, centred on the frame's raw bounding box.
+Walls come from the floor-standing stud lines (a line wider than 0.5 m is two
+walls and is split); an opening is a gap between full-height studs bridged by
+a header (a sill below makes it a window, no sill a door; wide doors become
+sliding glass). Exterior faces are found against the roof footprint, and each
+wall runs to the face of the wall it meets so the corners close.
+
+The roof is three true planes read off the members, not fitted to a height
+map: the left block's flat joist roof, and the gable's two 6:12 slopes from
+the truss top chords. Its outline is squared to the wall faces, with a 0.45 m
+overhang (the higher roof runs over the lower at an inside corner), fascia on
+open edges and a closing face wherever two planes meet at a step.
+
+The fireplace chimney is a free-standing brick box with a crown and flue: its
+studs make no wall, and the roof stops around it. A 0.28 m concrete slab sits
+under the whole footprint and the chimney.
+
+Materials are named (siding, trim, roof, fascia, window_frame, glass, door,
+door_frame, chimney, slab); SceneHero.jsx textures them. Output is in the
+frame GLB's own coordinates, centred on the frame's raw bounding box.
 """
 import pickle, numpy as np, json, trimesh
 from scipy import ndimage
@@ -19,47 +30,81 @@ T=np.array([e['type'] for e in els])
 CB=(LO.min(0)+HI.max(0))/2        # frame bbox centre (the GLB's raw bbox)
 Z2Y=np.array([[1,0,0],[0,0,1],[0,-1,0]],float)
 
-# ---------- roof heightfield ----------
+# ---------- chimney (fireplace): a free-standing box, not part of the roof ----------
+# The tall box at the back. Everything inside its footprint belongs to it.
+# Everything that rises above the ridge (~4.4 m) is the chimney.
+_tall=np.where(HI[:,2]>4.55)[0]
+CH0=LO[_tall,:2].min(0)-0.03; CH1=HI[_tall,:2].max(0)+0.03
+in_ch=(C[:,0]>CH0[0]-0.1)&(C[:,0]<CH1[0]+0.1)&(C[:,1]>CH0[1]-0.1)&(C[:,1]<CH1[1]+0.1)
+CH_TOP=float(HI[in_ch,2].max())
+print('chimney', CH0.round(2), CH1.round(2), 'top', round(CH_TOP,2))
+
+# ---------- roof footprint: everything framed above the walls ----------
 cell=0.15
 x0,y0=LO[:,0].min()-1.5, LO[:,1].min()-1.5
 nx=int((HI[:,0].max()+1.5-x0)/cell)+1; ny=int((HI[:,1].max()+1.5-y0)/cell)+1
 H=np.full((nx,ny),-np.inf)
-for e,lo,hi in zip(els,LO,HI):
-    if hi[2]<2.6 or e['type'] in ('IfcBuildingElementProxy','IfcBuildingElementPart'): continue
+for k,(e,lo,hi) in enumerate(zip(els,LO,HI)):
+    if hi[2]<2.6 or in_ch[k] or e['type'] in ('IfcBuildingElementProxy','IfcBuildingElementPart'): continue
     v=e['v']; v=v[v[:,2]>2.5]
     if len(v)==0: continue
     np.maximum.at(H,(((v[:,0]-x0)/cell).astype(int),((v[:,1]-y0)/cell).astype(int)),v[:,2])
 raw=np.isfinite(H)
 foot=ndimage.binary_fill_holes(ndimage.binary_closing(raw,iterations=3))
-# Height everywhere = the nearest real structure cell's height (no zeros
-# leaking in), then lightly smoothed; the overhang ring takes its edge value.
-_, (ii, jj) = ndimage.distance_transform_edt(~raw, return_indices=True)
-Hn=np.where(raw,H,H[ii,jj])
-# Bridge the gaps between trusses (~0.6 m): a 1 m grey closing fills them
-# while leaving each sloped roof plane flat and the ridge line sharp.
-Hc=ndimage.grey_closing(Hn,size=(7,7))   # bridge the gaps between trusses
-# Purlins sit on the top chords in bands along the ridge; a local plane fit
-# (least squares over a ~1.35 m window) turns each slope into one flat plane.
-def local_plane(Z, w=9):
-    I,J=np.meshgrid(np.arange(Z.shape[0]),np.arange(Z.shape[1]),indexing='ij')
-    I=I.astype(float); J=J.astype(float)
-    m=lambda A: ndimage.uniform_filter(A,size=w,mode='nearest')
-    mi,mj,mz=m(I),m(J),m(Z)
-    cii=m(I*I)-mi*mi; cjj=m(J*J)-mj*mj; cij=m(I*J)-mi*mj
-    ciz=m(I*Z)-mi*mz; cjz=m(J*Z)-mj*mz
-    det=cii*cjj-cij*cij; det=np.where(np.abs(det)<1e-9,1e-9,det)
-    a=(ciz*cjj-cjz*cij)/det; b=(cjz*cii-ciz*cij)/det
-    return mz+a*(I-mi)+b*(J-mj)
-Hv=np.maximum(local_plane(Hc), Hc-0.12)   # never sink below the structure
-OVER=2   # 0.30 m overhang
-roofmask=ndimage.binary_dilation(foot,iterations=OVER)
+XI=x0+(np.arange(nx)+0.5)*cell; YJ=y0+(np.arange(ny)+0.5)*cell
+GX,GY=np.meshgrid(XI,YJ,indexing='ij')
+# The roof is three true planes, read off the members rather than fitted to
+# the height map (the trusses' terraced tops fool a free fit):
+#   0  the left block's flat joist roof (all joists top out at one height)
+#   1  the south slope of the gable, 2  the north slope: the top chords of
+#      the trusses, all at 6:12, give each slope's exact line z = m*y + D.
+def chord_plane(sg):
+    rows=[]
+    for k,e in enumerate(els):
+        if e['type'] not in ('IfcMember','IfcBeam') or in_ch[k]: continue
+        v=e['v']
+        if len(v)<6 or EXT[k,1]<0.8 or HI[k,2]<4.3: continue
+        m,_=np.linalg.lstsq(np.c_[v[:,1],np.ones(len(v))],v[:,2],rcond=None)[0]
+        if abs(m-0.5*sg)>0.03: continue
+        rows.append((float((v[:,2]-0.5*sg*v[:,1]).max()),LO[k,0],HI[k,0],LO[k,1],HI[k,1]))
+    r=np.array(rows)
+    return 0.5*sg, float(r[:,0].max()), (r[:,1].min(),r[:,2].max(),r[:,3].min(),r[:,4].max())
+mS,DS,bS=chord_plane(1); mN,DN,bN=chord_plane(-1)
+flat=[HI[k,2] for k,e in enumerate(els) if e['type'] in ('IfcMember','IfcBeam') and 3.3<HI[k,2]<3.9 and not in_ch[k]]
+FLAT=float(np.median(flat))
+SKIN=0.04                          # sheathing + shingles on top of the members
+PL=np.array([[0,0,FLAT+SKIN],[0,mS,DS+SKIN],[0,mN,DN+SKIN]])
+print('roof planes: flat',round(FLAT,3),'south',mS,round(DS,3),bS,'north',mN,round(DN,3),bN)
+def plane_z(k,x,y): return PL[k,0]*x+PL[k,1]*y+PL[k,2]
+def _inb(b,X,Y,pad=0.05): return (X>b[0]-pad)&(X<b[1]+pad)&(Y>b[2]-pad)&(Y<b[3]+pad)
+ridge=(DN-DS)/(mS-mN)
+lab=np.zeros((nx,ny),int)
+lab[_inb(bS,GX,GY)&(GY<=ridge)]=1
+lab[_inb(bN,GX,GY)&(GY>ridge)]=2
+# West of the full trusses the south slope's trusses run a short way past the
+# ridge, so the north slope starts there too and stops at a framed step wall
+# down to the flat roof. Find where those short trusses end.
+_short=np.where((C[:,0]>bS[0]-0.05)&(C[:,0]<bN[0])&(LO[:,1]>ridge-0.05)&(HI[:,2]>FLAT+0.4)&~in_ch)[0]
+YN_W=float(HI[_short,1].max()) if len(_short) else ridge
+lab[(GX>bS[0]-0.05)&(GX<bN[0])&(GY>ridge)&(GY<YN_W+0.05)]=2
+print('north slope west of the full trusses ends at y',round(YN_W,2))
+OVER=3   # 0.45 m overhang (covers the truss tails)
+# Square off the outline first: joist ends and studs poking out by a cell
+# would otherwise leave teeth along every eave.
+SQ=np.ones((3,3),bool)
+foot=ndimage.binary_opening(foot,SQ,iterations=2)
+roofmask=ndimage.binary_dilation(foot,SQ,iterations=OVER)
 _, (fi, fj) = ndimage.distance_transform_edt(~foot, return_indices=True)
-Hroof=np.where(foot,Hv,Hv[fi,fj])
-def hf(x,y,M=Hv):
-    ix=int((x-x0)/cell); iy=int((y-y0)/cell)
-    if 0<=ix<nx and 0<=iy<ny: return float(M[ix,iy])
-    return 0.0
-outside_mask=~ndimage.binary_fill_holes(ndimage.binary_closing(raw,iterations=2))
+lab=np.where(foot,lab,lab[fi,fj])
+def roof_at(x,y):
+    """Roof surface height at (x,y): the plane of the nearest roofed cell."""
+    i=min(max(int((x-x0)/cell),0),nx-1); j=min(max(int((y-y0)/cell),0),ny-1)
+    if not roofmask[i,j]:
+        i,j=fi[i,j],fj[i,j]
+    return float(plane_z(lab[i,j],x,y))
+outside_mask=~ndimage.binary_erosion(foot,iterations=2)
+_ci=slice(int((CH0[0]-x0)/cell),int((CH1[0]-x0)/cell)+1); _cj=slice(int((CH0[1]-y0)/cell),int((CH1[1]-y0)/cell)+1)
+outside_mask[_ci,_cj]=True
 def is_out(x,y):
     ix=int((x-x0)/cell); iy=int((y-y0)/cell)
     if ix<0 or iy<0 or ix>=nx or iy>=ny: return True
@@ -80,6 +125,14 @@ for axis in (0,1):
         if C[b,axis]-C[a,axis]<0.45: cur.append(b)
         else: cl.append(cur); cur=[b]
     cl.append(cur)
+    # A wall is at most ~0.5 m thick: a wider cluster is two stud lines that
+    # chained together, so split it at its widest gap until each part fits.
+    def split(g):
+        g=sorted(g,key=lambda i:C[i,axis])
+        if len(g)<2 or HI[g,axis].max()-LO[g,axis].min()<=0.5: return [g]
+        cs=C[g,axis]; k=int(np.argmax(np.diff(cs)))+1
+        return split(g[:k])+split(g[k:])
+    cl=[h for g in cl for h in split(g)]
     for g in cl:
         if len(g)<3: continue
         g=np.array(g); n0,n1=LO[g,axis].min(),HI[g,axis].max(); nm=(n0+n1)/2
@@ -103,6 +156,8 @@ for axis in (0,1):
         runs.append((start,prev,ops))
         for s0,s1,ops in runs:
             s0-=0.05; s1+=0.05
+            lo_=[0,0]; hi_=[0,0]; lo_[axis]=n0; hi_[axis]=n1; lo_[other]=s0; hi_[other]=s1
+            if lo_[0]>CH0[0]-0.2 and hi_[0]<CH1[0]+0.2 and lo_[1]>CH0[1]-0.2 and hi_[1]<CH1[1]+0.2: continue   # chimney's own studs
             if s1-s0<0.6: continue
             # exterior side, per 0.3 m sample
             ss=np.arange(s0+0.15,s1-0.1,0.3)
@@ -112,12 +167,6 @@ for axis in (0,1):
                 p_hi=[0,0]; p_hi[axis]=n1+0.6; p_hi[other]=s
                 ol,oh=is_out(*p_lo),is_out(*p_hi)
                 side.append(-1 if ol and not oh else (1 if oh and not ol else 0))
-            # The little tower's side walls sit inside the filled outline: a short
-            # run that rises well above the eaves faces away from the tower centre.
-            if top>3.4 and s1-s0<1.5 and side.count(0)*2>=len(side):
-                tall=[(LO[k,axis]+HI[k,axis])/2 for k in np.where(full&(HI[:,2]>3.4))[0]]
-                mid_n=float(np.mean(tall)) if tall else nm
-                side=[-1 if nm<mid_n else 1]*len(ss)
             # contiguous exterior pieces
             i=0
             while i<len(ss):
@@ -130,7 +179,47 @@ for axis in (0,1):
                     pops=[o for o in ops if o['a']>=a-0.3 and o['b']<=b+0.3]
                     pieces.append(dict(axis=axis,n0=float(n0),n1=float(n1),a=float(a),b=float(b),sgn=side[i],top=top,ops=pops))
                 i=j+1
+# Close the corners: each end of a piece runs to the outer face of the wall it
+# meets, so no frame shows through a slot at the corner. At an outside corner
+# it also wraps the other wall's siding edge; at an inside corner it stops on
+# the other wall's face.
+def face(p): return (p['n1']+0.012) if p['sgn']>0 else (p['n0']-0.012)
+for p in pieces:
+    P=face(p)
+    for q in pieces:
+        if q['axis']==p['axis']: continue
+        if not (q['a']-0.5<P<q['b']+0.5): continue
+        Q=face(q)
+        for end in ('a','b'):
+            if abs(Q-p[end])>0.5: continue
+            convex=(end=='b')==(q['sgn']>0)
+            p[end]=Q+q['sgn']*0.026 if convex else Q
 print(len(pieces),'exterior pieces')
+
+# ---------- square the roof footprint to the walls ----------
+# The raster footprint steps diagonally wherever the framing does; cut the
+# plan into rectangles along every exterior wall face instead and keep the
+# ones over the footprint, so every eave and inside corner is straight.
+fx=sorted({face(p) for p in pieces if p['axis']==0}); fy=sorted({face(p) for p in pieces if p['axis']==1})
+gx=[x0]+fx+[x0+nx*cell]; gy=[y0]+fy+[y0+ny*cell]
+rects=[]
+for xa,xb in zip(gx[:-1],gx[1:]):
+    for ya,yb in zip(gy[:-1],gy[1:]):
+        if foot[int(((xa+xb)/2-x0)/cell),int(((ya+yb)/2-y0)/cell)]: rects.append((xa,ya,xb,yb))
+foot=np.zeros_like(foot)
+for xa,ya,xb,yb in rects: foot[(GX>xa)&(GX<xb)&(GY>ya)&(GY<yb)]=True
+roofmask=ndimage.binary_dilation(foot,SQ,iterations=OVER)
+# Each overhang cell takes the highest roof that reaches it, so at an inside
+# corner the upper eave runs straight over the lower one.
+_reach=[]
+for k in range(len(PL)):
+    m=foot&(lab==k)
+    d=ndimage.distance_transform_edt(~m) if m.any() else np.full(foot.shape,np.inf)
+    side=(GY<=ridge) if k==1 else (GY>ridge) if k==2 else np.ones_like(foot)   # a slope never crosses its ridge
+    _reach.append(np.where((d<=OVER*1.5)&side,plane_z(k,GX,GY),-np.inf))
+_reach=np.stack(_reach)
+lab=np.where(foot,lab,np.argmax(_reach,axis=0))
+_, (fi, fj) = ndimage.distance_transform_edt(~foot, return_indices=True)
 for p in pieces: print('xy'[p['axis']], round(p['n0'],2), 'sgn',p['sgn'], round(p['a'],2), round(p['b'],2), [(o['kind'],round(o['b']-o['a'],2)) for o in p['ops']])
 
 # ---------- mesh helpers ----------
@@ -156,10 +245,10 @@ for p in pieces:
     # top profile follows the roof just inside the wall (gables rise)
     ss=np.linspace(p['a'],p['b'],max(2,int((p['b']-p['a'])/0.15)+1))
     tops=[]
-    for s in ss:
-        q=[0,0]; q[ax]=(p['n0'] if sgn>0 else p['n1'])-sgn*0.35; q[other]=s
-        tops.append(max(p['top'], hf(*q)))
-    tops=ndimage.median_filter(np.array(tops),size=5)
+    for s_ in ss:
+        q=[0,0]; q[ax]=plane+sgn*0.03; q[other]=s_
+        tops.append(max(p['top'], roof_at(*q)-0.08))
+    tops=np.array(tops)
     outline=[(p['a'],-0.05),(p['b'],-0.05)]+[(s,z) for s,z in zip(ss[::-1],tops[::-1])]
     wall=Polygon(outline).buffer(0)
     for o in p['ops']:
@@ -193,36 +282,91 @@ for p in pieces:
             slab(sbox(a+0.06,0.06,b-0.06,z1-0.06),ax,plane,sgn,-0.07,-0.065,'glass')
 
 # ---------- roof ----------
-V=[];F=[];UV=[]; vid={}
-def corner(i,j):
-    k=(i,j)
-    if k in vid: return vid[k]
-    zs=[Hroof[a,b] for a in (i-1,i) for b in (j-1,j) if 0<=a<nx and 0<=b<ny and roofmask[a,b]]
-    z=float(np.mean(zs))+0.06
-    x=x0+i*cell; y=y0+j*cell
-    vid[k]=len(V); V.append((x,y,z)); UV.append((x,y)); return vid[k]
+inch=np.zeros_like(roofmask)
+inch[int((CH0[0]-x0)/cell):int((CH1[0]-x0)/cell)+1, int((CH0[1]-y0)/cell):int((CH1[1]-y0)/cell)+1]=True
+roofmask=roofmask&~inch          # the roof stops around the chimney
+STEP=0.25                        # a bigger jump between planes is a real step
+def cell_corner(i,j,ci,cj):
+    """Corner (ci,cj) of cell (i,j): its own plane, raised to a neighbour's
+    plane where they meet within STEP (a sharp ridge), never across a step."""
+    x=x0+ci*cell; y=y0+cj*cell; own=float(plane_z(lab[i,j],x,y)); z=own
+    for a_ in (ci-1,ci):
+        for b_ in (cj-1,cj):
+            if 0<=a_<nx and 0<=b_<ny and roofmask[a_,b_]:
+                v=float(plane_z(lab[a_,b_],x,y))
+                if own<v<own+STEP: z=max(z,v)
+    return z
+V=[];F=[];UV=[];FV=[];FF=[]
+cz={}
 for i in range(nx):
     for j in range(ny):
         if not roofmask[i,j]: continue
-        a,b,c,d=corner(i,j),corner(i+1,j),corner(i+1,j+1),corner(i,j+1)
-        F+=[(a,b,c),(a,c,d)]
+        q=[(i,j),(i+1,j),(i+1,j+1),(i,j+1)]
+        zs=[cell_corner(i,j,*c) for c in q]; cz[(i,j)]=zs
+        k=len(V)
+        for (ci,cj),z in zip(q,zs): V.append((x0+ci*cell,y0+cj*cell,z)); UV.append((x0+ci*cell,y0+cj*cell))
+        F+=[(k,k+1,k+2),(k,k+2,k+3)]
 meshes['roof'].append((np.array(V),np.array(F),np.array(UV)))
-# fascia skirt on the roof boundary
-FV=[];FF=[]
-for i in range(nx):
-    for j in range(ny):
-        if not roofmask[i,j]: continue
-        for di,dj,e in ((1,0,((i+1,j),(i+1,j+1))),(-1,0,((i,j+1),(i,j))),(0,1,((i+1,j+1),(i,j+1))),(0,-1,((i,j),(i+1,j)))):
-            a2,b2=i+di,j+dj
-            if 0<=a2<nx and 0<=b2<ny and roofmask[a2,b2]: continue
-            p,q=V[vid[e[0]]],V[vid[e[1]]]
-            k=len(FV); FV+=[p,q,(q[0],q[1],q[2]-0.22),(p[0],p[1],p[2]-0.22)]; FF+=[(k,k+1,k+2),(k,k+2,k+3)]
+# fascia: a 0.22 m board on every open roof edge, and a closing face on any
+# step down to a neighbouring roof plane
+for (i,j),zs in cz.items():
+    edges=((1,0,1,2),(-1,0,3,0),(0,1,2,3),(0,-1,0,1))
+    q=[(i,j),(i+1,j),(i+1,j+1),(i,j+1)]
+    for di,dj,e0,e1 in edges:
+        n_=(i+di,j+dj)
+        p0=(x0+q[e0][0]*cell,y0+q[e0][1]*cell,zs[e0]); p1=(x0+q[e1][0]*cell,y0+q[e1][1]*cell,zs[e1])
+        if n_ in cz:
+            # Between two roof planes: close the gap with a face that runs
+            # exactly from this cell's edge to the neighbour's (no sawtooth).
+            if lab[i,j]==lab[n_] or (i,j)>n_: continue
+            qn=[n_,(n_[0]+1,n_[1]),(n_[0]+1,n_[1]+1),(n_[0],n_[1]+1)]
+            zn0=cz[n_][qn.index(q[e0])]; zn1=cz[n_][qn.index(q[e1])]
+            if max(abs(zs[e0]-zn0),abs(zs[e1]-zn1))<0.01: continue
+            k=len(FV); FV+=[p0,p1,(p1[0],p1[1],zn1),(p0[0],p0[1],zn0)]; FF+=[(k,k+1,k+2),(k,k+2,k+3)]
+            continue
+        k=len(FV); FV+=[p0,p1,(p1[0],p1[1],p1[2]-0.22),(p0[0],p0[1],p0[2]-0.22)]; FF+=[(k,k+1,k+2),(k,k+2,k+3)]
 meshes['fascia'].append((np.array(FV),np.array(FF),np.array(FV)[:,:2]))
+
+# ---------- chimney ----------
+def quadbox(lo,hi,key):
+    """Box with its own UVs per face (metres), so textures don't smear."""
+    (x0_,y0_,z0_),(x1_,y1_,z1_)=lo,hi
+    faces=[((x0_,y0_,z0_),(x1_,y0_,z0_),(x1_,y0_,z1_),(x0_,y0_,z1_),'xz'),
+           ((x1_,y1_,z0_),(x0_,y1_,z0_),(x0_,y1_,z1_),(x1_,y1_,z1_),'xz'),
+           ((x0_,y1_,z0_),(x0_,y0_,z0_),(x0_,y0_,z1_),(x0_,y1_,z1_),'yz'),
+           ((x1_,y0_,z0_),(x1_,y1_,z0_),(x1_,y1_,z1_),(x1_,y0_,z1_),'yz'),
+           ((x0_,y0_,z1_),(x1_,y0_,z1_),(x1_,y1_,z1_),(x0_,y1_,z1_),'xy'),
+           ((x0_,y1_,z0_),(x1_,y1_,z0_),(x1_,y0_,z0_),(x0_,y0_,z0_),'xy')]
+    vs=[];fs=[];uv=[]
+    for q in faces:
+        pts=np.array(q[:4]); k=len(vs)
+        ax={'xz':(0,2),'yz':(1,2),'xy':(0,1)}[q[4]]
+        vs+=list(pts); uv+=[(pt[ax[0]],pt[ax[1]]) for pt in pts]
+        fs+=[(k,k+1,k+2),(k,k+2,k+3)]
+    meshes[key].append((np.array(vs),np.array(fs),np.array(uv)))
+meshes.setdefault('chimney',[]); meshes.setdefault('slab',[])
+top=CH_TOP+0.15
+quadbox((CH0[0]-0.03,CH0[1]-0.03,-0.05),(CH1[0]+0.03,CH1[1]+0.03,top),'chimney')
+quadbox((CH0[0]-0.1,CH0[1]-0.1,top),(CH1[0]+0.1,CH1[1]+0.1,top+0.1),'trim')            # crown
+cx,cy=(CH0+CH1)/2
+quadbox((cx-0.18,cy-0.14,top+0.1),(cx+0.18,cy+0.14,top+0.45),'door')                    # flue
+
+# ---------- slab under the footprint ----------
+from shapely.ops import unary_union
+# The same wall-face rectangles as the roof, plus a pad under the
+# free-standing chimney.
+rects=[sbox(*r) for r in rects]
+rects.append(sbox(CH0[0]-0.1,CH0[1]-0.1,CH1[0]+0.1,CH1[1]+0.1))
+outline=unary_union(rects).simplify(0.01).buffer(0.12,join_style=2)
+for poly in (outline.geoms if outline.geom_type=='MultiPolygon' else [outline]):
+    m=trimesh.creation.extrude_polygon(poly,0.28)
+    v=m.vertices.copy(); v[:,2]-=0.33
+    meshes['slab'].append((v,m.faces.copy(),v[:,:2].copy()))
 
 # ---------- export, same space as the frame GLB ----------
 scene=trimesh.Scene()
 COL={'siding':[232,228,218,255],'trim':[250,250,247,255],'roof':[74,79,87,255],'fascia':[250,250,247,255],
-     'window_frame':[248,248,246,255],'glass':[150,180,205,140],'door':[47,58,69,255],'door_frame':[248,248,246,255]}
+     'window_frame':[248,248,246,255],'glass':[150,180,205,140],'door':[47,58,69,255],'door_frame':[248,248,246,255],'chimney':[150,96,78,255],'slab':[200,198,192,255]}
 tot=0
 for k,parts in meshes.items():
     if not parts: continue
