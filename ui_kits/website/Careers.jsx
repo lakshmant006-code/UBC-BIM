@@ -7,8 +7,10 @@
   - HangingTag: the "Hire me" tag hangs from a pin on a spring. Brushing
     past it with the pointer swings it; it can be grabbed and flung, and a
     tap (or Enter/Space, it is a real button) opens the quote drawer.
-  - Role plates: each open role (UBC_DATA.roles) gets a live Hairline line
-    drawing that answers the pointer, and the site's hover glow.
+  - Role cards hang from nails like the tag, on a stiffer spring so they
+    swing fast, and give a quick shake (a form field's "rejected" jolt) when
+    they scroll into view or the pointer reaches them. Short labels only: a
+    title, place and contract type, and a live Hairline drawing.
   - Filter pills: All / location / contract type, with a sliding marker.
     Roles that don't match dim in place (inert) instead of reflowing.
   - Apply opens the role's own pop-up with the application form already
@@ -47,8 +49,14 @@ const ROLE_FIGURE = {
 };
 const reduceMotion = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ---------- Hanging "Hire me" tag (spring pendulum) ----------
-function HangingTag({ onQuote }) {
+// ---------- Swing: a spring pendulum hung from a nail ----------
+// Shared by the hero tag and the role cards. The arm (string + card)
+// rotates about the top of `wrap`. Brushing past pushes it, it can be
+// grabbed and flung (the drag only starts once the pointer moves, so a tap
+// stays a click), and shake() gives the quick side-to-side jolt of a form
+// field rejecting input. `stiffness`/`damping` are per frame: higher
+// stiffness swings faster.
+function useSwing({ stiffness = 0.02, damping = 0.035 } = {}) {
   const wrapRef = React.useRef(null);
   const armRef = React.useRef(null);
   const sim = React.useRef(null);
@@ -56,32 +64,28 @@ function HangingTag({ onQuote }) {
   React.useEffect(() => {
     const wrap = wrapRef.current, arm = armRef.current;
     if (!wrap || !arm) return undefined;
-    // Angle in degrees, velocity in degrees per frame; an underdamped
-    // spring back to vertical, so a push swings a few times and settles.
     const s = { a: 0, v: 0, raf: 0, drag: false, moved: 0, lastX: null, suppress: false };
     sim.current = s;
     const still = reduceMotion();
     const clamp = (x, m) => Math.max(-m, Math.min(m, x));
     const paint = () => { arm.style.transform = 'rotate(' + s.a.toFixed(2) + 'deg)'; };
     const step = () => {
-      if (!s.drag) { s.v += -0.02 * s.a - 0.035 * s.v; s.a = clamp(s.a + s.v, 70); }
+      if (!s.drag) { s.v += -stiffness * s.a - damping * s.v; s.a = clamp(s.a + s.v, 70); }
       paint();
       if (s.drag || Math.abs(s.a) > 0.03 || Math.abs(s.v) > 0.03) s.raf = requestAnimationFrame(step);
       else { s.a = 0; s.v = 0; paint(); s.raf = 0; }
     };
     const kick = () => { if (!s.raf && !still) s.raf = requestAnimationFrame(step); };
-    s.nudge = (dv) => { if (still) return; s.v = clamp(s.v + dv, 6); kick(); };
+    s.nudge = (dv) => { if (still) return; s.v = clamp(s.v + dv, 8); kick(); };
+    s.shake = (power = 4) => { if (still) return; s.v = (s.v >= 0 ? -1 : 1) * power; kick(); };
 
-    // Brushing past: the pointer's sideways speed pushes the tag.
+    // Brushing past: the pointer's sideways speed pushes the arm.
     const onBrush = (e) => {
       if (s.drag || e.pointerType === 'touch') { s.lastX = e.clientX; return; }
       if (s.lastX != null) s.nudge(clamp((s.lastX - e.clientX) * 0.06, 1.6));
       s.lastX = e.clientX;
     };
     const onLeave = () => { s.lastX = null; };
-    // Grab and fling: the tag follows the pointer around its pin. The drag
-    // only starts once the pointer has actually moved, so a plain tap stays
-    // an ordinary click on the button.
     const pin = () => { const r = wrap.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top }; };
     let press = null;
     const onMove = (e) => {
@@ -101,7 +105,7 @@ function HangingTag({ onQuote }) {
       window.removeEventListener('pointercancel', onUp);
       press = null;
       if (!s.drag) return;
-      s.drag = false; s.v = clamp(s.v, 6); kick();
+      s.drag = false; s.v = clamp(s.v, 8); kick();
       // A fling can end in a click event too; swallow just that one.
       s.suppress = true; setTimeout(() => { s.suppress = false; }, 80);
     };
@@ -123,13 +127,21 @@ function HangingTag({ onQuote }) {
       arm.removeEventListener('pointerdown', onDown);
       onUp();
     };
-  }, []);
+  }, [stiffness, damping]);
 
-  const onClick = () => {
+  // Wraps a click handler so the click that ends a fling is ignored.
+  const guard = (fn) => (e) => {
     const s = sim.current;
-    if (s && s.suppress) { s.suppress = false; return; }   // that was a fling, not a tap
-    onQuote();
+    if (s && s.suppress) { s.suppress = false; return; }
+    fn(e);
   };
+  return { wrapRef, armRef, sim, guard };
+}
+
+// ---------- Hanging "Hire me" tag ----------
+function HangingTag({ onQuote }) {
+  const { wrapRef, armRef, sim, guard } = useSwing();
+  const onClick = guard(() => onQuote());
 
   return (
     <div ref={wrapRef} className="ubc-tag-wrap">
@@ -302,6 +314,62 @@ function FilterPills({ options, value, onChange }) {
   );
 }
 
+// Short card labels; the pop-up still shows each role's full title.
+const ROLE_SHORT = {
+  'Wood frame BIM modeller': 'BIM modeller',
+  'Architectural draftsperson': 'Draftsperson'
+};
+
+// A role card hung from its own nail. It swings fast (stiff spring) and
+// gives a quick shake when the pointer reaches it or it first scrolls into
+// view. The whole card opens Apply; its Apply button is the keyboard way in.
+function RoleTag({ role, index, dim, onApply }) {
+  const { wrapRef, armRef, sim, guard } = useSwing({ stiffness: 0.07, damping: 0.09 });
+  const figure = ROLE_FIGURE[role.title];
+  React.useEffect(() => {
+    const el = wrapRef.current; if (!el) return undefined;
+    const io = new IntersectionObserver((e) => {
+      if (!e[0].isIntersecting) return;
+      io.disconnect();
+      setTimeout(() => sim.current && sim.current.shake(5), 120 + index * 110);
+    }, { threshold: 0.6 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [index]); // eslint-disable-line react-hooks/exhaustive-deps
+  const shake = () => sim.current && sim.current.shake(3.5);
+  return (
+    <li className={dim ? 'is-dim' : ''} inert={dim ? true : undefined}>
+      <div ref={wrapRef} className="ubc-hang" onPointerEnter={shake}>
+        <span className="ubc-hang-nail" aria-hidden="true" />
+        <div ref={armRef} className="ubc-hang-arm">
+          <span className="ubc-hang-string" aria-hidden="true" />
+          {/* The whole card is clickable for the pointer; the Apply button
+              is the keyboard and screen-reader way in. */}
+          <div className="ubc-hang-card" onClick={guard((e) => {
+            // Move focus to this card's Apply button first, so closing the
+            // pop-up returns focus here rather than to the top of the page.
+            const btn = e.currentTarget.querySelector('.ubc-hang-go');
+            if (btn) btn.focus({ preventScroll: true });
+            onApply(role);
+          })}>
+            <span className="ubc-hang-hole" aria-hidden="true" />
+            <div className="ubc-hang-stage" aria-hidden="true">
+              {figure && <HairlineFigure figure={figure} intensity={0.6} />}
+            </div>
+            <div className="ubc-hang-cap">
+              <h3 className="ubc-hang-title">{ROLE_SHORT[role.title] || role.title}</h3>
+              <p className="ubc-hang-meta">{role.place} · {role.type}</p>
+              <button type="button" className="ubc-hang-go" aria-haspopup="dialog" onFocus={shake}
+                onClick={(e) => { e.stopPropagation(); guard(() => onApply(role))(e); }}
+                aria-label={'Apply: ' + role.title}>Apply {'\u2192'}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+}
+
 function OpenRoles({ onApply }) {
   const [filter, setFilter] = React.useState('All');
   const options = ['All', ...new Set(ROLES.flatMap((r) => [r.place, r.type]))];
@@ -319,28 +387,9 @@ function OpenRoles({ onApply }) {
           <p aria-live="polite" style={{ ...eyebrowStyle, margin: 0 }}>Showing {shown} of {ROLES.length}</p>
         </div>
         <ul className="ubc-role-cards">
-          {ROLES.map((r, i) => {
-            const on = matches(r);
-            const figure = ROLE_FIGURE[r.title];
-            return (
-              <li key={r.title} className={on ? '' : 'is-dim'} inert={on ? undefined : true}>
-                <article className="ubc-plate ubc-glow ubc-role" aria-labelledby={'role-' + i}>
-                  <div className="ubc-plate-stage">
-                    {figure && <HairlineFigure figure={figure} intensity={0.6} label={r.title + ': interactive construction line drawing'} />}
-                  </div>
-                  <div className="ubc-role-cap">
-                    <h3 id={'role-' + i} className="ubc-plate-title"><span className="ubc-plate-no">{String(i + 1).padStart(2, '0')}</span>{r.title}</h3>
-                    <div className="ubc-role-foot">
-                      <span style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}><Tag>{r.place}</Tag><Tag>{r.type}</Tag></span>
-                      <button type="button" className="ubc-plate-btn ubc-role-apply" aria-haspopup="dialog" onClick={() => onApply(r)}>
-                        Apply {'→'}
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              </li>
-            );
-          })}
+          {ROLES.map((r, i) => (
+            <RoleTag key={r.title} role={r} index={i} dim={!matches(r)} onApply={onApply} />
+          ))}
         </ul>
       </Page>
     </Section>
