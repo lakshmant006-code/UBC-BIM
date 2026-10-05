@@ -2,8 +2,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Wordmark } from '../core/Wordmark.jsx';
-import { Button } from '../core/Button.jsx';
-import { Icon } from '../core/Icon.jsx';
 
 const NAV = [
   { label: 'Services', id: 'services' },
@@ -12,7 +10,6 @@ const NAV = [
   { label: 'Careers', id: 'careers' },
   { label: 'Contact', id: 'contact' }
 ];
-const SOCIAL = ['linkedin', 'youtube', 'message-circle'];
 
 // A nav item's `id` (services/projects/about/careers/blogs/contact) doubles
 // as its real route segment now that every page has a real URL — 'home' is
@@ -21,9 +18,10 @@ const idToHref = (id) => (id === 'home' ? '/' : '/' + id);
 
 // The nav links sit in a pill. Once the page is scrolled the pill springs
 // down to a compact form (the links fade out, the pill closes up to its two
-// end marks); hovering it, focusing into it, tapping its menu button or
-// scrolling back to the top springs it open again. Styles: .ubc-navpill-*
-// in ui_kits/website/responsive.css.
+// end marks); hovering it, focusing into it, tapping its menu mark or
+// scrolling back to the top springs it open again. "Request Quote" is not
+// here: it is the floating StickyQuote button. Styles: .ubc-navpill-* in
+// ui_kits/website/responsive.css.
 function NavPill({ items, active, scrolled }) {
   const listRef = React.useRef(null);
   const [width, setWidth] = React.useState(0);
@@ -81,7 +79,7 @@ function NavPill({ items, active, scrolled }) {
   );
 }
 
-export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, style, ...rest }) {
+export function Header({ items = NAV, active, scrolled, style, ...rest }) {
   return (
     <header {...rest} style={{
       position: 'sticky', top: 0, zIndex: 40,
@@ -92,28 +90,14 @@ export function Header({ items = NAV, active, onNavigate, scrolled, onQuote, sty
       transition: 'background var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out)',
       ...style
     }}>
-      <div style={{
+      <div className="ubc-header-row" style={{
         maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)',
-        height: scrolled ? 64 : 76, display: 'flex', alignItems: 'center', gap: 'var(--s-6)',
-        transition: 'height var(--dur-2) var(--ease-out)'
+        height: scrolled ? 64 : 76, transition: 'height var(--dur-2) var(--ease-out)'
       }}>
         <Link href="/" style={{ borderBottom: 'none', display: 'flex' }}>
           <Wordmark size={21} />
         </Link>
         <NavPill items={items} active={active} scrolled={scrolled} />
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--s-5)' }}>
-          <div style={{ display: 'flex', gap: 'var(--s-4)', color: 'var(--text-muted)' }}>
-            {SOCIAL.map((n) => (
-              <a key={n} href="#" onClick={(e) => e.preventDefault()} aria-label={n}
-                 style={{ borderBottom: 'none', color: 'inherit', display: 'flex' }}>
-                <Icon name={n} size={18} />
-              </a>
-            ))}
-          </div>
-          <span style={{ width: 1, height: 22, background: 'var(--border-subtle)' }} />
-          <Button size="sm" variant="secondary" onClick={() => onNavigate && onNavigate('contact')}>Book a call</Button>
-          <Button size="sm" onClick={onQuote}>Request Quote →</Button>
-        </div>
       </div>
     </header>
   );

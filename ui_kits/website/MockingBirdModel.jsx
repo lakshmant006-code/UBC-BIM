@@ -64,7 +64,7 @@ import { HairlineFigure } from './hairline/HairlineFigure.jsx';
 const SERVICE_SUB_TABS = {
   'modeling-detailing': [
     { id: 'wall-panels', label: 'Wall panels' },
-    { id: 'truss-panels', label: 'Truss panels' }
+    { id: 'truss-panels', label: 'Roof trusses' }
   ]
 };
 
@@ -306,9 +306,20 @@ export function MockingBirdModel() {
       {onModelView ? (
         <>
           <Page style={{ paddingTop: 'var(--s-5)', paddingBottom: 'var(--s-3)' }}>
-            <button type="button" onClick={() => setSelection({ type: 'article', id: null })} className="ubc-svc-back">
-              {'\u2190'} Back to services
-            </button>
+            <div className="ubc-svc-modelbar">
+              <button type="button" onClick={() => setSelection({ type: 'article', id: null })} className="ubc-svc-back">
+                {'\u2190'} Back to services
+              </button>
+              {/* Switch straight between the two models without going back. */}
+              <div className="ubc-svc-switch" role="group" aria-label="3D model">
+                {(SERVICE_SUB_TABS[selection.parentId] || []).map((sv) => (
+                  <button key={sv.id} type="button" aria-pressed={selection.type === sv.id}
+                    onClick={() => { if (selection.type !== sv.id) setSelection({ type: sv.id, parentId: selection.parentId }); }}>
+                    {sv.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </Page>
           {activeModel ? (
             <>

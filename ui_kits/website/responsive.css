@@ -50,18 +50,18 @@
 }
 
 /* ---------- Header ----------
-   The header lays the wordmark, nav and actions out in one row, which runs
-   far wider than a phone. Below 940px drop the nav links (they are repeated
-   in the footer) and keep only the primary call to action. The header comes
-   from the design-system bundle and carries no class names, so it is targeted
-   structurally: header > div > [wordmark, nav, actions]. */
+   Wordmark on the left, the nav pill centred. "Request Quote" is the
+   floating StickyQuote button, not part of the header. Below 940px the pill
+   is hidden (its links are repeated in the footer). */
+.ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
+.ubc-header-row > a { justify-self: start; }
 /* Header nav pill (components/navigation/Header.jsx NavPill). Scrolled,
    the links fade down and out and the pill springs closed to its two end
    marks; hover, focus, a tap on the menu mark or the page top reopen it. */
 .ubc-navpill {
   --spring: cubic-bezier(.22, 1.08, .36, 1);
   --spring: linear(0, .012, .048 4%, .186 8.5%, .379 13.5%, .585 19%, .765 25.5%, .882 32%, .957 39.5%, 1.004 48%, 1.022 56%, 1.024 63%, 1.016 72%, 1.006 83%, 1);
-  display: flex; align-items: center; gap: 2px; padding: 3px; margin-left: var(--s-2);
+  display: flex; align-items: center; gap: 2px; padding: 3px;
   border: 1px solid #D9DFE6; border-radius: 999px; background: rgba(255,255,255,.9);
   transition: box-shadow 240ms var(--ease-out), border-color 240ms var(--ease-out);
 }
@@ -100,17 +100,12 @@
   .ubc-navpill-track, .ubc-navpill.is-collapsed .ubc-navpill-track, .ubc-navpill-list > li, .ubc-navpill.is-collapsed .ubc-navpill-list > li { transition: none; }
 }
 
-/* Mid-size screens: the nav still fits, but not the social icons and
-   secondary "Book a call" beside it, so only the primary CTA stays. */
-@media (max-width: 1250px) {
-  header > div > div:last-child > *:not(:last-child) { display: none !important; }
-}
 @media (max-width: 1060px) {
   .ubc-navpill-link { padding: 0 9px; }
   .ubc-navpill-link.is-on::after { left: 9px; right: 9px; }
 }
 @media (max-width: 940px) {
-  header > div > nav { display: none !important; }
+  .ubc-navpill { display: none !important; }
 }
 
 /* ---------- Phones ---------- */
@@ -549,6 +544,16 @@
   font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; transition: border-color 200ms var(--ease-out);
 }
 .ubc-svc-subview:hover, .ubc-svc-back:hover { border-color: var(--text-strong); }
+/* 3D model view: Back button plus a switch between the two models. */
+.ubc-svc-modelbar { display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; }
+.ubc-svc-switch { display: inline-flex; gap: 4px; padding: 3px; border: var(--bw-hair) solid var(--border-strong); border-radius: var(--r-pill); background: var(--white); }
+.ubc-svc-switch button {
+  min-height: 44px; padding: 0 var(--s-5); border: 0; border-radius: var(--r-pill); cursor: pointer; background: transparent;
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; color: var(--text-muted);
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.ubc-svc-switch button:hover { color: var(--text-strong); }
+.ubc-svc-switch button[aria-pressed="true"] { background: var(--accent); color: var(--white); }
 
 /* Services pop-up (MockingBirdModel.jsx ServiceDialog): a native modal
    <dialog>; the body scrolls inside it, the close button stays pinned. */

@@ -62,9 +62,7 @@ export function AppChrome({ children }) {
 
   return (
     <>
-      <Header items={NAV} active={active} scrolled={scrolled}
-        onNavigate={(id) => router.push(id === 'home' ? '/' : '/' + id)}
-        onQuote={openQuote} />
+      <Header items={NAV} active={active} scrolled={scrolled} />
       <QuoteDrawerProvider open={openQuote}>
         {children}
       </QuoteDrawerProvider>
