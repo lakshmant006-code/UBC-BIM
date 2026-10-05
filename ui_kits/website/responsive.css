@@ -319,7 +319,7 @@
   border: var(--bw-hair) solid var(--line); border-radius: var(--r-4); overflow: hidden;
   box-shadow: 0 24px 48px -28px rgba(0,0,0,.45);
 }
-.ubc-int-visual { position: relative; overflow: hidden; background: var(--paper); padding: clamp(28px, 4vw, 48px) clamp(16px, 3vw, 40px); }
+.ubc-int-visual { position: relative; overflow: hidden; background: var(--white); padding: clamp(28px, 4vw, 48px) clamp(16px, 3vw, 40px); }
 .ubc-int-dots { position: absolute; inset: 0; opacity: .2; background-image: radial-gradient(circle, var(--ink) 1px, transparent 1px); background-size: 32px 32px; }
 .ubc-int-fade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(255,255,255,.6) 10%, transparent 50%, rgba(255,255,255,.6) 90%); }
 .ubc-int-visual-body { position: relative; z-index: 1; }
@@ -368,7 +368,7 @@
 
 @media (max-width: 760px) {
   .ubc-int-flow { grid-template-columns: minmax(0, 1fr); row-gap: 48px; }
-  .ubc-int-col .ubc-int-head { display: table; margin-left: auto; margin-right: auto; padding: 0 var(--s-2); background: var(--paper); text-align: center; }
+  .ubc-int-col .ubc-int-head { display: table; margin-left: auto; margin-right: auto; padding: 0 var(--s-2); background: var(--white); text-align: center; }
   .ubc-int-col ul { flex-direction: column; align-items: center !important; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -428,3 +428,42 @@
    model's camera view offset (heroShift in SceneHero.jsx) */
 .ubc-hero-poster { transform: translateX(12%); }
 @media (min-width: 1100px) { .ubc-hero-poster { transform: translateX(20%); } }
+
+/* ---------- Blogs: tilted card deck (BlogDeck in Blogs.jsx) ----------
+   Covers overlap in one row, skewed like a fanned stack of frosted
+   sheets; the hovered/focused card rises and clears. The plain grid is the
+   phone layout, so each view hides the other. */
+.ubc-blog-deck { display: block; }
+.ubc-blog-deck + .ubc-blog-grid { display: none !important; }
+.ubc-deck {
+  --card-w: clamp(220px, 26vw, 320px); --step: calc((100% - var(--card-w)) / (var(--n) - 1));
+  position: relative; list-style: none; margin: 0; padding: 0;
+  height: calc(var(--card-w) * 1.25 + 96px); padding-top: 72px;
+}
+.ubc-deck > li { position: absolute; top: 72px; left: calc(var(--i) * var(--step)); width: var(--card-w); }
+.ubc-deck-card {
+  position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; padding: 0; overflow: hidden; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.7); border-radius: 18px; background: var(--white);
+  transform: skewY(10deg); transform-origin: left top;
+  box-shadow: 0 18px 34px -22px rgba(14,19,24,.45);
+  transition: transform 420ms var(--ease-out), box-shadow 420ms var(--ease-out);
+}
+.ubc-deck-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ubc-deck-fallback { display: flex; align-items: center; justify-content: center; height: 100%; padding: var(--s-5); font-family: var(--font-serif); color: var(--text-strong); }
+.ubc-deck-haze {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(160deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
+  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  transition: opacity 420ms var(--ease-out);
+}
+.ubc-deck-card.is-up, .ubc-deck-card:focus-visible { transform: skewY(10deg) translateY(-64px); box-shadow: 0 34px 50px -24px rgba(14,19,24,.55); }
+.ubc-deck-card.is-up .ubc-deck-haze, .ubc-deck-card:focus-visible .ubc-deck-haze { opacity: 0; }
+.ubc-deck-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.ubc-deck-panel { margin-top: var(--s-6); max-width: 860px; }
+@media (max-width: 760px) {
+  .ubc-blog-deck { display: none; }
+  .ubc-blog-deck + .ubc-blog-grid { display: grid !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ubc-deck-card, .ubc-deck-haze { transition: none; }
+}

@@ -404,7 +404,7 @@ function GlobalPresence() {
 
         // tokens/colors.css, normalised to 0-1: --white, --paper, --ubc-red.
         const WHITE = [1, 1, 1];
-        const PAPER = [0.953, 0.945, 0.925];
+        const PAPER = [1, 1, 1];   // page background (pure white)
         const RED = [0.839, 0.212, 0.122];
         // Radians per frame at a nominal 60fps: one full turn roughly every
         // 4 minutes — slow enough to read as "idle", not spinning.

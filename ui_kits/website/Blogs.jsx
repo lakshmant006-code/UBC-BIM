@@ -3,7 +3,8 @@
   Blogs: the site's "Blogs" page. Reads UBC_DATA.blogPosts — real
   client-supplied write-ups (see the comment on that array in data.js for
   exactly what each post's own source document was) — and renders them as
-  a card grid; clicking a card opens that post's own full write-up in
+  a deck of tilted cover cards (BlogDeck; the plain card grid on phones);
+  clicking a card opens that post's own full write-up in
   place, the same "one tab strip, no separate route" pattern the rest of
   this site already uses for services (MockingBirdModel.jsx) and projects
   (Portfolio.jsx). With no posts supplied yet, this shows an honest
@@ -182,6 +183,50 @@ function BlogPost({ post, onBack }) {
   );
 }
 
+// Blog deck: every post's cover as a tilted, frosted card in one
+// overlapping row. Hovering or focusing a card lifts it clear of the stack;
+// the panel beneath shows that post's title, date, tags and summary with
+// its "Read" link. Shown on wider screens (responsive.css); phones keep the
+// card grid below, which the CSS shows in its place.
+function BlogDeck({ posts, onOpen }) {
+  const [active, setActive] = React.useState(null);   // lifted card
+  const [shown, setShown] = React.useState(0);        // post in the panel
+  const pick = (i) => { setActive(i); setShown(i); };
+  const post = posts[shown] || posts[0];
+  const badge = post && (post.date || (post.tags && post.tags[0]));
+
+  return (
+    <div className="ubc-blog-deck">
+      <ul className="ubc-deck" onMouseLeave={() => setActive(null)} style={{ '--n': posts.length }}>
+        {posts.map((p, i) => (
+          <li key={p.id} style={{ '--i': i, zIndex: i + 1 }}>
+            <button type="button" className={'ubc-deck-card' + (active === i ? ' is-up' : '')}
+              aria-label={p.title + (p.date ? ', ' + p.date : '') + '. Read the write-up'}
+              onMouseEnter={() => pick(i)} onFocus={() => pick(i)} onBlur={() => setActive(null)}
+              onClick={() => onOpen(p.id)}>
+              {p.image ? <img src={p.image} alt="" loading="lazy" /> : <span className="ubc-deck-fallback">{p.title}</span>}
+              <span className="ubc-deck-haze" aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      {post && (
+        <div className="ubc-deck-panel" aria-live="polite">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', flexWrap: 'wrap' }}>
+            {badge && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{badge}</span>}
+            {post.tags && post.tags.slice(0, 3).map((t) => <Tag key={t}>{t}</Tag>)}
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(22px, 2.4vw, 32px)', lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', margin: 'var(--s-3) 0 0' }}>{post.title}</h2>
+          {post.excerpt && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0', maxWidth: '72ch' }}>{post.excerpt}</p>}
+          <button type="button" onClick={() => onOpen(post.id)} style={{ marginTop: 'var(--s-5)', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44, padding: '0 var(--s-5)', borderRadius: 'var(--r-pill)', border: 'none', cursor: 'pointer', background: 'var(--accent)', color: 'var(--white)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600 }}>
+            Read the write-up {'\u2192'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Blogs() {
   const posts = (UBC_DATA && UBC_DATA.blogPosts) || [];
   const [openId, setOpenId] = React.useState(null);
@@ -203,6 +248,7 @@ export function Blogs() {
       ) : (
         <Section tight>
           <Page>
+            <BlogDeck posts={posts} onOpen={goTo} />
             <div className="ubc-blog-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-8) var(--s-7)' }}>
               {posts.map((post, i) => (
                 <Reveal key={post.id} delay={(i % 3) * 70}>

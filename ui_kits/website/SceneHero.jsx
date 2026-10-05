@@ -30,7 +30,7 @@ const HERO = UBC_DATA.hero;
 const STAGES = HERO.stages;
 const INTRO = HERO.intro;
 const OUTPUTS = HERO.outputs || [];
-const PAPER = 0xf3f1ec;
+const PAPER = 0xffffff;   // page background (pure white)
 const INTRO_END = 0.16;
 const STAGE_SPAN = (1 - INTRO_END) / STAGES.length;
 const COORD_COLORS = [0x2a5fbe, 0xd6361f, 0xd99a00, 0x1e9e6a, 0x7a5af8];
@@ -317,7 +317,7 @@ export function SceneHero({ onQuote, onGo }) {
         )}
 
         {/* Paper scrim behind the copy, lighter once the stages take over */}
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'opacity 300ms', opacity: stageOn ? 0.55 : 1, background: 'linear-gradient(90deg, rgba(243,241,236,.94) 0%, rgba(243,241,236,.82) 38%, rgba(243,241,236,.2) 70%, rgba(243,241,236,0) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'opacity 300ms', opacity: stageOn ? 0.55 : 1, background: 'linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.82) 38%, rgba(255,255,255,.2) 70%, rgba(255,255,255,0) 100%)' }} />
 
         {/* Hero */}
         <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', alignItems: 'center', opacity: introOp, pointerEvents: stageOn ? 'none' : 'auto' }}>
