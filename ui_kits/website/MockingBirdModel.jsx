@@ -1,9 +1,11 @@
 'use client';
 /*
-  MockingBirdModel: the site's "Services" page. One tab strip pinned at the
-  very top of the page (every one of the 6 service categories), and the
-  content beneath it swaps to match whichever tab is active — no separate
-  route, no popup. (Project management and training services were dropped
+  MockingBirdModel: the site's "Services" page. No tab strip any more: the
+  6 service categories are a list beside one hairline isometric building
+  (ServicesOverview + ServicesIsometric.jsx). Hovering a service previews
+  its part of the building; clicking selects it and shows its write-up
+  below. Modeling and detailing's two 3D panel models (below) open from
+  buttons above its write-up, with a "Back to services" button. (Project management and training services were dropped
   from this list entirely, per feedback on the live page — not hidden, not
   marked pending, just removed from UBC_DATA.serviceArticles.)
 
@@ -54,6 +56,7 @@ import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { ServicesDetail } from './ServicesDetail.jsx';
+import { ServicesIsometric } from './ServicesIsometric.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
 // Which top-level tabs carry their own dropdown, and what's in it. Only
@@ -66,78 +69,51 @@ const SERVICE_SUB_TABS = {
   ]
 };
 
-// The tab strip itself: every service category, pinned at the top of the
-// page above whatever's currently showing beneath it. Reuses FilterBar's
-// own look (underline-tab, mono label, hover accent) by hand rather than
-// FilterBar itself, since FilterBar only knows a flat list of labels — this
-// bar also has to carry the one tab with a dropdown hanging off it.
-function ServiceTabs({ articles, selection, onSelectArticle, onSelectSub }) {
-  const [openId, setOpenId] = React.useState(null);
-  const closeTimer = React.useRef(null);
-  const openNow = (id) => { if (closeTimer.current) window.clearTimeout(closeTimer.current); setOpenId(id); };
-  // A short delay before closing on mouse-out, so moving from the tab down
-  // into its own dropdown doesn't close the very thing being reached for.
-  const closeSoon = () => { closeTimer.current = window.setTimeout(() => setOpenId(null), 180); };
-  React.useEffect(() => () => closeTimer.current && window.clearTimeout(closeTimer.current), []);
-
-  // A sub-view (wall/truss panels) is conceptually under its parent tab, so
-  // that parent still reads as the active one while either is open.
-  const activeArticleId = selection.type === 'article' ? selection.id
-    : (SERVICE_SUB_TABS[selection.parentId] ? selection.parentId : null);
-
+// Services overview: no tab strip. The service list sits beside one
+// hairline isometric building (ServicesIsometric.jsx); hovering or
+// focusing a service previews its part of the building, clicking selects
+// it and shows its write-up below. Modeling and detailing also opens the
+// two guided 3D panel models.
+function ServicesOverview({ articles, selectedId, onSelect }) {
+  const [previewId, setPreviewId] = React.useState(null);
+  const shownId = previewId || selectedId;
+  const shown = articles.find((a) => a.id === shownId);
   return (
-    <Page style={{ paddingTop: 'var(--s-7)' }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--s-5)', flexWrap: 'wrap',
-        borderTop: 'var(--bw-hair) solid var(--border-subtle)', borderBottom: 'var(--bw-hair) solid var(--border-subtle)',
-        padding: 'var(--s-3) 0'
-      }}>
-        {articles.map((a) => {
-          const sub = SERVICE_SUB_TABS[a.id];
-          const on = activeArticleId === a.id;
-          return (
-            <div key={a.id} style={{ position: 'relative' }}
-              onMouseEnter={() => sub && openNow(a.id)} onMouseLeave={() => sub && closeSoon()}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button onClick={() => { onSelectArticle(a.id); setOpenId(null); }} style={{
-                  background: 'none', border: 'none', cursor: 'pointer', padding: '6px 0',
-                  fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)',
-                  textTransform: 'uppercase', color: on ? 'var(--text-strong)' : 'var(--text-muted)',
-                  borderBottom: 'var(--bw-2) solid ' + (on ? 'var(--accent)' : 'transparent'), transition: 'var(--t-hover)'
-                }}>{a.label}</button>
-                {sub && (
-                  <button aria-label={a.label + ' options'} aria-expanded={openId === a.id}
-                    onClick={(e) => { e.stopPropagation(); setOpenId(openId === a.id ? null : a.id); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: '6px 2px 6px 4px', color: on ? 'var(--text-strong)' : 'var(--text-muted)' }}>
-                    <Icon name="chevron-down" size={12} />
+    <Section>
+      <Page>
+        <div style={{ maxWidth: 760 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-accent)' }}>Services</div>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>One coordinated model, every service</h1>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-head-text) 0 0' }}>
+            Pick a service to see where it sits on the building, then read how we deliver it.
+          </p>
+        </div>
+        <div className="ubc-svc-grid">
+          <ol className="ubc-svc-list" onMouseLeave={() => setPreviewId(null)}>
+            {articles.map((a, i) => {
+              const on = a.id === selectedId;
+              return (
+                <li key={a.id}>
+                  <button type="button" aria-pressed={on} className={'ubc-svc-item' + (on ? ' is-on' : '') + (a.id === shownId ? ' is-shown' : '')}
+                    onMouseEnter={() => setPreviewId(a.id)} onFocus={() => setPreviewId(a.id)} onBlur={() => setPreviewId(null)}
+                    onClick={() => onSelect(a.id)}>
+                    <span className="ubc-svc-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="ubc-svc-text">
+                      <span className="ubc-svc-label">{a.title}</span>
+                      {a.summary && <span className="ubc-svc-sum">{a.summary}</span>}
+                    </span>
                   </button>
-                )}
-              </div>
-              {sub && openId === a.id && (
-                <div role="menu" style={{
-                  position: 'absolute', top: '100%', left: 0, marginTop: 6, zIndex: 40, minWidth: 180,
-                  background: 'rgba(245,244,241,.96)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)',
-                  border: 'var(--bw-hair) solid var(--border-strong)', borderRadius: 'var(--r-2)', boxShadow: 'var(--shadow-2)', padding: 'var(--s-2) 0'
-                }}>
-                  {sub.map((s) => {
-                    const subOn = selection.type === s.id;
-                    return (
-                      <button key={s.id} role="menuitem"
-                        onClick={() => { onSelectSub(a.id, s.id); setOpenId(null); }}
-                        style={{
-                          display: 'block', width: '100%', textAlign: 'left', background: subOn ? 'var(--surface-sunken)' : 'none',
-                          border: 'none', cursor: 'pointer', padding: '8px 14px',
-                          fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: subOn ? 'var(--text-strong)' : 'var(--text-body)'
-                        }}>{s.label}</button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </Page>
+                </li>
+              );
+            })}
+          </ol>
+          <figure className="ubc-svc-figure">
+            <ServicesIsometric serviceId={shownId} label={shown ? shown.title + ': isometric illustration of where this service sits on an LGSF building' : 'Isometric LGSF building'} />
+            {shown && <figcaption className="ubc-svc-cap">{shown.label}</figcaption>}
+          </figure>
+        </div>
+      </Page>
+    </Section>
   );
 }
 
@@ -278,27 +254,55 @@ export function MockingBirdModel() {
 
   const activeArticle = selection.type === 'article' ? articles.find((a) => a.id === selection.id) : null;
 
+  const subViews = selection.type === 'article' ? SERVICE_SUB_TABS[selection.id] : null;
+
   return (
     <div onClick={handleBackgroundClick}>
-      <ServiceTabs articles={articles} selection={selection}
-        onSelectArticle={(id) => setSelection({ type: 'article', id })}
-        onSelectSub={(parentId, subId) => setSelection({ type: subId, parentId })} />
-
       {onModelView ? (
-        activeModel ? (
-          <>
-            <ModelViewer key={selection.type} src={activeModel.src} radius={activeModel.radius}
-              height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle}
-              hotspots={activeModel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
-            <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
-            {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
-          </>
-        ) : (
-          <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
-        )
+        <>
+          <Page style={{ paddingTop: 'var(--s-5)', paddingBottom: 'var(--s-3)' }}>
+            <button type="button" onClick={() => setSelection({ type: 'article', id: selection.parentId })} className="ubc-svc-back">
+              {'\u2190'} Back to services
+            </button>
+          </Page>
+          {activeModel ? (
+            <>
+              <ModelViewer key={selection.type} src={activeModel.src} radius={activeModel.radius}
+                height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle}
+                hotspots={activeModel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
+              <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
+              {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
+            </>
+          ) : (
+            <Page><div className="ubc-model-viewer" style={{ height: 560, background: 'var(--surface-sunken)' }} /></Page>
+          )}
+        </>
       ) : (
-        activeArticle && <ServicesDetail article={activeArticle} onQuote={onQuote} />
+        <>
+          <ServicesOverview articles={articles} selectedId={selection.id}
+            onSelect={(id) => {
+              setSelection({ type: 'article', id });
+              // Bring the write-up into view under the illustration.
+              window.requestAnimationFrame(() => { const el = document.getElementById('ubc-svc-detail'); if (el) el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); });
+            }} />
+          <div id="ubc-svc-detail" style={{ scrollMarginTop: 96 }}>
+            {subViews && (
+              <Page>
+                <div className="ubc-svc-subviews">
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Explore in 3D</span>
+                  {subViews.map((sv) => (
+                    <button key={sv.id} type="button" className="ubc-svc-subview" onClick={() => { setSelection({ type: sv.id, parentId: selection.id }); window.scrollTo(0, 0); }}>
+                      {sv.label} {'\u2192'}
+                    </button>
+                  ))}
+                </div>
+              </Page>
+            )}
+            {activeArticle && <ServicesDetail article={activeArticle} onQuote={onQuote} />}
+          </div>
+        </>
       )}
     </div>
   );
 }
+
