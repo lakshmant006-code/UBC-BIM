@@ -51,16 +51,65 @@
 
 /* ---------- Header ----------
    The header lays the wordmark, nav and actions out in one row, which runs
-   far wider than a phone. Below 880px drop the nav links (they are repeated
+   far wider than a phone. Below 940px drop the nav links (they are repeated
    in the footer) and keep only the primary call to action. The header comes
    from the design-system bundle and carries no class names, so it is targeted
    structurally: header > div > [wordmark, nav, actions]. */
+/* Header nav pill (components/navigation/Header.jsx NavPill). Scrolled,
+   the links fade down and out and the pill springs closed to its two end
+   marks; hover, focus, a tap on the menu mark or the page top reopen it. */
+.ubc-navpill {
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
+  --spring: linear(0, .009, .035 2.1%, .141, .281 6.7%, .723 12.9%, .938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, .991, .977 51%, .974 53.8%, .975 57.1%, .997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+  display: flex; align-items: center; gap: 2px; padding: 3px; margin-left: var(--s-2);
+  border: 1px solid #D9DFE6; border-radius: 999px; background: rgba(255,255,255,.9);
+  transition: box-shadow 240ms var(--ease-out), border-color 240ms var(--ease-out);
+}
+.ubc-navpill.is-collapsed { box-shadow: 0 6px 18px -12px rgba(14,19,24,.35); }
+.ubc-navpill-end {
+  flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px;
+  color: var(--text-muted); background: transparent; border: 0; padding: 0;
+}
+.ubc-navpill-menu { cursor: pointer; transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out); }
+.ubc-navpill-menu svg { fill: currentColor; }
+.ubc-navpill-menu:hover { color: var(--text-accent); background: #F3F5F8; }
+.ubc-navpill-dot > span { width: 18px; height: 18px; border-radius: 999px; border: 2px solid #C9D1DB; display: grid; place-items: center; }
+.ubc-navpill-dot > span::after { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
+.ubc-navpill-track {
+  overflow: hidden; display: flex; justify-content: center;
+  transition: width 720ms var(--spring);
+}
+.ubc-navpill.is-collapsed .ubc-navpill-track { transition: width 520ms var(--ease-out) 120ms; }
+.ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; width: max-content; flex: none; }
+.ubc-navpill-list > li {
+  transition: opacity 260ms var(--ease-out) calc(var(--i) * 30ms + 140ms), transform 420ms var(--spring) calc(var(--i) * 30ms + 140ms), visibility 0s;
+}
+.ubc-navpill.is-collapsed .ubc-navpill-list > li {
+  opacity: 0; transform: translateY(14px); visibility: hidden;
+  transition: opacity 180ms var(--ease-out), transform 240ms var(--ease-out), visibility 0s linear 260ms;
+}
+.ubc-navpill-link {
+  position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px;
+  font-size: var(--fs-body-sm); font-weight: var(--fw-medium); color: var(--text-muted); white-space: nowrap;
+  transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+.ubc-navpill-link:hover { color: var(--text-accent); background: #F3F5F8; }
+.ubc-navpill-link.is-on { color: var(--text-strong); }
+.ubc-navpill-link.is-on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 7px; height: 2px; border-radius: 2px; background: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  .ubc-navpill-track, .ubc-navpill.is-collapsed .ubc-navpill-track, .ubc-navpill-list > li, .ubc-navpill.is-collapsed .ubc-navpill-list > li { transition: none; }
+}
+
 /* Mid-size screens: the nav still fits, but not the social icons and
    secondary "Book a call" beside it, so only the primary CTA stays. */
 @media (max-width: 1211px) {
   header > div > div:last-child > *:not(:last-child) { display: none !important; }
 }
-@media (max-width: 880px) {
+@media (max-width: 1060px) {
+  .ubc-navpill-link { padding: 0 9px; }
+  .ubc-navpill-link.is-on::after { left: 9px; right: 9px; }
+}
+@media (max-width: 940px) {
   header > div > nav { display: none !important; }
 }
 
@@ -471,8 +520,7 @@
 /* ---------- Services: hairline figure cards ("plates") ----------
    After the Hairline Figure Library: a white plate with a hairline border,
    a 5:4 figure stage, then a caption with a mono number, title, summary
-   and a "Read more" button. The selected service's plate takes the accent
-   border. */
+   and a "Read more" button that opens the write-up in a pop-up. */
 .ubc-svc-cards { list-style: none; margin: var(--space-head-content) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
 .ubc-plate {
   height: 100%; display: grid; grid-template-rows: auto 1fr; background: #FFFFFF;
@@ -480,14 +528,10 @@
   transition: border-color 240ms var(--ease-out), box-shadow 240ms var(--ease-out), transform 240ms var(--ease-out);
 }
 .ubc-plate:hover { border-color: var(--border-strong); box-shadow: 0 18px 36px -24px rgba(14,19,24,.35); transform: translateY(-2px); }
-.ubc-plate.is-on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .ubc-plate-stage { background: #FFFFFF; --hairline-hi: var(--accent); }   /* the part the pointer picks draws in the brand red */
-.ubc-plate-cap { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4) var(--s-4) var(--s-4); border-top: 1px solid #D9DFE6; }
+.ubc-plate-cap { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; padding: var(--s-3) var(--s-4); border-top: 1px solid #D9DFE6; }
 .ubc-plate-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h4); line-height: var(--lh-heading); color: var(--text-strong); }
 .ubc-plate-no { font-family: var(--font-mono); font-weight: 400; font-size: var(--fs-label); color: var(--text-muted); margin-right: 10px; }
-.ubc-plate-sum { margin: 0; font-family: var(--font-body); font-size: var(--fs-body-sm); line-height: var(--lh-relaxed); color: var(--text-muted); }
-.ubc-plate-foot { margin-top: auto; padding-top: var(--s-2); display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
-.ubc-plate-hint { font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: .06em; color: var(--text-faint); }
 .ubc-plate-btn {
   display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-4); border-radius: 7px; cursor: pointer;
   border: 1px solid #D9DFE6; background: #FFFFFF; color: var(--text-strong);
@@ -495,7 +539,6 @@
   transition: border-color 200ms var(--ease-out), color 200ms var(--ease-out), background-color 200ms var(--ease-out);
 }
 .ubc-plate-btn:hover { border-color: var(--accent); color: var(--text-accent); }
-.ubc-plate-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--white); }
 @media (max-width: 1100px) { .ubc-svc-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .ubc-svc-cards { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .ubc-plate, .ubc-plate-btn { transition: none; } .ubc-plate:hover { transform: none; } }
@@ -506,3 +549,28 @@
   font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; transition: border-color 200ms var(--ease-out);
 }
 .ubc-svc-subview:hover, .ubc-svc-back:hover { border-color: var(--text-strong); }
+
+/* Services pop-up (MockingBirdModel.jsx ServiceDialog): a native modal
+   <dialog>; the body scrolls inside it, the close button stays pinned. */
+.ubc-svc-modal {
+  width: min(1120px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 48px);
+  margin: auto; padding: 0; border: 1px solid #D9DFE6; border-radius: 14px; background: var(--white);
+  color: var(--text-body); box-shadow: 0 40px 80px -32px rgba(14,19,24,.45); overflow: auto; overscroll-behavior: contain;
+}
+.ubc-svc-modal::backdrop { background: rgba(14,19,24,.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.ubc-svc-modal[open] { animation: ubcModalIn 320ms var(--ease-out); }
+.ubc-svc-modal[open]::backdrop { animation: ubcFadeIn 320ms var(--ease-out); }
+@keyframes ubcModalIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes ubcFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.ubc-svc-modal-body { position: relative; padding: clamp(24px, 4vw, 48px); }
+.ubc-svc-modal-x {
+  position: sticky; top: 0; float: right; z-index: 2; margin: -8px -8px 0 16px;
+  width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer;
+  border: 1px solid #D9DFE6; border-radius: 999px; background: var(--white); color: var(--text-strong);
+  transition: border-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.ubc-svc-modal-x:hover { border-color: var(--accent); color: var(--text-accent); }
+@media (max-width: 640px) {
+  .ubc-svc-modal { width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .ubc-svc-modal[open], .ubc-svc-modal[open]::backdrop { animation: none; } }
