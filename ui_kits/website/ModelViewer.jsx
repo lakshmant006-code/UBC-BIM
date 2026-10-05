@@ -103,7 +103,10 @@ export function applySteelMaterials(THREE, root) {
     if (!o.isMesh || !o.material) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     const next = mats.map((m) => {
-      if (!m.color) return m;
+      // Wood surfaces are settled already: a pale timber tone sits inside
+      // the yellow band above, which is exactly how a wood frame used to
+      // come out as brushed steel.
+      if (!m.color || (m.userData && m.userData.wood)) return m;
       if (!isSteelColor(m.color, m.opacity)) {
         if (m.envMapIntensity == null || m.envMapIntensity === 1) m.envMapIntensity = 0.75;
         m.needsUpdate = true;
@@ -206,6 +209,7 @@ export function applyWoodMaterials(THREE, root) {
       // plywood still read as different stock.
       const tint = new THREE.Color(0xffffff).lerp(m.color, single ? 0 : 0.35);
       const wood = new THREE.MeshStandardMaterial({ map: woodTexture(THREE), color: tint, roughness: 0.78, metalness: 0, envMapIntensity: 0.55, side: THREE.DoubleSide });
+      wood.userData.wood = true;
       m.dispose();
       return wood;
     });
