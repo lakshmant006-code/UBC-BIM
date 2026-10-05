@@ -8,6 +8,11 @@
   model; the rest scrubs through four model states (UBC_DATA.hero.stages):
   complete, framing highlighted, coordination colours, and the parts
   separating while the output chain (BIM Model → … → Machine Files) appears.
+  The house starts as an architectural model of this same frame (siding,
+  shingles, windows, doors, a free-standing brick chimney, on a concrete
+  slab: HERO.envelope, built from the M2 IFC's own studs, headers and
+  trusses); from stage 01 to stage 04 a horizontal clipping plane sweeps down
+  through it, peeling it away top-down to leave the bare frame on its slab.
   A 01–04 indicator tracks progress. Every stage title (H3) and body is in
   the server-rendered HTML at all times; scroll only changes which is shown.
 
@@ -34,6 +39,59 @@ const PAPER = 0xffffff;   // page background (pure white)
 const INTRO_END = 0.16;
 const STAGE_SPAN = (1 - INTRO_END) / STAGES.length;
 const COORD_COLORS = [0x2a5fbe, 0xd6361f, 0xd99a00, 0x1e9e6a, 0x7a5af8];
+
+// The architectural envelope (stage 01) peels away top-down between these
+// two scroll positions, leaving the bare frame by the start of stage 04.
+const PEEL_START = INTRO_END + STAGE_SPAN * 0.55;
+const PEEL_END = INTRO_END + STAGE_SPAN * 2.85;
+
+// Procedural surface textures for the envelope, 1 texture repeat = 1 m
+// (the envelope's UVs are in metres): lap siding boards and asphalt shingles.
+function envelopeTextures(THREE) {
+  const mk = (draw) => {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    draw(c.getContext('2d'));
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; t.encoding = THREE.sRGBEncoding;
+    return t;
+  };
+  const siding = mk((g) => {
+    g.fillStyle = '#ECE8DF'; g.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 5; i++) {            // 5 boards per metre, 200 mm exposure
+      const y = i * 51.2;
+      const grd = g.createLinearGradient(0, y, 0, y + 51.2);
+      grd.addColorStop(0, '#F4F1EA'); grd.addColorStop(0.85, '#E4DFD4'); grd.addColorStop(1, '#C9C3B6');
+      g.fillStyle = grd; g.fillRect(0, y, 256, 51.2);
+      g.fillStyle = 'rgba(80,70,55,.35)'; g.fillRect(0, y + 49, 256, 2.2);   // drip shadow under each lap
+    }
+  });
+  const shingles = mk((g) => {
+    g.fillStyle = '#3F444B'; g.fillRect(0, 0, 256, 256);
+    const rowH = 256 / 7;                    // ~143 mm exposure
+    for (let r = 0; r < 7; r++) {
+      const off = (r % 2) * 42;
+      for (let x = -off; x < 256; x += 84) {
+        const shade = 54 + ((r * 7 + Math.round(x)) % 5) * 5;
+        g.fillStyle = 'rgb(' + shade + ',' + (shade + 4) + ',' + (shade + 10) + ')';
+        g.fillRect(x + 1, r * rowH + 1, 82, rowH - 2);
+      }
+      g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(0, r * rowH + rowH - 2.5, 256, 2.5);
+    }
+  });
+  const brick = mk((g) => {
+    g.fillStyle = '#D8D2C8'; g.fillRect(0, 0, 256, 256);        // mortar
+    const rowH = 256 / 13;                                       // ~75 mm courses
+    for (let r = 0; r < 13; r++) {
+      const off = (r % 2) * 28;
+      for (let x = -off; x < 256; x += 56) {
+        const k = ((r * 5 + Math.round(x / 56)) % 4);
+        g.fillStyle = ['#9A5B47', '#8E5240', '#A4644E', '#94573F'][k];
+        g.fillRect(x + 1.5, r * rowH + 1.5, 53, rowH - 3);
+      }
+    }
+  });
+  return { siding, shingles, brick };
+}
 
 function stageAt(p) {
   if (p < INTRO_END) return -1;
@@ -126,6 +184,7 @@ export function SceneHero({ onQuote, onGo }) {
   const ctaRef = React.useRef(null);
   const visibleRef = React.useRef(true);
   const targetStateRef = React.useRef('complete');
+  const progressRef = React.useRef(0);
   const [progress, setProgress] = React.useState(0);
   const [ready, setReady] = React.useState(false);
   const [loadError, setLoadError] = React.useState(false);
@@ -137,6 +196,7 @@ export function SceneHero({ onQuote, onGo }) {
     if (narrow || reduce) setMode('static');
   }, []);
 
+  progressRef.current = progress;
   const stage = stageAt(progress);
   targetStateRef.current = stage < 0 ? 'complete' : STAGES[stage].state;
 
@@ -181,6 +241,7 @@ export function SceneHero({ onQuote, onGo }) {
       renderer.toneMappingExposure = 1.05;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.localClippingEnabled = true;   // the envelope's top-down peel
       host.appendChild(renderer.domElement);
       Object.assign(renderer.domElement.style, { display: 'block', width: '100%', height: '100%' });
 
@@ -221,6 +282,10 @@ export function SceneHero({ onQuote, onGo }) {
       // colour, opacity and vertical offset towards the active state.
       let parts = [];
       let modelGroup = null;
+      // Envelope peel: a horizontal clipping plane keeps only what is below
+      // it; scrolling lowers it from above the roof to the ground.
+      const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e6);
+      let envelope = null, envTop = 0, envBottom = 0;
       let baseY = 0;
       const tmp = new THREE.Color();
       const accent = new THREE.Color(0xd6361f);
@@ -244,6 +309,12 @@ export function SceneHero({ onQuote, onGo }) {
             modelGroup.rotation.y = (elapsed / 30) * Math.PI * 2;
             const k = 1 - Math.pow(0.002, dt);
             const state = targetStateRef.current;
+            if (envelope) {
+              const p = progressRef.current;
+              let t = Math.min(1, Math.max(0, (p - PEEL_START) / (PEEL_END - PEEL_START)));
+              t = t * t * (3 - 2 * t);
+              clipPlane.constant = envTop + 0.3 - t * (envTop + 0.3 - (envBottom - 0.1));
+            }
             parts.forEach((part, i) => {
               const t = targetFor(part, i, state);
               part.mat.color.lerp(t.color, k);
@@ -280,6 +351,41 @@ export function SceneHero({ onQuote, onGo }) {
         scene.add(gltf.scene);
         modelGroup = gltf.scene;
         setReady(true);
+        // The same house as an architectural model, in the frame's own
+        // coordinates (centred on the frame's raw bounding box, so it sits at
+        // that box's centre inside the frame's scene).
+        if (HERO.envelope) {
+          const frameCentre = box.getCenter(new THREE.Vector3());
+          new GLTFLoader().load(HERO.envelope.src, (eg) => {
+            if (dead) return;
+            const tex = envelopeTextures(THREE);
+            eg.scene.traverse((o) => {
+              if (!o.isMesh) return;
+              const name = (o.material && o.material.name) || o.name;
+              let m;
+              if (name === 'siding') m = new THREE.MeshStandardMaterial({ map: tex.siding, roughness: 0.85, metalness: 0 });
+              else if (name === 'roof') m = new THREE.MeshStandardMaterial({ map: tex.shingles, roughness: 0.95, metalness: 0 });
+              // Tinted, mostly opaque glazing: the steel behind should read as a
+              // shadow in the room, not as a gap in the house.
+              else if (name === 'glass') m = new THREE.MeshPhysicalMaterial({ color: 0xa3b9cb, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.84, envMapIntensity: 1.4 });
+              else if (name === 'door') m = new THREE.MeshStandardMaterial({ color: 0x2f3a45, roughness: 0.55, metalness: 0.05 });
+              else if (name === 'chimney') m = new THREE.MeshStandardMaterial({ map: tex.brick, roughness: 0.9, metalness: 0 });
+              else if (name === 'slab') m = new THREE.MeshStandardMaterial({ color: 0xc9c7c1, roughness: 0.95, metalness: 0 });
+              else m = new THREE.MeshStandardMaterial({ color: 0xf7f6f2, roughness: 0.6, metalness: 0 });   // trim, fascia, frames
+              m.side = THREE.DoubleSide;
+              // The slab stays: the frame stands on it through every stage.
+              if (name !== 'slab') { m.clippingPlanes = [clipPlane]; m.clipShadows = true; }
+              o.material = m;
+              o.castShadow = name !== 'glass'; o.receiveShadow = true;
+            });
+            eg.scene.position.copy(frameCentre);
+            gltf.scene.add(eg.scene);
+            envelope = eg.scene;
+            gltf.scene.updateMatrixWorld(true);
+            const eb = new THREE.Box3().setFromObject(eg.scene);
+            envTop = eb.max.y; envBottom = eb.min.y + 0.3;   // stop at the slab's top
+          });
+        }
       }, undefined, () => { if (!dead) setLoadError(true); });
 
       cleanup = () => {

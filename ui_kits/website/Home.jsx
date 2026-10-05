@@ -300,7 +300,7 @@ function ProjectsGrid({ onGo }) {
               <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', borderRadius: 'var(--r-3)', border: 'var(--bw-hair) solid var(--border-subtle)', background: 'var(--surface-card)' }}
                 onClick={(e) => { if (p.model) e.stopPropagation(); }}>
                 {p.model ? (
-                  <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact />
+                  <ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact finish={p.system === 'Wood frame' ? 'wood' : undefined} />
                 ) : (
                   <img src={'/assets/frames/' + imgs[i % imgs.length] + '.jpg'} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 )}
@@ -864,7 +864,7 @@ function Technology() {
           <Reveal style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto' }}>
             <div style={label}>{T.eyebrow}</div>
             <h2 style={{ ...h2Style, color: 'var(--white)' }}>{T.title}</h2>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>
+            {T.intro && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>}
           </Reveal>
           {/* One line: centred when it fits, scrolls sideways when it doesn't */}
           <div className="ubc-pill-scroll" style={{ marginTop: 'var(--space-head-content)' }}>

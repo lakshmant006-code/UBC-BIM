@@ -99,3 +99,30 @@ export function AnimatedNumber({ value }) {
   }, []);
   return <span ref={ref}>{value}</span>;
 }
+
+// Sliding pill toggle (Careers role filter, Projects framing sub-tabs). The
+// accent mark glides under the pressed option. `options` are strings or
+// { value, label } objects; `label` names the group for screen readers.
+export function FilterPills({ options, value, onChange, label }) {
+  const groupRef = React.useRef(null);
+  const [mark, setMark] = React.useState(null);
+  const opts = options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o));
+  React.useLayoutEffect(() => {
+    const g = groupRef.current; if (!g) return undefined;
+    const place = () => {
+      const b = g.querySelector('[aria-pressed="true"]');
+      if (b) setMark({ left: b.offsetLeft, width: b.offsetWidth });
+    };
+    place();
+    const ro = new ResizeObserver(place); ro.observe(g);
+    return () => ro.disconnect();
+  }, [value]);
+  return (
+    <div ref={groupRef} className="ubc-pills" role="group" aria-label={label}>
+      {mark && <span className="ubc-pills-mark" aria-hidden="true" style={{ transform: 'translateX(' + mark.left + 'px)', width: mark.width }} />}
+      {opts.map((o) => (
+        <button key={o.value} type="button" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>{o.label}</button>
+      ))}
+    </div>
+  );
+}

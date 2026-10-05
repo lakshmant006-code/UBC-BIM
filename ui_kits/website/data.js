@@ -171,7 +171,43 @@ export const UBC_DATA = {
     { id: 'scs-five-level', name: 'Five-level steel frame', type: 'Multi-level', system: 'Light-gauge steel',
       size: '\u2248 39 \u00d7 68 ft overall (from model)', units: '5 levels \u00b7 12,883 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
-      model: { src: '/assets/models/scs-five-level.glb', radius: 20 } }
+      model: { src: '/assets/models/scs-five-level.glb', radius: 20 } },
+    // Five wood-frame IFCs the client supplied (repo root), converted with
+    // tools/ifc_to_glb.py. Wood, not LGSF, is read from each file: Asebedo and
+    // Cassia Street are Vertex BD timber models (LUMBER / LVL / I-JOIST
+    // materials, 2x4 and 2x6 studs, TJI joists); both Millbrook files are
+    // Revit timber-frame panel models (BP-Timber, Kerto LVL). Sizes are the
+    // model's own bounding box (Asebedo leaves out three stray ground-level
+    // pieces 6.5 m off the house), levels its IfcBuildingStorey entities,
+    // member counts its IfcColumn/IfcBeam/IfcMember elements, software the IFC
+    // header. The Millbrook location is the building address in the files
+    // (town only). Both Millbrook files carry a different plot number inside
+    // (24&25, 3) than their file names (20&21, 1); the file names are used.
+    { id: 'asebedo', name: 'Asebedo', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 131 \u00d7 67 ft overall (from model)', units: '1 storey \u00b7 2,836 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Vertex BD'],
+      model: { src: '/assets/models/asebedo.glb', radius: 21.8 } },
+    { id: 'cassia-street', name: 'Cassia Street', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 55 \u00d7 62 ft overall (from model)', units: '2 storeys \u00b7 2,588 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Vertex BD'],
+      model: { src: '/assets/models/cassia-street.glb', radius: 12.8 } },
+    { id: 'millbrook-plots-20-21', name: 'Millbrook, Plots 20 & 21', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 46 \u00d7 53 ft overall (from model)', units: '2 storeys \u00b7 1,123 model elements', location: 'Crowborough, UK',
+      delivered: 'Timber-frame panel model', software: ['Autodesk Revit'],
+      model: { src: '/assets/models/millbrook-plots-20-21.glb', radius: 13.5 } },
+    { id: 'millbrook-plot-1', name: 'Millbrook, Plot 1', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 39 \u00d7 39 ft overall (from model)', units: '2 storeys \u00b7 750 model elements', location: 'Crowborough, UK',
+      delivered: 'Timber-frame panel model', software: ['Autodesk Revit'],
+      model: { src: '/assets/models/millbrook-plot-1.glb', radius: 11.5 } },
+    // "Truss IFC" is a single Revit mesh (filed under Air Terminals) with no
+    // material or project data, so wood is read from the geometry instead:
+    // its members are solid 40 x 140 and 40 x 90 mm sections (2x6, 2x4
+    // lumber) and 150 mm square posts. Named by what it is until the client
+    // confirms the project.
+    { id: 'truss-model', name: 'Roof truss and wall frame', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 132 \u00d7 96 ft overall (from model)', units: 'Trusses and walls \u00b7 one mesh', location: 'Not specified',
+      delivered: 'Roof truss and wall framing model', software: ['Autodesk Revit'],
+      model: { src: '/assets/models/truss-model.glb', radius: 23.9 } }
   ],
   // Real logo/photo assets the client supplied directly (Client_Logos.zip,
   // Software_logos.zip, Machine_logo.zip), processed once (resized, no
@@ -632,41 +668,21 @@ UBC_DATA.beforeAfter = {
   start: 50
 };
 
-/* Contact page welcome scene. Two continuous shots, met at the door, then
-   walked into the studio, extracted to a frame sequence and scrubbed by
-   scroll, exactly like the home-page build sequence. `route` on a card is
-   handed back to the Contact page, which owns what each route does. */
+/* Contact page walk-in clip: a UBC BIM lead meeting two visitors at the
+   studio door and walking them into the office, encoded from the original
+   236-frame sequence (30 fps, ~7.9 s, no sound) to a small looping video.
+   Each stage's `t` is its position along the clip (fraction of the running
+   time), read off the frames: greeting to about frame 20, the door held open
+   around 90, inside from 121, the model table from roughly 196. */
 UBC_DATA.contactScene = {
-  seq: { prefix: '/assets/seq-contact/f_', count: 236, pad: 3, ext: '.jpg' },
-  seqMobile: { prefix: '/assets/seq-contact-m/f_', count: 236, pad: 3, ext: '.jpg' },
-  poster: '/assets/seq-contact/f_001.jpg',
-  // `t` is each stage's position along the scroll, read off the sequence:
-  // greeting to about frame 20, the door held open around 90, inside from 121,
-  // and the model table from roughly 196 on.
+  video: '/assets/contact/walk-in.mp4',
+  poster: '/assets/contact/walk-in-poster.jpg',
   stages: [
-    { n: '01', t: 0.00, title: 'Met at the door', note: 'You are met outside, not handed to a queue. One person owns the project from here on.' },
-    { n: '02', t: 0.09, title: 'Introductions', note: 'A short conversation about the building, the system and the deadline you are working to.' },
-    { n: '03', t: 0.38, title: 'Held open for you', note: 'Bring whatever you have: a plan set, a sketch, or a marked-up print.' },
-    { n: '04', t: 0.51, title: 'Into the studio', note: 'Past the modellers and detailers who will actually draw your frame.' },
-    { n: '05', t: 0.83, title: 'Around the model', note: 'Drawings on the table, the model on the wall, and a scope you can price.' }
-  ],
-  cards: [
-    { frame: 38, span: 20, side: 'right', route: 'chat',
-      eyebrow: 'Live chat', title: 'Say hello first',
-      body: 'A modeller answers in minutes during working hours. No forms, no gatekeeping, no sales script.',
-      cta: 'Start a chat' },
-    { frame: 100, span: 20, side: 'left', route: 'call',
-      eyebrow: 'Book a call', title: 'Fifteen minutes, your time zone',
-      body: 'Bring a plan set or a sketch. We will tell you what we would model, in what order, and how long it takes.',
-      cta: 'Open the scheduler' },
-    { frame: 150, span: 20, side: 'left', route: 'email',
-      eyebrow: 'Email or WhatsApp', title: 'Send the drawings over',
-      body: 'Architectural PDFs, a Revit model, or photos of a marked-up print: whatever you have is enough to start.',
-      cta: 'Email us' },
-    { frame: 214, span: 22, side: 'left', route: 'quote',
-      eyebrow: 'Send your project', title: 'Tell us about the project',
-      body: 'Building type, square footage and what you need modelled. You get a scope and a price, not a call-back.',
-      cta: 'Send Your Project \u2192' }
+    { n: '01', t: 0.00, title: 'Met at the door' },
+    { n: '02', t: 0.09, title: 'Introductions' },
+    { n: '03', t: 0.38, title: 'Held open for you' },
+    { n: '04', t: 0.51, title: 'Into the studio' },
+    { n: '05', t: 0.83, title: 'Around the model' }
   ]
 };
 
@@ -685,6 +701,14 @@ UBC_DATA.contactScene = {
    never pins the 3D). `camPos` is the fixed establishing shot. */
 UBC_DATA.hero = {
   model: { src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
+  // The same house as an architectural model: fibre-cement lap siding,
+  // asphalt shingles, white vinyl single-hung windows, panel entry doors and
+  // sliding glass in the widest openings (client's choices). Built from the
+  // M2 source IFC (tools/envelope_extract.py, then tools/build_envelope.py): every wall, opening and roof
+  // plane is taken from this frame's own studs, headers, sills and trusses,
+  // in the same coordinates as the frame GLB. Shown at stage 01, peeled away
+  // top-down while scrolling to stage 04.
+  envelope: { src: '/assets/models/mocking-bird-lot-2-envelope.glb' },
   camPos: [14.70, 11.99, 17.50],
   intro: {
     h1: 'CFS, LGSF & Wood Detailing, Engineered for Construction',
@@ -758,7 +782,6 @@ UBC_DATA.home = {
   technology: {
     eyebrow: 'Technology',
     title: 'Pick your roll-former. See exactly what lands on your line.',
-    intro: 'We model CFS, LGSF and wood framing in the software your machine already reads \u2014 so the files we send go straight to production, without a re-draw on your side.',
     youSend: ['Architectural drawings (PDF, DWG)', 'Structural requirements', 'Project scope'],
     shipsWith: ['Coordinated model (RVT \u00b7 IFC \u00b7 DWG)', 'Navisworks clash report (NWD \u00b7 PDF)', 'BOM (XLSX \u00b7 CSV)', 'Permit set (PDF, stamped where required)'],
     footer: 'Machine not listed? Tell us what you run \u2014 we\u2019ll confirm file compatibility before you commit.'

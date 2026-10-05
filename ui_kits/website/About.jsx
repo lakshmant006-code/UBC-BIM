@@ -75,7 +75,7 @@ function AboutHero({ onQuote }) {
 // downloads until someone presses play.
 function StepInside() {
   return (
-    <Section>
+    <Section id="step-inside" style={{ scrollMarginTop: 96 }}>
       <Page>
         <SectionHead eyebrow="Step inside" title="Pioneering BIM solutions for LGS and wood" center />
         <Reveal style={{ maxWidth: 1040, margin: 'var(--space-head-content) auto 0' }}>

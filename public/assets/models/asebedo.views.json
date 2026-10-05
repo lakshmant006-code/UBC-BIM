@@ -1,0 +1,76 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 21.755
+ },
+ "byClass": {
+  "IfcDoor": {
+   "center": [
+    -1.022,
+    -1.809,
+    -0.102
+   ],
+   "radius": 20.44,
+   "count": 40
+  },
+  "IfcOpeningElement": {
+   "center": [
+    0.0,
+    -0.012,
+    -0.051
+   ],
+   "radius": 22.347,
+   "count": 70
+  },
+  "IfcWindow": {
+   "center": [
+    0.463,
+    0.624,
+    -0.051
+   ],
+   "radius": 21.295,
+   "count": 30
+  },
+  "IfcBeam": {
+   "center": [
+    0.0,
+    -0.107,
+    0.864
+   ],
+   "radius": 24.642,
+   "count": 1064
+  },
+  "IfcBuildingElementPart": {
+   "center": [
+    -3.556,
+    -3.028,
+    -0.123
+   ],
+   "radius": 16.361,
+   "count": 44
+  },
+  "IfcColumn": {
+   "center": [
+    0.0,
+    0.394,
+    -0.051
+   ],
+   "radius": 21.837,
+   "count": 1716
+  },
+  "IfcMember": {
+   "center": [
+    2.743,
+    2.125,
+    0.864
+   ],
+   "radius": 11.284,
+   "count": 56
+  }
+ },
+ "byType": {}
+}

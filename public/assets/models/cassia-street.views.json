@@ -1,0 +1,67 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 12.759
+ },
+ "byClass": {
+  "IfcBeam": {
+   "center": [
+    -0.0,
+    0.064,
+    -0.203
+   ],
+   "radius": 13.067,
+   "count": 1201
+  },
+  "IfcColumn": {
+   "center": [
+    0.0,
+    -0.0,
+    -0.203
+   ],
+   "radius": 13.048,
+   "count": 1318
+  },
+  "IfcDoor": {
+   "center": [
+    -0.305,
+    -0.782,
+    0.216
+   ],
+   "radius": 12.003,
+   "count": 30
+  },
+  "IfcPlate": {
+   "center": [
+    0.207,
+    1.879,
+    -0.178
+   ],
+   "radius": 12.871,
+   "count": 238
+  },
+  "IfcMember": {
+   "center": [
+    -0.0,
+    3.438,
+    -0.272
+   ],
+   "radius": 10.627,
+   "count": 69
+  },
+  "IfcWindow": {
+   "center": [
+    0.0,
+    -0.997,
+    -0.559
+   ],
+   "radius": 11.822,
+   "count": 30
+  }
+ },
+ "byType": {}
+}

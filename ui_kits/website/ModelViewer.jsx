@@ -38,6 +38,8 @@
              drag/scroll/pan, so the only way the camera moves is a caller's
              own flyTo/reset calls (MockingBirdModel.jsx, for a guided,
              hotspot-driven view rather than a free-roam one).
+    finish   'wood' for a wood-frame project: timber surfaces get a matte
+             wood-grain material (applyWoodMaterials) instead of flat colour.
 */
 import React from 'react';
 import anime from 'animejs';
@@ -101,7 +103,10 @@ export function applySteelMaterials(THREE, root) {
     if (!o.isMesh || !o.material) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     const next = mats.map((m) => {
-      if (!m.color) return m;
+      // Wood surfaces are settled already: a pale timber tone sits inside
+      // the yellow band above, which is exactly how a wood frame used to
+      // come out as brushed steel.
+      if (!m.color || (m.userData && m.userData.wood)) return m;
       if (!isSteelColor(m.color, m.opacity)) {
         if (m.envMapIntensity == null || m.envMapIntensity === 1) m.envMapIntensity = 0.75;
         m.needsUpdate = true;
@@ -111,6 +116,102 @@ export function applySteelMaterials(THREE, root) {
       const steel = makeSteelMaterial(THREE);
       m.dispose();
       return steel;
+    });
+    o.material = Array.isArray(o.material) ? next : next[0];
+  });
+}
+
+// Wood-frame projects (finish="wood"): the timber in these exports carries a
+// warm, flat colour per material (Vertex BD LUMBER / LVL / I-JOIST, Revit
+// BP-Timber and plywood), which the studio light washes out to a pale grey
+// that reads as steel. Those surfaces get a matte wood-grain material instead.
+// Timber is told apart by colour, as with steel above: a warm hue with
+// moderate chroma. The vivid orange Vertex BD gives real steel (chroma ~0.6)
+// sits above the band, and white PVC windows, glass, concrete and galvanised
+// webs (all neutral) sit below it, so they keep their own colours. Parts the
+// converter could not style (its DEFAULT_RGBA) and a model with only one
+// unstyled colour (a mesh-only export) are timber too in a wood-frame model.
+function isTimberColor(color, opacity) {
+  if (opacity != null && opacity < 0.98) return false;
+  const { r, g, b } = color;
+  const hsl = { h: 0, s: 0, l: 0 };
+  color.getHSL(hsl);
+  const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+  const warm = hsl.h > 0.04 && hsl.h < 0.18 && chroma > 0.1 && chroma < 0.55 && hsl.l > 0.3;
+  const unstyled = Math.abs(r - 0.42) < 0.02 && Math.abs(g - 0.49) < 0.02 && Math.abs(b - 0.58) < 0.02;
+  return warm || unstyled;
+}
+// Light SPF framing lumber: fine, slightly wavy grain lines along the board
+// with soft growth-ring bands and a few darker streaks. Built once and shared.
+let woodTex = null;
+function woodTexture(THREE) {
+  if (woodTex) return woodTex;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 512;
+  const x = c.getContext('2d');
+  x.fillStyle = '#d9b47e'; x.fillRect(0, 0, 256, 512);
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 70; i++) {           // grain lines run along the board (v)
+    const x0 = rnd() * 256, amp = 2 + rnd() * 5, ph = rnd() * 6.28, dark = rnd() < 0.25;
+    x.strokeStyle = dark ? 'rgba(120,78,38,0.30)' : 'rgba(150,104,58,0.16)';
+    x.lineWidth = dark ? 1.6 + rnd() * 1.4 : 0.8 + rnd();
+    x.beginPath();
+    for (let y = 0; y <= 512; y += 8) {
+      const xx = x0 + Math.sin(y / 60 + ph) * amp;
+      if (y === 0) x.moveTo(xx, y); else x.lineTo(xx, y);
+    }
+    x.stroke();
+  }
+  for (let i = 0; i < 6; i++) {            // broad latewood bands
+    x.fillStyle = 'rgba(176,124,66,' + (0.06 + rnd() * 0.06) + ')';
+    x.fillRect(rnd() * 256, 0, 10 + rnd() * 26, 512);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; t.encoding = THREE.sRGBEncoding;
+  woodTex = t;
+  return t;
+}
+// The converted meshes carry no UVs. Box-project them in metres from each
+// vertex's dominant normal so the grain has a real scale; on side faces the
+// grain runs vertically (most framing faces are studs), on top and bottom
+// faces it runs along x.
+function addBoxUVs(geometry) {
+  if (geometry.attributes.uv) return;
+  if (!geometry.attributes.normal) geometry.computeVertexNormals();
+  const p = geometry.attributes.position, n = geometry.attributes.normal;
+  const uv = new Float32Array(p.count * 2);
+  const S = 1 / 0.9;                         // one texture tile per 0.9 m
+  for (let i = 0; i < p.count; i++) {
+    const nx = Math.abs(n.getX(i)), ny = Math.abs(n.getY(i)), nz = Math.abs(n.getZ(i));
+    let u, v;
+    if (ny >= nx && ny >= nz) { u = p.getZ(i); v = p.getX(i); }
+    else if (nx >= nz) { u = p.getZ(i); v = p.getY(i); }
+    else { u = p.getX(i); v = p.getY(i); }
+    uv[i * 2] = u * S * 0.5; uv[i * 2 + 1] = v * S;
+  }
+  geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+}
+export function applyWoodMaterials(THREE, root) {
+  const meshes = [];
+  root.traverse((o) => { if (o.isMesh && o.material) meshes.push(o); });
+  const single = meshes.length === 1;
+  meshes.forEach((o) => {
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    const next = mats.map((m) => {
+      if (!m.color || !(single || isTimberColor(m.color, m.opacity))) return m;
+      // Some Vertex BD faces come through with a normal that disagrees with
+      // their winding, which lights them near-black (the dark, steel-looking
+      // patches). Flat per-face normals plus two-sided lighting make every
+      // face of a board light the same way.
+      if (o.geometry.index) { const g = o.geometry.toNonIndexed(); o.geometry.dispose(); o.geometry = g; }
+      o.geometry.computeVertexNormals();
+      addBoxUVs(o.geometry);
+      // Keep a little of each material's own tone, so lumber, LVL and
+      // plywood still read as different stock.
+      const tint = new THREE.Color(0xffffff).lerp(m.color, single ? 0 : 0.35);
+      const wood = new THREE.MeshStandardMaterial({ map: woodTexture(THREE), color: tint, roughness: 0.78, metalness: 0, envMapIntensity: 0.55, side: THREE.DoubleSide });
+      wood.userData.wood = true;
+      m.dispose();
+      return wood;
     });
     o.material = Array.isArray(o.material) ? next : next[0];
   });
@@ -188,7 +289,7 @@ export function bounceHandlers(ref) {
   return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }
 
-export function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady }) {
+export function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady, finish }) {
   const wrapRef = React.useRef(null);
   const hostRef = React.useRef(null);
   const apiRef = React.useRef(null);
@@ -410,6 +511,7 @@ export function ModelViewer({ src, radius, title, height, compact, bare, initial
         floorOffsetY = -box.min.y;
         floorOffsetRef.current = floorOffsetY;
         gltf.scene.position.y = floorOffsetY;
+        if (finish === 'wood') applyWoodMaterials(THREE, gltf.scene);
         applySteelMaterials(THREE, gltf.scene);
         gltf.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
         scene.add(gltf.scene);
