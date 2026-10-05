@@ -5,10 +5,9 @@
   frame from About and the homepage) with its own interactions:
 
   - HangingTag: the "Hire me" tag, the page's main ad, hangs from a nail on
-    a stiff spring so it swings fast. It shakes (a form field's "rejected"
-    jolt) when it first shows and when the pointer reaches it; brushing past
-    swings it; it can be grabbed and flung; a tap (or Enter/Space, it is a
-    real button) opens the quote drawer.
+    the wall. It drops onto the nail in free fall and swings as a gravity
+    pendulum; hovering tilts it in 3D with its wall shadow and a sheen
+    shifting for depth; a tap (or Enter/Space) opens the quote drawer.
   - Role plates: each open role (UBC_DATA.roles) gets a live Hairline line
     drawing that answers the pointer, and the site's hover glow.
   - Filter pills: All / location / contract type, with a sliding marker.
@@ -49,128 +48,88 @@ const ROLE_FIGURE = {
 };
 const reduceMotion = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ---------- Swing: a spring pendulum hung from a nail ----------
-// Used by the hero tag. The arm (string + card)
-// rotates about the top of `wrap`. Brushing past pushes it, it can be
-// grabbed and flung (the drag only starts once the pointer moves, so a tap
-// stays a click), and shake() gives the quick side-to-side jolt of a form
-// field rejecting input. `stiffness`/`damping` are per frame: higher
-// stiffness swings faster.
-function useSwing({ stiffness = 0.02, damping = 0.035 } = {}) {
+// ---------- Hanging "Hire me" tag ----------
+// Hung on a nail against the wall. When it first comes into view it drops
+// onto the nail in free fall, then swings as a real pendulum under gravity
+// (long, slow, lightly damped swings that die away on their own; no
+// spring). The pointer doesn't push it around: hovering tilts it in 3D
+// towards the cursor while its shadow on the wall and a light sheen shift
+// the other way, for depth. A tap (or Enter/Space, it is a real button)
+// opens the quote drawer. Static under reduced motion.
+function HangingTag({ onQuote }) {
   const wrapRef = React.useRef(null);
   const armRef = React.useRef(null);
-  const sim = React.useRef(null);
+  const tagRef = React.useRef(null);
 
   React.useEffect(() => {
     const wrap = wrapRef.current, arm = armRef.current;
     if (!wrap || !arm) return undefined;
-    const s = { a: 0, v: 0, raf: 0, drag: false, moved: 0, lastX: null, suppress: false };
-    sim.current = s;
-    const still = reduceMotion();
-    const clamp = (x, m) => Math.max(-m, Math.min(m, x));
-    const paint = () => { arm.style.transform = 'rotate(' + s.a.toFixed(2) + 'deg)'; };
+    if (reduceMotion()) return undefined;
+    // Free fall: y (px) accelerates under gravity until the string goes
+    // taut at y = 0. Then a pendulum: th'' = -(g/L) sin(th) - c th'
+    // (per frame; g/L gives a ~1.6 s period, c a slow decay).
+    const G_FALL = 1.1, G_L = 0.0043, C = 0.016;
+    let y = -90, vy = 0, th = 0.32, w = 0, phase = 'idle', raf = 0;
+    const paint = () => { arm.style.transform = 'translateY(' + y.toFixed(1) + 'px) rotate(' + (th * 180 / Math.PI).toFixed(2) + 'deg)'; };
     const step = () => {
-      if (!s.drag) { s.v += -stiffness * s.a - damping * s.v; s.a = clamp(s.a + s.v, 70); }
+      if (phase === 'fall') {
+        vy += G_FALL; y += vy;
+        if (y >= 0) { y = 0; phase = 'swing'; w = -0.012; }
+      } else {
+        w += -G_L * Math.sin(th) - C * w; th += w;
+      }
       paint();
-      if (s.drag || Math.abs(s.a) > 0.03 || Math.abs(s.v) > 0.03) s.raf = requestAnimationFrame(step);
-      else { s.a = 0; s.v = 0; paint(); s.raf = 0; }
+      if (phase === 'fall' || Math.abs(th) > 0.0015 || Math.abs(w) > 0.0015) raf = requestAnimationFrame(step);
+      else { th = 0; w = 0; paint(); raf = 0; }
     };
-    const kick = () => { if (!s.raf && !still) s.raf = requestAnimationFrame(step); };
-    s.nudge = (dv) => { if (still) return; s.v = clamp(s.v + dv, 8); kick(); };
-    s.shake = (power = 4) => { if (still) return; s.v = (s.v >= 0 ? -1 : 1) * power; kick(); };
-
-    // Brushing past: the pointer's sideways speed pushes the arm.
-    const onBrush = (e) => {
-      if (s.drag || e.pointerType === 'touch') { s.lastX = e.clientX; return; }
-      if (s.lastX != null) s.nudge(clamp((s.lastX - e.clientX) * 0.06, 1.6));
-      s.lastX = e.clientX;
-    };
-    const onLeave = () => { s.lastX = null; };
-    const pin = () => { const r = wrap.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top }; };
-    let press = null;
-    const onMove = (e) => {
-      if (!press) return;
-      const dx = e.clientX - press.x, dy = e.clientY - press.y;
-      if (!s.drag && Math.hypot(dx, dy) < 5) return;
-      if (!s.drag) { s.drag = true; s.moved = 0; kick(); }
-      const p = pin();
-      const target = clamp(-Math.atan2(e.clientX - p.x, Math.max(20, e.clientY - p.y)) * 180 / Math.PI, 70);
-      s.v = target - s.a; s.a = target;
-      s.moved += Math.abs(e.clientX - (s.lastX == null ? e.clientX : s.lastX));
-      s.lastX = e.clientX;
-    };
-    const onUp = () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-      press = null;
-      if (!s.drag) return;
-      s.drag = false; s.v = clamp(s.v, 8); kick();
-      // A fling can end in a click event too; swallow just that one.
-      s.suppress = true; setTimeout(() => { s.suppress = false; }, 80);
-    };
-    const onDown = (e) => {
-      if (still || e.button > 0) return;
-      press = { x: e.clientX, y: e.clientY }; s.lastX = e.clientX;
-      window.addEventListener('pointermove', onMove);
-      window.addEventListener('pointerup', onUp);
-      window.addEventListener('pointercancel', onUp);
-    };
-
-    wrap.addEventListener('pointermove', onBrush);
-    wrap.addEventListener('pointerleave', onLeave);
-    arm.addEventListener('pointerdown', onDown);
-    return () => {
-      cancelAnimationFrame(s.raf);
-      wrap.removeEventListener('pointermove', onBrush);
-      wrap.removeEventListener('pointerleave', onLeave);
-      arm.removeEventListener('pointerdown', onDown);
-      onUp();
-    };
-  }, [stiffness, damping]);
-
-  // Wraps a click handler so the click that ends a fling is ignored.
-  const guard = (fn) => (e) => {
-    const s = sim.current;
-    if (s && s.suppress) { s.suppress = false; return; }
-    fn(e);
-  };
-  return { wrapRef, armRef, sim, guard };
-}
-
-// ---------- Hanging "Hire me" tag ----------
-function HangingTag({ onQuote }) {
-  const { wrapRef, armRef, sim, guard } = useSwing({ stiffness: 0.07, damping: 0.09 });
-  const onClick = guard(() => onQuote());
-  const shake = (power) => sim.current && sim.current.shake && sim.current.shake(power);
-  // A first shake once the tag is properly in view.
-  React.useEffect(() => {
-    const el = wrapRef.current; if (!el) return undefined;
+    arm.style.opacity = '0'; paint();
     const io = new IntersectionObserver((e) => {
       if (!e[0].isIntersecting) return;
       io.disconnect();
-      setTimeout(() => shake(7), 700);
-    }, { threshold: 0.6 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+      setTimeout(() => { arm.style.opacity = ''; phase = 'fall'; raf = requestAnimationFrame(step); }, 250);
+    }, { threshold: 0.5 });
+    io.observe(wrap);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); arm.style.opacity = ''; };
+  }, []);
+
+  // Depth: tilt toward the pointer; the shadow and sheen move with it.
+  const onMove = (e) => {
+    const t = tagRef.current; if (!t || reduceMotion()) return;
+    const r = t.getBoundingClientRect();
+    const px = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+    const py = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+    t.style.setProperty('--rx', (-py * 10).toFixed(2) + 'deg');
+    t.style.setProperty('--ry', (px * 14).toFixed(2) + 'deg');
+    t.style.setProperty('--sx', (-px * 14).toFixed(1) + 'px');
+    t.style.setProperty('--sy', (10 - py * 6).toFixed(1) + 'px');
+    t.style.setProperty('--gx', ((px + 1) * 50).toFixed(0) + '%');
+    t.style.setProperty('--gy', ((py + 1) * 50).toFixed(0) + '%');
+    t.classList.add('is-tilt');
+  };
+  const onLeave = () => {
+    const t = tagRef.current; if (!t) return;
+    ['--rx', '--ry', '--sx', '--sy', '--gx', '--gy'].forEach((k) => t.style.removeProperty(k));
+    t.classList.remove('is-tilt');
+  };
 
   return (
-    <div ref={wrapRef} className="ubc-tag-wrap" onPointerEnter={() => shake(4.5)}>
+    <div ref={wrapRef} className="ubc-tag-wrap" onPointerMove={onMove} onPointerLeave={onLeave}>
       <span className="ubc-tag-pin" aria-hidden="true" />
       <div ref={armRef} className="ubc-tag-arm">
         <span className="ubc-tag-string" aria-hidden="true" />
-        <button type="button" className="ubc-tag" onClick={onClick}
-          onFocus={() => shake(4)}
-          aria-label="Hire the team: send us your project">
-          <span className="ubc-tag-hole" aria-hidden="true" />
-          <span className="ubc-tag-kicker">Hire me</span>
-          <span className="ubc-tag-name">UBC BIM</span>
-          <span className="ubc-tag-rule" aria-hidden="true" />
-          <span className="ubc-tag-foot">Wood · LGS · MEP</span>
-        </button>
+        <div ref={tagRef} className="ubc-tag-depth">
+          <span className="ubc-tag-shadow" aria-hidden="true" />
+          <button type="button" className="ubc-tag" onClick={() => onQuote()}
+            aria-label="Hire the team: send us your project">
+            <span className="ubc-tag-hole" aria-hidden="true" />
+            <span className="ubc-tag-kicker">Hire me</span>
+            <span className="ubc-tag-name">UBC BIM</span>
+            <span className="ubc-tag-rule" aria-hidden="true" />
+            <span className="ubc-tag-foot">Wood · LGS · MEP</span>
+            <span className="ubc-tag-sheen" aria-hidden="true" />
+          </button>
+        </div>
       </div>
-      <p className="ubc-tag-hint" aria-hidden="true">Give it a push</p>
     </div>
   );
 }
