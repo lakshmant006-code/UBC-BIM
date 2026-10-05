@@ -50,16 +50,26 @@
 }
 
 /* ---------- Header ----------
-   Wordmark on the left, the nav pill centred. "Request Quote" is the
-   floating StickyQuote button, not part of the header. Below 940px the pill
-   is hidden (its links are repeated in the footer). */
+   Wordmark on the left, the nav pill centred, the standalone "Request
+   Quote" button just right of it. Below 940px the pill is hidden (its links
+   are repeated in the footer) and the button moves to the right edge. */
 .ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
+.ubc-header-row > * { pointer-events: auto; }   /* the header itself lets clicks through to the page */
 .ubc-header-row > a { justify-self: start; }
+.ubc-header-cta {
+  grid-column: 3; justify-self: start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px;
+  border: 0; border-radius: 999px; cursor: pointer; background: var(--accent); color: var(--white); white-space: nowrap;
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600;
+  transition: background-color 160ms var(--ease-out);
+}
+.ubc-header-cta:hover { background: var(--accent-press); }
+.ubc-header-cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 /* Header nav pill (components/navigation/Header.jsx NavPill): the links in
    one rounded pill with a small mark at each end. */
 .ubc-navpill {
   display: flex; align-items: center; gap: 2px; padding: 3px;
-  border: 1px solid #D9DFE6; border-radius: 999px; background: rgba(255,255,255,.9);
+  border: 1px solid #D9DFE6; border-radius: 999px; background: var(--white);
+  box-shadow: 0 6px 18px -14px rgba(14,19,24,.35);
 }
 .ubc-navpill-end { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-muted); }
 .ubc-navpill-menu svg { fill: currentColor; }
@@ -79,8 +89,14 @@
   .ubc-navpill-link { padding: 0 9px; }
   .ubc-navpill-link.is-on::after { left: 9px; right: 9px; }
 }
+@media (max-width: 1180px) {
+  /* Not enough room to centre the pill: pill and button sit together on the right. */
+  .ubc-header-row { display: flex !important; }
+  .ubc-navpill { margin-left: auto; }
+}
 @media (max-width: 940px) {
   .ubc-navpill { display: none !important; }
+  .ubc-header-cta { margin-left: auto; }
 }
 
 /* ---------- Phones ---------- */

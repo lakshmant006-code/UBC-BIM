@@ -62,7 +62,7 @@ export function AppChrome({ children }) {
 
   return (
     <>
-      <Header items={NAV} active={active} scrolled={scrolled} />
+      <Header items={NAV} active={active} scrolled={scrolled} onQuote={openQuote} />
       <QuoteDrawerProvider open={openQuote}>
         {children}
       </QuoteDrawerProvider>

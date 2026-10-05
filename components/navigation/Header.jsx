@@ -17,9 +17,9 @@ const NAV = [
 const idToHref = (id) => (id === 'home' ? '/' : '/' + id);
 
 // The nav links sit in a pill with a small mark at each end; it stays the
-// same open pill at any scroll position. "Request Quote" is not here: it is
-// the floating StickyQuote button. Styles: .ubc-navpill-* in
-// ui_kits/website/responsive.css.
+// same open pill at any scroll position. The standalone "Request Quote"
+// button sits just right of it (Header below). Styles: .ubc-navpill-* and
+// .ubc-header-cta in ui_kits/website/responsive.css.
 function NavPill({ items, active }) {
   return (
     <nav aria-label="Main" className="ubc-navpill">
@@ -44,14 +44,12 @@ function NavPill({ items, active }) {
   );
 }
 
-export function Header({ items = NAV, active, scrolled, style, ...rest }) {
+export function Header({ items = NAV, active, scrolled, onQuote, style, ...rest }) {
   return (
     <header {...rest} style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: scrolled ? 'rgba(255,255,255,.82)' : 'var(--surface-page)',
-      backdropFilter: scrolled ? 'var(--blur-panel)' : 'none',
-      WebkitBackdropFilter: scrolled ? 'var(--blur-panel)' : 'none',
-      transition: 'background var(--dur-2) var(--ease-out)',
+      // No bar behind the header: the logo, nav pill and button float.
+      background: 'transparent', pointerEvents: 'none',
       ...style
     }}>
       <div className="ubc-header-row" style={{
@@ -62,6 +60,7 @@ export function Header({ items = NAV, active, scrolled, style, ...rest }) {
           <Wordmark size={21} />
         </Link>
         <NavPill items={items} active={active} />
+        <button type="button" className="ubc-header-cta" onClick={onQuote}>Request Quote {'\u2192'}</button>
       </div>
     </header>
   );
