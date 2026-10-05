@@ -10,7 +10,7 @@ import { Hotspot } from '../../components/model/Hotspot.jsx';
 import { SpecPanel } from '../../components/model/SpecPanel.jsx';
 import { FilterBar } from '../../components/navigation/FilterBar.jsx';
 import { UBC_DATA } from './data.js';
-import { Page, Section, Reveal } from './shared.jsx';
+import { Page, Section, Reveal, FilterPills } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
@@ -80,15 +80,17 @@ function ProjectDetail({ project, onBack, onQuote }) {
   );
 }
 
-// The page is split by framing system first: wood frame, then light-gauge
-// steel, then anything else (structural steel, mixed). Each group keeps its
-// own heading and grid; the filter narrows within them.
+// Two levels: building type first (Residential, Commercial, Multi-level),
+// then framing system inside it (LGSF or Wood, plus Other only where a type
+// has a structural-steel or mixed project). Each type opens on its first
+// framing system that has projects.
+const TYPES = ['Residential', 'Commercial', 'Multi-level'];
 const FRAMES = [
-  { key: 'Wood frame', title: 'Wood frame', test: (p) => p.system === 'Wood frame' },
-  { key: 'Light-gauge steel', title: 'Light-gauge steel (LGSF)', test: (p) => p.system === 'Light-gauge steel' },
-  { key: 'Other', title: 'Other framing systems', test: (p) => p.system !== 'Wood frame' && p.system !== 'Light-gauge steel' }
+  { key: 'lgsf', label: 'LGSF', title: 'Light-gauge steel (LGSF)', test: (p) => p.system === 'Light-gauge steel' },
+  { key: 'wood', label: 'Wood', title: 'Wood frame', test: (p) => p.system === 'Wood frame' },
+  { key: 'other', label: 'Other', title: 'Other framing systems', test: (p) => p.system !== 'Wood frame' && p.system !== 'Light-gauge steel' }
 ];
-const FILTERS = ['All', 'Wood frame', 'Light-gauge steel', 'Residential', 'Commercial', 'Multi-level'];
+const firstFrame = (items) => (FRAMES.find((f) => items.some(f.test)) || FRAMES[0]).key;
 
 function ProjectCard({ p, onOpen }) {
   return (
@@ -115,14 +117,23 @@ export function Portfolio() {
   const onQuote = useQuoteDrawer();
   const D = UBC_DATA;
   // One-shot deep link: another page can set window.UBC_NAV_FILTER before
-  // navigating here (e.g. the LGSF tab on the build-sequence hero).
-  const [filter, setFilter] = React.useState(() => {
-    if (typeof window === 'undefined') return 'All';
-    const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null; return f || 'All';
-  });
+  // navigating here, naming a building type or a framing system.
+  const [type, setType] = React.useState('Residential');
+  const [frame, setFrame] = React.useState(() => firstFrame(D.projects.filter((p) => p.type === 'Residential')));
+  React.useEffect(() => {
+    const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null;
+    if (!f) return;
+    if (TYPES.includes(f)) { setType(f); setFrame(firstFrame(D.projects.filter((p) => p.type === f))); }
+    else if (/steel|lgsf/i.test(f)) setFrame('lgsf');
+    else if (/wood/i.test(f)) setFrame('wood');
+  }, [D.projects]);
   const [open, setOpen] = React.useState(null);
-  const list = D.projects.filter((p) => filter === 'All' || p.type === filter || p.system === filter);
-  const groups = FRAMES.map((g) => ({ ...g, items: list.filter(g.test) })).filter((g) => g.items.length);
+  const ofType = D.projects.filter((p) => p.type === type);
+  const frameOpts = FRAMES.filter((f) => f.key !== 'other' || ofType.some(f.test))
+    .map((f) => ({ value: f.key, label: f.label + ' (' + ofType.filter(f.test).length + ')' }));
+  const current = FRAMES.find((f) => f.key === frame) || FRAMES[0];
+  const list = ofType.filter(current.test);
+  const pickType = (t) => { setType(t); setFrame(firstFrame(D.projects.filter((p) => p.type === t))); };
   // Opening a project is local state, not a page change, so nothing else
   // resets scroll: without this the live model can land scrolled out of
   // view if the grid card that opened it was well down the page.
@@ -135,27 +146,30 @@ export function Portfolio() {
         <SectionHeading eyebrow="3D Project Lab" title="Rotate a project, read its spec, ask for a quote" size="lg"
           standfirst="Our wood-frame and light-gauge-steel projects, each with a live model, its specification and the files we delivered." />
         <div style={{ marginTop: 'var(--s-7)' }}>
-          <FilterBar options={FILTERS} value={filter} onChange={setFilter} count={list.length} />
+          <FilterBar options={TYPES} value={type} onChange={pickType} count={ofType.length} />
         </div>
-        {groups.map((g) => (
-          <section key={g.key} className="ubc-frame-group" aria-labelledby={'frame-' + g.key.replace(/\W+/g, '-').toLowerCase()}>
-            <div className="ubc-frame-group-head">
-              <h2 id={'frame-' + g.key.replace(/\W+/g, '-').toLowerCase()}>{g.title}</h2>
-              <span>{g.items.length} {g.items.length === 1 ? 'project' : 'projects'}</span>
-            </div>
-            {/* This grid carries live orbitable models, not just photos, so it
-                needs to be usable on a phone rather than squeezing three
-                columns into 390px. ubc-proj-grid already drops to one column
-                below 900px for the Home page's grid; reused here. */}
-            <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)' }}>
-              {g.items.map((p, i) => (
+        <div className="ubc-proj-sub">
+          <FilterPills options={frameOpts} value={frame} onChange={setFrame} label={type + ' projects by framing system'} />
+        </div>
+        <section className="ubc-frame-group" aria-labelledby="proj-group-head">
+          <div className="ubc-frame-group-head">
+            <h2 id="proj-group-head">{type} · {current.title}</h2>
+            <span>{list.length} {list.length === 1 ? 'project' : 'projects'}</span>
+          </div>
+          {list.length ? (
+            // Live orbitable models, not photos, so the grid must stay usable
+            // on a phone: ubc-proj-grid drops to one column below 900px.
+            <div key={type + frame} className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)' }}>
+              {list.map((p, i) => (
                 <Reveal key={p.id} delay={i * 60}>
                   <ProjectCard p={p} onOpen={openProject} />
                 </Reveal>
               ))}
             </div>
-          </section>
-        ))}
+          ) : (
+            <p className="ubc-proj-empty">No {current.label === 'Wood' ? 'wood-frame' : current.label === 'LGSF' ? 'light-gauge-steel' : ''} {type.toLowerCase()} projects on the site yet.</p>
+          )}
+        </section>
       </Page>
     </Section>
   );

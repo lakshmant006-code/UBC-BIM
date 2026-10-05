@@ -31,7 +31,7 @@ import { Input } from '../../components/forms/Input.jsx';
 import { Select } from '../../components/forms/Select.jsx';
 import { Textarea } from '../../components/forms/Textarea.jsx';
 import { UBC_DATA } from './data.js';
-import { Page, Section, Reveal } from './shared.jsx';
+import { Page, Section, Reveal, FilterPills } from './shared.jsx';
 import { HairlineFigure } from './hairline/HairlineFigure.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
@@ -262,29 +262,6 @@ function ApplyDialog({ role, onClose }) {
 }
 
 // ---------- Open roles ----------
-function FilterPills({ options, value, onChange }) {
-  const groupRef = React.useRef(null);
-  const [mark, setMark] = React.useState(null);
-  React.useLayoutEffect(() => {
-    const g = groupRef.current; if (!g) return undefined;
-    const place = () => {
-      const b = g.querySelector('[aria-pressed="true"]');
-      if (b) setMark({ left: b.offsetLeft, width: b.offsetWidth });
-    };
-    place();
-    const ro = new ResizeObserver(place); ro.observe(g);
-    return () => ro.disconnect();
-  }, [value]);
-  return (
-    <div ref={groupRef} className="ubc-pills" role="group" aria-label="Filter roles">
-      {mark && <span className="ubc-pills-mark" aria-hidden="true" style={{ transform: 'translateX(' + mark.left + 'px)', width: mark.width }} />}
-      {options.map((o) => (
-        <button key={o} type="button" aria-pressed={value === o} onClick={() => onChange(o)}>{o}</button>
-      ))}
-    </div>
-  );
-}
-
 function OpenRoles({ onApply }) {
   const [filter, setFilter] = React.useState('All');
   const options = ['All', ...new Set(ROLES.flatMap((r) => [r.place, r.type]))];
@@ -298,7 +275,7 @@ function OpenRoles({ onApply }) {
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>{ROLES.length} roles open now</h2>
         </Reveal>
         <div className="ubc-roles-bar">
-          <FilterPills options={options} value={filter} onChange={setFilter} />
+          <FilterPills options={options} value={filter} onChange={setFilter} label="Filter roles" />
           <p aria-live="polite" style={{ ...eyebrowStyle, margin: 0 }}>Showing {shown} of {ROLES.length}</p>
         </div>
         <ul className="ubc-role-cards">

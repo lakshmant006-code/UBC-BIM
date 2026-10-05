@@ -666,3 +666,7 @@
 .ubc-frame-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; padding-bottom: var(--s-3); margin-bottom: var(--s-5); border-bottom: var(--bw-hair) solid var(--border-subtle); }
 .ubc-frame-group-head h2 { margin: 0; font-family: var(--font-serif); font-weight: 500; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-strong); }
 .ubc-frame-group-head span { font-family: var(--font-mono); font-size: var(--fs-caption); line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-faint); }
+/* Projects: framing sub-tabs (LGSF / Wood) under the building-type tabs. */
+.ubc-proj-sub { margin-top: var(--s-5); }
+.ubc-proj-sub + .ubc-frame-group { margin-top: var(--s-7); }
+.ubc-proj-empty { margin: var(--s-6) 0 0; font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.6; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-muted); }
