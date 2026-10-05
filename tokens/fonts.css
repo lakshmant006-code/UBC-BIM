@@ -1,5 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 /* Per the homepage developer handoff: Archivo for headings, IBM Plex Sans
-   for body copy, IBM Plex Mono for labels. --font-serif is the name most
-   page headings were written against, so it aliases the heading face. */
-:root{--font-display:"Archivo","Helvetica Neue",Arial,sans-serif;--font-body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,monospace;--font-serif:"Archivo","Helvetica Neue",Arial,sans-serif}
+   for body copy and labels (labels were IBM Plex Mono; the client asked
+   for sans-serif everywhere, so --font-mono now points at the sans body
+   face and every label follows). --font-serif is the name most page
+   headings were written against, so it aliases the heading face. */
+:root{--font-display:"Archivo","Helvetica Neue",Arial,sans-serif;--font-body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--font-serif:"Archivo","Helvetica Neue",Arial,sans-serif}

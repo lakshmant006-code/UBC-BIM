@@ -1,10 +1,9 @@
 'use client';
 /*
   MockingBirdModel: the site's "Services" page. No tab strip any more: the
-  6 service categories are a list beside one hairline isometric building
-  (ServicesOverview + ServicesIsometric.jsx). Hovering a service previews
-  its part of the building; clicking selects it and shows its write-up
-  below. Modeling and detailing's two 3D panel models (below) open from
+  6 service categories are cards (ServicesOverview), each with a live
+  construction line drawing on the Hairline engine (hairline/) that answers
+  the pointer; "Read more" shows that service's write-up below. Modeling and detailing's two 3D panel models (below) open from
   buttons above its write-up, with a "Back to services" button. (Project management and training services were dropped
   from this list entirely, per feedback on the live page — not hidden, not
   marked pending, just removed from UBC_DATA.serviceArticles.)
@@ -56,7 +55,7 @@ import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { ServicesDetail } from './ServicesDetail.jsx';
-import { ServicesIsometric } from './ServicesIsometric.jsx';
+import { HairlineFigure } from './hairline/HairlineFigure.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 
 // Which top-level tabs carry their own dropdown, and what's in it. Only
@@ -69,15 +68,21 @@ const SERVICE_SUB_TABS = {
   ]
 };
 
-// Services overview: no tab strip. The service list sits beside one
-// hairline isometric building (ServicesIsometric.jsx); hovering or
-// focusing a service previews its part of the building, clicking selects
-// it and shows its write-up below. Modeling and detailing also opens the
-// two guided 3D panel models.
+// Services overview: no tab strip. Each service is a card ("plate", after
+// the Hairline Figure Library) with a live construction line drawing that
+// answers the pointer on the Hairline engine's physics (hairline/). Clicking
+// a card shows that service's write-up below; Modeling and detailing also
+// opens the two guided 3D panel models.
+const SERVICE_FIGURES = {
+  'drafting-architectural': { figure: 'drafting', hint: 'Move across to open the drawing set' },
+  'bom-estimation': { figure: 'bom', hint: 'Move up and down to pull out materials' },
+  'permit-sets': { figure: 'permit', hint: 'Point at a sheet to lift it' },
+  'modeling-detailing': { figure: 'modeling', hint: 'Move over the panel to lift members' },
+  engineering: { figure: 'engineering', hint: 'Move the load across the deck' },
+  manufacturing: { figure: 'manufacturing', hint: 'Hover to slow the line' }
+};
+
 function ServicesOverview({ articles, selectedId, onSelect }) {
-  const [previewId, setPreviewId] = React.useState(null);
-  const shownId = previewId || selectedId;
-  const shown = articles.find((a) => a.id === shownId);
   return (
     <Section>
       <Page>
@@ -85,33 +90,34 @@ function ServicesOverview({ articles, selectedId, onSelect }) {
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-accent)' }}>Services</div>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>One coordinated model, every service</h1>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-head-text) 0 0' }}>
-            Pick a service to see where it sits on the building, then read how we deliver it.
+            Six services, one workflow. Move over a card to play with it, then open it to read how we deliver it.
           </p>
         </div>
-        <div className="ubc-svc-grid">
-          <ol className="ubc-svc-list" onMouseLeave={() => setPreviewId(null)}>
-            {articles.map((a, i) => {
-              const on = a.id === selectedId;
-              return (
-                <li key={a.id}>
-                  <button type="button" aria-pressed={on} className={'ubc-svc-item' + (on ? ' is-on' : '') + (a.id === shownId ? ' is-shown' : '')}
-                    onMouseEnter={() => setPreviewId(a.id)} onFocus={() => setPreviewId(a.id)} onBlur={() => setPreviewId(null)}
-                    onClick={() => onSelect(a.id)}>
-                    <span className="ubc-svc-num">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="ubc-svc-text">
-                      <span className="ubc-svc-label">{a.title}</span>
-                      {a.summary && <span className="ubc-svc-sum">{a.summary}</span>}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-          <figure className="ubc-svc-figure">
-            <ServicesIsometric serviceId={shownId} label={shown ? shown.title + ': isometric illustration of where this service sits on an LGSF building' : 'Isometric LGSF building'} />
-            {shown && <figcaption className="ubc-svc-cap">{shown.label}</figcaption>}
-          </figure>
-        </div>
+        <ul className="ubc-svc-cards">
+          {articles.map((a, i) => {
+            const on = a.id === selectedId;
+            const f = SERVICE_FIGURES[a.id];
+            return (
+              <li key={a.id}>
+                <article className={'ubc-plate' + (on ? ' is-on' : '')} aria-labelledby={'svc-' + a.id}>
+                  <div className="ubc-plate-stage">
+                    {f && <HairlineFigure figure={f.figure} intensity={0.6} label={a.title + ': interactive construction line drawing'} />}
+                  </div>
+                  <div className="ubc-plate-cap">
+                    <h2 id={'svc-' + a.id} className="ubc-plate-title"><span className="ubc-plate-no">{String(i + 1).padStart(2, '0')}</span>{a.title}</h2>
+                    {a.summary && <p className="ubc-plate-sum">{a.summary}</p>}
+                    <div className="ubc-plate-foot">
+                      {f && <span className="ubc-plate-hint">{f.hint}</span>}
+                      <button type="button" className="ubc-plate-btn" aria-pressed={on} onClick={() => onSelect(a.id)}>
+                        {on ? 'Showing below' : 'Read more'} {'\u2192'}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
       </Page>
     </Section>
   );

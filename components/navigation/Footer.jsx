@@ -10,14 +10,17 @@ const COLS = [
 
 export function Footer({ columns = COLS, onNavigate, style, ...rest }) {
   return (
-    <footer {...rest} style={{
-      background: 'var(--surface-sunken)', borderTop: 'var(--bw-hair) solid var(--border-subtle)',
+    // Blue on every page: .ubc-frame-blue (responsive.css) re-scopes the
+    // text and border tokens to their white-on-blue values, so every
+    // var(--text-*) below reads white without touching each style.
+    <footer {...rest} className={['ubc-frame-blue', rest.className].filter(Boolean).join(' ')} style={{
+      background: 'var(--frame-blue)', color: 'var(--white)',
       marginTop: 'var(--s-10)', ...style
     }}>
       <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: 'var(--s-9) var(--gutter) var(--s-6)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1.4fr repeat(3, 1fr)', gap: 'var(--s-8)' }}>
           <div>
-            <Wordmark size={24} />
+            <Wordmark size={24} tone="inverse" />
             <p style={{ fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '30ch', margin: 'var(--s-4) 0 var(--s-5)' }}>
               BIM services for wood-frame and light-gauge-steel construction. Framing models, detailing, permit sets and machine files.
             </p>

@@ -12,11 +12,9 @@
   the Modeling and detailing tab's own Wall panels/Truss panels dropdown)
   and hands this component whichever article is currently selected.
 */
-import { Button } from '../../components/core/Button.jsx';
-import { Tag } from '../../components/core/Tag.jsx';
 import { Page, Section, Reveal } from './shared.jsx';
 
-export function ServicesDetail({ article, onQuote }) {
+export function ServicesDetail({ article }) {
   const a = article;
   if (!a) return null;
   const hasGallery = Boolean(a.gallery && a.gallery.length);
@@ -67,20 +65,6 @@ export function ServicesDetail({ article, onQuote }) {
               </div>
             ))}
 
-            {a.regions && (
-              <div style={{ marginTop: 'var(--s-8)', paddingTop: 'var(--s-6)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 'var(--s-3)' }}>
-                  Where we deliver
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)' }}>
-                  {a.regions.map((r) => <Tag key={r}>{r}</Tag>)}
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: 'var(--s-7)' }}>
-              <Button onClick={onQuote}>Send Your Project →</Button>
-            </div>
           </Reveal>
         </div>
         {hasGallery && (
