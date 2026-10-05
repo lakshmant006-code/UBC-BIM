@@ -1,0 +1,33 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 23.943
+ },
+ "byClass": {
+  "IfcFlowTerminal": {
+   "center": [
+    -0.019,
+    0.147,
+    0.0
+   ],
+   "radius": 25.173,
+   "count": 1
+  }
+ },
+ "byType": {
+  "Air Terminals 1": {
+   "center": [
+    -0.019,
+    0.147,
+    0.0
+   ],
+   "radius": 25.173,
+   "count": 1,
+   "ifcClass": "IfcFlowTerminal"
+  }
+ }
+}

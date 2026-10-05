@@ -80,6 +80,34 @@ function ProjectDetail({ project, onBack, onQuote }) {
   );
 }
 
+// The page is split by framing system first: wood frame, then light-gauge
+// steel, then anything else (structural steel, mixed). Each group keeps its
+// own heading and grid; the filter narrows within them.
+const FRAMES = [
+  { key: 'Wood frame', title: 'Wood frame', test: (p) => p.system === 'Wood frame' },
+  { key: 'Light-gauge steel', title: 'Light-gauge steel (LGSF)', test: (p) => p.system === 'Light-gauge steel' },
+  { key: 'Other', title: 'Other framing systems', test: (p) => p.system !== 'Wood frame' && p.system !== 'Light-gauge steel' }
+];
+const FILTERS = ['All', 'Wood frame', 'Light-gauge steel', 'Residential', 'Commercial', 'Multi-level'];
+
+function ProjectCard({ p, onOpen }) {
+  return (
+    <Card interactive className="ubc-glow"
+      // A real IFC gets the live, orbitable model right on the card
+      // (not a photo of it). stopPropagation keeps a drag-to-orbit
+      // from also firing the card's own "open this project" click.
+      media={p.model
+        ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact /></div>
+        : null}
+      mediaLabel={p.name + ': model render pending'}
+      eyebrow={p.type} title={p.name} meta={p.size + ' · ' + p.location}
+      tags={[<Tag key="s">{p.system}</Tag>, ...(p.model ? [<Tag key="3d" tone="steel">3D model</Tag>] : []), ...p.software.map((s) => <Tag key={s} tone="steel">{s}</Tag>)]}
+      onClick={() => onOpen(p)} style={{ height: '100%', cursor: 'pointer' }}>
+      {p.delivered}
+    </Card>
+  );
+}
+
 export function Portfolio() {
   // Was a prop from the old single-page App() component; now reached
   // through the same quote-drawer context every page uses (see
@@ -94,6 +122,7 @@ export function Portfolio() {
   });
   const [open, setOpen] = React.useState(null);
   const list = D.projects.filter((p) => filter === 'All' || p.type === filter || p.system === filter);
+  const groups = FRAMES.map((g) => ({ ...g, items: list.filter(g.test) })).filter((g) => g.items.length);
   // Opening a project is local state, not a page change, so nothing else
   // resets scroll: without this the live model can land scrolled out of
   // view if the grid card that opened it was well down the page.
@@ -104,34 +133,29 @@ export function Portfolio() {
     <Section>
       <Page>
         <SectionHeading eyebrow="3D Project Lab" title="Rotate a project, read its spec, ask for a quote" size="lg"
-          standfirst="Eight to twelve of our wood and light-gauge-steel projects, each with a live model, its specification and the files we delivered." />
+          standfirst="Our wood-frame and light-gauge-steel projects, each with a live model, its specification and the files we delivered." />
         <div style={{ marginTop: 'var(--s-7)' }}>
-          <FilterBar value={filter} onChange={setFilter} count={list.length} />
+          <FilterBar options={FILTERS} value={filter} onChange={setFilter} count={list.length} />
         </div>
-        {/* This grid now carries live orbitable models, not just photos, so it
-            needs to actually be usable on a phone rather than squeezing three
-            columns into 390px. ubc-proj-grid already drops to one column
-            below 900px for the Home page's grid; reused here rather than a
-            near-duplicate rule. */}
-        <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)', marginTop: 'var(--s-7)' }}>
-          {list.map((p, i) => (
-            <Reveal key={p.id} delay={i * 60}>
-              <Card interactive className="ubc-glow"
-                // A real IFC gets the live, orbitable model right on the card
-                // (not a photo of it). stopPropagation keeps a drag-to-orbit
-                // from also firing the card's own "open this project" click.
-                media={p.model
-                  ? <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', inset: 0 }}><ModelViewer src={p.model.src} radius={p.model.radius} height="100%" compact /></div>
-                  : null}
-                mediaLabel={p.name + ': model render pending'}
-                eyebrow={p.type} title={p.name} meta={p.size + ' · ' + p.location}
-                tags={[<Tag key="s">{p.system}</Tag>, ...(p.model ? [<Tag key="3d" tone="steel">3D model</Tag>] : []), ...p.software.map((s) => <Tag key={s} tone="steel">{s}</Tag>)]}
-                onClick={() => openProject(p)} style={{ height: '100%', cursor: 'pointer' }}>
-                {p.delivered}
-              </Card>
-            </Reveal>
-          ))}
-        </div>
+        {groups.map((g) => (
+          <section key={g.key} className="ubc-frame-group" aria-labelledby={'frame-' + g.key.replace(/\W+/g, '-').toLowerCase()}>
+            <div className="ubc-frame-group-head">
+              <h2 id={'frame-' + g.key.replace(/\W+/g, '-').toLowerCase()}>{g.title}</h2>
+              <span>{g.items.length} {g.items.length === 1 ? 'project' : 'projects'}</span>
+            </div>
+            {/* This grid carries live orbitable models, not just photos, so it
+                needs to be usable on a phone rather than squeezing three
+                columns into 390px. ubc-proj-grid already drops to one column
+                below 900px for the Home page's grid; reused here. */}
+            <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-5)' }}>
+              {g.items.map((p, i) => (
+                <Reveal key={p.id} delay={i * 60}>
+                  <ProjectCard p={p} onOpen={openProject} />
+                </Reveal>
+              ))}
+            </div>
+          </section>
+        ))}
       </Page>
     </Section>
   );

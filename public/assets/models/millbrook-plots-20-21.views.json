@@ -1,0 +1,58 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 10.353
+ },
+ "byClass": {
+  "IfcSlab": {
+   "center": [
+    -0.029,
+    -4.881,
+    0.009
+   ],
+   "radius": 10.688,
+   "count": 15
+  },
+  "IfcBuildingElementProxy": {
+   "center": [
+    -0.029,
+    -0.176,
+    0.009
+   ],
+   "radius": 11.56,
+   "count": 418
+  },
+  "IfcBeam": {
+   "center": [
+    -0.029,
+    -0.344,
+    0.009
+   ],
+   "radius": 11.173,
+   "count": 108
+  },
+  "IfcColumn": {
+   "center": [
+    -0.029,
+    -0.099,
+    0.009
+   ],
+   "radius": 11.076,
+   "count": 562
+  },
+  "IfcMember": {
+   "center": [
+    0.68,
+    -0.823,
+    0.176
+   ],
+   "radius": 4.788,
+   "count": 20
+  }
+ },
+ "byType": {}
+}

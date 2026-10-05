@@ -171,7 +171,43 @@ export const UBC_DATA = {
     { id: 'scs-five-level', name: 'Five-level steel frame', type: 'Multi-level', system: 'Light-gauge steel',
       size: '\u2248 39 \u00d7 68 ft overall (from model)', units: '5 levels \u00b7 12,883 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
-      model: { src: '/assets/models/scs-five-level.glb', radius: 20 } }
+      model: { src: '/assets/models/scs-five-level.glb', radius: 20 } },
+    // Five wood-frame IFCs the client supplied (repo root), converted with
+    // tools/ifc_to_glb.py. Wood, not LGSF, is read from each file: Asebedo and
+    // Cassia Street are Vertex BD timber models (LUMBER / LVL / I-JOIST
+    // materials, 2x4 and 2x6 studs, TJI joists); both Millbrook files are
+    // Revit timber-frame panel models (BP-Timber, Kerto LVL). Sizes are the
+    // model's own bounding box (Asebedo leaves out three stray ground-level
+    // pieces 6.5 m off the house), levels its IfcBuildingStorey entities,
+    // member counts its IfcColumn/IfcBeam/IfcMember elements, software the IFC
+    // header. The Millbrook location is the building address in the files
+    // (town only). Both Millbrook files carry a different plot number inside
+    // (24&25, 3) than their file names (20&21, 1); the file names are used.
+    { id: 'asebedo', name: 'Asebedo', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 131 \u00d7 67 ft overall (from model)', units: '1 storey \u00b7 2,836 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Vertex BD'],
+      model: { src: '/assets/models/asebedo.glb', radius: 21.8 } },
+    { id: 'cassia-street', name: 'Cassia Street', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 55 \u00d7 62 ft overall (from model)', units: '2 storeys \u00b7 2,588 framing members', location: 'Not specified',
+      delivered: 'Coordinated framing model', software: ['Vertex BD'],
+      model: { src: '/assets/models/cassia-street.glb', radius: 12.8 } },
+    { id: 'millbrook-plots-20-21', name: 'Millbrook, Plots 20 & 21', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 46 \u00d7 53 ft overall (from model)', units: '2 storeys \u00b7 1,123 model elements', location: 'Crowborough, UK',
+      delivered: 'Timber-frame panel model', software: ['Autodesk Revit'],
+      model: { src: '/assets/models/millbrook-plots-20-21.glb', radius: 13.5 } },
+    { id: 'millbrook-plot-1', name: 'Millbrook, Plot 1', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 39 \u00d7 39 ft overall (from model)', units: '2 storeys \u00b7 750 model elements', location: 'Crowborough, UK',
+      delivered: 'Timber-frame panel model', software: ['Autodesk Revit'],
+      model: { src: '/assets/models/millbrook-plot-1.glb', radius: 11.5 } },
+    // "Truss IFC" is a single Revit mesh (filed under Air Terminals) with no
+    // material or project data, so wood is read from the geometry instead:
+    // its members are solid 40 x 140 and 40 x 90 mm sections (2x6, 2x4
+    // lumber) and 150 mm square posts. Named by what it is until the client
+    // confirms the project.
+    { id: 'truss-model', name: 'Roof truss and wall frame', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 132 \u00d7 96 ft overall (from model)', units: 'Trusses and walls \u00b7 one mesh', location: 'Not specified',
+      delivered: 'Roof truss and wall framing model', software: ['Autodesk Revit'],
+      model: { src: '/assets/models/truss-model.glb', radius: 23.9 } }
   ],
   // Real logo/photo assets the client supplied directly (Client_Logos.zip,
   // Software_logos.zip, Machine_logo.zip), processed once (resized, no

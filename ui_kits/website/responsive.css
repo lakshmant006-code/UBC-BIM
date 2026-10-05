@@ -660,3 +660,9 @@
 @media (max-width: 900px) { .ubc-spec { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); } }
 .ubc-career-sent { display: flex; gap: var(--s-4); align-items: flex-start; animation: ubcFadeIn 360ms var(--ease-out); }
 .ubc-career-tick { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; background: var(--accent); color: var(--white); }
+
+/* Projects: one block per framing system (wood frame, LGSF, other). */
+.ubc-frame-group { margin-top: var(--s-8); }
+.ubc-frame-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; padding-bottom: var(--s-3); margin-bottom: var(--s-5); border-bottom: var(--bw-hair) solid var(--border-subtle); }
+.ubc-frame-group-head h2 { margin: 0; font-family: var(--font-serif); font-weight: 500; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-strong); }
+.ubc-frame-group-head span { font-family: var(--font-mono); font-size: var(--fs-caption); line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-faint); }
