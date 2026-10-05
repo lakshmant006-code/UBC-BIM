@@ -4,13 +4,13 @@
   Hairline plates from Services, the pop-up panel from Services, the blue
   frame from About and the homepage) with its own interactions:
 
-  - HangingTag: the "Hire me" tag hangs from a pin on a spring. Brushing
-    past it with the pointer swings it; it can be grabbed and flung, and a
-    tap (or Enter/Space, it is a real button) opens the quote drawer.
-  - Role cards hang from nails like the tag, on a stiffer spring so they
-    swing fast, and give a quick shake (a form field's "rejected" jolt) when
-    they scroll into view or the pointer reaches them. Short labels only: a
-    title, place and contract type, and a live Hairline drawing.
+  - HangingTag: the "Hire me" tag, the page's main ad, hangs from a nail on
+    a stiff spring so it swings fast. It shakes (a form field's "rejected"
+    jolt) when it first shows and when the pointer reaches it; brushing past
+    swings it; it can be grabbed and flung; a tap (or Enter/Space, it is a
+    real button) opens the quote drawer.
+  - Role plates: each open role (UBC_DATA.roles) gets a live Hairline line
+    drawing that answers the pointer, and the site's hover glow.
   - Filter pills: All / location / contract type, with a sliding marker.
     Roles that don't match dim in place (inert) instead of reflowing.
   - Apply opens the role's own pop-up with the application form already
@@ -50,7 +50,7 @@ const ROLE_FIGURE = {
 const reduceMotion = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- Swing: a spring pendulum hung from a nail ----------
-// Shared by the hero tag and the role cards. The arm (string + card)
+// Used by the hero tag. The arm (string + card)
 // rotates about the top of `wrap`. Brushing past pushes it, it can be
 // grabbed and flung (the drag only starts once the pointer moves, so a tap
 // stays a click), and shake() gives the quick side-to-side jolt of a form
@@ -140,16 +140,28 @@ function useSwing({ stiffness = 0.02, damping = 0.035 } = {}) {
 
 // ---------- Hanging "Hire me" tag ----------
 function HangingTag({ onQuote }) {
-  const { wrapRef, armRef, sim, guard } = useSwing();
+  const { wrapRef, armRef, sim, guard } = useSwing({ stiffness: 0.07, damping: 0.09 });
   const onClick = guard(() => onQuote());
+  const shake = (power) => sim.current && sim.current.shake && sim.current.shake(power);
+  // A first shake once the tag is properly in view.
+  React.useEffect(() => {
+    const el = wrapRef.current; if (!el) return undefined;
+    const io = new IntersectionObserver((e) => {
+      if (!e[0].isIntersecting) return;
+      io.disconnect();
+      setTimeout(() => shake(7), 700);
+    }, { threshold: 0.6 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div ref={wrapRef} className="ubc-tag-wrap">
+    <div ref={wrapRef} className="ubc-tag-wrap" onPointerEnter={() => shake(4.5)}>
       <span className="ubc-tag-pin" aria-hidden="true" />
       <div ref={armRef} className="ubc-tag-arm">
         <span className="ubc-tag-string" aria-hidden="true" />
         <button type="button" className="ubc-tag" onClick={onClick}
-          onFocus={() => sim.current && sim.current.nudge && sim.current.nudge(2.2)}
+          onFocus={() => shake(4)}
           aria-label="Hire the team: send us your project">
           <span className="ubc-tag-hole" aria-hidden="true" />
           <span className="ubc-tag-kicker">Hire me</span>
@@ -314,62 +326,6 @@ function FilterPills({ options, value, onChange }) {
   );
 }
 
-// Short card labels; the pop-up still shows each role's full title.
-const ROLE_SHORT = {
-  'Wood frame BIM modeller': 'BIM modeller',
-  'Architectural draftsperson': 'Draftsperson'
-};
-
-// A role card hung from its own nail. It swings fast (stiff spring) and
-// gives a quick shake when the pointer reaches it or it first scrolls into
-// view. The whole card opens Apply; its Apply button is the keyboard way in.
-function RoleTag({ role, index, dim, onApply }) {
-  const { wrapRef, armRef, sim, guard } = useSwing({ stiffness: 0.07, damping: 0.09 });
-  const figure = ROLE_FIGURE[role.title];
-  React.useEffect(() => {
-    const el = wrapRef.current; if (!el) return undefined;
-    const io = new IntersectionObserver((e) => {
-      if (!e[0].isIntersecting) return;
-      io.disconnect();
-      setTimeout(() => sim.current && sim.current.shake(5), 120 + index * 110);
-    }, { threshold: 0.6 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [index]); // eslint-disable-line react-hooks/exhaustive-deps
-  const shake = () => sim.current && sim.current.shake(3.5);
-  return (
-    <li className={dim ? 'is-dim' : ''} inert={dim ? true : undefined}>
-      <div ref={wrapRef} className="ubc-hang" onPointerEnter={shake}>
-        <span className="ubc-hang-nail" aria-hidden="true" />
-        <div ref={armRef} className="ubc-hang-arm">
-          <span className="ubc-hang-string" aria-hidden="true" />
-          {/* The whole card is clickable for the pointer; the Apply button
-              is the keyboard and screen-reader way in. */}
-          <div className="ubc-hang-card" onClick={guard((e) => {
-            // Move focus to this card's Apply button first, so closing the
-            // pop-up returns focus here rather than to the top of the page.
-            const btn = e.currentTarget.querySelector('.ubc-hang-go');
-            if (btn) btn.focus({ preventScroll: true });
-            onApply(role);
-          })}>
-            <span className="ubc-hang-hole" aria-hidden="true" />
-            <div className="ubc-hang-stage" aria-hidden="true">
-              {figure && <HairlineFigure figure={figure} intensity={0.6} />}
-            </div>
-            <div className="ubc-hang-cap">
-              <h3 className="ubc-hang-title">{ROLE_SHORT[role.title] || role.title}</h3>
-              <p className="ubc-hang-meta">{role.place} · {role.type}</p>
-              <button type="button" className="ubc-hang-go" aria-haspopup="dialog" onFocus={shake}
-                onClick={(e) => { e.stopPropagation(); guard(() => onApply(role))(e); }}
-                aria-label={'Apply: ' + role.title}>Apply {'\u2192'}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </li>
-  );
-}
-
 function OpenRoles({ onApply }) {
   const [filter, setFilter] = React.useState('All');
   const options = ['All', ...new Set(ROLES.flatMap((r) => [r.place, r.type]))];
@@ -387,9 +343,28 @@ function OpenRoles({ onApply }) {
           <p aria-live="polite" style={{ ...eyebrowStyle, margin: 0 }}>Showing {shown} of {ROLES.length}</p>
         </div>
         <ul className="ubc-role-cards">
-          {ROLES.map((r, i) => (
-            <RoleTag key={r.title} role={r} index={i} dim={!matches(r)} onApply={onApply} />
-          ))}
+          {ROLES.map((r, i) => {
+            const on = matches(r);
+            const figure = ROLE_FIGURE[r.title];
+            return (
+              <li key={r.title} className={on ? '' : 'is-dim'} inert={on ? undefined : true}>
+                <article className="ubc-plate ubc-glow ubc-role" aria-labelledby={'role-' + i}>
+                  <div className="ubc-plate-stage">
+                    {figure && <HairlineFigure figure={figure} intensity={0.6} label={r.title + ': interactive construction line drawing'} />}
+                  </div>
+                  <div className="ubc-role-cap">
+                    <h3 id={'role-' + i} className="ubc-plate-title"><span className="ubc-plate-no">{String(i + 1).padStart(2, '0')}</span>{r.title}</h3>
+                    <div className="ubc-role-foot">
+                      <span style={{ display: 'flex', gap: 'var(--s-2)', flexWrap: 'wrap' }}><Tag>{r.place}</Tag><Tag>{r.type}</Tag></span>
+                      <button type="button" className="ubc-plate-btn ubc-role-apply" aria-haspopup="dialog" onClick={() => onApply(r)}>
+                        Apply {'→'}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
         </ul>
       </Page>
     </Section>
