@@ -55,6 +55,10 @@
 .ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
 .ubc-header-row > * { pointer-events: auto; }   /* the header itself lets clicks through to the page */
 .ubc-header-row > a { justify-self: start; }
+.ubc-header-logo { display: block; height: 40px; width: auto; }
+@media (max-width: 1100px) { .ubc-header-logo { height: 32px; } }
+@media (max-width: 640px) { .ubc-header-logo { height: 28px; } }
+@media (max-width: 420px) { .ubc-header-logo { height: 24px; } }
 .ubc-header-cta {
   grid-column: 3; justify-self: start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px;
   border: 0; border-radius: 999px; cursor: pointer; background: var(--accent); color: var(--white); white-space: nowrap;
@@ -93,7 +97,7 @@
   .ubc-header-row { display: flex !important; }
   .ubc-navpill { margin-left: auto; }
 }
-@media (max-width: 940px) {
+@media (max-width: 1000px) {
   .ubc-navpill { display: none !important; }
   .ubc-header-cta { margin-left: auto; }
 }

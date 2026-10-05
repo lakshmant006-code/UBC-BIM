@@ -665,6 +665,14 @@ UBC_DATA.contactScene = {
    never pins the 3D). `camPos` is the fixed establishing shot. */
 UBC_DATA.hero = {
   model: { src: '/assets/models/mocking-bird-lot-2.glb', radius: 9.2 },
+  // The same house as an architectural model: fibre-cement lap siding,
+  // asphalt shingles, white vinyl single-hung windows, panel entry doors and
+  // sliding glass in the widest openings (client's choices). Built from the
+  // M2 source IFC (tools/envelope_extract.py, then tools/build_envelope.py): every wall, opening and roof
+  // plane is taken from this frame's own studs, headers, sills and trusses,
+  // in the same coordinates as the frame GLB. Shown at stage 01, peeled away
+  // top-down while scrolling to stage 04.
+  envelope: { src: '/assets/models/mocking-bird-lot-2-envelope.glb' },
   camPos: [14.70, 11.99, 17.50],
   intro: {
     h1: 'CFS, LGSF & Wood Detailing, Engineered for Construction',

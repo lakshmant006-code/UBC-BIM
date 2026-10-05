@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { Wordmark } from '../core/Wordmark.jsx';
 
 const NAV = [
   { label: 'Services', id: 'services' },
@@ -56,8 +55,9 @@ export function Header({ items = NAV, active, scrolled, onQuote, style, ...rest 
         maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)',
         height: 76
       }}>
-        <Link href="/" style={{ borderBottom: 'none', display: 'flex' }}>
-          <Wordmark size={21} />
+        <Link href="/" aria-label="UBC BIM home" style={{ borderBottom: 'none', display: 'flex', alignItems: 'center', minHeight: 44 }}>
+          {/* Client logo: Unique Building Concepts, BIM Services */}
+          <img src="/assets/brand/ubc-logo.png" alt="UBC: Unique Building Concepts, BIM Services" width={228} height={40} className="ubc-header-logo" />
         </Link>
         <NavPill items={items} active={active} />
         <button type="button" className="ubc-header-cta" onClick={onQuote}>Request Quote {'\u2192'}</button>
