@@ -34,11 +34,12 @@
   we considered" idea the client asked for, and the template for the other
   seven categories' own models as those arrive.
 
-  Truss panels uses the same GLB — the model carries a real truss system
-  across its top — but its own UBC_DATA.trussPanelModel hotspot set, placed
-  on that truss geometry, with cards drawn only from the client's truss
-  details in TYPICAL_DETAILS.pdf. `onModelView` is true for either sub-tab;
-  the ModelViewer is keyed by tab so switching remounts it cleanly.
+  Roof trusses has its own model: five bays of Mocking Bird Lot 2's real
+  pitched (scissor) roof trusses with the walls they bear on
+  (UBC_DATA.trussPanelModel, cut out by tools/extract_truss_section.py),
+  its own hotspot set on those members, and cards drawn from the client's
+  truss details in TYPICAL_DETAILS.pdf. `onModelView` is true for either
+  sub-tab; the ModelViewer is keyed by tab so switching remounts it cleanly.
 
   `locked` on ModelViewer turns off free drag/scroll orbiting, so the camera
   only ever moves via a hotspot's own flyTo or back out via reset — closing
@@ -248,6 +249,17 @@ export function MockingBirdModel() {
   // whoever's checking the framing) can switch this on to drag/scroll the
   // model freely and see the real thing rather than trusting the math.
   const [freeRotate, setFreeRotate] = React.useState(false);
+  // Deep links: /services#bom-estimation opens that service's pop-up (the
+  // footer links to each service this way).
+  React.useEffect(() => {
+    const fromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (articles.some((a) => a.id === id)) setSelection({ type: 'article', id });
+    };
+    fromHash();
+    window.addEventListener('hashchange', fromHash);
+    return () => window.removeEventListener('hashchange', fromHash);
+  }, [articles]);
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Both sub-tabs are "the model view" (same GLB, different hotspot set).

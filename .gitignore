@@ -11,3 +11,4 @@ Thumbs.db
 # Next.js
 node_modules/
 .next/
+__pycache__/

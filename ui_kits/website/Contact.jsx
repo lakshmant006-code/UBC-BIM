@@ -93,25 +93,20 @@ function WalkIn() {
 }
 
 export function Contact() {
+  // The form is the first thing on the page (client feedback): no centred
+  // head above it any more; the form card carries the page's h1.
   return (
     <div>
-      <Page style={{ paddingTop: 'var(--section-y)' }}>
-        <Reveal style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto' }}>
-          <div style={{ ...eyebrowStyle, display: 'inline-block' }}>Contact us</div>
-          <h1 style={{ ...serifH, fontSize: 'clamp(34px, 5vw, 60px)', margin: 'var(--s-3) 0 0' }}>Come in, let's talk about the project</h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--space-hero-text) auto 0', maxWidth: '56ch' }}>
-            Send your project below, or pick another way to reach us. We reply within one working day.
-          </p>
-        </Reveal>
-      </Page>
-
-      <Section>
+      <Section tight style={{ paddingTop: 'var(--s-7)' }}>
         <Page>
           <div className="ubc-contact-main">
             <Reveal>
               <div className="ubc-card ubc-card--still" style={{ padding: 'clamp(20px, 3vw, 36px)' }}>
-                <div style={{ ...eyebrowStyle, color: 'var(--accent)' }}>Send your project</div>
-                <h2 style={{ ...serifH, fontSize: 'clamp(24px, 2.6vw, 34px)', margin: 'var(--s-3) 0 var(--s-5)' }}>Tell us what you're building</h2>
+                <div style={{ ...eyebrowStyle, color: 'var(--accent)' }}>Contact us</div>
+                <h1 style={{ ...serifH, fontSize: 'clamp(28px, 3.4vw, 44px)', margin: 'var(--s-3) 0 var(--s-3)' }}>Start your next project</h1>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: '0 0 var(--s-5)', maxWidth: '52ch' }}>
+                  Tell us what you're building. We reply within one working day.
+                </p>
                 <ProjectForm source="contact" />
               </div>
             </Reveal>

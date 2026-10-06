@@ -1,91 +1,138 @@
 'use client';
 /*
-  Quick-answers panel behind the header/StickyQuote "Quick answers" button
-  (message-square icon). Predefined questions only — there's no backend
-  here to answer anything open-ended, so this doesn't pretend to be a live
-  agent or a real AI: the greeting says so up front, and every answer comes
-  straight from data.js's `faq` array, itself paraphrased from data already
-  on the site rather than invented for the bot. Panel opens/closes with a
-  plain opacity+translateY fade (no bounce/scale), matching the "long, slow,
-  single-axis" motion rule the rest of the site's entrances use.
+  Chat assistant panel, opened by the "Chat" pill beside the main CTA.
+  Visitors type a question; app/api/chat answers it with Claude, from the
+  site's own content only (app/api/chat/knowledge.js), streaming the reply
+  in as it is written. Asked for a quote or a person, the assistant collects
+  a name and email and passes them to the team as a Zoho CRM lead.
+
+  Kept deliberately plain: a title, the conversation, three short starter
+  questions until the first one is asked, a one-line input and a quiet
+  "prefer a person?" link. If the assistant isn't switched on yet (no API
+  key: the route answers 503), starters are answered from data.js's `faq`
+  and anything else points to the project form, so it is never a dead end. The panel fades in on a
+  plain opacity + translateY, matching the site's other entrances.
 */
 import React from 'react';
-import { Button } from '../../components/core/Button.jsx';
-import { Icon } from '../../components/core/Icon.jsx';
+import Link from 'next/link';
 import { UBC_DATA } from './data.js';
 
+const GREETING = 'Hi! Ask me anything about our services, software, machines or projects.';
+const OFFLINE = 'Live answers aren\u2019t switched on yet. For anything not covered here, start your project below and the team will reply within one working day.';
+// Three short starters, shown only before the first question.
+const STARTERS = [
+  { label: 'Services', q: 'What services do you offer?' },
+  { label: 'Wood or LGSF?', q: 'Do you work with wood frame or light-gauge steel?' },
+  { label: 'Get a quote', q: 'How do I get a quote?' }
+];
+
 export function ChatBot({ open, onClose, onQuote }) {
-  const D = UBC_DATA;
+  const faq = (UBC_DATA && UBC_DATA.faq) || [];
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [shown, setShown] = React.useState(false);
-  const [asked, setAsked] = React.useState([]);
+  const [msgs, setMsgs] = React.useState([]);        // { role: 'user' | 'assistant', content }
+  const [draft, setDraft] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
+  const [offline, setOffline] = React.useState(false);
   const scrollRef = React.useRef(null);
+  const inputRef = React.useRef(null);
 
   React.useEffect(() => {
-    if (!open) { setShown(false); return; }
-    if (reduceMotion) { setShown(true); return; }
+    if (!open) { setShown(false); return undefined; }
+    if (reduceMotion) { setShown(true); return undefined; }
     const raf = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(raf);
   }, [open]);
-
+  React.useEffect(() => { if (open && inputRef.current) inputRef.current.focus(); }, [open]);
   React.useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [asked, open]);
+  }, [msgs, open, busy]);
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const esc = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [open, onClose]);
 
   if (!open) return null;
 
-  const askedQs = new Set(asked.map((a) => a.q));
-  const remaining = (D.faq || []).filter((item) => !askedQs.has(item.q));
+  const answerFromFaq = (q) => {
+    const hit = faq.find((f) => f.q === q);
+    setMsgs((m) => [...m, { role: 'user', content: q }, { role: 'assistant', content: hit ? hit.a : OFFLINE }]);
+  };
 
-  const botBubble = { alignSelf: 'flex-start', maxWidth: '86%', background: 'var(--surface-sunken)', color: 'var(--text-body)', borderRadius: 'var(--r-2)', padding: 'var(--s-4) var(--s-5)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)' };
-  const userBubble = { alignSelf: 'flex-end', maxWidth: '86%', background: 'var(--surface-inverse)', color: 'var(--text-inverse)', borderRadius: 'var(--r-2)', padding: 'var(--s-4) var(--s-5)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)' };
+  const ask = async (text) => {
+    const q = text.trim();
+    if (!q || busy) return;
+    if (offline) { answerFromFaq(q); setDraft(''); return; }
+    const history = [...msgs, { role: 'user', content: q }];
+    setMsgs([...history, { role: 'assistant', content: '' }]);
+    setDraft(''); setBusy(true);
+    const put = (content) => setMsgs((m) => { const n = m.slice(); n[n.length - 1] = { role: 'assistant', content }; return n; });
+    try {
+      const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: history }) });
+      if (res.status === 503) {
+        setOffline(true);
+        const hit = faq.find((f) => f.q === q);
+        put(hit ? hit.a : OFFLINE);
+      } else if (!res.ok || !res.body) {
+        put(res.status === 429 ? 'That’s a lot of questions at once. Give it a minute and try again.' : 'Sorry, something went wrong. Please try again, or use “Start Your Next Project”.');
+      } else {
+        const reader = res.body.getReader(); const dec = new TextDecoder(); let acc = '';
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          acc += dec.decode(value, { stream: true });
+          put(acc);
+        }
+        if (!acc.trim()) put('Sorry, I didn’t get an answer back. Please try again.');
+      }
+    } catch {
+      put('Sorry, the connection dropped. Please try again.');
+    }
+    setBusy(false);
+  };
 
   return (
-    <div role="dialog" aria-label="Quick answers" style={{
-      position: 'fixed', right: 'var(--s-6)', bottom: 'calc(var(--s-6) + 44px + var(--s-3))', zIndex: 55,
-      width: 360, maxWidth: 'calc(100vw - var(--s-6) * 2)', maxHeight: 'min(70vh, 560px)',
-      display: 'flex', flexDirection: 'column',
-      background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-strong)',
-      borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-3)', overflow: 'hidden',
+    <div id="ubc-chat-panel" role="dialog" aria-label="Chat with UBC BIM" className="ubc-chat" style={{
       opacity: shown ? 1 : 0, transform: shown ? 'translateY(0)' : 'translateY(12px)',
       transition: reduceMotion ? 'none' : 'opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out)'
     }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--s-3)', padding: 'var(--s-5) var(--s-6)', borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)' }}>Quick answers</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-strong)', marginTop: 2 }}>Ask us anything</div>
-        </div>
-        <button onClick={onClose} aria-label="Close quick answers" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4, flex: '0 0 auto' }}>
-          <Icon name="x" size={18} />
+      <div className="ubc-chat-head">
+        <div className="ubc-chat-title">Ask UBC BIM</div>
+        <button type="button" onClick={onClose} aria-label="Close chat" className="ubc-chat-x">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
         </button>
       </div>
 
-      <div ref={scrollRef} aria-live="polite" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 'var(--s-5) var(--s-6)', display: 'flex', flexDirection: 'column', gap: 'var(--s-4)' }}>
-        <div style={botBubble}>
-          Hi — I'm a set of predefined answers, not a live person or an AI. Pick a question below, or request a quote for the real thing.
-        </div>
-        {asked.map((item, i) => (
-          <React.Fragment key={item.q + i}>
-            <div style={userBubble}>{item.q}</div>
-            <div style={botBubble}>{item.a}</div>
-          </React.Fragment>
+      <div ref={scrollRef} className="ubc-chat-log" aria-live="polite">
+        <div className="ubc-chat-bot">{GREETING}</div>
+        {msgs.map((m, i) => (
+          <div key={i} className={m.role === 'user' ? 'ubc-chat-user' : 'ubc-chat-bot'}>
+            {m.content || <span className="ubc-chat-typing" aria-label="Writing a reply"><i /><i /><i /></span>}
+          </div>
         ))}
-      </div>
-
-      <div style={{ borderTop: 'var(--bw-hair) solid var(--border-subtle)', padding: 'var(--s-4) var(--s-6)', display: 'flex', flexDirection: 'column', gap: 'var(--s-2)', maxHeight: 168, overflowY: 'auto' }}>
-        {remaining.length ? remaining.map((item) => (
-          <Button key={item.q} variant="secondary" size="sm" full
-            style={{ whiteSpace: 'normal', textAlign: 'left', justifyContent: 'flex-start' }}
-            onClick={() => setAsked((prev) => [...prev, item])}>{item.q}</Button>
-        )) : (
-          <p style={{ fontSize: 'var(--fs-caption)', color: 'var(--text-faint)', margin: 0 }}>That's everything pre-loaded here — request a quote for anything else.</p>
+        {msgs.length === 0 && (
+          <div className="ubc-chat-chips" role="group" aria-label="Suggested questions">
+            {STARTERS.map((c) => <button key={c.q} type="button" onClick={() => ask(c.q)}>{c.label}</button>)}
+          </div>
         )}
       </div>
 
-      <div style={{ padding: 'var(--s-5) var(--s-6)', borderTop: 'var(--bw-hair) solid var(--border-subtle)' }}>
-        <Button full size="sm" onClick={() => { onClose(); onQuote && onQuote(); }}>Send Your Project →</Button>
-      </div>
+      <form className="ubc-chat-form" onSubmit={(e) => { e.preventDefault(); ask(draft); }}>
+        <label htmlFor="ubc-chat-input" className="ubc-visually-hidden">Your question</label>
+        <input id="ubc-chat-input" ref={inputRef} type="text" value={draft} maxLength={4000} autoComplete="off"
+          placeholder="Ask a question…" onChange={(e) => setDraft(e.target.value)} />
+        <button type="submit" className="ubc-chat-send" disabled={busy || !draft.trim()} aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+      </form>
+
+      <p className="ubc-chat-foot">
+        Prefer a person? <button type="button" onClick={() => { onClose(); onQuote && onQuote(); }}>Start your next project</button>
+        <span aria-hidden="true"> · </span><Link href="/privacy" onClick={onClose}>Privacy</Link>
+      </p>
     </div>
   );
 }

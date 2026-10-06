@@ -13,6 +13,43 @@
 */
 import React from 'react';
 import { Page, Section, Reveal } from './shared.jsx';
+import { UBC_DATA } from './data.js';
+
+// "Sample output": what this service delivers, generated from a real model
+// on the site (UBC_DATA.serviceOutputs, keyed by article id).
+function SampleOutput({ out, title }) {
+  return (
+    <section className="ubc-svc-output" aria-label={'Sample output: ' + title}>
+      <div className="ubc-svc-output-eyebrow">Sample output</div>
+      {out.note && <p className="ubc-svc-output-note">{out.note}</p>}
+      <div className={'ubc-svc-output-figs' + (out.images.length > 1 ? ' is-two' : '')}>
+        {out.images.map((g) => (
+          <figure key={g.src}>
+            <a href={g.src} target="_blank" rel="noopener noreferrer" aria-label={g.caption + ' (opens full size)'}>
+              <img src={g.src} alt={g.alt} loading="lazy" />
+            </a>
+            <figcaption>{g.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+      {out.table && (
+        <div className="ubc-svc-output-table" role="region" aria-label={out.table.caption} tabIndex={0}>
+          <table>
+            <caption>{out.table.caption}</caption>
+            <thead><tr>{out.table.columns.map((c) => <th key={c} scope="col">{c}</th>)}</tr></thead>
+            <tbody>
+              {out.table.rows.map((r, i) => (
+                <tr key={i} className={/^Total/.test(r[0]) ? 'is-total' : undefined}>
+                  {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
 
 export function ServicesDetail({ article, embedded = false, titleId }) {
   const a = article;
@@ -40,6 +77,10 @@ export function ServicesDetail({ article, embedded = false, titleId }) {
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0' }}>
                 {a.summary}
               </p>
+            )}
+
+            {UBC_DATA.serviceOutputs && UBC_DATA.serviceOutputs[a.id] && (
+              <SampleOutput out={UBC_DATA.serviceOutputs[a.id]} title={a.title} />
             )}
 
             {a.sections.map((s, i) => (

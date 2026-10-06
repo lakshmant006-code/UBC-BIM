@@ -16,17 +16,49 @@ const NAV = [
 const idToHref = (id) => (id === 'home' ? '/' : '/' + id);
 
 // The nav links sit in a pill with a small mark at each end; it stays the
-// same open pill at any scroll position. The standalone "Request Quote"
+// same open pill at any scroll position. The standalone "Start Your Next Project"
 // button sits just right of it (Header below). Styles: .ubc-navpill-* and
 // .ubc-header-cta in ui_kits/website/responsive.css.
+// The "⋯" at the pill's left end is a small menu: the BIM Pulse client
+// platform login (also at ubcbim.../admin and in the footer).
+const MORE = [{ label: 'BIM Pulse login', href: 'https://app.bimpulse.world/login', external: true }];
+
+function MoreMenu() {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const away = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', away); document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', away); document.removeEventListener('keydown', esc); };
+  }, [open]);
+  return (
+    <div ref={ref} className="ubc-navpill-more">
+      <button type="button" className="ubc-navpill-end ubc-navpill-menu" aria-label="More" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((v) => !v)}>
+        <svg width="18" height="18" viewBox="0 0 18 18" focusable="false" aria-hidden="true">
+          <circle cx="4" cy="9" r="1.6" /><circle cx="9" cy="9" r="1.6" /><circle cx="14" cy="9" r="1.6" />
+        </svg>
+      </button>
+      {open && (
+        <ul className="ubc-navpill-pop">
+          {MORE.map((m) => (
+            <li key={m.href}>
+              <a href={m.href} target={m.external ? '_blank' : undefined} rel={m.external ? 'noopener noreferrer' : undefined} onClick={() => setOpen(false)}>
+                {m.label}{m.external ? ' \u2197' : ''}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function NavPill({ items, active }) {
   return (
     <nav aria-label="Main" className="ubc-navpill">
-      <span className="ubc-navpill-end ubc-navpill-menu" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 18 18" focusable="false">
-          <circle cx="4" cy="9" r="1.6" /><circle cx="9" cy="9" r="1.6" /><circle cx="14" cy="9" r="1.6" />
-        </svg>
-      </span>
+      <MoreMenu />
       <ul className="ubc-navpill-list">
         {items.map((it) => {
           const on = active === it.id;
@@ -60,7 +92,7 @@ export function Header({ items = NAV, active, scrolled, onQuote, style, ...rest 
           <img src="/assets/brand/ubc-logo.png" alt="UBC: Unique Building Concepts, BIM Services" width={228} height={40} className="ubc-header-logo" />
         </Link>
         <NavPill items={items} active={active} />
-        <button type="button" className="ubc-header-cta" onClick={onQuote}>Request Quote {'\u2192'}</button>
+        <button type="button" className="ubc-header-cta" onClick={onQuote}>Start Your Next Project<span className="ubc-header-cta-arrow" aria-hidden="true">{'\u00a0\u2192'}</span></button>
       </div>
     </header>
   );

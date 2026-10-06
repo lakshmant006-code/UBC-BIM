@@ -6,7 +6,7 @@
   Desktop: the Mocking Bird Lot 2 frame is pinned while the page scrolls.
   The first stretch of scroll shows the hero copy over the slowly turning
   model; the rest scrubs through four model states (UBC_DATA.hero.stages):
-  complete, framing highlighted, coordination colours, and the parts
+  complete, coordination colours, framing highlighted, and the parts
   separating while the output chain (BIM Model → … → Machine Files) appears.
   The house starts as an architectural model of this same frame (siding,
   shingles, windows, doors, a free-standing brick chimney, on a concrete
