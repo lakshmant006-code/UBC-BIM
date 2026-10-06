@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Wordmark } from '../core/Wordmark.jsx';
+import { SocialIcon } from '../core/SocialIcon.jsx';
 
 // Every link here is a real URL (crawlable, not a click handler on "#"), so
 // the footer doubles as a site map on every page: each service, each project
@@ -39,7 +40,10 @@ export function Footer({ columns = [], social = DEFAULT_SOCIAL, legal = [], styl
               <ul className="ubc-footer-social" aria-label="UBC BIM on social media">
                 {social.map((s) => (
                   <li key={s.label}>
-                    <a href={s.href} target="_blank" rel="noopener noreferrer me">{s.label}<span className="ubc-visually-hidden"> (opens in a new tab)</span></a>
+                    <a href={s.href} target="_blank" rel="noopener noreferrer me" title={s.label}>
+                      <SocialIcon name={s.label} />
+                      <span className="ubc-visually-hidden">{s.label} (opens in a new tab)</span>
+                    </a>
                   </li>
                 ))}
               </ul>
