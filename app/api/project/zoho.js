@@ -41,11 +41,11 @@ async function accessToken() {
   return cached.token;
 }
 
-const SOURCE_LABEL = { contact: 'Contact page', drawer: 'Start Your Next Project panel', careers: 'Careers application', chat: 'Website chat assistant', website: 'Website form' };
+const SOURCE_LABEL = { contact: 'Contact page', drawer: 'Start Your Next Project panel', quote: 'Request Quote form', careers: 'Careers application', chat: 'Website chat assistant', website: 'Website form' };
 
 // Map one form submission onto Zoho's standard Lead fields. Last_Name and
-// Company are mandatory in Zoho's default Lead layout; the forms don't ask
-// for a company, so that field says so rather than guessing one.
+// Company are mandatory in Zoho's default Lead layout; only the quote form
+// asks for a company, so elsewhere that field says so rather than guessing.
 export function leadRecord(lead) {
   const parts = lead.name.split(/\s+/).filter(Boolean);
   const last = parts.pop();                       // a one-word name is the last name
@@ -54,6 +54,11 @@ export function leadRecord(lead) {
   const lines = [
     'Submitted from: ' + where,
     lead.role && 'Role applied for: ' + lead.role,
+    lead.buildingType && 'Building type: ' + lead.buildingType,
+    lead.framing && 'Framing system: ' + lead.framing,
+    lead.services && lead.services.length && 'Services: ' + lead.services.join(', '),
+    lead.size && 'Size: ' + lead.size,
+    lead.timeline && 'Timeline: ' + lead.timeline,
     lead.machine && 'Machine or software: ' + lead.machine,
     lead.files.length && 'Files named: ' + lead.files.join(', '),
     lead.message && '\n' + lead.message,
@@ -62,10 +67,11 @@ export function leadRecord(lead) {
   const rec = {
     Last_Name: last,
     Email: lead.email,
-    Company: 'Not provided (website form)',
+    Company: lead.company || 'Not provided (website form)',
     Description: lines.join('\n')
   };
   if (first) rec.First_Name = first;
+  if (lead.phone) rec.Phone = lead.phone;
   if (process.env.ZOHO_LEAD_SOURCE) rec.Lead_Source = process.env.ZOHO_LEAD_SOURCE;
   return rec;
 }

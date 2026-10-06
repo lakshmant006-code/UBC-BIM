@@ -68,6 +68,7 @@ export function AppChrome({ children }) {
   const [scrolled, setScrolled] = React.useState(false);
   const [quote, setQuote] = React.useState(false);
   const [quoteMachine, setQuoteMachine] = React.useState('');
+  const [quoteMode, setQuoteMode] = React.useState('project');
   const [chat, setChat] = React.useState(false);
 
   React.useEffect(() => {
@@ -81,8 +82,12 @@ export function AppChrome({ children }) {
   // { machine } options object pre-selects the form's machine field.
   const openQuote = (opts) => {
     setQuoteMachine(opts && typeof opts.machine === 'string' ? opts.machine : '');
+    setQuoteMode('project');
     setQuote(true);
   };
+  // The floating button is the one place that asks for a quote: same
+  // slide-in panel, with the quote request form in it.
+  const openQuoteRequest = () => { setQuoteMode('quote'); setQuote(true); };
 
   return (
     <>
@@ -91,8 +96,8 @@ export function AppChrome({ children }) {
         {children}
       </QuoteDrawerProvider>
       <Footer columns={FOOTER_COLUMNS} social={FOOTER_SOCIAL} legal={FOOTER_LEGAL} />
-      <StickyQuote onQuote={openQuote} onChat={() => setChat((v) => !v)} chatOpen={chat} />
-      <QuoteDrawer open={quote} machine={quoteMachine} onClose={() => setQuote(false)} />
+      <StickyQuote onQuote={openQuoteRequest} label={'Request Quote \u2192'} onChat={() => setChat((v) => !v)} chatOpen={chat} />
+      <QuoteDrawer open={quote} mode={quoteMode} machine={quoteMachine} onClose={() => setQuote(false)} />
       <ChatBot open={chat} onClose={() => setChat(false)} onQuote={openQuote} />
     </>
   );

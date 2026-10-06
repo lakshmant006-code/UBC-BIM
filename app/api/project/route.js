@@ -36,6 +36,15 @@ export async function POST(request) {
     // for and a short note; both are empty for project enquiries.
     role: String(form.get('role') || '').slice(0, 120),
     message: String(form.get('message') || '').slice(0, 4000),
+    // Quote requests (source 'quote', the floating "Request Quote" button)
+    // also carry the scope; every field is optional and empty elsewhere.
+    company: String(form.get('company') || '').slice(0, 160),
+    phone: String(form.get('phone') || '').slice(0, 40),
+    buildingType: String(form.get('buildingType') || '').slice(0, 60),
+    framing: String(form.get('framing') || '').slice(0, 60),
+    services: form.getAll('services').map(String).slice(0, 20),
+    size: String(form.get('size') || '').slice(0, 120),
+    timeline: String(form.get('timeline') || '').slice(0, 60),
     submittedAt: new Date().toISOString()
   };
   if (zohoConfigured()) {

@@ -762,3 +762,18 @@ button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-o
 }
 @media (max-width: 1060px) { .ubc-navpill-link { padding: 0 8px; } .ubc-navpill-link.is-on::after { left: 8px; right: 8px; } }
 @media (max-width: 640px) { .ubc-header-cta { display: none; } }
+
+/* Quote request form (QuoteRequestForm.jsx), in the slide-in panel. */
+.ubc-qr { display: grid; gap: var(--s-4); }
+.ubc-qr-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--s-4); }
+.ubc-qr-group { border: 0; margin: 0; padding: 0; min-width: 0; }
+.ubc-qr-group legend { padding: 0; margin-bottom: var(--s-2); font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted); line-height: 1.5; }
+.ubc-qr-group > div { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.ubc-qr-group button { min-height: 40px; padding: 6px 14px; border: var(--bw-hair) solid var(--border-strong); border-radius: 999px; background: var(--white); color: var(--text-body); cursor: pointer; text-align: left; font-family: var(--font-body); font-size: var(--fs-caption); line-height: 1.5; letter-spacing: 0.12em; }
+.ubc-qr-group button:hover { border-color: var(--accent); }
+.ubc-qr-group button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--white); }
+.ubc-qr-group button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ubc-qr-file { font-family: var(--font-body); font-size: var(--fs-body-sm); color: var(--text-strong); min-height: 44px; width: 100%; max-width: 100%; }
+.ubc-qr-error { margin: 0; font-size: var(--fs-body-sm); color: var(--danger); }
+.ubc-qr-sent-title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 600; color: var(--text-strong); }
+.ubc-qr-sent p { margin: var(--s-2) 0 0; font-size: var(--fs-body-sm); line-height: 1.6; letter-spacing: 0.12em; color: var(--text-muted); }
