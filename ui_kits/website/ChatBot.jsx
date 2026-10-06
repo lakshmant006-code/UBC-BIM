@@ -6,18 +6,25 @@
   in as it is written. Asked for a quote or a person, the assistant collects
   a name and email and passes them to the team as a Zoho CRM lead.
 
-  If the assistant isn't switched on yet (no API key: the route answers
-  503), the panel says so and falls back to the predefined quick answers
-  from data.js's `faq`, so it is never a dead end. The panel fades in on a
+  Kept deliberately plain: a title, the conversation, three short starter
+  questions until the first one is asked, a one-line input and a quiet
+  "prefer a person?" link. If the assistant isn't switched on yet (no API
+  key: the route answers 503), starters are answered from data.js's `faq`
+  and anything else points to the project form, so it is never a dead end. The panel fades in on a
   plain opacity + translateY, matching the site's other entrances.
 */
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '../../components/core/Button.jsx';
 import { UBC_DATA } from './data.js';
 
-const GREETING = 'Hi, I’m UBC BIM’s AI assistant. Ask me about our services, the software and machines we support, or the projects on this site. I can also pass your details to the team.';
-const OFFLINE = 'The AI assistant isn’t switched on yet, so here are quick answers to common questions. For anything else, use “Start Your Next Project” and the team will reply within one working day.';
+const GREETING = 'Hi! Ask me anything about our services, software, machines or projects.';
+const OFFLINE = 'Live answers aren\u2019t switched on yet. For anything not covered here, start your project below and the team will reply within one working day.';
+// Three short starters, shown only before the first question.
+const STARTERS = [
+  { label: 'Services', q: 'What services do you offer?' },
+  { label: 'Wood or LGSF?', q: 'Do you work with wood frame or light-gauge steel?' },
+  { label: 'Get a quote', q: 'How do I get a quote?' }
+];
 
 export function ChatBot({ open, onClose, onQuote }) {
   const faq = (UBC_DATA && UBC_DATA.faq) || [];
@@ -87,56 +94,45 @@ export function ChatBot({ open, onClose, onQuote }) {
     setBusy(false);
   };
 
-  const onKey = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(draft); }
-  };
-  const asked = new Set(msgs.filter((m) => m.role === 'user').map((m) => m.content));
-  const chips = faq.filter((f) => !asked.has(f.q)).slice(0, offline ? 6 : 4);
-
   return (
     <div id="ubc-chat-panel" role="dialog" aria-label="Chat with UBC BIM" className="ubc-chat" style={{
       opacity: shown ? 1 : 0, transform: shown ? 'translateY(0)' : 'translateY(12px)',
       transition: reduceMotion ? 'none' : 'opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out)'
     }}>
       <div className="ubc-chat-head">
-        <div>
-          <div className="ubc-chat-eyebrow">{offline ? 'Quick answers' : 'AI assistant'}</div>
-          <div className="ubc-chat-title">Ask UBC BIM</div>
-        </div>
+        <div className="ubc-chat-title">Ask UBC BIM</div>
         <button type="button" onClick={onClose} aria-label="Close chat" className="ubc-chat-x">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
         </button>
       </div>
 
       <div ref={scrollRef} className="ubc-chat-log" aria-live="polite">
-        <div className="ubc-chat-bot">{offline ? OFFLINE : GREETING}</div>
+        <div className="ubc-chat-bot">{GREETING}</div>
         {msgs.map((m, i) => (
           <div key={i} className={m.role === 'user' ? 'ubc-chat-user' : 'ubc-chat-bot'}>
             {m.content || <span className="ubc-chat-typing" aria-label="Writing a reply"><i /><i /><i /></span>}
           </div>
         ))}
-        {chips.length > 0 && !busy && (
+        {msgs.length === 0 && (
           <div className="ubc-chat-chips" role="group" aria-label="Suggested questions">
-            {chips.map((f) => <button key={f.q} type="button" onClick={() => (offline ? answerFromFaq(f.q) : ask(f.q))}>{f.q}</button>)}
+            {STARTERS.map((c) => <button key={c.q} type="button" onClick={() => ask(c.q)}>{c.label}</button>)}
           </div>
         )}
       </div>
 
-      {!offline && (
-        <form className="ubc-chat-form" onSubmit={(e) => { e.preventDefault(); ask(draft); }}>
-          <label htmlFor="ubc-chat-input" className="ubc-visually-hidden">Your question</label>
-          <textarea id="ubc-chat-input" ref={inputRef} rows={1} value={draft} maxLength={4000}
-            placeholder="Ask about services, machines, projects…" onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey} />
-          <button type="submit" className="ubc-chat-send" disabled={busy || !draft.trim()} aria-label="Send">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" /></svg>
-          </button>
-        </form>
-      )}
+      <form className="ubc-chat-form" onSubmit={(e) => { e.preventDefault(); ask(draft); }}>
+        <label htmlFor="ubc-chat-input" className="ubc-visually-hidden">Your question</label>
+        <input id="ubc-chat-input" ref={inputRef} type="text" value={draft} maxLength={4000} autoComplete="off"
+          placeholder="Ask a question…" onChange={(e) => setDraft(e.target.value)} />
+        <button type="submit" className="ubc-chat-send" disabled={busy || !draft.trim()} aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+      </form>
 
-      <div className="ubc-chat-foot">
-        <Button full size="sm" onClick={() => { onClose(); onQuote && onQuote(); }}>Start Your Next Project →</Button>
-        <p>AI answers can be wrong; the team confirms every quote. <Link href="/privacy" onClick={onClose}>Privacy</Link></p>
-      </div>
+      <p className="ubc-chat-foot">
+        Prefer a person? <button type="button" onClick={() => { onClose(); onQuote && onQuote(); }}>Start your next project</button>
+        <span aria-hidden="true"> · </span><Link href="/privacy" onClick={onClose}>Privacy</Link>
+      </p>
     </div>
   );
 }
