@@ -1,6 +1,6 @@
 import { zohoConfigured, createZohoLead } from './zoho.js';
 
-// Project intake ("Send Your Project →", on Contact and in the Request Quote
+// Project intake ("Start Your Next Project →", on Contact and in the slide-in
 // panel) and careers applications (source 'careers', from Careers.jsx).
 // Every submission becomes a Lead in Zoho CRM through its API (zoho.js, set
 // up with the ZOHO_* variables in Vercel). PROJECT_WEBHOOK_URL is still

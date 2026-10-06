@@ -1,5 +1,5 @@
 'use client';
-// The one project-intake form ("Send Your Project →"), used inline in the
+// The one project-intake form ("Start Your Next Project →"), used inline in the
 // homepage's final CTA and inside the quote drawer every other conversion
 // button opens. Posts to app/api/project/route.js, which creates a Lead in
 // Zoho CRM once the ZOHO_* variables are set in Vercel; until then the form
@@ -80,7 +80,7 @@ export function ProjectForm({ defaultMachine = '', source = 'website', dark = fa
         </p>
       )}
       <div>
-        <Button type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send Your Project →'}</Button>
+        <Button type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Start Your Next Project →'}</Button>
       </div>
     </form>
   );

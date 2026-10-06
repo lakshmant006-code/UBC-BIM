@@ -33,7 +33,7 @@ const eyebrowStyle = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)' };
 const h2Style = { ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' };
 const bodyStyle = { fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' };
-const sendLabel = 'Send Your Project →';
+const sendLabel = 'Start Your Next Project →';
 
 function SectionHead({ eyebrow, title, center }) {
   return (

@@ -370,6 +370,7 @@ UBC_DATA.videoTestimonials = [
 UBC_DATA.blogPosts = [
   {
     id: 'climbing-wall-lgsf',
+    shortTitle: 'A 30-foot LGSF climbing wall',
     title: 'Engineering Innovation in Light Gauge Steel: Custom 30-Foot Climbing Wall for a Commercial Building',
     excerpt: 'A client asked for a 30-foot climbing wall panel inside a light-gauge-steel commercial building — three times the height LGSF walls are normally engineered for. Here’s how strap connections made it work.',
     tags: ['Engineering', 'Light-gauge steel', 'Commercial'],
@@ -415,6 +416,7 @@ UBC_DATA.blogPosts = [
 
   {
     id: 'lgsf-software-stack-2026',
+    shortTitle: 'The LGSF detailing software stack',
     title: 'The Complete Software Stack for LGSF Detailing in 2026',
     excerpt: 'A working detailer’s guide to the five platforms that actually ship light-gauge steel framing projects today — Vertex BD, Framecad, Scottsdale Scottsteel, Revit with MWF, and StaadPro.',
     tags: ['Software', 'LGSF', 'BIM'],
@@ -482,6 +484,7 @@ UBC_DATA.blogPosts = [
 
   {
     id: 'steel-framed-modular-homes',
+    shortTitle: 'Steel-framed modular homes',
     title: 'Building the Future: Why Steel-Framed Modular Homes are a Game Changer',
     excerpt: 'Splitting a 600 sq ft California home into two 300 sq ft light-gauge-steel modules, engineered to bolt together into one seamless, permanent-feeling house.',
     tags: ['Modular', 'Light-gauge steel', 'Residential'],
@@ -518,6 +521,7 @@ UBC_DATA.blogPosts = [
 
   {
     id: 'hidden-engineering-challenges-lgsf',
+    shortTitle: 'Hidden engineering in LGSF buildings',
     title: 'The Hidden Engineering Challenges Behind Successful LGSF Buildings: Lessons from Real-World Projects',
     excerpt: 'Speed and precision get the credit, but a successful LGSF building is decided earlier — in load paths, environmental design, and constructability worked out long before construction starts.',
     tags: ['Engineering', 'LGSF', 'Hybrid structures'],
@@ -562,6 +566,7 @@ UBC_DATA.blogPosts = [
 
   {
     id: '12-days-of-bim',
+    shortTitle: 'A 12-day BIM journey',
     title: 'From Concept to Construction: A 12-Day BIM Journey with UBC BIM',
     date: 'Jan 13, 2026',
     excerpt: 'A 2-storey residential build in Texas, walked day by day from first concept sketch to machine-ready Light Gauge Steel production files.',
@@ -713,7 +718,7 @@ UBC_DATA.hero = {
   intro: {
     h1: 'CFS, LGSF & Wood Detailing, Engineered for Construction',
     sub: 'From estimating and BIM modeling to engineering, permit sets and shop drawings, UBC BIM helps manufacturers, contractors, builders and fabricators turn project requirements into accurate, construction-ready documentation.',
-    primary: 'Send Your Project \u2192',
+    primary: 'Start Your Next Project \u2192',
     secondary: 'Explore Our Services \u2192',
     proof: ['783 projects', '224 clients', '12 countries', 'Revit', 'Vertex BD', 'FRAMECAD', 'Scottsdale']
   },
@@ -721,12 +726,15 @@ UBC_DATA.hero = {
     { n: '01', state: 'complete', still: '/assets/hero/stage-01.jpg',
       title: 'Your Project. Our Model.',
       body: 'Bring your architectural drawings, structural requirements and project scope. We build a coordinated CFS, LGSF or wood-frame BIM model around your project.' },
-    { n: '02', state: 'framing', still: '/assets/hero/stage-02.jpg',
-      title: 'Detailed to Your Standards',
-      body: 'We model and detail walls, floors, roofs, openings, connections and framing systems to your project standards and requirements.' },
-    { n: '03', state: 'coordinated', still: '/assets/hero/stage-03.jpg',
+    // 02 and 03 swapped per client feedback: engineering and coordination
+    // come before detailing. Each keeps its own visual state; the stills
+    // are re-captured so each card shows its own stage.
+    { n: '02', state: 'coordinated', still: '/assets/hero/stage-02.jpg',
       title: 'Engineered & Coordinated',
       body: 'Engineering and coordination are integrated into the model to resolve critical conditions before they reach the field.' },
+    { n: '03', state: 'framing', still: '/assets/hero/stage-03.jpg',
+      title: 'Detailed to Your Standards',
+      body: 'We model and detail walls, floors, roofs, openings, connections and framing systems to your project standards and requirements.' },
     { n: '04', state: 'outputs', still: '/assets/hero/stage-04.jpg',
       title: 'Ready for the Next Step',
       body: 'Get the coordinated models, drawings, quantities and documentation your team needs for the next stage of the project.' }
@@ -957,36 +965,36 @@ UBC_DATA.wallPanelModel = {
   ]
 };
 
-/* Truss panels: same GLB as wallPanelModel — that model carries a real
-   truss system across its top: ten parallel-chord trusses at ~0.61 m
-   (24") centres, each 0.58 m deep (top chord y≈1.67, bottom chord y≈1.17,
-   webs between), spanning 4.25 m between the front and back walls
-   (z≈±2.06), with full-depth blocking in every bay over the front wall.
-   Every marker below sits on that truss geometry, found by splitting the
-   GLB into connected components, and every card's image and wording is
-   from the client's own TYPICAL_DETAILS.pdf (sheets S640, S650, S662,
-   S663) — truss details only, nothing from the wall-panel set above.
-   Positions were checked through the viewer's own camera projection so
-   no two markers land within 44 px of each other at the resting frame. */
+/* Roof trusses: real pitched roof trusses, not the wall panel's flat floor
+   trusses (client feedback: the old view showed the wrong truss). The model
+   is five bays cut out of Mocking Bird Lot 2's own frame IFC by
+   tools/extract_truss_section.py (x 11.15-13.9 m, trusses at 0.61 m / 24"
+   centres), with the wall framing they bear on. These are scissor trusses:
+   6:12 top chords meet at a 4.46 m ridge, and the bottom chords slope too,
+   from 2.92 m at the wall to 4.07 m at mid-span, for a vaulted ceiling.
+   Every marker sits on a real member of that file (positions are the
+   member's own coordinates through the extractor's centring and Z-up to
+   Y-up rotation); images and fastening details are from the client's
+   TYPICAL_DETAILS.pdf truss sheets (S650, S662). */
 UBC_DATA.trussPanelModel = {
-  src: UBC_DATA.wallPanelModel.src, radius: UBC_DATA.wallPanelModel.radius,
-  restAngle: UBC_DATA.wallPanelModel.restAngle,
+  src: '/assets/models/m2-roof-trusses.glb', radius: 3.86,
+  restAngle: [2.3, 1.7, 2.7],
   hotspots: [
-    { id: 'top-chord', label: 'Top chord', position: [2.37, 1.667, 0.5], viewAngle: [-1.0, 1.6, -1.0],
-      image: '/assets/details/truss-floor-anatomy.jpg',
-      body: 'The top rail of each truss, running its full 4.25 m span. The client’s typical floor-truss detail (S663) builds every truss the same way: a top chord and a bottom chord held apart by a zig-zag of webs, with side reinforcement added where the design needs it.' },
-    { id: 'webs', label: 'Webs', position: [-1.187, 1.419, 1.028], viewAngle: [-0.4, 1.8, -0.6],
+    { id: 'top-chord', label: 'Top chord', position: [-0.60, 1.63, 1.595], viewAngle: [-0.6, 1.0, 1.9],
       image: '/assets/details/truss-roof-anatomy.jpg',
-      body: 'The diagonal and vertical members between the top and bottom chords, as labelled in the typical roof-truss detail (S662). They tie the two chords together into one deep, stiff frame that spans from wall to wall.' },
-    { id: 'bottom-chord', label: 'Bottom chord', position: [0.03, 1.17, -1.2], viewAngle: [-0.7, 1.2, -1.2],
-      image: '/assets/details/truss-s650-flush.jpg',
-      body: 'The lower rail of the truss, and the part that sits on the wall. Per the typical flush detail (S650, detail 6), the wall’s top plate is attached to the truss bottom chord with a minimum of two #10 ¾" screws.' },
-    { id: 'bearing', label: 'Truss to wall', position: [-2.41, 1.13, -2.08], viewAngle: [-1.4, 0.8, -1.4],
+      body: 'The sloped top rail of each truss, rising at 6:12 from the wall to the ridge. It carries the roof sheathing and everything on it, and is labelled the same way in the typical roof-truss detail (S662).' },
+    { id: 'webs', label: 'Webs', position: [0.01, 1.232, 1.964], viewAngle: [0.6, 0.7, 1.9],
+      image: '/assets/details/truss-roof-anatomy.jpg',
+      body: 'The verticals and diagonals between the chords (S662). Each one is a short 350S162-43 steel stud, so the whole truss is built from the same section as the walls, cut and screwed into a rigid web.' },
+    { id: 'bottom-chord', label: 'Scissor bottom chord', position: [0.62, 1.33, 1.395], viewAngle: [1.4, 0.6, 1.6],
+      image: '/assets/details/truss.jpg',
+      body: 'On these trusses the bottom chords slope as well: they rise from 2.92 m at the wall to 4.07 m at mid-span. That is a scissor truss, which gives the room below a vaulted ceiling instead of a flat one.' },
+    { id: 'ridge', label: 'Ridge', position: [0.01, 2.29, 0.265], viewAngle: [0.4, 1.8, 1.2],
+      image: '/assets/details/truss.jpg',
+      body: 'Where the two top chords meet, 4.46 m above the floor: the highest point of the frame. Every truss in the run is the same, set at 0.61 m (24") centres.' },
+    { id: 'heel', label: 'Truss to wall', position: [0.62, 0.78, 2.695], viewAngle: [1.0, 0.5, 1.8],
       image: '/assets/details/truss-to-wall-panel.jpg',
-      body: 'Where each truss lands on the wall panel below. The typical load-bearing detail (S650, detail 4) fixes the wall’s top plate to the truss with two #10 × ¾" screws at 24" on centre, the same 24" spacing the trusses themselves are set at in this model.' },
-    { id: 'blocking', label: 'Blocking', position: [0.835, 1.419, -2.082], viewAngle: [0.2, 0.6, -1.9],
-      image: '/assets/details/truss-s640-blocking.jpg',
-      body: 'Full-depth blocking fitted between the trusses directly over the wall, so the roof and the shear wall below act together against sideways loads. The typical detail (S640) fastens it with four #12-¾" hex-head screws at every 24" on centre.' }
+      body: 'The heel, where each truss lands on the wall below. Per the typical roof-truss detail (S650), the wall\u2019s top plate is fixed to the truss bottom chord with at least two #10 \u00d7 \u00be" screws at every truss.' }
   ]
 };
 
@@ -1096,3 +1104,217 @@ UBC_DATA.serviceArticles = [
       ] }
     ] }
 ];
+
+/* The company's own social channels (client-supplied, Oct 2026). Shown in
+   the footer on every page. */
+UBC_DATA.social = [
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/ubc-bim/' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@UBCBIMService' },
+  { label: 'Facebook', href: 'https://www.facebook.com/ubcimpex/' },
+  { label: 'Instagram', href: 'https://www.instagram.com/ubcbimservices/' },
+  { label: 'Pinterest', href: 'https://in.pinterest.com/UBCBIMService/' },
+  { label: 'X (Twitter)', href: 'https://x.com/UBCBIM' }
+];
+
+/* Sample output per service (client feedback: every service page should show
+   what you get, e.g. the Bill of Materials with its 3D model and steel
+   quantities). Everything is generated from the real Mocking Bird Lot 2
+   model on this site, not mocked up: drawings by tools/service_outputs.py,
+   quantities by tools/model_takeoff.py (pieces, length and volume-based
+   steel weight per profile, straight from the IFC geometry). */
+UBC_DATA.serviceOutputs = {
+  "drafting-architectural": {
+    "note": "Drawn straight from the coordinated model of Mocking Bird Lot 2, one of the projects on this site.",
+    "images": [
+      {
+        "src": "/assets/services/output/plan.webp",
+        "alt": "Floor plan of Mocking Bird Lot 2, cut at 1.2 m: walls in black, glazing in blue, overall 15.31 by 9.80 metres",
+        "caption": "Floor plan, cut at 1.2 m"
+      },
+      {
+        "src": "/assets/services/output/elevation.webp",
+        "alt": "South elevation of Mocking Bird Lot 2: lap siding, large sliding glass doors, a flat-roofed wing and a shingled gable with a brick chimney",
+        "caption": "South elevation"
+      }
+    ]
+  },
+  "bom-estimation": {
+    "note": "Quantities counted off the Mocking Bird Lot 2 framing model: pieces and length per profile, steel weight from each member's modelled volume at 7,850 kg/m³.",
+    "images": [
+      {
+        "src": "/assets/services/output/frame-3d.jpg",
+        "alt": "3D light-gauge steel framing model of Mocking Bird Lot 2: wall panels, scissor roof trusses and floor joists",
+        "caption": "The 3D model the quantities come from"
+      }
+    ],
+    "table": {
+      "caption": "Steel quantities, Mocking Bird Lot 2",
+      "columns": [
+        "Item",
+        "Pieces",
+        "Total length",
+        "Steel weight"
+      ],
+      "rows": [
+        [
+          "350S162-43",
+          "2,039",
+          "1,988 m / 6,522 ft",
+          "3,289 kg / 7,251 lb"
+        ],
+        [
+          "550S162-43",
+          "901",
+          "1,159 m / 3,804 ft",
+          "2,415 kg / 5,325 lb"
+        ],
+        [
+          "HSS-512x512x1/4",
+          "2",
+          "6 m / 21 ft",
+          "174 kg / 383 lb"
+        ],
+        [
+          "W8x21",
+          "1",
+          "6 m / 20 ft",
+          "184 kg / 405 lb"
+        ],
+        [
+          "Total framing",
+          "2,943",
+          "3,160 m / 10,367 ft",
+          "6,062 kg / 13,364 lb"
+        ],
+        [
+          "Structural bolts (A325 / A490)",
+          "112",
+          "",
+          ""
+        ],
+        [
+          "Anchors",
+          "86",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "permit-sets": {
+    "note": "A sample sheet assembled from the same model: plan and elevation in a title block. Real permit sets add sections, details, schedules and the engineer's stamp where required.",
+    "images": [
+      {
+        "src": "/assets/services/output/permit-sheet.webp",
+        "alt": "Sample permit sheet A-101 for Mocking Bird Lot 2 with the floor plan, south elevation and a title block marked sample, not for construction",
+        "caption": "Sheet A-101 (sample)"
+      }
+    ]
+  },
+  "modeling-detailing": {
+    "note": "Two pieces of the Mocking Bird Lot 2 framing model, drawn member by member.",
+    "images": [
+      {
+        "src": "/assets/services/output/wall-panel.webp",
+        "alt": "Framing elevation of the 5.49 m west wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging",
+        "caption": "Wall panel, west wall"
+      },
+      {
+        "src": "/assets/services/output/truss.webp",
+        "alt": "Elevation of scissor roof truss T1: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise",
+        "caption": "Roof truss T1 (scissor)"
+      }
+    ]
+  },
+  "engineering": {
+    "note": "The truss geometry the engineering is checked against: every chord and web as modelled, with span and rise.",
+    "images": [
+      {
+        "src": "/assets/services/output/truss.webp",
+        "alt": "Elevation of scissor roof truss T1: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise",
+        "caption": "Roof truss T1: geometry for design checks"
+      }
+    ]
+  },
+  "manufacturing": {
+    "note": "A cut list taken from one wall panel of the model: every member's profile and length, ready to become the CSV your roll-former reads (the exact file format depends on the machine).",
+    "images": [
+      {
+        "src": "/assets/services/output/wall-panel.webp",
+        "alt": "Framing elevation of the 5.49 m west wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging",
+        "caption": "The panel the cut list is for"
+      }
+    ],
+    "table": {
+      "caption": "Cut list, west wall panel (first 10 lines of 70 pieces)",
+      "columns": [
+        "Member",
+        "Profile",
+        "Length",
+        "Qty"
+      ],
+      "rows": [
+        [
+          "Track / header",
+          "350S162-43",
+          "5,485 mm",
+          "1"
+        ],
+        [
+          "Track / header",
+          "350S162-43",
+          "5,305 mm",
+          "1"
+        ],
+        [
+          "Stud",
+          "550S162-43",
+          "3,070 mm",
+          "18"
+        ],
+        [
+          "Stud",
+          "350S162-43",
+          "3,045 mm",
+          "17"
+        ],
+        [
+          "Track / header",
+          "550S162-43",
+          "2,440 mm",
+          "4"
+        ],
+        [
+          "Track / header",
+          "350S162-43",
+          "2,440 mm",
+          "4"
+        ],
+        [
+          "Track / header",
+          "550S162-43",
+          "2,435 mm",
+          "4"
+        ],
+        [
+          "Track / header",
+          "350S162-43",
+          "2,435 mm",
+          "4"
+        ],
+        [
+          "Blocking / bridging",
+          "550S162-43",
+          "330 mm",
+          "4"
+        ],
+        [
+          "Blocking / bridging",
+          "350S162-43",
+          "330 mm",
+          "4"
+        ]
+      ]
+    }
+  }
+};

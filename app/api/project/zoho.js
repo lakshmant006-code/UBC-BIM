@@ -41,7 +41,7 @@ async function accessToken() {
   return cached.token;
 }
 
-const SOURCE_LABEL = { contact: 'Contact page', drawer: 'Request Quote panel', careers: 'Careers application', website: 'Website form' };
+const SOURCE_LABEL = { contact: 'Contact page', drawer: 'Start Your Next Project panel', careers: 'Careers application', chat: 'Website chat assistant', website: 'Website form' };
 
 // Map one form submission onto Zoho's standard Lead fields. Last_Name and
 // Company are mandatory in Zoho's default Lead layout; the forms don't ask

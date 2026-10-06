@@ -50,7 +50,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
               { label: 'Delivered', value: project.delivered }
             ]}
             tags={project.software.map((s) => <Tag key={s}>{s}</Tag>)}
-            actions={<><Button full size="sm" onClick={onQuote}>Send Your Project →</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
+            actions={<><Button full size="sm" onClick={onQuote}>Start Your Next Project →</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
         </div>
       </div>
       <Section tight>
@@ -120,6 +120,17 @@ export function Portfolio() {
   // navigating here, naming a building type or a framing system.
   const [type, setType] = React.useState('Residential');
   const [frame, setFrame] = React.useState(() => firstFrame(D.projects.filter((p) => p.type === 'Residential')));
+  // Deep links: /projects#commercial (or #residential, #multi-level) opens
+  // that building type; the footer links to each.
+  React.useEffect(() => {
+    const fromHash = () => {
+      const t = TYPES.find((x) => x.toLowerCase() === decodeURIComponent(window.location.hash.slice(1)).toLowerCase());
+      if (t) { setType(t); setFrame(firstFrame(D.projects.filter((p) => p.type === t))); }
+    };
+    fromHash();
+    window.addEventListener('hashchange', fromHash);
+    return () => window.removeEventListener('hashchange', fromHash);
+  }, [D.projects]);
   React.useEffect(() => {
     const f = window.UBC_NAV_FILTER; window.UBC_NAV_FILTER = null;
     if (!f) return;

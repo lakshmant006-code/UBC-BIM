@@ -231,6 +231,16 @@ export function Blogs() {
   const posts = (UBC_DATA && UBC_DATA.blogPosts) || [];
   const [openId, setOpenId] = React.useState(null);
   const open = posts.find((p) => p.id === openId);
+  // Deep links: /blogs#<post id> opens that post (the footer links to each).
+  React.useEffect(() => {
+    const fromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (posts.some((p) => p.id === id)) { setOpenId(id); window.scrollTo(0, 0); }
+    };
+    fromHash();
+    window.addEventListener('hashchange', fromHash);
+    return () => window.removeEventListener('hashchange', fromHash);
+  }, [posts]);
 
   const back = () => { setOpenId(null); window.scrollTo(0, 0); };
   const goTo = (id) => { setOpenId(id); window.scrollTo(0, 0); };
