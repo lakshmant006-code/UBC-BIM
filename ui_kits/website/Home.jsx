@@ -597,7 +597,7 @@ const VIDEO_TESTIMONIALS = D.videoTestimonials || [];
 // own flat tint swatches, so the video stays readable underneath).
 const VIDEO_TINTS = [
   'linear-gradient(165deg, rgba(214,54,31,.90), rgba(214,54,31,.55) 45%, rgba(16,18,21,.82))',
-  'linear-gradient(165deg, rgba(23,41,92,.90), rgba(23,41,92,.55) 45%, rgba(16,18,21,.82))',
+  'linear-gradient(165deg, rgba(32,44,92,.90), rgba(32,44,92,.55) 45%, rgba(16,18,21,.82))',
   'linear-gradient(165deg, rgba(60,74,90,.90), rgba(60,74,90,.55) 45%, rgba(16,18,21,.82))'
 ];
 function VideoCard({ v, index }) {
