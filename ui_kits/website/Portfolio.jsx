@@ -82,7 +82,7 @@ function ProjectDetail({ project, onBack, onQuote }) {
 
 // Two levels: building type first (Residential, Commercial, Multi-level),
 // then framing system inside it (LGSF or Wood, plus Other only where a type
-// has a structural-steel or mixed project). Each type opens on its first
+// has a project that is neither, e.g. mixed construction). Each type opens on its first
 // framing system that has projects.
 const TYPES = ['Residential', 'Commercial', 'Multi-level'];
 const FRAMES = [
