@@ -62,7 +62,7 @@ export const UBC_DATA = {
     // measured from the model geometry itself rather than invented, and
     // `software` is read from each file's own header. Everything else about
     // these four is honestly what the model shows, not a delivery record.
-    { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Structural steel',
+    { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Light-gauge steel',
       size: '≈ 2,390 sq ft footprint (from model)', units: '988 columns · 834 beams', location: 'Not specified',
       delivered: 'Coordinated structural model', software: ['FRAMECAD Steelwise'],
       model: { src: '/assets/models/camping-resort.glb', radius: 11.2 } },
