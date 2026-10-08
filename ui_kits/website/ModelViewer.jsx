@@ -628,13 +628,13 @@ export function ModelViewer({ src, radius, title, height, compact, bare, initial
           {/* Compact chrome for a grid thumbnail: a small always-on badge so
               it reads as a live model rather than a photo, nothing else
               cluttering the card until the visitor is actually hovering it. */}
-          <div style={{ position: 'absolute', left: 'var(--s-4)', top: 'var(--s-4)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(16,18,21,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-pill)', padding: '4px 10px 4px 8px' }}>
+          <div style={{ position: 'absolute', left: 'var(--s-4)', top: 'var(--s-4)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(16,18,21,.78)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-pill)', padding: '4px 10px 4px 8px' }}>
             <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--paper)' }}>3D · drag to orbit</span>
           </div>
           {state === 'ready' && (
             <button onClick={(e) => { e.stopPropagation(); apiRef.current && apiRef.current.reset(); }}
-              style={{ position: 'absolute', right: 'var(--s-4)', top: 'var(--s-4)', cursor: 'pointer', opacity: hover ? 1 : 0, transition: 'opacity var(--dur-2) var(--ease-out)', background: 'rgba(16,18,21,.55)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-2)', color: 'var(--paper)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '6px 9px' }}>
+              style={{ position: 'absolute', right: 'var(--s-4)', top: 'var(--s-4)', cursor: 'pointer', opacity: hover ? 1 : 0, transition: 'opacity var(--dur-2) var(--ease-out)', background: 'rgba(16,18,21,.78)', backdropFilter: 'var(--blur-panel)', WebkitBackdropFilter: 'var(--blur-panel)', border: 'var(--bw-hair) solid rgba(245,244,241,.24)', borderRadius: 'var(--r-2)', color: 'var(--paper)', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', padding: '6px 9px' }}>
               Reset
             </button>
           )}

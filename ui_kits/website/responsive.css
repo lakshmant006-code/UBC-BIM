@@ -429,12 +429,12 @@
    four visible on desktop, two on tablets, one (with a peek) on phones */
 .ubc-proj-carousel {
   --per: 4; --gap: var(--s-5);
-  list-style: none; margin: 0; padding: 0 0 var(--s-3);
+  margin: 0; padding: 0 0 var(--s-3);
   display: flex; gap: var(--gap); overflow-x: auto; overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none;
 }
 .ubc-proj-carousel::-webkit-scrollbar { display: none; }
-.ubc-proj-carousel > li { flex: 0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per)); min-width: 0; scroll-snap-align: start; }
+.ubc-proj-carousel > * { flex: 0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per)); min-width: 0; scroll-snap-align: start; }
 .ubc-proj-carousel:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .ubc-proj-nav {
   display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0;

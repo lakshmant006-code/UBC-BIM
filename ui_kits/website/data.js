@@ -219,38 +219,38 @@ export const UBC_DATA = {
   // each image actually shows rather than calling a machine photo a logo.
   logos: {
     client: [
-      { src: '/assets/logos/client/revolution-steel.jpg', alt: 'Revolution Steel' },
-      { src: '/assets/logos/client/lgs-framing.jpg', alt: 'LGS Framing' },
-      { src: '/assets/logos/client/accurate-steel-fab.jpg', alt: 'Accurate Steel Fab' },
-      { src: '/assets/logos/client/steel-tek-framing.jpg', alt: 'Steel Tek Framing' },
-      { src: '/assets/logos/client/offsitek.jpg', alt: 'OffsiteK' },
-      { src: '/assets/logos/client/taynr.jpg', alt: 'TAYNR' },
-      { src: '/assets/logos/client/conqst.jpg', alt: 'CONQST' },
-      { src: '/assets/logos/client/my-barndo-plans.jpg', alt: 'My Barndo Plans' },
-      { src: '/assets/logos/client/evolusion-innovation.jpg', alt: 'Evolusion Innovation' },
-      { src: '/assets/logos/client/beattie.jpg', alt: 'Beattie' },
-      { src: '/assets/logos/client/expertise.jpg', alt: 'Expertise' },
-      { src: '/assets/logos/client/innovative-living-design.jpg', alt: 'Innovative Living Design Inc.' },
-      { src: '/assets/logos/client/indan-planning-systems.jpg', alt: 'INDAN Planning Systems Ltd.' }
+      { src: '/assets/logos/client/revolution-steel.webp', w: 114, h: 84, alt: 'Revolution Steel' },
+      { src: '/assets/logos/client/lgs-framing.webp', w: 168, h: 59, alt: 'LGS Framing' },
+      { src: '/assets/logos/client/accurate-steel-fab.webp', w: 207, h: 84, alt: 'Accurate Steel Fab' },
+      { src: '/assets/logos/client/steel-tek-framing.webp', w: 107, h: 84, alt: 'Steel Tek Framing' },
+      { src: '/assets/logos/client/offsitek.webp', w: 274, h: 78, alt: 'OffsiteK' },
+      { src: '/assets/logos/client/taynr.webp', w: 105, h: 51, alt: 'TAYNR' },
+      { src: '/assets/logos/client/conqst.webp', w: 86, h: 84, alt: 'CONQST' },
+      { src: '/assets/logos/client/my-barndo-plans.webp', w: 94, h: 84, alt: 'My Barndo Plans' },
+      { src: '/assets/logos/client/evolusion-innovation.webp', w: 162, h: 84, alt: 'Evolusion Innovation' },
+      { src: '/assets/logos/client/beattie.webp', w: 273, h: 84, alt: 'Beattie' },
+      { src: '/assets/logos/client/expertise.webp', w: 249, h: 82, alt: 'Expertise' },
+      { src: '/assets/logos/client/innovative-living-design.webp', w: 244, h: 73, alt: 'Innovative Living Design Inc.' },
+      { src: '/assets/logos/client/indan-planning-systems.webp', w: 147, h: 64, alt: 'INDAN Planning Systems Ltd.' }
     ],
     software: [
-      { src: '/assets/logos/software/framecad.jpg', alt: 'FrameCAD' },
-      { src: '/assets/logos/software/mwf-pro-metal.png', alt: 'MWF Pro Metal' },
-      { src: '/assets/logos/software/autodesk-revit.jpg', alt: 'Autodesk Revit' },
-      { src: '/assets/logos/software/scottsdale.jpg', alt: 'Scottsdale' },
-      { src: '/assets/logos/software/vertex-bd.jpg', alt: 'Vertex BD' }
+      { src: '/assets/logos/software/framecad.webp', w: 168, h: 84, alt: 'FrameCAD' },
+      { src: '/assets/logos/software/mwf-pro-metal.webp', w: 300, h: 82, alt: 'MWF Pro Metal' },
+      { src: '/assets/logos/software/autodesk-revit.webp', w: 84, h: 84, alt: 'Autodesk Revit' },
+      { src: '/assets/logos/software/scottsdale.webp', w: 168, h: 84, alt: 'Scottsdale' },
+      { src: '/assets/logos/software/vertex-bd.webp', w: 179, h: 84, alt: 'Vertex BD' }
     ],
     machine: [
-      { src: '/assets/logos/machine/arkitech.jpg', alt: 'Arkitech' },
-      { src: '/assets/logos/machine/framecad-machine.jpg', alt: 'FrameCAD roll-forming line' },
-      { src: '/assets/logos/machine/howick-machine.png', alt: 'Howick roll-forming line' },
-      { src: '/assets/logos/machine/knudson-machine.jpg', alt: 'Knudson roll-forming line' },
-      { src: '/assets/logos/machine/pinnacle.jpg', alt: 'Pinnacle Light Gauge Steel' },
-      { src: '/assets/logos/machine/scottsdale-machine.jpg', alt: 'Scottsdale roll-forming line' },
-      { src: '/assets/logos/machine/ams-controls.jpg', alt: 'AMS Controls' },
-      { src: '/assets/logos/machine/beck-automation.png', alt: 'Beck Automation' },
-      { src: '/assets/logos/machine/framemac.jpg', alt: 'FrameMac' },
-      { src: '/assets/logos/machine/pinnacle-machine.jpg', alt: 'Pinnacle roll-forming line' }
+      { src: '/assets/logos/machine/arkitech.webp', w: 84, h: 84, alt: 'Arkitech' },
+      { src: '/assets/logos/machine/framecad-machine.webp', w: 131, h: 84, alt: 'FrameCAD roll-forming line' },
+      { src: '/assets/logos/machine/howick-machine.webp', w: 140, h: 84, alt: 'Howick roll-forming line' },
+      { src: '/assets/logos/machine/knudson-machine.webp', w: 149, h: 84, alt: 'Knudson roll-forming line' },
+      { src: '/assets/logos/machine/pinnacle.webp', w: 286, h: 84, alt: 'Pinnacle Light Gauge Steel' },
+      { src: '/assets/logos/machine/scottsdale-machine.webp', w: 126, h: 84, alt: 'Scottsdale roll-forming line' },
+      { src: '/assets/logos/machine/ams-controls.webp', w: 204, h: 84, alt: 'AMS Controls' },
+      { src: '/assets/logos/machine/beck-automation.webp', w: 249, h: 84, alt: 'Beck Automation' },
+      { src: '/assets/logos/machine/framemac.webp', w: 84, h: 84, alt: 'FrameMac' },
+      { src: '/assets/logos/machine/pinnacle-machine.webp', w: 167, h: 84, alt: 'Pinnacle roll-forming line' }
     ]
   },
   // Real figures, from ubcbim.com itself: 783 projects, 12 countries, 224
@@ -665,8 +665,8 @@ UBC_DATA.beforeAfter = {
   eyebrow: 'Compare systems',
   title: 'The same house, framed both ways',
   standfirst: 'Drag to compare a wood-frame structure with the same house in light-gauge steel, both detailed from one coordinated model.',
-  before: '/assets/frames/wood.jpg',
-  after: '/assets/frames/steel.jpg',
+  before: '/assets/frames/wood-1000.webp',
+  after: '/assets/frames/steel-1000.webp',
   beforeLabel: 'Wood frame',
   afterLabel: 'Light-gauge steel',
   aspect: '5 / 4',
@@ -723,16 +723,16 @@ UBC_DATA.hero = {
     proof: ['783 projects', '224 clients', '12 countries', 'Revit', 'Vertex BD', 'FRAMECAD', 'Scottsdale']
   },
   stages: [
-    { n: '01', state: 'complete', still: '/assets/hero/stage-01.jpg',
+    { n: '01', state: 'complete', still: '/assets/hero/stage-01.webp',
       title: 'Your Project. Our Model.',
       body: 'Bring your architectural drawings, structural requirements and project scope. We build a coordinated CFS, LGSF or wood-frame BIM model around your project.' },
     // 02 and 03 swapped per client feedback: engineering and coordination
     // come before detailing. Each keeps its own visual state; the stills
     // are re-captured so each card shows its own stage.
-    { n: '02', state: 'coordinated', still: '/assets/hero/stage-02.jpg',
+    { n: '02', state: 'coordinated', still: '/assets/hero/stage-02.webp',
       title: 'Engineered & Coordinated',
       body: 'Engineering and coordination are integrated into the model to resolve critical conditions before they reach the field.' },
-    { n: '03', state: 'framing', still: '/assets/hero/stage-03.jpg',
+    { n: '03', state: 'framing', still: '/assets/hero/stage-03.webp',
       title: 'Detailed to Your Standards',
       body: 'We model and detail walls, floors, roofs, openings, connections and framing systems to your project standards and requirements.' },
     { n: '04', state: 'outputs', still: '/assets/hero/stage-04.jpg',

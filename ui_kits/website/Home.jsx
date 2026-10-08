@@ -43,7 +43,7 @@ function LogoCarousel({ images, reverse, height = 64 }) {
         {[...images, ...images].map((img, i) => (
           <div key={i} aria-hidden={i >= images.length || undefined}
             style={{ flexShrink: 0, height, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 var(--s-4)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
-            <img src={img.src} alt={i < images.length ? img.alt : ''} style={{ height: '66%', width: 'auto', maxWidth: 150, objectFit: 'contain' }} />
+            <img src={img.src} alt={i < images.length ? img.alt : ''} width={img.w} height={img.h} loading="lazy" decoding="async" style={{ height: '66%', width: 'auto', maxWidth: 150, objectFit: 'contain' }} />
           </div>
         ))}
       </div>
@@ -106,6 +106,8 @@ function LogoWalls() {
 // a wrapper), so the "before" image never squashes and the whole thing stays
 // responsive. Drag writes styles directly on rAF: no per-frame React renders.
 const BA = UBC_DATA.beforeAfter || {};
+// The comparison photos ship as -1000.webp plus a -600.webp for phones.
+const SRCSET = (src) => (src && src.endsWith('-1000.webp')) ? src.replace(/-1000\.webp$/, '-600.webp') + ' 600w, ' + src + ' 1000w' : undefined;
 function BeforeAfterSlider() {
   const sliderRef = React.useRef(null);
   const beforeRef = React.useRef(null);
@@ -217,9 +219,9 @@ function BeforeAfterSlider() {
                 borderRadius: 'var(--r-3)', boxShadow: 'var(--shadow-2)', cursor: 'ew-resize',
                 background: 'var(--surface-sunken)'
               }}>
-              <img src={BA.after} alt={BA.afterLabel || 'After'} draggable="false"
+              <img srcSet={SRCSET(BA.after)} sizes="(min-width: 1100px) 560px, 100vw" width={1000} height={800} loading="lazy" decoding="async" src={BA.after} alt={BA.afterLabel || 'After'} draggable="false"
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <img ref={beforeRef} src={BA.before} alt={BA.beforeLabel || 'Before'} draggable="false"
+              <img srcSet={SRCSET(BA.before)} sizes="(min-width: 1100px) 560px, 100vw" width={1000} height={800} loading="lazy" decoding="async" ref={beforeRef} src={BA.before} alt={BA.beforeLabel || 'Before'} draggable="false"
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               {BA.beforeLabel && label(BA.beforeLabel, 'left')}
               {BA.afterLabel && label(BA.afterLabel, 'right')}
@@ -256,7 +258,7 @@ function ProjectsGrid({ onGo }) {
   // One card per press; scroll-snap settles it on a card edge.
   const step = (dir) => {
     const t = trackRef.current; if (!t) return;
-    const card = t.querySelector('li');
+    const card = t.firstElementChild;
     const gap = parseFloat(getComputedStyle(t).columnGap) || 0;
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     t.scrollBy({ left: dir * ((card ? card.getBoundingClientRect().width : t.clientWidth) + gap), behavior: reduce ? 'auto' : 'smooth' });
@@ -288,11 +290,14 @@ function ProjectsGrid({ onGo }) {
             mounts once its card scrolls into view (ModelViewer's own
             IntersectionObserver), so off-screen cards cost nothing. No
             autoplay: a moving track fights both orbiting and screen readers. */}
-        <ul id="ubc-proj-track" ref={trackRef} className="ubc-proj-carousel" onScroll={syncEdges}
+        {/* A <div>, not a <ul>: the carousel's region role would otherwise
+            replace the list's own role and orphan its items (Lighthouse:
+            "ARIA role should be appropriate for the element"). */}
+        <div id="ubc-proj-track" ref={trackRef} className="ubc-proj-carousel" onScroll={syncEdges}
           tabIndex={0} role="region" aria-roledescription="carousel" aria-labelledby="ubc-proj-title"
           style={{ marginTop: 'var(--space-head-content)' }}>
           {projects.map((p, i) => (
-            <li key={p.id} role="group" aria-roledescription="slide" aria-label={(i + 1) + ' of ' + projects.length + ': ' + p.name}>
+            <div key={p.id} role="group" aria-roledescription="slide" aria-label={(i + 1) + ' of ' + projects.length + ': ' + p.name}>
               {/* A project with a real IFC gets the live model here, orbitable
                   on the spot; never a photo standing in for it.
                   stopPropagation keeps a drag-to-orbit from also firing the
@@ -310,9 +315,9 @@ function ProjectsGrid({ onGo }) {
                 <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
                 <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </Page>
     </Section>
   );

@@ -89,7 +89,7 @@ export function Header({ items = NAV, active, scrolled, onQuote, style, ...rest 
       }}>
         <Link href="/" aria-label="UBC BIM home" style={{ borderBottom: 'none', display: 'flex', alignItems: 'center', minHeight: 44 }}>
           {/* Client logo: Unique Building Concepts, BIM Services */}
-          <img src="/assets/brand/ubc-logo.png" alt="UBC: Unique Building Concepts, BIM Services" width={228} height={40} className="ubc-header-logo" />
+          <img src="/assets/brand/ubc-logo.webp" srcSet="/assets/brand/ubc-logo-1x.webp 1x, /assets/brand/ubc-logo.webp 2x" alt="UBC: Unique Building Concepts, BIM Services" width={228} height={40} className="ubc-header-logo" />
         </Link>
         <NavPill items={items} active={active} />
         <button type="button" className="ubc-header-cta" onClick={onQuote}>Start Your Next Project<span className="ubc-header-cta-arrow" aria-hidden="true">{'\u00a0\u2192'}</span></button>

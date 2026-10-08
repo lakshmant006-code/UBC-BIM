@@ -162,7 +162,7 @@ function StaticHero({ onQuote, onGo }) {
         <div style={{ display: 'grid', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {STAGES.map((s) => (
             <article key={s.n} style={{ background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden' }}>
-              {s.still && <img src={s.still} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover' }} />}
+              {s.still && <img src={s.still} srcSet={s.still.replace(/\.webp$/, '-640.webp') + ' 640w, ' + s.still + ' 1280w'} sizes="(min-width: 1100px) 33vw, 100vw" width={1280} height={800} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover' }} />}
               <div style={{ padding: 'var(--space-card-pad)' }}>
                 <div style={{ ...eyebrowStyle, color: 'var(--text-accent)' }}>Stage {s.n}</div>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
@@ -415,7 +415,7 @@ export function SceneHero({ onQuote, onGo }) {
     <div ref={wrapRef} style={{ height: ((STAGES.length + 1) * 100) + 'vh', position: 'relative', background: 'var(--surface-page)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
         {/* Poster until the live model is ready */}
-        <img src={STAGES[posterStage].still} alt="" aria-hidden="true" className="ubc-hero-poster"
+        <img src={STAGES[posterStage].still} alt="" aria-hidden="true" className="ubc-hero-poster" fetchPriority="high"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: ready ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
         <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0 }} />
         {loadError && (
