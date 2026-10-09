@@ -1,6 +1,14 @@
 import '../styles.css';
 import '../ui_kits/website/responsive.css';
 import { AppChrome } from './AppChrome.jsx';
+import { Archivo, IBM_Plex_Sans } from 'next/font/google';
+
+// Fonts are downloaded at build time and served from this site (next/font),
+// not @imported from fonts.googleapis.com: no render-blocking third-party
+// stylesheet, no extra connection chain before text can paint. The CSS
+// variables they set feed --font-display / --font-body in tokens/fonts.css.
+const archivo = Archivo({ subsets: ['latin'], weight: ['400', '500', '600', '700'], display: 'swap', variable: '--font-archivo' });
+const plexSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], display: 'swap', variable: '--font-plex-sans' });
 
 // The site-wide defaults index.html's single shared <title>/meta block used
 // to carry for every "page" of the old SPA; each route below now sets its
@@ -34,7 +42,7 @@ const ORG_SCHEMA = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={archivo.variable + ' ' + plexSans.variable}>
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }} />
         <style dangerouslySetInnerHTML={{ __html: KEYFRAMES }} />

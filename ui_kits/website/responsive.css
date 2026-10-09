@@ -223,7 +223,8 @@
    blue. Muted/faint text stays at 4.6:1 or better on the blue; cards take
    a slightly darker tint (not a lighter one) so their copy keeps that too.
    --accent (the one solid red CTA) is deliberately left alone. */
-:root { --frame-blue: #2A5FBE; }
+/* The navy of the UBC logo itself (public/assets/brand/ubc-logo.png). */
+:root { --frame-blue: var(--ubc-navy); }
 .ubc-frame-blue {
   background: var(--frame-blue); color: #fff;
   --text-strong: #FFFFFF; --text-body: rgba(255,255,255,.94); --text-muted: rgba(255,255,255,.88); --text-faint: rgba(255,255,255,.84); --text-accent: #FFFFFF;
@@ -274,7 +275,7 @@
   background-color: #FFFFFF;
   background-image:
     radial-gradient(circle at var(--g-lx) var(--g-ly), rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 19.02%, rgba(255,255,255,0.5) 38.05%, rgba(255,255,255,0.156) 57.07%, rgba(255,255,255,0) 76.1%),
-    radial-gradient(circle at var(--g-bx) var(--g-by), rgba(38,89,250,0.62) 0%, rgba(38,89,250,0.523) 12.73%, rgba(38,89,250,0.31) 25.45%, rgba(38,89,250,0.097) 38.18%, rgba(38,89,250,0.0) 50.9%),
+    radial-gradient(circle at var(--g-bx) var(--g-by), rgba(32,44,92,0.36) 0%, rgba(32,44,92,0.304) 12.73%, rgba(32,44,92,0.18) 25.45%, rgba(32,44,92,0.056) 38.18%, rgba(32,44,92,0.0) 50.9%),
     radial-gradient(circle at var(--g-rx) var(--g-ry), rgba(249,87,95,0.62) 0%, rgba(249,87,95,0.523) 16.75%, rgba(249,87,95,0.31) 33.5%, rgba(249,87,95,0.097) 50.25%, rgba(249,87,95,0.0) 67%),
     radial-gradient(circle at var(--g-wx) var(--g-wy), rgba(255,255,255,1) 0%, rgba(255,255,255,0.844) 10.28%, rgba(255,255,255,0.5) 20.55%, rgba(255,255,255,0.156) 30.83%, rgba(255,255,255,0) 41.1%);
   animation: ubcGlowFlow 7s ease-in-out infinite paused, ubcGlowDrift 11s ease-in-out infinite alternate paused;
@@ -428,12 +429,12 @@
    four visible on desktop, two on tablets, one (with a peek) on phones */
 .ubc-proj-carousel {
   --per: 4; --gap: var(--s-5);
-  list-style: none; margin: 0; padding: 0 0 var(--s-3);
+  margin: 0; padding: 0 0 var(--s-3);
   display: flex; gap: var(--gap); overflow-x: auto; overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none;
 }
 .ubc-proj-carousel::-webkit-scrollbar { display: none; }
-.ubc-proj-carousel > li { flex: 0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per)); min-width: 0; scroll-snap-align: start; }
+.ubc-proj-carousel > * { flex: 0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per)); min-width: 0; scroll-snap-align: start; }
 .ubc-proj-carousel:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .ubc-proj-nav {
   display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0;
