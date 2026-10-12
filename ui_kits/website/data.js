@@ -164,11 +164,11 @@ export const UBC_DATA = {
       size: '\u2248 81 \u00d7 69 ft overall (from model)', units: '3 levels \u00b7 3,524 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
       model: { src: '/assets/models/davis-farm-house.glb', radius: 13 } },
-    { id: 'putnam', name: 'Multi-family building, four levels', type: 'Multi-level', system: 'Light-gauge steel',
+    { id: 'putnam', name: 'Multi-family building, four levels', type: 'Multi-Family', system: 'Light-gauge steel',
       size: '\u2248 42 \u00d7 72 ft overall (from model)', units: '4 levels \u00b7 5,422 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
       model: { src: '/assets/models/putnam.glb', radius: 20 } },
-    { id: 'scs-five-level', name: 'Multi-family building, five levels', type: 'Multi-level', system: 'Light-gauge steel',
+    { id: 'scs-five-level', name: 'Multi-family building, five levels', type: 'Multi-Family', system: 'Light-gauge steel',
       size: '\u2248 39 \u00d7 68 ft overall (from model)', units: '5 levels \u00b7 12,883 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
       model: { src: '/assets/models/scs-five-level.glb', radius: 20 } },
@@ -1029,28 +1029,47 @@ UBC_DATA.trussPanelModel = {
   ]
 };
 
+/* Floor trusses (director: add a third "Explore in 3D" button). A real
+   first-floor deck: every Posi-Joist and Kerto-S joist filed under the
+   first-floor joist storeys of the Millbrook Plots 20 & 21 timber-frame IFC,
+   cut out by tools/extract_floor_system.py (nothing else from that building).
+   Marker positions are each member's own bounding-box centre through the
+   extractor's centring and Z-up to Y-up rotation; sizes and counts are read
+   from the IFC element names. */
+UBC_DATA.floorTrussModel = {
+  src: '/assets/models/floor-trusses.glb', radius: 9.89,
+  // A whole deck, so a marker frames a few joists, not one connection.
+  zoomRadius: 2.4,
+  finish: 'wood',
+  restAngle: [1.3, 1.5, 1.7],
+  hotspots: [
+    { id: 'posi-joist', label: 'Posi-Joist', position: [-2.215, 1.514, 1.57], viewAngle: [-1.2, 1.2, 1.6],
+      body: 'One of 57 Posi-Joists in this first-floor deck: metal-web floor trusses 304 mm deep with 72 mm timber chords. The open web lets pipes and ducts run through the floor without cutting a single joist.' },
+    { id: 'wide-joist', label: 'Wider chords', position: [1.461, -1.048, -1.902], viewAngle: [1.4, 1.2, -1.4],
+      body: 'Another 44 joists in the same deck use 122 mm chords instead of 72 mm, at the same 304 mm depth, so the floor stays level across both.' },
+    { id: 'kerto-joist', label: 'LVL joist', position: [-1.07, -1.543, -1.516], viewAngle: [-1.3, 1.0, -1.5],
+      body: 'Where the plan calls for solid joists, the model uses Kerto-S LVL (laminated veneer lumber), 245 \u00d7 45 mm.' }
+  ]
+};
+
 const CORE_REGIONS = ['South Carolina', 'Florida', 'Texas', 'California', 'Australia', 'New Zealand', 'Chile', 'Hyderabad, India', 'Dubai, UAE'];
 const EXTENDED_REGIONS = [...CORE_REGIONS, 'UK', 'Europe', 'Canada', 'Israel'];
 
+/* The six service pages. Body copy is the director's own (10 Oct changes
+   doc, one block per page), used as written apart from typo fixes ("3D
+   modeling for streamlines" -> "3D modeling streamlines", "LGSf" -> "LGSF",
+   spacing after commas) and lower-case "wood" in running text. */
 UBC_DATA.serviceArticles = [
   { id: 'drafting-architectural', label: 'Drafting and architectural', title: 'Drafting & Architectural Services',
     summary: 'Technical drawings and architectural documentation that turn a design into a buildable, coordinated construction set.',
     regions: CORE_REGIONS,
     sections: [
       { body: [
-        'Drafting services primarily involve the creation of technical drawings and plans, while architectural services encompass the broader scope of activities related to the design and execution of a project: planning, conceptualization, documentation and oversight. Both are essential to delivering a building project.',
-        'Drafting involves creating the technical drawings and plans that document a project in detail. Traditionally done by hand, it is now done almost entirely in CAD software, and covers several distinct kinds of drawings.'
+        'Drafting services translate design concepts and engineering requirements into accurate, detailed construction documentation. UBC supports residential and commercial projects with 2D CAD drafting, 3D BIM modeling, architectural drawings, structural drawings, and construction documentation, tailored to project standards, drawing requirements, and local practices.'
       ] },
-      { heading: 'What a drafting set includes', list: [
-        { title: 'Architectural drawings', body: 'Floor plans, elevations, sections and details that illustrate the layout, dimensions and features of buildings and spaces.' },
-        { title: 'Structural drawings', body: 'Structural plans, sections and details showing the layout and specifications of beams, columns, foundations and reinforcement.' },
-        { title: 'MEP drawings', body: 'HVAC, electrical, plumbing and fire-protection plans detailing the layout and specifications of building systems.' },
-        { title: 'Site plans and landscaping drawings', body: 'Site layout, grading, landscaping features, utilities and other site-related information.' },
-        { title: 'Detail drawings', body: 'Close-up views and specifications of specific building components, connections and assemblies.' }
-      ] },
-      { body: [
-        'Drafting services ensure accurate communication of design intent, facilitate coordination among disciplines, and provide the information construction and fabrication need.',
-        'UBC delivers drafting and architectural services across the USA and internationally, with location-specific expertise that means accurate documentation, faster approvals, and seamless coordination with local authorities and construction teams.'
+      { heading: 'What Does a Drafting Set Include?', body: [
+        'A complete drafting set can include architectural floor plans, elevations, building sections, reflected ceiling plans, door and window schedules, site plans, structural plans, foundation plans, framing plans, roof plans, wall sections, construction details, and MEP drawings covering mechanical, electrical, plumbing, HVAC, and fire protection systems. These documents provide the information required for design review, permitting, construction, and fabrication.',
+        'UBC delivers drafting and architectural services across South Carolina, Florida, Texas, and California, while supporting projects in Australia, New Zealand, South America (Chile), India (Hyderabad), and Dubai, UAE. Our location-specific experience helps produce accurate documentation aligned with local building codes, project standards, permitting requirements, and construction practices.'
       ] }
     ] },
 
@@ -1059,29 +1078,24 @@ UBC_DATA.serviceArticles = [
     regions: CORE_REGIONS,
     sections: [
       { body: [
-        '3D modeling significantly streamlines the time and expense of a construction project. Rather than flat renderings, our team works in full 3D perspective to capture every intricate detail, from foundation to ridge vent — stud spacing, drywall, siding and every other material — in one holistic, easily accessible format.',
-        'Obtaining quotes for bid packages is traditionally slow, often stalling on delayed or incomplete responses. With our modeling capability, we deliver bid packages, complete with full 3D views of every phase of construction, in under a week depending on complexity — letting clients compare quotes across every aspect of the project.',
-        'A detailed bill of materials paired with 3D views doesn’t just speed up bidding: it mitigates the risk of change orders, back-charges and disputes later. Clients frequently save up to three months solely from the efficiency this gains them.'
+        '3D modeling streamlines construction planning by providing a detailed view of the project from foundation to ridge vents. Unlike traditional 2D drawings, our BIM models clearly represent stud spacing, framing, drywall, siding, openings, and other construction elements, giving builders, developers, and contractors a complete visual understanding of the project. UBC BIM supports projects across South Carolina, Florida, Texas, California, Australia, New Zealand, Chile, Hyderabad, and Dubai.'
+      ] },
+      { heading: 'What Bill of Material Includes', body: [
+        'Traditional bid packages can take weeks to prepare, delaying pricing and project decisions. With UBC BIM’s BIM-driven modeling and estimation services, we can deliver detailed bid packages in under a week, depending on project complexity. Our packages include 3D views, quantity takeoffs, and detailed material information, helping clients review scopes, compare quotes, and make faster, more informed decisions.',
+        'A detailed Bill of Materials for CFS, LGSF and wood paired with 3D views doesn’t just speed up bidding—it helps reduce the risk of change orders, back-charges, material shortages, and disputes later. Our BOM can include framing members, studs, tracks, headers, sheathing, drywall, siding, fasteners, hardware, insulation, and other project-specific materials, along with quantities and relevant specifications. Clients can save up to three months through improved estimating and material planning, while gaining better cost control and a smoother construction workflow.'
       ] }
     ] },
 
-  { id: 'permit-sets', label: 'Lot specific permit sets', title: 'Lot Specific Permit Sets',
-    summary: 'Complete, code-compliant permit sets — architectural, structural, MEP, site, specifications and calculations — ready for submission.',
+  { id: 'permit-sets', label: 'Permit sets', title: 'Permit Sets',
+    summary: 'Complete, code-compliant permit sets: structural drawings, ready for submission.',
     regions: CORE_REGIONS,
     sections: [
       { body: [
-        'A "permit set" is the specific set of construction documents submitted to local building authorities to obtain the permits a project needs. It provides the detailed information that lets a jurisdiction confirm compliance with building codes, regulations and zoning requirements, for both residential and commercial projects.'
+        'A permit set is a comprehensive package for CFS, LGSF and wood construction drawings and documents submitted to local building authorities for approval before construction begins. It provides the information required to demonstrate compliance with applicable building codes, zoning requirements, and jurisdictional standards for residential and commercial projects. UBC BIM supports permit documentation for projects across the USA, including California, Texas, Florida, and South Carolina, as well as Australia, New Zealand, Hyderabad, Chile, and Dubai, UAE.'
       ] },
-      { heading: 'What a permit set includes', list: [
-        { title: 'Architectural drawings', body: 'Plans, elevations, sections and details of the building’s architectural features, including floor plans with layout, dimensions and finishes.' },
-        { title: 'Structural drawings', body: 'The design and layout of foundations, columns, beams, slabs and walls, with structural materials, sizes, reinforcement and connections.' },
-        { title: 'MEP drawings', body: 'Mechanical, electrical, plumbing and fire-protection systems: HVAC ductwork, electrical wiring, plumbing and fire suppression.' },
-        { title: 'Site plans', body: 'Building location on the property, property lines, setbacks, easements, parking, driveways, landscaping, utilities, stormwater and erosion control.' },
-        { title: 'Specifications', body: 'Written descriptions of materials, finishes, construction methods and quality standards, complementing the drawings.' },
-        { title: 'Calculations and reports', body: 'Engineering calculations, energy compliance reports, environmental assessments and other technical documents where required.' }
-      ] },
-      { body: [
-        'The permit set is typically one of the first steps in the construction process. Building authorities review it to confirm the proposed construction meets code and safety requirements before permits are issued, and inspections follow at various stages to verify the work matches the approved plans.'
+      { heading: 'What Permit Sets Include', body: [
+        'Depending on project scope and jurisdiction, a permit set may include structural drawings. These documents provide clear information on building layouts, dimensions, materials, structural systems, utilities, site conditions, and other technical requirements needed for plan review.',
+        'A complete and coordinated permit set helps streamline the approval process and reduce delays caused by missing or inconsistent information. UBC BIM develops detailed, BIM-driven permit documentation aligned with project requirements and local jurisdictional standards, helping builders, developers, contractors, and design teams move efficiently from design and approval to construction.'
       ] }
     ] },
 
@@ -1090,29 +1104,30 @@ UBC_DATA.serviceArticles = [
     regions: CORE_REGIONS,
     sections: [
       { body: [
-        'Our approach to 3D modeling and detailing is entirely customizable, for an individual homeowner or a national builder alike. Building a home effectively means building it twice: with us, the first build happens virtually, as a full walkthrough of the interior before anything real breaks ground.',
-        'That proactive pass lets us catch and resolve issues early, before they become costly delays on site. Problems that surface mid-construction escalate fast, in cost, in schedule and in frustration; prototyping the project as a detailed 3D rendering, with our engineers involved throughout, is how we get ahead of that.',
-        'The detailing phase is where consistency gets decided: uniform placement of light switches, framing packages aligned so stud spacing lines up under every floor truss, consistent corner blocking throughout. These are the details we model so you can specify them exactly on site, cutting waste and keeping construction moving.'
+        'Our 3D BIM modeling and detailing for CFS, LGSF and wood is fully customizable to your project requirements. We virtually build and coordinate the project before construction begins, allowing teams to review the design, visualize the interior, and identify potential issues early. This proactive approach helps reduce costly site changes, delays, and construction disruptions across residential and commercial projects.',
+        'Our detailed 3D models allow engineers and project teams to review every aspect of the structure before it reaches the job site.'
+      ] },
+      { heading: 'What Our Modeling and Detailing Includes', body: [
+        'From framing layouts and stud spacing to floor truss alignment, corner blocking, openings, and fixture placement, we focus on the details that improve consistency and constructability. By defining these requirements in the model, contractors can follow precise specifications on-site, reduce material waste, and streamline installation.',
+        'UBC’s 3D BIM modeling and detailing services combine technical accuracy with practical construction workflows to improve efficiency, minimize risks, and support smoother project execution. We serve projects across the USA, Australia, New Zealand, India, South America, and the Middle East, delivering consistent BIM solutions aligned with regional codes, project requirements, and construction practices.'
       ] }
     ] },
 
   { id: 'engineering', label: 'Engineering', title: 'Engineering',
     summary: 'In-house engineering for wood and light-gauge steel, from concept through permitting — no outside engineers required.',
     regions: CORE_REGIONS,
-    // The client's own engineering model images (supplied directly):
-    // the rendered member model with its supports, and two views of the
-    // analysis model (members, nodes and support points).
+    // The client's own engineering model images (supplied directly): the
+    // rendered member model with its supports, and a second view of the
+    // analysis model. The first analysis view is the sample output above.
     gallery: [
       { src: '/assets/engineering/eng-rendered-model.jpg', alt: 'Rendered structural model of a light-gauge steel building: wall framing, roof trusses and posts on their supports', caption: 'Structural model: walls, trusses and posts on their supports' },
-      { src: '/assets/engineering/eng-analysis-model-1.jpg', alt: 'Wireframe analysis model of the same building, with every node and support point marked', caption: 'Analysis model: members, nodes and supports' },
-      { src: '/assets/engineering/eng-analysis-model-2.jpg', alt: 'Wireframe analysis model of the building from the opposite side', caption: 'Analysis model: opposite view' }
+      { src: '/assets/engineering/eng-analysis-model-2.jpg', alt: 'Wireframe analysis model of the building from the opposite side, with every node and support point marked', caption: 'Analysis model: opposite view' }
     ],
     sections: [
       { body: [
-        'Our engineering services support both wood and steel projects end to end, so you don’t need to bring on separate engineers or contractors. Our in-house team works with you from concept through execution, delivering engineered solutions that meet local building codes and construction standards.',
-        'You choose the level of service: bring us plans you’ve already developed, or ones purchased online, and we’ll provide the engineering — wood or light-gauge steel — needed to meet permitting requirements.',
-        'For specialized elements like floor and roof trusses, we have established affiliations across both the wood and light-gauge steel industries, connecting you with the specific expertise a given truss design needs.',
-        'Our office network lets us apply region-specific code expertise while keeping one unified engineering standard: timber construction in New Zealand, steel systems in Australia, seismic-compliant design in Chile, engineering production in Hyderabad, fast-track developments in Dubai — all under the same integrated approach.'
+        'Our engineering services support both CFS, LGSF and wood projects end to end, so you don’t need to bring on separate engineers or contractors. Our in-house team works with you from concept through execution, delivering engineered solutions that meet local building codes and construction standards. Whether you need engineering for timber framing, light gauge steel, or specialized structural systems, we provide practical, code-compliant solutions tailored to your project.',
+        'You can provide plans purchased online, existing drawings, or project concepts, and our engineers can develop the required engineering for permitting and construction. Our services cover structural design, engineering calculations, and documentation for wood and steel systems. Through our industry affiliations, we can also connect projects with trusted specialists for floor trusses, roof trusses, and other specialized components when required.',
+        'With operations supporting projects across the USA, Australia, New Zealand, South America, India, and the Middle East, UBC combines regional code expertise with consistent engineering standards. From timber construction and light gauge steel to seismic and region-specific requirements, our integrated engineering approach helps improve compliance, efficiency, and constructability throughout the project lifecycle.'
       ] }
     ] },
 
@@ -1121,17 +1136,9 @@ UBC_DATA.serviceArticles = [
     regions: CORE_REGIONS,
     sections: [
       { body: [
-        'Manufacturing is integrated into our full suite of services: a streamlined way to cover a project’s construction material needs, with a focus on quality, efficiency and reliability. It begins with precise planning and design, using advanced software to turn conceptual ideas into tangible products, whether that’s a custom building component or a standardized material.',
-        'Strategic partnerships with trusted suppliers give us access to a wide range of high-quality materials, so we can manufacture and supply a comprehensive range of construction materials, including:'
-      ] },
-      { list: [
-        'Structural components: beams, columns and trusses',
-        'Exterior finishes: siding, roofing materials and windows',
-        'Interior fixtures: doors, cabinets and hardware',
-        'Specialized components for specific project requirements'
-      ] },
-      { body: [
-        'Our facility runs on state-of-the-art machinery, operated by skilled professionals, under quality-control measures that keep every product at or above regulatory standards and client expectations — fulfilling orders promptly and consistently, from a single renovation to a multi-million-dollar development.'
+        'At Unique Building Concepts (UBC), our manufacturing capabilities are integrated with our construction services to provide reliable, high-quality building components tailored to project requirements. From precise planning and design to production and quality control, we use advanced technology, equipment, and skilled professionals to ensure accuracy, consistency, and efficiency across projects in the USA and international markets.',
+        'We manufacture and supply a wide range of construction components, including structural elements such as beams, columns, and trusses; exterior components such as siding, roofing materials, and windows; interior components such as doors, cabinets, and hardware; and specialized components based on project requirements. Through established supplier partnerships, we also maintain access to quality materials and support projects with varying specifications and scales.',
+        'Our manufacturing process emphasizes precision, quality control, and timely delivery, helping contractors, builders, and developers maintain reliable project schedules. With operations and project support across the USA, Australia, New Zealand, India, South America, and the Middle East, UBC combines technology, skilled expertise, and efficient production workflows to deliver consistent construction solutions for projects of different sizes and requirements.'
       ] }
     ] }
 ];
@@ -1148,38 +1155,42 @@ UBC_DATA.social = [
 ];
 
 /* Sample output per service (client feedback: every service page should show
-   what you get, e.g. the Bill of Materials with its 3D model and steel
-   quantities). Everything is generated from the real Mocking Bird Lot 2
-   model on this site, not mocked up: drawings by tools/service_outputs.py,
-   quantities by tools/model_takeoff.py (pieces, length and volume-based
-   steel weight per profile, straight from the IFC geometry). */
+   what you get). Drawings and quantities are generated from a real project
+   model on this site (tools/service_outputs.py, tools/model_takeoff.py); per
+   the director's 10 Oct changes no project is named, the struck labels are
+   gone from the drawings themselves, and the permit sheet (S-311), the
+   engineering analysis model and the machine CSV are the director's own
+   images. The 3D model image is rendered from the same home's architectural
+   model (mocking-bird-lot-2-envelope.glb). */
 UBC_DATA.serviceOutputs = {
   "drafting-architectural": {
-    "note": "Drawn straight from the coordinated model of Mocking Bird Lot 2, one of the projects on this site.",
+    "note": "Send us a sketch, a PDF or a marked-up print and we build the architectural 3D model, then draw the plans and elevations from it. These come from one of the projects on this site.",
     "images": [
       {
+        "src": "/assets/services/output/model-3d.webp",
+        "alt": "3D architectural model of a single-storey home: lap siding, asphalt shingle roofs, sliding glass doors and a brick chimney"
+      },
+      {
         "src": "/assets/services/output/plan.webp",
-        "alt": "Floor plan of Mocking Bird Lot 2, cut at 1.2 m: walls in black, glazing in blue, overall 15.31 by 9.80 metres",
-        "caption": "Floor plan, cut at 1.2 m"
+        "alt": "Floor plan drawn from the same model: walls in black, glazing in blue, overall 15.31 by 9.80 metres"
       },
       {
         "src": "/assets/services/output/elevation.webp",
-        "alt": "South elevation of Mocking Bird Lot 2: lap siding, large sliding glass doors, a flat-roofed wing and a shingled gable with a brick chimney",
-        "caption": "South elevation"
+        "alt": "Elevation drawn from the same model: lap siding, large sliding glass doors, a flat-roofed wing and a shingled gable with a brick chimney"
       }
     ]
   },
   "bom-estimation": {
-    "note": "Quantities counted off the Mocking Bird Lot 2 framing model: pieces and length per profile, steel weight from each member's modelled volume at 7,850 kg/m³.",
+    "note": "Quantities counted off the framing model of a project on this site: pieces and length per profile, steel weight from each member's modelled volume at 7,850 kg/m³.",
     "images": [
       {
-        "src": "/assets/services/output/frame-3d.jpg",
-        "alt": "3D light-gauge steel framing model of Mocking Bird Lot 2: wall panels, scissor roof trusses and floor joists",
+        "src": "/assets/services/output/model-3d.webp",
+        "alt": "3D model of the home the quantities come from: lap siding, asphalt shingle roofs, sliding glass doors and a brick chimney",
         "caption": "The 3D model the quantities come from"
       }
     ],
     "table": {
-      "caption": "Steel quantities, Mocking Bird Lot 2",
+      "caption": "Steel quantities",
       "columns": [
         "Item",
         "Pieces",
@@ -1233,119 +1244,50 @@ UBC_DATA.serviceOutputs = {
     }
   },
   "permit-sets": {
-    "note": "A sample sheet assembled from the same model: plan and elevation in a title block. Real permit sets add sections, details, schedules and the engineer's stamp where required.",
+    "note": "A structural sheet from a UBC permit set: the anchor bolt layout, with the hold-down and anchor schedules and the title block.",
     "images": [
       {
-        "src": "/assets/services/output/permit-sheet.webp",
-        "alt": "Sample permit sheet A-101 for Mocking Bird Lot 2 with the floor plan, south elevation and a title block marked sample, not for construction",
-        "caption": "Sheet A-101 (sample)"
+        "src": "/assets/services/output/permit-s311.webp",
+        "alt": "Permit sheet S-311, anchor bolt layout: foundation plan with gridlines, hold-down and anchor bolt marks, schedules and the UBC title block",
+        "caption": "Sheet S-311: anchor bolt layout"
       }
     ]
   },
   "modeling-detailing": {
-    "note": "Two pieces of the Mocking Bird Lot 2 framing model, drawn member by member.",
+    "note": "From the framing model of a project on this site: the 3D frame, then pieces of it drawn member by member.",
     "images": [
       {
+        "src": "/assets/services/output/frame-3d.jpg",
+        "alt": "3D light-gauge steel framing model: wall panels, scissor roof trusses and floor joists"
+      },
+      {
         "src": "/assets/services/output/wall-panel.webp",
-        "alt": "Framing elevation of the 5.49 m west wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging",
-        "caption": "Wall panel, west wall"
+        "alt": "Framing elevation of a 5.49 m wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging"
       },
       {
         "src": "/assets/services/output/truss.webp",
-        "alt": "Elevation of scissor roof truss T1: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise",
-        "caption": "Roof truss T1 (scissor)"
+        "alt": "Elevation of a roof truss: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise"
       }
     ]
   },
   "engineering": {
-    "note": "The truss geometry the engineering is checked against: every chord and web as modelled, with span and rise.",
+    "note": "The analysis model the engineering is checked in: every member, node and support point of the frame.",
     "images": [
       {
-        "src": "/assets/services/output/truss.webp",
-        "alt": "Elevation of scissor roof truss T1: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise",
-        "caption": "Roof truss T1: geometry for design checks"
+        "src": "/assets/engineering/eng-analysis-model-1.jpg",
+        "alt": "Wireframe structural analysis model of a light-gauge steel house, with every node and support point marked",
+        "caption": "Structural analysis model"
       }
     ]
   },
   "manufacturing": {
-    "note": "A cut list taken from one wall panel of the model: every member's profile and length, ready to become the CSV your roll-former reads (the exact file format depends on the machine).",
+    "note": "A machine CSV straight from the model: each COMPONENT line is one member, with its label, length, section (3.625 × 1.625 in, 0.0346 in steel) and the position of every dimple, swage, service hole, lip cut and notch the roll-former makes.",
     "images": [
       {
-        "src": "/assets/services/output/wall-panel.webp",
-        "alt": "Framing elevation of the 5.49 m west wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging",
-        "caption": "The panel the cut list is for"
+        "src": "/assets/services/output/machine-csv.webp",
+        "alt": "Spreadsheet view of a roll-former machine CSV: unit, version, profile and frameset header rows, then one COMPONENT row per member with its length, section and tooling operations",
+        "caption": "Machine CSV (excerpt)"
       }
-    ],
-    "table": {
-      "caption": "Cut list, west wall panel (first 10 lines of 70 pieces)",
-      "columns": [
-        "Member",
-        "Profile",
-        "Length",
-        "Qty"
-      ],
-      "rows": [
-        [
-          "Track / header",
-          "350S162-43",
-          "5,485 mm",
-          "1"
-        ],
-        [
-          "Track / header",
-          "350S162-43",
-          "5,305 mm",
-          "1"
-        ],
-        [
-          "Stud",
-          "550S162-43",
-          "3,070 mm",
-          "18"
-        ],
-        [
-          "Stud",
-          "350S162-43",
-          "3,045 mm",
-          "17"
-        ],
-        [
-          "Track / header",
-          "550S162-43",
-          "2,440 mm",
-          "4"
-        ],
-        [
-          "Track / header",
-          "350S162-43",
-          "2,440 mm",
-          "4"
-        ],
-        [
-          "Track / header",
-          "550S162-43",
-          "2,435 mm",
-          "4"
-        ],
-        [
-          "Track / header",
-          "350S162-43",
-          "2,435 mm",
-          "4"
-        ],
-        [
-          "Blocking / bridging",
-          "550S162-43",
-          "330 mm",
-          "4"
-        ],
-        [
-          "Blocking / bridging",
-          "350S162-43",
-          "330 mm",
-          "4"
-        ]
-      ]
-    }
+    ]
   }
 };

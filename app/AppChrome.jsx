@@ -43,7 +43,10 @@ const FOOTER_COLUMNS = [
     { label: 'All projects', href: '/projects' },
     { label: 'Residential', href: '/projects#residential' },
     { label: 'Commercial', href: '/projects#commercial' },
-    { label: 'Multi-level', href: '/projects#multi-level' }
+    { label: 'Multi-Family', href: '/projects#multi-family' },
+    { label: 'Modular', href: '/projects#modular' },
+    { label: 'Bathroom pods', href: '/projects#bathroom-pods' },
+    { label: 'ADUs', href: '/projects#adus' }
   ] },
   { head: 'Company', links: [
     { label: 'Home', href: '/' },

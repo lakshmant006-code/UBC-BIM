@@ -160,29 +160,19 @@ function Leadership() {
   );
 }
 
-const DISCIPLINES = [
-  { icon: 'clipboard-list', title: 'Project Coordination', body: 'Owns the project end to end: scope confirmation, scheduling and the single point of contact for every update.' },
-  { icon: 'box', title: 'BIM Modeling', body: 'Builds the one coordinated 3D model every drawing and machine file downstream is drawn from.' },
-  { icon: 'ruler', title: 'Detailing', body: 'Turns the model into panel layouts, truss drawings and shop-ready detail, matched to the model member for member.' },
-  { icon: 'shield-check', title: 'Structural Engineering', body: 'Sizes and stamps the load path, connections and bracing the model depends on, where a jurisdiction requires it.' },
-  { icon: 'search-check', title: 'Quality Assurance', body: 'Checks every drawing and model revision against the last before it ships, and owns the RFI and revision record.' }
-];
-function TeamBehindModel() {
+// OUR SERVICE ROADMAP: the director's roadmap graphic (from the previous
+// ubcbim.com), in place of the "Five disciplines" cards. The image carries
+// its own title, so the heading is for screen readers and the outline.
+function ServiceRoadmap() {
   return (
     <Section id="team">
       <Page>
-        <SectionHead eyebrow="The team behind the model" title="Five disciplines, one coordinated process" center />
-        <div className="ubc-team-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
-          {DISCIPLINES.map((d, i) => (
-            <Reveal key={d.title} delay={i * 60}>
-              <div className="ubc-card" style={{ padding: 'var(--s-5)', height: '100%' }}>
-                <Icon name={d.icon} size={20} style={{ color: 'var(--accent)' }} />
-                <h3 style={{ ...serifH, fontSize: 'var(--fs-h4)', margin: 'var(--s-3) 0 0' }}>{d.title}</h3>
-                <p style={bodyStyle}>{d.body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <h2 className="ubc-visually-hidden">Our Service Roadmap</h2>
+        <Reveal>
+          <img src="/assets/about/service-roadmap.webp" width={1770} height={377} loading="lazy" decoding="async"
+            alt="Our Service Roadmap: Drafting & Architecture, Bill of Material & Estimation, Engineering, Permit Sets, Modeling & Detailing, and Manufacture / Supply of Materials, connected in sequence"
+            style={{ display: 'block', width: '100%', height: 'auto' }} />
+        </Reveal>
       </Page>
     </Section>
   );
@@ -290,7 +280,7 @@ export function About() {
       <OurStory />
       <WhereWeAre />
       <Leadership />
-      <TeamBehindModel />
+      <ServiceRoadmap />
       <QualityAccountability />
       <ProofStrip />
       <Testimonial />

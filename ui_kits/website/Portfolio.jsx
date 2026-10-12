@@ -84,7 +84,13 @@ function ProjectDetail({ project, onBack, onQuote }) {
 // then framing system inside it (LGSF or Wood, plus Other only where a type
 // has a project that is neither, e.g. mixed construction). Each type opens on its first
 // framing system that has projects.
-const TYPES = ['Residential', 'Commercial', 'Multi-level'];
+// Segments per the director's 10 Oct changes: Multi-level renamed
+// Multi-Family, plus Modular, Bathroom Pods and ADUs. A segment with no
+// project on the site yet says so instead of being hidden.
+const TYPES = ['Residential', 'Commercial', 'Multi-Family', 'Modular', 'Bathroom Pods', 'ADUs'];
+// Old deep links (/projects#multi-level) still land on the renamed tab.
+const HASH_ALIAS = { 'multi-level': 'Multi-Family' };
+const slug = (t) => t.toLowerCase().replace(/\s+/g, '-');
 const FRAMES = [
   { key: 'lgsf', label: 'LGSF', title: 'Light-gauge steel (LGSF)', test: (p) => p.system === 'Light-gauge steel' },
   { key: 'wood', label: 'Wood', title: 'Wood frame', test: (p) => p.system === 'Wood frame' },
@@ -124,7 +130,8 @@ export function Portfolio() {
   // that building type; the footer links to each.
   React.useEffect(() => {
     const fromHash = () => {
-      const t = TYPES.find((x) => x.toLowerCase() === decodeURIComponent(window.location.hash.slice(1)).toLowerCase());
+      const h = decodeURIComponent(window.location.hash.slice(1)).toLowerCase();
+      const t = HASH_ALIAS[h] || TYPES.find((x) => slug(x) === h || x.toLowerCase() === h);
       if (t) { setType(t); setFrame(firstFrame(D.projects.filter((p) => p.type === t))); }
     };
     fromHash();
@@ -159,12 +166,14 @@ export function Portfolio() {
         <div style={{ marginTop: 'var(--s-7)' }}>
           <FilterBar options={TYPES} value={type} onChange={pickType} count={ofType.length} />
         </div>
-        <div className="ubc-proj-sub">
-          <FilterPills options={frameOpts} value={frame} onChange={setFrame} label={type + ' projects by framing system'} />
-        </div>
+        {ofType.length > 0 && (
+          <div className="ubc-proj-sub">
+            <FilterPills options={frameOpts} value={frame} onChange={setFrame} label={type + ' projects by framing system'} />
+          </div>
+        )}
         <section className="ubc-frame-group" aria-labelledby="proj-group-head">
           <div className="ubc-frame-group-head">
-            <h2 id="proj-group-head">{type} · {current.title}</h2>
+            <h2 id="proj-group-head">{ofType.length ? type + ' \u00b7 ' + current.title : type}</h2>
             <span>{list.length} {list.length === 1 ? 'project' : 'projects'}</span>
           </div>
           {list.length ? (
@@ -178,7 +187,9 @@ export function Portfolio() {
               ))}
             </div>
           ) : (
-            <p className="ubc-proj-empty">No {current.label === 'Wood' ? 'wood-frame' : current.label === 'LGSF' ? 'light-gauge-steel' : ''} {type.toLowerCase()} projects on the site yet.</p>
+            <p className="ubc-proj-empty">{ofType.length
+              ? 'No ' + (current.label === 'Wood' ? 'wood-frame' : current.label === 'LGSF' ? 'light-gauge-steel' : '') + ' ' + type.toLowerCase() + ' projects on the site yet.'
+              : type + ' projects are being added. Ask us for examples of our ' + type.toLowerCase() + ' work.'}</p>
           )}
         </section>
       </Page>

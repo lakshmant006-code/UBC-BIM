@@ -765,6 +765,8 @@ button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-o
 .ubc-svc-output-note { margin: var(--s-2) 0 var(--s-4); font-size: var(--fs-body-sm); line-height: 1.6; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-body); }
 .ubc-svc-output-figs { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
 .ubc-svc-output-figs figure { margin: 0; }
+.ubc-svc-output-zoom { display: block; width: 100%; padding: 0; cursor: zoom-in; border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-3); overflow: hidden; background: var(--white); }
+.ubc-svc-output-zoom:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ubc-svc-output-figs a { display: block; border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-3); overflow: hidden; background: var(--white); border-bottom: var(--bw-hair) solid var(--border-subtle); }
 .ubc-svc-output-figs img { display: block; width: 100%; height: auto; }
 .ubc-svc-output-figs figcaption { margin-top: var(--s-2); font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.12em; line-height: 1.5; color: var(--text-muted); }
@@ -824,3 +826,11 @@ button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-o
   object-fit: contain; pointer-events: none; transition: opacity 400ms var(--ease-out);
 }
 @media (prefers-reduced-motion: reduce) { .ubc-hero-overlay { transition: none; } }
+
+/* In-page full-size image viewer (service sample outputs) */
+.ubc-img-viewer { border: none; padding: var(--s-5); max-width: min(1400px, 96vw); max-height: 94vh; border-radius: var(--r-3); background: var(--white); box-shadow: var(--shadow-3); }
+.ubc-img-viewer::backdrop { background: rgba(14,19,24,.72); }
+.ubc-img-viewer img { display: block; max-width: 100%; max-height: calc(94vh - 120px); width: auto; height: auto; margin: 0 auto; }
+.ubc-img-viewer p { margin: var(--s-3) 0 0; font-size: var(--fs-body-sm); line-height: 1.5; letter-spacing: 0.12em; color: var(--text-muted); text-align: center; }
+.ubc-img-viewer-x { position: sticky; top: 0; float: right; width: 44px; height: 44px; margin: calc(-1 * var(--s-3)) calc(-1 * var(--s-3)) 0 0; border-radius: 999px; border: var(--bw-hair) solid var(--border-strong); background: var(--white); color: var(--text-strong); font-size: 24px; line-height: 1; cursor: pointer; z-index: 1; }
+.ubc-img-viewer-x:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

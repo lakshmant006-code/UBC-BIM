@@ -65,7 +65,8 @@ import { HairlineFigure } from './hairline/HairlineFigure.jsx';
 const SERVICE_SUB_TABS = {
   'modeling-detailing': [
     { id: 'wall-panels', label: 'Wall panels' },
-    { id: 'truss-panels', label: 'Roof trusses' }
+    { id: 'truss-panels', label: 'Roof trusses' },
+    { id: 'floor-trusses', label: 'Floor trusses' }
   ]
 };
 
@@ -265,8 +266,8 @@ export function MockingBirdModel() {
   // Both sub-tabs are "the model view" (same GLB, different hotspot set).
   // Any tab change clears the open card and free-rotate so each view starts
   // from its resting frame; leaving both also drops the stale viewer api.
-  const onModelView = selection.type === 'wall-panels' || selection.type === 'truss-panels';
-  const activeModel = selection.type === 'truss-panels' ? D.trussPanelModel : wallPanel;
+  const onModelView = selection.type === 'wall-panels' || selection.type === 'truss-panels' || selection.type === 'floor-trusses';
+  const activeModel = selection.type === 'truss-panels' ? D.trussPanelModel : selection.type === 'floor-trusses' ? D.floorTrussModel : wallPanel;
   React.useEffect(() => {
     setOpenHotspot(null); setFreeRotate(false);
     if (!onModelView) setApi(null);
@@ -291,7 +292,7 @@ export function MockingBirdModel() {
   // panel actually reads clearly for that specific detail, rather than
   // every hotspot sharing the page's one resting angle.
   const handleHotspotClick = (hs) => {
-    if (api) api.flyTo({ center: hs.position, radius: HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
+    if (api) api.flyTo({ center: hs.position, radius: (activeModel && activeModel.zoomRadius) || HOTSPOT_ZOOM_RADIUS, angle: hs.viewAngle });
     window.setTimeout(() => setOpenHotspot(hs), reduceMotion ? 50 : 900);
   };
 
@@ -336,7 +337,7 @@ export function MockingBirdModel() {
           {activeModel ? (
             <>
               <ModelViewer key={selection.type} src={activeModel.src} radius={activeModel.radius}
-                height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle}
+                height="calc(100vh - 84px)" bare locked={!freeRotate} initialAngle={activeModel.restAngle} finish={activeModel.finish}
                 hotspots={activeModel.hotspots} onHotspotClick={handleHotspotClick} onReady={setApi} />
               <FreeRotateToggle on={freeRotate} onToggle={toggleFreeRotate} />
               {openHotspot && <HotspotCard hotspot={openHotspot} onClose={closeHotspot} />}
