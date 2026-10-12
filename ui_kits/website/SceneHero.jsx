@@ -144,8 +144,10 @@ function OutputChain({ shown, animate }) {
   );
 }
 
+// Only after stage 04 (director: a link is only there if we want the
+// visitor to go there), and as a solid button so it stands out.
 const seeHow = (
-  <a href="#the-ubc-way" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)' }}>
+  <a href="#the-ubc-way" className="ubc-btn-solid" style={{ marginTop: 'var(--s-4)' }}>
     See How It Works {'→'}
   </a>
 );
@@ -162,17 +164,17 @@ function StaticHero({ onQuote, onGo }) {
         <div style={{ display: 'grid', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
           {STAGES.map((s) => (
             <article key={s.n} style={{ background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden' }}>
-              {s.still && <img src={s.still} srcSet={s.still.replace(/\.webp$/, '-640.webp') + ' 640w, ' + s.still + ' 1280w'} sizes="(min-width: 1100px) 33vw, 100vw" width={1280} height={800} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover' }} />}
+              {s.still && <img src={s.still} srcSet={s.still.replace(/\.webp$/, '-640.webp') + ' 640w, ' + s.still + ' 1280w'} sizes="(min-width: 1100px) 33vw, 100vw" width={1280} height={800} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: s.overlay ? 'contain' : 'cover', background: 'var(--white)' }} />}
               <div style={{ padding: 'var(--space-card-pad)' }}>
                 <div style={{ ...eyebrowStyle, color: 'var(--text-accent)' }}>Stage {s.n}</div>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
                 {s.state === 'outputs' && <OutputChain shown animate={false} />}
+                {s.state === 'outputs' && seeHow}
               </div>
             </article>
           ))}
         </div>
-        <div style={{ marginTop: 'var(--s-4)' }}>{seeHow}</div>
       </section>
     </div>
   );
@@ -409,7 +411,8 @@ export function SceneHero({ onQuote, onGo }) {
 
   const introOp = Math.max(0, 1 - progress / (INTRO_END * 0.7));
   const stageOn = stage >= 0;
-  const posterStage = stageOn ? stage : 0;
+  const posterStage = stageOn && !STAGES[stage].overlay ? stage : 0;
+  const overlayOn = stageOn && Boolean(STAGES[stage].overlay);
 
   return (
     <div ref={wrapRef} style={{ height: ((STAGES.length + 1) * 100) + 'vh', position: 'relative', background: 'var(--surface-page)' }}>
@@ -417,7 +420,13 @@ export function SceneHero({ onQuote, onGo }) {
         {/* Poster until the live model is ready */}
         <img src={STAGES[posterStage].still} alt="" aria-hidden="true" className="ubc-hero-poster" fetchPriority="high"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: ready ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
-        <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0 }} />
+        <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0, opacity: overlayOn ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
+        {/* Stages with an `overlay` (02: the engineering analysis model) show
+            that image in place of the live model while they are active. */}
+        {STAGES.map((s, i) => s.overlay && (
+          <img key={'ov' + s.n} src={s.overlay} alt="" aria-hidden="true" className="ubc-hero-overlay" loading="lazy" decoding="async"
+            style={{ opacity: stage === i ? 1 : 0 }} />
+        ))}
         {loadError && (
           <span style={{ ...eyebrowStyle, position: 'absolute', right: 'var(--gutter)', top: 'var(--s-9)', color: 'var(--text-accent)' }}>The live model could not be loaded</span>
         )}
@@ -446,11 +455,11 @@ export function SceneHero({ onQuote, onGo }) {
                       <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(26px, 3vw, 40px)', fontWeight: 700, lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
                       <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-body)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
                       {s.state === 'outputs' && <OutputChain shown={on} animate />}
+                      {s.state === 'outputs' && <div>{seeHow}</div>}
                     </div>
                   );
                 })}
               </div>
-              <div style={{ marginTop: 'var(--s-3)' }}>{seeHow}</div>
             </div>
             {/* 01-04 progress indicator */}
             <ol aria-label="Stage progress" className="ubc-stage-rail" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--s-2)' }}>

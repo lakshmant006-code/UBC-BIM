@@ -62,15 +62,15 @@ export const UBC_DATA = {
     // measured from the model geometry itself rather than invented, and
     // `software` is read from each file's own header. Everything else about
     // these four is honestly what the model shows, not a delivery record.
-    { id: 'camping-resort', name: 'Camping resort steel frame', type: 'Commercial', system: 'Light-gauge steel',
+    { id: 'camping-resort', name: 'Commercial steel frame', type: 'Commercial', system: 'Light-gauge steel',
       size: '≈ 2,390 sq ft footprint (from model)', units: '988 columns · 834 beams', location: 'Not specified',
       delivered: 'Coordinated structural model', software: ['FRAMECAD Steelwise'],
       model: { src: '/assets/models/camping-resort.glb', radius: 11.2 } },
-    { id: 'shita-room', name: 'Shita Room framing', type: 'Residential', system: 'Light-gauge steel',
+    { id: 'shita-room', name: 'Three-storey residence', type: 'Residential', system: 'Light-gauge steel',
       size: '≈ 2,020 sq ft footprint (from model)', units: '3 storeys', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
       model: { src: '/assets/models/shita-room.glb', radius: 10.2 } },
-    { id: 'dael-4-0070', name: 'Project 4.0070', type: 'Residential', system: 'Mixed construction',
+    { id: 'dael-4-0070', name: 'Four-storey residence', type: 'Residential', system: 'Mixed construction',
       size: '≈ 1,970 sq ft footprint (from model)', units: '4 storeys', location: 'Not specified',
       delivered: 'Coordinated architectural model', software: ['Autodesk Revit'],
       model: { src: '/assets/models/dael-4-0070.glb', radius: 16 } },
@@ -84,7 +84,7 @@ export const UBC_DATA = {
     // typical web asset. Storey count is read from the file's own
     // IfcBuildingStorey entities (1st floor, 2nd floor, roof), not
     // estimated from height.
-    { id: 'mocking-bird-lot-2', name: 'Mocking Bird Lot 2', type: 'Residential', system: 'Light-gauge steel',
+    { id: 'mocking-bird-lot-2', name: 'Single-family home, two storeys', type: 'Residential', system: 'Light-gauge steel',
       size: '≈ 1,560 sq ft footprint (from model)', units: '2 storeys', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
       model: {
@@ -160,15 +160,15 @@ export const UBC_DATA = {
     // The third file was supplied as "UPDATED_IFC" with no project name in it
     // (IfcProject is the generic "SCS Project"), so it is named by what it is
     // until the client confirms its real name.
-    { id: 'davis-farm-house', name: 'Davis Farm House', type: 'Residential', system: 'Light-gauge steel',
+    { id: 'davis-farm-house', name: 'Single-family home, three levels', type: 'Residential', system: 'Light-gauge steel',
       size: '\u2248 81 \u00d7 69 ft overall (from model)', units: '3 levels \u00b7 3,524 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
       model: { src: '/assets/models/davis-farm-house.glb', radius: 13 } },
-    { id: 'putnam', name: 'Putnam', type: 'Multi-level', system: 'Light-gauge steel',
+    { id: 'putnam', name: 'Multi-family building, four levels', type: 'Multi-level', system: 'Light-gauge steel',
       size: '\u2248 42 \u00d7 72 ft overall (from model)', units: '4 levels \u00b7 5,422 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
       model: { src: '/assets/models/putnam.glb', radius: 20 } },
-    { id: 'scs-five-level', name: 'Five-level steel frame', type: 'Multi-level', system: 'Light-gauge steel',
+    { id: 'scs-five-level', name: 'Multi-family building, five levels', type: 'Multi-level', system: 'Light-gauge steel',
       size: '\u2248 39 \u00d7 68 ft overall (from model)', units: '5 levels \u00b7 12,883 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Scottsdale ScotSteel'],
       model: { src: '/assets/models/scs-five-level.glb', radius: 20 } },
@@ -183,20 +183,20 @@ export const UBC_DATA = {
     // header. The Millbrook location is the building address in the files
     // (town only). Both Millbrook files carry a different plot number inside
     // (24&25, 3) than their file names (20&21, 1); the file names are used.
-    { id: 'asebedo', name: 'Asebedo', type: 'Residential', system: 'Wood frame',
+    { id: 'asebedo', name: 'Single-storey home', type: 'Residential', system: 'Wood frame',
       size: '\u2248 131 \u00d7 67 ft overall (from model)', units: '1 storey \u00b7 2,836 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
       model: { src: '/assets/models/asebedo.glb', radius: 21.8 } },
-    { id: 'cassia-street', name: 'Cassia Street', type: 'Residential', system: 'Wood frame',
+    { id: 'cassia-street', name: 'Two-storey home', type: 'Residential', system: 'Wood frame',
       size: '\u2248 55 \u00d7 62 ft overall (from model)', units: '2 storeys \u00b7 2,588 framing members', location: 'Not specified',
       delivered: 'Coordinated framing model', software: ['Vertex BD'],
       model: { src: '/assets/models/cassia-street.glb', radius: 12.8 } },
-    { id: 'millbrook-plots-20-21', name: 'Millbrook, Plots 20 & 21', type: 'Residential', system: 'Wood frame',
-      size: '\u2248 46 \u00d7 53 ft overall (from model)', units: '2 storeys \u00b7 1,123 model elements', location: 'Crowborough, UK',
+    { id: 'millbrook-plots-20-21', name: 'Semi-detached pair', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 46 \u00d7 53 ft overall (from model)', units: '2 storeys \u00b7 1,123 model elements', location: 'United Kingdom',
       delivered: 'Timber-frame panel model', software: ['Autodesk Revit'],
       model: { src: '/assets/models/millbrook-plots-20-21.glb', radius: 13.5 } },
-    { id: 'millbrook-plot-1', name: 'Millbrook, Plot 1', type: 'Residential', system: 'Wood frame',
-      size: '\u2248 39 \u00d7 39 ft overall (from model)', units: '2 storeys \u00b7 750 model elements', location: 'Crowborough, UK',
+    { id: 'millbrook-plot-1', name: 'Detached two-storey home', type: 'Residential', system: 'Wood frame',
+      size: '\u2248 39 \u00d7 39 ft overall (from model)', units: '2 storeys \u00b7 750 model elements', location: 'United Kingdom',
       delivered: 'Timber-frame panel model', software: ['Autodesk Revit'],
       model: { src: '/assets/models/millbrook-plot-1.glb', radius: 11.5 } },
     // "Truss IFC" is a single Revit mesh (filed under Air Terminals) with no
@@ -210,6 +210,12 @@ export const UBC_DATA = {
       model: { src: '/assets/models/truss-model.glb', radius: 23.9 } }
   ],
   // Real logo/photo assets the client supplied directly (Client_Logos.zip,
+  // Software_logos.zip, Machine_logo.zip, and the 10 Oct changes doc for
+  // STAAD.Pro, STRAP, Tekla, Valtek and the wood machines), trimmed of
+  // their built-in white margins and resized only. `name` is shown above
+  // each logo (director's design reference). AMS Controls and Beck
+  // Automation were removed at the director's request.
+  // Original note:
   // Software_logos.zip, Machine_logo.zip), processed once (resized, no
   // content changes) into ui_kits/website/assets/logos/. `machine` mixes
   // brand logos (Arkitech, Pinnacle, AMS Controls, Beck Automation,
@@ -234,23 +240,35 @@ export const UBC_DATA = {
       { src: '/assets/logos/client/indan-planning-systems.webp', w: 147, h: 64, alt: 'INDAN Planning Systems Ltd.' }
     ],
     software: [
-      { src: '/assets/logos/software/framecad.webp', w: 168, h: 84, alt: 'FrameCAD' },
-      { src: '/assets/logos/software/mwf-pro-metal.webp', w: 300, h: 82, alt: 'MWF Pro Metal' },
-      { src: '/assets/logos/software/autodesk-revit.webp', w: 84, h: 84, alt: 'Autodesk Revit' },
-      { src: '/assets/logos/software/scottsdale.webp', w: 168, h: 84, alt: 'Scottsdale' },
-      { src: '/assets/logos/software/vertex-bd.webp', w: 179, h: 84, alt: 'Vertex BD' }
+      { src: '/assets/logos/software/autodesk-revit.webp', w: 240, h: 112, name: 'Autodesk Revit', alt: 'Autodesk Revit' },
+      { src: '/assets/logos/software/vertex-bd.webp', w: 400, h: 108, name: 'Vertex BD', alt: 'Vertex BD' },
+      { src: '/assets/logos/software/framecad.webp', w: 400, h: 99, name: 'FRAMECAD', alt: 'FRAMECAD' },
+      { src: '/assets/logos/software/scottsdale.webp', w: 400, h: 95, name: 'Scottsdale', alt: 'Scottsdale' },
+      { src: '/assets/logos/software/staad-pro.webp', w: 128, h: 128, name: 'STAAD.Pro', alt: 'STAAD.Pro' },
+      { src: '/assets/logos/software/strap-atir.webp', w: 362, h: 128, name: 'STRAP', alt: 'STRAP (ATIR)' },
+      { src: '/assets/logos/software/tekla.webp', w: 280, h: 83, name: 'Tekla', alt: 'Tekla' },
+      { src: '/assets/logos/software/mwf-pro-metal.webp', w: 400, h: 109, name: 'MWF StrucSoft', alt: 'MWF Pro Metal by StrucSoft' }
     ],
     machine: [
-      { src: '/assets/logos/machine/arkitech.webp', w: 84, h: 84, alt: 'Arkitech' },
-      { src: '/assets/logos/machine/framecad-machine.webp', w: 131, h: 84, alt: 'FrameCAD roll-forming line' },
-      { src: '/assets/logos/machine/howick-machine.webp', w: 140, h: 84, alt: 'Howick roll-forming line' },
-      { src: '/assets/logos/machine/knudson-machine.webp', w: 149, h: 84, alt: 'Knudson roll-forming line' },
-      { src: '/assets/logos/machine/pinnacle.webp', w: 286, h: 84, alt: 'Pinnacle Light Gauge Steel' },
-      { src: '/assets/logos/machine/scottsdale-machine.webp', w: 126, h: 84, alt: 'Scottsdale roll-forming line' },
-      { src: '/assets/logos/machine/ams-controls.webp', w: 204, h: 84, alt: 'AMS Controls' },
-      { src: '/assets/logos/machine/beck-automation.webp', w: 249, h: 84, alt: 'Beck Automation' },
-      { src: '/assets/logos/machine/framemac.webp', w: 84, h: 84, alt: 'FrameMac' },
-      { src: '/assets/logos/machine/pinnacle-machine.webp', w: 167, h: 84, alt: 'Pinnacle roll-forming line' }
+      { src: '/assets/logos/machine/framecad-machine.webp', w: 198, h: 128, name: 'FRAMECAD', alt: 'FRAMECAD roll-forming line' },
+      { src: '/assets/logos/machine/howick-machine.webp', w: 224, h: 128, name: 'Howick', alt: 'Howick roll-forming line' },
+      { src: '/assets/logos/machine/scottsdale-machine.webp', w: 240, h: 128, name: 'Scottsdale', alt: 'Scottsdale roll-forming line' },
+      { src: '/assets/logos/machine/pinnacle.webp', w: 275, h: 83, name: 'Pinnacle', alt: 'Pinnacle Light Gauge Steel' },
+      { src: '/assets/logos/machine/pinnacle-machine.webp', w: 213, h: 128, name: 'Pinnacle', alt: 'Pinnacle roll-forming line' },
+      { src: '/assets/logos/machine/knudson-machine.webp', w: 228, h: 128, name: 'Knudson', alt: 'Knudson roll-forming line' },
+      { src: '/assets/logos/machine/valtek.webp', w: 274, h: 128, name: 'Valtek', alt: 'Valtek roll-forming line' },
+      { src: '/assets/logos/machine/framemac.webp', w: 197, h: 50, name: 'FrameMac', alt: 'FrameMac' },
+      { src: '/assets/logos/machine/arkitech.webp', w: 208, h: 128, name: 'Arkitech', alt: 'Arkitech' }
+    ],
+    wood: [
+      { src: '/assets/logos/wood/essetre.webp', w: 329, h: 110, name: 'Essetre', alt: 'Essetre' },
+      { src: '/assets/logos/wood/easyframe.webp', w: 400, h: 78, name: 'EasyFrame', alt: 'EasyFrame automated marking system' },
+      { src: '/assets/logos/wood/hundegger.webp', w: 375, h: 91, name: 'Hundegger', alt: 'Hundegger' },
+      { src: '/assets/logos/wood/homag.webp', w: 137, h: 30, name: 'Homag', alt: 'Homag' },
+      { src: '/assets/logos/wood/weinmann.webp', w: 168, h: 50, name: 'Weinmann', alt: 'Weinmann' },
+      { src: '/assets/logos/wood/lap.webp', w: 85, h: 46, name: 'LAP', alt: 'LAP laser projection' },
+      { src: '/assets/logos/wood/mitek.webp', w: 92, h: 44, name: 'MiTek', alt: 'MiTek' },
+      { src: '/assets/logos/wood/randek.webp', w: 177, h: 46, name: 'Randek', alt: 'Randek' }
     ]
   },
   // Real figures, from ubcbim.com itself: 783 projects, 12 countries, 224
@@ -299,7 +317,8 @@ UBC_DATA.blueprint = {
     { role: 'Fabricators', body: 'Shop-ready detail, drawn from the same model as the takeoff, so a revision reaches both together.', serviceIndexes: [0, 5] },
     { role: 'Engineers', body: 'Engineering support for wood and light-gauge steel, in house, from concept through permitting.', serviceIndexes: [2] },
     { role: 'Architects / design teams', body: 'Drafting and detailing that stays inside your own drawing standards and titleblocks.', serviceIndexes: [6] },
-    { role: 'Developers', body: 'One coordinated model across a project, so the framing, MEP and permit set never fall out of step with each other.', serviceIndexes: [3, 4] }
+    { role: 'Developers', body: 'One coordinated model across a project, so the framing, MEP and permit set never fall out of step with each other.', serviceIndexes: [3, 4] },
+    { role: 'Modular, Panelized & Volumetric Construction', body: 'Modular, panelized, bathroom-pod and offsite volumetric builders: module and panel layouts, BOMs and machine files from one model.', serviceIndexes: [0, 5] }
   ]
 };
 
@@ -314,6 +333,12 @@ UBC_DATA.faq = [
     a: 'Seven, all drawn from one coordinated model: wall panel detailing, roof and floor trusses, engineering, MEP detailing and clash detection, permit documents, Bill of Materials and machine CSV, and architectural drafting.' },
   { q: 'Do you work with wood frame or light-gauge steel?',
     a: 'Both, often on the same project. Wall panel detailing, engineering and machine files are covered for wood frame and light-gauge steel alike.' },
+  { q: 'Do you detail wood-frame walls, floors and roof trusses?',
+    a: 'Yes. Wood-frame wall panels, floor systems and roof trusses are modelled and detailed the same way as light-gauge steel: shop drawings, a Bill of Materials and production files all come from the one model.' },
+  { q: 'Which wood framing machines can your files run on?',
+    a: 'We prepare production files for wood lines including Hundegger, Weinmann, Homag, Randek, Essetre, MiTek, LAP and EasyFrame. Tell us what you run and we’ll confirm the file format before you commit.' },
+  { q: 'Can you engineer wood-frame and timber projects?',
+    a: 'Yes, in house. Our engineers cover structural design, calculations and documentation for timber framing and wood-frame buildings, from a concept or purchased plan through permitting and construction.' },
   { q: 'What software and file formats do you use?',
     a: 'Revit, Vertex BD, Tekla Structures and Navisworks on our side, producing RVT, IFC, DWG, NC1, machine CSV and clash reports. Send whatever you have: a Revit model, an IFC, an architectural PDF, or photos of a marked-up print.' },
   { q: 'How many countries do you work in?',
@@ -325,7 +350,7 @@ UBC_DATA.faq = [
   { q: "What's the fastest way to reach a person?",
     a: 'Start a live chat, book a 15-minute call, or send drawings by email or WhatsApp — a modeller answers directly, no sales script.' },
   { q: 'Which roll-formers do your files support?',
-    a: 'FRAMECAD, Howick, Scottsdale, Pinnacle, Knudson, AMS Controls, Beck Automation, FrameMac and Arkitech. Machine not listed? Tell us what you run and we\u2019ll confirm file compatibility before you commit.' },
+    a: 'FRAMECAD, Howick, Scottsdale, Pinnacle, Knudson, FrameMac, Arkitech and Valtek. Machine not listed? Tell us what you run and we\u2019ll confirm file compatibility before you commit.' },
   { q: 'Do you stamp CFS engineering?',
     a: 'Yes, where it\u2019s required. Every project ships with a permit set, stamped where the jurisdiction requires it.' },
   { q: 'Can I see real project examples?',
@@ -662,7 +687,7 @@ UBC_DATA.blogPosts = [
 /* Before / after comparison slider. Swap `before` and `after` for the real
    images when they land; nothing else needs to change. */
 UBC_DATA.beforeAfter = {
-  eyebrow: 'Compare systems',
+  eyebrow: 'You choose wood or steel, we will frame it',
   title: 'The same house, framed both ways',
   standfirst: 'Drag to compare a wood-frame structure with the same house in light-gauge steel, both detailed from one coordinated model.',
   before: '/assets/frames/wood-1000.webp',
@@ -717,10 +742,10 @@ UBC_DATA.hero = {
   camPos: [14.70, 11.99, 17.50],
   intro: {
     h1: 'CFS, LGSF & Wood Detailing, Engineered for Construction',
-    sub: 'From estimating and BIM modeling to engineering, permit sets and shop drawings, UBC BIM helps manufacturers, contractors, builders and fabricators turn project requirements into accurate, construction-ready documentation.',
+    sub: 'From estimating and BIM modeling to engineering, permit sets and shop drawings, UBC BIM helps manufacturers, contractors, builders and fabricators turn project requirements into accurate solutions equipped for construction and fabrication.',
     primary: 'Start Your Next Project \u2192',
     secondary: 'Explore Our Services \u2192',
-    proof: ['783 projects', '224 clients', '12 countries', 'Revit', 'Vertex BD', 'FRAMECAD', 'Scottsdale']
+    proof: ['783 projects', '224 clients', '12 countries', 'Revit', 'Vertex BD', 'FRAMECAD', 'Scottsdale', 'STAAD.Pro', 'STRAP', 'Tekla', 'MWF StrucSoft']
   },
   stages: [
     { n: '01', state: 'complete', still: '/assets/hero/stage-01.webp',
@@ -729,17 +754,20 @@ UBC_DATA.hero = {
     // 02 and 03 swapped per client feedback: engineering and coordination
     // come before detailing. Each keeps its own visual state; the stills
     // are re-captured so each card shows its own stage.
-    { n: '02', state: 'coordinated', still: '/assets/hero/stage-02.webp',
-      title: 'Engineered & Coordinated',
-      body: 'Engineering and coordination are integrated into the model to resolve critical conditions before they reach the field.' },
+    // 02 shows the engineering analysis model (director's wireframe image,
+    // the same house as a structural analysis model) instead of the
+    // coordination colours; `overlay` replaces the live 3D for this stage.
+    { n: '02', state: 'coordinated', still: '/assets/hero/stage-02-analysis.webp', overlay: '/assets/hero/stage-02-analysis.webp',
+      title: 'Value Engineered Solutions for LGSF, Wood',
+      body: 'Engineered solutions for LGSF, wood, integrating design requirements into the model to resolve critical conditions and meet local building codes, permit requirements, and construction standards.' },
     { n: '03', state: 'framing', still: '/assets/hero/stage-03.webp',
-      title: 'Detailed to Your Standards',
-      body: 'We model and detail walls, floors, roofs, openings, connections and framing systems to your project standards and requirements.' },
+      title: '3D BIM Modeling & Detailing',
+      body: '3D BIM modeling and detailing creates a digital twin of residential and commercial projects, capturing framing, walls, floors, roofs, openings, and connections in a detailed virtual environment that is entirely customizable to your preferences and needs.' },
     { n: '04', state: 'outputs', still: '/assets/hero/stage-04.jpg',
       title: 'Ready for the Next Step',
       body: 'Get the coordinated models, drawings, quantities and documentation your team needs for the next stage of the project.' }
   ],
-  outputs: ['BIM Model', 'Shop Drawings', 'Permit Sets', 'BOM', 'Machine Files (CSV)']
+  outputs: ['BIM Model', 'Shop Drawings', 'Permit Sets', 'BOM', 'CNC Production Files']
 };
 
 /* Homepage sections added or rewritten by the homepage developer handoff.
@@ -750,24 +778,27 @@ UBC_DATA.hero = {
    About restructure note on time zones, the Engineering service article),
    not new claims. */
 UBC_DATA.home = {
+  // The director asked for the previous ubcbim.com "About UBC" block here
+  // (title, Our USPs list, video and quote), in place of "What sets us
+  // apart" and its six cards. The director will supply a new video; until
+  // then the existing About film plays.
   aboutUs: {
-    eyebrow: 'About us',
-    title: 'What sets us apart',
-    body: 'We support contractors, builders, component manufacturers, architects, and engineers with specialist engineering, BIM, detailing, coordination, and documentation services.',
-    // Set to { src, poster, captions } once the About Us video and its
-    // captions are supplied (handoff open item); the section renders without
-    // it until then rather than showing an empty player.
-    video: null
+    eyebrow: 'About UBC',
+    title: 'Pioneering BIM Solutions, Our Dedicated Team Delivers',
+    titleAccent: 'Tailored Services',
+    uspTitle: 'Our USPs',
+    usps: [
+      'Full-service for steel and wood structures, from bid to delivery.',
+      'Fast turnaround, hours/days not weeks/months.',
+      '24×7 and 365 days service with 3 shifts and a global presence.',
+      'Multiple support software tools for detailing and structural engineering.',
+      'Specialized in residential homes and commercial buildings.',
+      'Constructability and ease of installation are the key factors we consider while designing.'
+    ],
+    quote: 'Dreams → Blueprints → Reality – with Speed, Precision, and Unwavering Dedication',
+    video: { src: '/assets/about/about-film.mp4', poster: '/assets/about/about-film-poster.jpg' }
   },
-  usps: [
-    { title: 'A US point of contact', body: 'Talk to someone in your time zone, from first scope to final revision.' },
-    { title: 'Files your line can run', body: 'We model in the software your machine already reads, so files go straight to production without a re-draw.' },
-    { title: 'Engineering in-house', body: 'Wood and light-gauge steel engineering from concept through permitting, with no outside engineers to bring in.' },
-    { title: 'Work that moves overnight', body: 'Our production team works while you sleep, so the next revision is waiting in the morning.' },
-    { title: 'No minimum volume', body: 'One project is fine. Add a whole detailing team when the workload calls for it.' },
-    { title: 'Your drawings stay yours', body: 'NDA on request, and your files are used for your project only.' }
-  ],
-  whyTitle: 'Why CFS, LGSF & wood manufacturers outsource detailing to UBC BIM',
+  whyTitle: 'Why CFS, LGSF & wood manufacturers partner with UBC BIM',
   ubcWay: {
     eyebrow: 'The UBC Way',
     title: 'Understand. Coordinate. Deliver. No surprises in between.',
@@ -789,7 +820,7 @@ UBC_DATA.home = {
   },
   technology: {
     eyebrow: 'Technology',
-    title: 'Pick your roll-former. See exactly what lands on your line.',
+    title: 'Pick your machine. See exactly what lands on your line.',
     youSend: ['Architectural drawings (PDF, DWG)', 'Structural requirements', 'Project scope'],
     shipsWith: ['Coordinated model (RVT \u00b7 IFC \u00b7 DWG)', 'Navisworks clash report (NWD \u00b7 PDF)', 'BOM (XLSX \u00b7 CSV)', 'Permit set (PDF, stamped where required)'],
     footer: 'Machine not listed? Tell us what you run \u2014 we\u2019ll confirm file compatibility before you commit.'

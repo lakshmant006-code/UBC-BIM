@@ -38,7 +38,6 @@
 
   /* Why UBC / USPs / Who we serve / Where we are: three cards -> two */
   .ubc-why-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .ubc-serve-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* About: team (five) / QA (six) -> narrower grids */
   .ubc-team-grid { grid-template-columns: repeat(3, 1fr) !important; }
@@ -124,7 +123,6 @@
 
   /* Card grids: down to one column on a phone */
   .ubc-why-grid { grid-template-columns: minmax(0, 1fr) !important; }
-  .ubc-serve-grid { grid-template-columns: minmax(0, 1fr) !important; }
   .ubc-team-grid { grid-template-columns: minmax(0, 1fr) !important; }
   .ubc-qa-grid { grid-template-columns: minmax(0, 1fr) !important; }
 
@@ -189,6 +187,29 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: var(--s-6) var(--s-5) !important;
   }
+}
+
+/* ---------- Who we serve: wrapping cards, a short last row centred ---------- */
+.ubc-serve-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-card-gap); }
+.ubc-serve-grid > * { flex: 0 1 calc((100% - 2 * var(--space-card-gap)) / 3); min-width: 0; }
+@media (max-width: 1100px) { .ubc-serve-grid > * { flex-basis: calc((100% - var(--space-card-gap)) / 2); } }
+@media (max-width: 640px) { .ubc-serve-grid > * { flex-basis: 100%; } }
+
+/* ---------- Named logo tiles (software, LGSF and wood machines) ----------
+   Brand name above a larger logo, per the director's reference. */
+.ubc-logo-tile {
+  flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  gap: var(--s-2); padding: var(--s-3) var(--s-5) var(--s-4); min-width: 150px;
+  background: var(--surface-card); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-2);
+}
+.ubc-logo-name {
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; line-height: 1.5;
+  letter-spacing: 0.12em; color: var(--text-strong); white-space: nowrap;
+}
+.ubc-logo-tile img { display: block; height: 64px; width: auto; max-width: 200px; object-fit: contain; }
+@media (max-width: 640px) {
+  .ubc-logo-tile { min-width: 120px; padding: var(--s-2) var(--s-4) var(--s-3); }
+  .ubc-logo-tile img { height: 52px; max-width: 160px; }
 }
 
 /* ---------- Logo carousels (clients / software / machines) ----------
@@ -782,3 +803,24 @@ button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-o
 .ubc-qr-error { margin: 0; font-size: var(--fs-body-sm); color: var(--danger); }
 .ubc-qr-sent-title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 600; color: var(--text-strong); }
 .ubc-qr-sent p { margin: var(--s-2) 0 0; font-size: var(--fs-body-sm); line-height: 1.6; letter-spacing: 0.12em; color: var(--text-muted); }
+
+/* ---------- Solid red link-buttons (About UBC block, "See How It Works") ---------- */
+.ubc-btn-solid {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
+  padding: 10px 22px; border-radius: var(--r-pill); background: var(--accent); color: var(--white);
+  font-family: var(--font-body); font-size: var(--fs-body-sm); font-weight: 600; line-height: 1.5;
+  letter-spacing: 0.12em; word-spacing: 0.16em; text-decoration: none; border: none; cursor: pointer;
+  box-shadow: 0 6px 18px -8px rgba(214,54,31,.55);
+  transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+.ubc-btn-solid:hover { background: var(--accent-press); color: var(--white); text-decoration: none; }
+.ubc-btn-solid:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .ubc-btn-solid { transition: none; } }
+
+/* Hero stage overlay (stage 02's engineering analysis model): upper right,
+   clear of the stage copy at bottom left. */
+.ubc-hero-overlay {
+  position: absolute; top: 12%; right: var(--gutter); width: 58%; height: 60%;
+  object-fit: contain; pointer-events: none; transition: opacity 400ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) { .ubc-hero-overlay { transition: none; } }
