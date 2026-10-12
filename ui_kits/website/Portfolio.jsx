@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '../../components/core/Button.jsx';
 import { Tag } from '../../components/core/Tag.jsx';
 import { Icon } from '../../components/core/Icon.jsx';
@@ -13,15 +14,20 @@ import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal, FilterPills } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
+import { projectHref, projectBySlug } from './site.js';
+import { Breadcrumbs } from './ServicePage.jsx';
 
 function ProjectDetail({ project, onBack, onQuote }) {
   return (
     <div>
       <Page style={{ paddingTop: 'var(--s-7)' }}>
-        <Button variant="ghost" icon={<Icon name="arrow-left" size={16} />} onClick={onBack}>All projects</Button>
+        <Breadcrumbs trail={[['Home', '/'], ['Projects', '/projects'], [project.name, projectHref(project)]]} />
+        <div style={{ marginTop: 'var(--s-4)' }}>
+          <Button variant="ghost" icon={<Icon name="arrow-left" size={16} />} onClick={onBack}>All projects</Button>
+        </div>
       </Page>
       <Page style={{ paddingTop: 'var(--s-5)' }}>
-        <SectionHeading eyebrow={project.type + ' · ' + project.system} title={project.name} size="lg" />
+        <SectionHeading as="h1" eyebrow={project.type + ' · ' + project.system} title={project.name} size="lg" />
       </Page>
       <div className="ubc-model-row" style={{ marginTop: 'var(--s-7)', position: 'relative' }}>
         {/* A real IFC, converted to glTF, gets the orbitable viewer; everything
@@ -145,7 +151,7 @@ export function Portfolio() {
     else if (/steel|lgsf/i.test(f)) setFrame('lgsf');
     else if (/wood/i.test(f)) setFrame('wood');
   }, [D.projects]);
-  const [open, setOpen] = React.useState(null);
+  const router = useRouter();
   const ofType = D.projects.filter((p) => p.type === type);
   const frameOpts = FRAMES.filter((f) => f.key !== 'other' || ofType.some(f.test))
     .map((f) => ({ value: f.key, label: f.label + ' (' + ofType.filter(f.test).length + ')' }));
@@ -155,13 +161,12 @@ export function Portfolio() {
   // Opening a project is local state, not a page change, so nothing else
   // resets scroll: without this the live model can land scrolled out of
   // view if the grid card that opened it was well down the page.
-  const openProject = (p) => { setOpen(p); window.scrollTo(0, 0); };
-  const closeProject = () => { setOpen(null); window.scrollTo(0, 0); };
-  if (open) return <ProjectDetail project={open} onBack={closeProject} onQuote={onQuote} />;
+  // Each project has its own URL (/projects/<slug>, team SEO audit).
+  const openProject = (p) => router.push(projectHref(p));
   return (
     <Section>
       <Page>
-        <SectionHeading eyebrow="3D Project Lab" title="Rotate a project, read its spec, ask for a quote" size="lg"
+        <SectionHeading as="h1" eyebrow="3D Project Lab" title="Rotate a project, read its spec, ask for a quote" size="lg"
           standfirst="Our wood-frame and light-gauge-steel projects, each with a live model, its specification and the files we delivered." />
         <div style={{ marginTop: 'var(--s-7)' }}>
           <FilterBar options={TYPES} value={type} onChange={pickType} count={ofType.length} />
@@ -195,4 +200,13 @@ export function Portfolio() {
       </Page>
     </Section>
   );
+}
+
+// One project on its own URL (app/projects/[slug]).
+export function ProjectPage({ slug }) {
+  const router = useRouter();
+  const onQuote = useQuoteDrawer();
+  const project = projectBySlug(slug);
+  if (!project) return null;
+  return <ProjectDetail project={project} onBack={() => router.push('/projects')} onQuote={onQuote} />;
 }

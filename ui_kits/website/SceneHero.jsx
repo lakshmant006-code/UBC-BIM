@@ -17,7 +17,7 @@
   the server-rendered HTML at all times; scroll only changes which is shown.
 
   Phones and prefers-reduced-motion: nothing is pinned or scroll-scrubbed and
-  the 44 MB model is never fetched. The hero copy sits in normal flow and the
+  the 3D model is never fetched. The hero copy sits in normal flow and the
   stages become four stacked cards, each with a pre-rendered still.
 
   The model's GLB carries five material groups and no IFC class names, so
@@ -28,6 +28,9 @@ import React from 'react';
 import Link from 'next/link';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+// Steel and architectural models ship Meshopt-compressed (6x smaller;
+// gltf-transform meshopt), which needs this decoder on the loader.
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { UBC_DATA } from './data.js';
 import { bounceHandlers, buildStudioEnvironment, makeGroundShadow, applySteelMaterials } from './ModelViewer.jsx';
 
@@ -221,11 +224,19 @@ export function SceneHero({ onQuote, onGo }) {
     if (mode !== 'pinned' || !HERO.model) return;
     let dead = false;
     let cleanup = () => {};
-    // Let the poster and copy paint first; the model is the page's heaviest
-    // asset by far.
+    // The model is the page's heaviest asset by far, so nothing is fetched
+    // until the visitor scrolls or interacts (team SEO audit: LCP). The
+    // poster still and the copy are the first paint; the stages only begin
+    // once scrolling starts anyway, by which point the model is on its way.
     const idle = window.requestIdleCallback || ((cb) => window.setTimeout(cb, 200));
     const cancelIdle = window.cancelIdleCallback || window.clearTimeout;
-    const idleId = idle(() => {
+    let idleId = 0;
+    const WAKE = ['scroll', 'wheel', 'pointerdown', 'touchstart', 'keydown'];
+    const wake = () => {
+      WAKE.forEach((ev) => window.removeEventListener(ev, wake));
+      if (!dead && !idleId) idleId = idle(start);
+    };
+    const start = () => {
       if (dead) return;
       const host = canvasHolderRef.current;
       if (!host) return;
@@ -332,7 +343,7 @@ export function SceneHero({ onQuote, onGo }) {
       };
       raf = requestAnimationFrame(tick);
 
-      new GLTFLoader().load(HERO.model.src, (gltf) => {
+      new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(HERO.model.src, (gltf) => {
         if (dead) return;
         const box = new THREE.Box3().setFromObject(gltf.scene);
         const center = box.getCenter(new THREE.Vector3());
@@ -403,8 +414,10 @@ export function SceneHero({ onQuote, onGo }) {
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
       };
-    });
-    return () => { dead = true; cancelIdle(idleId); cleanup(); };
+    };
+    if (window.scrollY > 0) wake();
+    else WAKE.forEach((ev) => window.addEventListener(ev, wake, { passive: true }));
+    return () => { dead = true; WAKE.forEach((ev) => window.removeEventListener(ev, wake)); if (idleId) cancelIdle(idleId); cleanup(); };
   }, [mode]);
 
   if (mode === 'static') return <StaticHero onQuote={onQuote} onGo={onGo} />;

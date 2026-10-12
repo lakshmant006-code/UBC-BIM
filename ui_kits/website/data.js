@@ -1073,7 +1073,7 @@ UBC_DATA.serviceArticles = [
       ] }
     ] },
 
-  { id: 'bom-estimation', label: 'Bill of material and estimation', title: 'Bill of Material & Estimation',
+  { id: 'bom-estimation', slug: 'bill-of-materials-estimation', label: 'Bill of material and estimation', title: 'Bill of Material & Estimation',
     summary: '3D-modeled bills of material that turn bid packages around in under a week and cut change orders before they start.',
     regions: CORE_REGIONS,
     sections: [

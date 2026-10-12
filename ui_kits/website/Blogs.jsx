@@ -12,12 +12,16 @@
   inventing sample posts.
 */
 import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Tag } from '../../components/core/Tag.jsx';
 import { Icon } from '../../components/core/Icon.jsx';
 import { Button } from '../../components/core/Button.jsx';
 import { SectionHeading } from '../../components/core/SectionHeading.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal } from './shared.jsx';
+import { postHref } from './site.js';
+import { Breadcrumbs } from './ServicePage.jsx';
 
 // Four brand-palette gradients (not the literal orange/gray/purple/green a
 // generic "gradient card" reference uses) — each pairs one of the site's own
@@ -31,13 +35,13 @@ const BLOG_GRADIENTS = [
   { bg: 'linear-gradient(135deg, var(--orange-tint), var(--paper-2))', dot: 'var(--orange)' }
 ];
 
-function BlogCard({ post, index, onOpen }) {
+function BlogCard({ post, index }) {
   const [hover, setHover] = React.useState(false);
   const g = BLOG_GRADIENTS[index % BLOG_GRADIENTS.length];
   const badgeText = post.date || (post.tags && post.tags[0]);
 
   return (
-    <a href="#" className="ubc-glow" onClick={(e) => { e.preventDefault(); onOpen(post.id); }}
+    <Link href={postHref(post)} className="ubc-glow"
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none', color: 'inherit',
@@ -81,7 +85,7 @@ function BlogCard({ post, index, onOpen }) {
           <Icon name="arrow-right" size={15} style={{ transform: hover ? 'translateX(4px)' : 'none', transition: 'transform var(--dur-2) var(--ease-out)' }} />
         </span>
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -108,20 +112,23 @@ function BlogsPending() {
 // doesn't need: an optional inline `image` (+ `caption`) per section, since
 // several of these posts carry their own real diagram or job-site photo
 // partway through, not just a cover image up top.
-function BlogPost({ post, onBack }) {
+// Rendered on the post's own URL (/blogs/<id>, app/blogs/[slug]).
+export function BlogPost({ id }) {
+  const router = useRouter();
+  const post = ((UBC_DATA && UBC_DATA.blogPosts) || []).find((p) => p.id === id);
+  if (!post) return null;
+  const onBack = () => router.push('/blogs');
   return (
     <Section>
       <Page>
         <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <Breadcrumbs trail={[['Home', '/'], ['Blog', '/blogs'], [post.shortTitle || post.title, postHref(post)]]} />
           <Reveal key={post.id}>
-            <button onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              <Icon name="arrow-left" size={15} /> All posts
-            </button>
 
             {post.date && (
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', marginTop: 'var(--s-5)' }}>{post.date}</div>
             )}
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: 'clamp(28px, 3.8vw, 48px)', margin: 'var(--s-3) 0 0' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: 'clamp(28px, 3.8vw, 48px)', margin: 'var(--s-5) 0 0' }}>
               {post.title}
             </h1>
             {post.tags && post.tags.length > 0 && (
@@ -188,7 +195,9 @@ function BlogPost({ post, onBack }) {
 // the panel beneath shows that post's title, date, tags and summary with
 // its "Read" link. Shown on wider screens (responsive.css); phones keep the
 // card grid below, which the CSS shows in its place.
-function BlogDeck({ posts, onOpen }) {
+function BlogDeck({ posts }) {
+  const router = useRouter();
+  const onOpen = (id) => router.push('/blogs/' + id);
   const [active, setActive] = React.useState(null);   // lifted card
   const [shown, setShown] = React.useState(0);        // post in the panel
   const pick = (i) => { setActive(i); setShown(i); };
@@ -218,9 +227,9 @@ function BlogDeck({ posts, onOpen }) {
           </div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(22px, 2.4vw, 32px)', lineHeight: 'var(--lh-heading)', color: 'var(--text-strong)', margin: 'var(--s-3) 0 0' }}>{post.title}</h2>
           {post.excerpt && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0', maxWidth: '72ch' }}>{post.excerpt}</p>}
-          <button type="button" onClick={() => onOpen(post.id)} style={{ marginTop: 'var(--s-5)', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44, padding: '0 var(--s-5)', borderRadius: 'var(--r-pill)', border: 'none', cursor: 'pointer', background: 'var(--accent)', color: 'var(--white)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600 }}>
+          <Link href={postHref(post)} className="ubc-btn-solid" style={{ marginTop: 'var(--s-5)' }}>
             Read the write-up {'\u2192'}
-          </button>
+          </Link>
         </div>
       )}
     </div>
@@ -229,28 +238,17 @@ function BlogDeck({ posts, onOpen }) {
 
 export function Blogs() {
   const posts = (UBC_DATA && UBC_DATA.blogPosts) || [];
-  const [openId, setOpenId] = React.useState(null);
-  const open = posts.find((p) => p.id === openId);
-  // Deep links: /blogs#<post id> opens that post (the footer links to each).
+  const router = useRouter();
+  // Old deep links (/blogs#<post id>) move on to the post's own URL.
   React.useEffect(() => {
-    const fromHash = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      if (posts.some((p) => p.id === id)) { setOpenId(id); window.scrollTo(0, 0); }
-    };
-    fromHash();
-    window.addEventListener('hashchange', fromHash);
-    return () => window.removeEventListener('hashchange', fromHash);
-  }, [posts]);
-
-  const back = () => { setOpenId(null); window.scrollTo(0, 0); };
-  const goTo = (id) => { setOpenId(id); window.scrollTo(0, 0); };
-
-  if (open) return <BlogPost post={open} onBack={back} />;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (posts.some((p) => p.id === id)) router.replace('/blogs/' + id);
+  }, [posts, router]);
 
   return (
     <div>
       <Page style={{ paddingTop: 'var(--s-9)' }}>
-        <SectionHeading eyebrow="Blog" title="Notes from the model" size="lg" align="center"
+        <SectionHeading as="h1" eyebrow="Blog" title="Notes from the model" size="lg" align="center"
           standfirst="Updates, technical write-ups and behind-the-scenes from the UBC BIM team." />
       </Page>
       {posts.length === 0 ? (
@@ -258,11 +256,11 @@ export function Blogs() {
       ) : (
         <Section tight>
           <Page>
-            <BlogDeck posts={posts} onOpen={goTo} />
+            <BlogDeck posts={posts} />
             <div className="ubc-blog-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--s-8) var(--s-7)' }}>
               {posts.map((post, i) => (
                 <Reveal key={post.id} delay={(i % 3) * 70}>
-                  <BlogCard post={post} index={i} onOpen={goTo} />
+                  <BlogCard post={post} index={i} />
                 </Reveal>
               ))}
             </div>

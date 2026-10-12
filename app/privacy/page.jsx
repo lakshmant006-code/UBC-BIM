@@ -8,12 +8,13 @@
 // on the site yet; they are marked with <Todo> so they stand out until the
 // client supplies them. Retention periods are marked the same way.
 import { Page, Section } from '../../ui_kits/website/shared.jsx';
+import { pageMeta } from '../../ui_kits/website/site.js';
 
-export const metadata = {
+export const metadata = pageMeta({
   title: 'Privacy Policy | UBC BIM',
-  description: 'How UBC BIM collects, uses and protects the information you share through ubcbim.com: project enquiries, careers applications and the chat assistant.',
-  alternates: { canonical: '/privacy' }
-};
+  description: 'How UBC BIM collects, uses and protects the information you share through this site: project enquiries, careers applications and the chat assistant.',
+  path: '/privacy'
+});
 
 const UPDATED = '6 October 2026';
 

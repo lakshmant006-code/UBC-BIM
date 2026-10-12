@@ -22,6 +22,7 @@ import { ChatBot } from '../ui_kits/website/ChatBot.jsx';
 import { QuoteDrawer } from './QuoteDrawer.jsx';
 import { QuoteDrawerProvider } from './QuoteContext.jsx';
 import { UBC_DATA } from '../ui_kits/website/data.js';
+import { serviceHref, postHref } from '../ui_kits/website/site.js';
 
 // Same 6 labels/ids index.html's own `nav` array passed to Header, in the
 // same order (Services, Projects, About, Careers, Blogs, Contact).
@@ -38,7 +39,7 @@ const NAV = [
 // blog post by its own URL, plus the company pages, legal and the client
 // platform. Built from data.js so a new service or post appears here too.
 const FOOTER_COLUMNS = [
-  { head: 'Services', links: (UBC_DATA.serviceArticles || []).map((a) => ({ label: a.title, href: '/services#' + a.id })) },
+  { head: 'Services', links: (UBC_DATA.serviceArticles || []).map((a) => ({ label: a.title, href: serviceHref(a) })) },
   { head: 'Projects', links: [
     { label: 'All projects', href: '/projects' },
     { label: 'Residential', href: '/projects#residential' },
@@ -56,7 +57,7 @@ const FOOTER_COLUMNS = [
     { label: 'Contact', href: '/contact' },
     { label: 'BIM Pulse login', href: 'https://app.bimpulse.world/login', external: true }
   ] },
-  { head: 'From the blog', links: (UBC_DATA.blogPosts || []).map((p) => ({ label: p.shortTitle || p.title, href: '/blogs#' + p.id })) }
+  { head: 'From the blog', links: (UBC_DATA.blogPosts || []).map((p) => ({ label: p.shortTitle || p.title, href: postHref(p) })) }
 ];
 const FOOTER_SOCIAL = UBC_DATA.social || [];
 const FOOTER_LEGAL = [{ label: 'Privacy policy', href: '/privacy' }];
@@ -96,7 +97,7 @@ export function AppChrome({ children }) {
     <>
       <Header items={NAV} active={active} scrolled={scrolled} onQuote={openQuote} />
       <QuoteDrawerProvider open={openQuote}>
-        {children}
+        <main id="main">{children}</main>
       </QuoteDrawerProvider>
       <Footer columns={FOOTER_COLUMNS} social={FOOTER_SOCIAL} legal={FOOTER_LEGAL} />
       <StickyQuote onQuote={openQuoteRequest} label={'Request Quote \u2192'} onChat={() => setChat((v) => !v)} chatOpen={chat} />

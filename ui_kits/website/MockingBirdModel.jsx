@@ -1,17 +1,14 @@
 'use client';
 /*
-  MockingBirdModel: the site's "Services" page. No tab strip any more: the
-  6 service categories are cards (ServicesOverview), each with a live
-  construction line drawing on the Hairline engine (hairline/) that answers
-  the pointer; "Read more" opens that service's write-up in a pop-up panel
-  (ServiceDialog). Modeling and detailing's two 3D panel models (below) open
-  from buttons inside its panel, with a "Back to services" button. (Project management and training services were dropped
-  from this list entirely, per feedback on the live page — not hidden, not
-  marked pending, just removed from UBC_DATA.serviceArticles.)
+  MockingBirdModel: the site's "Services" page. The 6 service categories
+  are cards (ServicesOverview), each with a live construction line drawing
+  on the Hairline engine (hairline/) that answers the pointer; "Read more"
+  links to that service's own page (/services/<slug>, ServicePage.jsx).
+  The three guided 3D models for Modeling & Detailing (wall panels, roof
+  trusses, floor trusses) open here from /services#3d-... links on that
+  service's page, with a link back to it.
 
-  Five of the six tabs show that category's own write-up (ServicesDetail
-  .jsx, one article at a time — it owns no tabs of its own any more, just
-  renders whichever `article` this page hands it).
+  The older notes below describe how those 3D views work.
 
   "Modeling and detailing" is the one tab with more behind it: hovering it
   (or tapping its own chevron, for touch) opens a small dropdown with two
@@ -52,16 +49,19 @@
   or article-content swap only ever has to happen in one place.
 */
 import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Icon } from '../../components/core/Icon.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
-import { ServicesDetail } from './ServicesDetail.jsx';
+import { serviceHref } from './site.js';
 import { HairlineFigure } from './hairline/HairlineFigure.jsx';
 
 // Which top-level tabs carry their own dropdown, and what's in it. Only
 // Modeling and detailing has one today; a future category gaining its own
 // model/sub-view is one more entry here, not a new mechanism.
+const HASH_VIEWS = { '3d-wall-panels': 'wall-panels', '3d-roof-trusses': 'truss-panels', '3d-floor-trusses': 'floor-trusses' };
 const SERVICE_SUB_TABS = {
   'modeling-detailing': [
     { id: 'wall-panels', label: 'Wall panels' },
@@ -84,7 +84,9 @@ const SERVICE_FIGURES = {
   manufacturing: 'manufacturing'
 };
 
-function ServicesOverview({ articles, onOpen }) {
+// Each card links to that service's own page (/services/<slug>, team SEO
+// audit) instead of opening a pop-up here.
+function ServicesOverview({ articles }) {
   return (
     <Section style={{ paddingTop: 'var(--s-5)' }}>
       <Page>
@@ -106,9 +108,9 @@ function ServicesOverview({ articles, onOpen }) {
                   </div>
                   <div className="ubc-plate-cap">
                     <h2 id={'svc-' + a.id} className="ubc-plate-title"><span className="ubc-plate-no">{String(i + 1).padStart(2, '0')}</span>{a.title}</h2>
-                    <button type="button" className="ubc-plate-btn" aria-haspopup="dialog" onClick={() => onOpen(a.id)}>
+                    <Link href={serviceHref(a)} className="ubc-plate-btn" aria-label={'Read more: ' + a.title}>
                       Read more {'\u2192'}
-                    </button>
+                    </Link>
                   </div>
                 </article>
               </li>
@@ -117,53 +119,6 @@ function ServicesOverview({ articles, onOpen }) {
         </ul>
       </Page>
     </Section>
-  );
-}
-
-// The pop-up panel "Read more" opens: a native modal <dialog>, so focus
-// moves into it and stays there, Escape closes it, and the page behind is
-// inert. A click on the backdrop closes it too; focus returns to the card's
-// button on close.
-function ServiceDialog({ article, onClose, onSubView }) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    const d = ref.current; if (!d || !article) return undefined;
-    const opener = document.activeElement;
-    if (!d.open) d.showModal();
-    d.scrollTop = 0;
-    const root = document.documentElement, prev = root.style.overflow;
-    root.style.overflow = 'hidden';
-    return () => {
-      root.style.overflow = prev;
-      if (d.open) d.close();
-      // The dialog unmounts on close, so hand focus back to the card's button.
-      if (opener && opener.isConnected && typeof opener.focus === 'function') opener.focus({ preventScroll: true });
-    };
-  }, [article]);
-  if (!article) return null;
-  const subViews = SERVICE_SUB_TABS[article.id];
-  const titleId = 'svc-dialog-' + article.id;
-  return (
-    <dialog ref={ref} className="ubc-svc-modal" aria-labelledby={titleId}
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="ubc-svc-modal-body">
-        <button type="button" className="ubc-svc-modal-x" aria-label="Close" onClick={onClose}>
-          <Icon name="x" size={20} />
-        </button>
-        <ServicesDetail article={article} embedded titleId={titleId} />
-        {subViews && (
-          <div className="ubc-svc-subviews">
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Explore in 3D</span>
-            {subViews.map((sv) => (
-              <button key={sv.id} type="button" className="ubc-svc-subview" onClick={() => onSubView(sv.id, article.id)}>
-                {sv.label} {'\u2192'}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </dialog>
   );
 }
 
@@ -250,12 +205,17 @@ export function MockingBirdModel() {
   // whoever's checking the framing) can switch this on to drag/scroll the
   // model freely and see the real thing rather than trusting the math.
   const [freeRotate, setFreeRotate] = React.useState(false);
-  // Deep links: /services#bom-estimation opens that service's pop-up (the
-  // footer links to each service this way).
+  // Deep links: /services#3d-wall-panels (-roof-trusses, -floor-trusses)
+  // opens that 3D model (the service pages link here); an old
+  // /services#<service id> link moves on to that service's own page.
+  const router = useRouter();
   React.useEffect(() => {
     const fromHash = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      if (articles.some((a) => a.id === id)) setSelection({ type: 'article', id });
+      const h = decodeURIComponent(window.location.hash.slice(1));
+      const view = HASH_VIEWS[h];
+      if (view) { setSelection({ type: view, parentId: 'modeling-detailing' }); window.scrollTo(0, 0); return; }
+      const a = articles.find((x) => x.id === h);
+      if (a) router.replace(serviceHref(a));
     };
     fromHash();
     window.addEventListener('hashchange', fromHash);
@@ -312,7 +272,6 @@ export function MockingBirdModel() {
     if (openHotspot && !e.target.closest('[role="dialog"]')) closeHotspot();
   };
 
-  const activeArticle = selection.type === 'article' ? articles.find((a) => a.id === selection.id) || null : null;
 
   return (
     <div onClick={handleBackgroundClick}>
@@ -320,9 +279,9 @@ export function MockingBirdModel() {
         <>
           <Page style={{ paddingTop: 'var(--s-5)', paddingBottom: 'var(--s-3)' }}>
             <div className="ubc-svc-modelbar">
-              <button type="button" onClick={() => setSelection({ type: 'article', id: null })} className="ubc-svc-back">
-                {'\u2190'} Back to services
-              </button>
+              <Link href="/services/modeling-detailing" onClick={() => setSelection({ type: 'article', id: null })} className="ubc-svc-back">
+                {'\u2190'} Back to Modeling &amp; Detailing
+              </Link>
               {/* Switch straight between the two models without going back. */}
               <div className="ubc-svc-switch" role="group" aria-label="3D model">
                 {(SERVICE_SUB_TABS[selection.parentId] || []).map((sv) => (
@@ -348,10 +307,7 @@ export function MockingBirdModel() {
         </>
       ) : (
         <>
-          <ServicesOverview articles={articles} onOpen={(id) => setSelection({ type: 'article', id })} />
-          <ServiceDialog article={activeArticle}
-            onClose={() => setSelection({ type: 'article', id: null })}
-            onSubView={(type, parentId) => { setSelection({ type, parentId }); window.scrollTo(0, 0); }} />
+          <ServicesOverview articles={articles} />
         </>
       )}
     </div>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const sizes = { sm: 'var(--fs-h3)', md: 'var(--fs-h2)', lg: 'var(--fs-h1)', xl: 'var(--fs-display-2)' };
 
-export function SectionHeading({ eyebrow, title, standfirst, size = 'md', align = 'left', inverse, action, rule = true, style, ...rest }) {
+export function SectionHeading({ as: Tag = 'h2', eyebrow, title, standfirst, size = 'md', align = 'left', inverse, action, rule = true, style, ...rest }) {
   const fg = inverse ? 'var(--text-inverse)' : 'var(--text-strong)';
   return (
     <div {...rest} style={{
@@ -22,12 +22,12 @@ export function SectionHeading({ eyebrow, title, standfirst, size = 'md', align 
             {eyebrow}
           </div>
         )}
-        <h2 style={{
+        <Tag style={{
           fontFamily: 'var(--font-display)', fontSize: sizes[size], fontWeight: 'var(--fw-semibold)',
           letterSpacing: size === 'xl' ? 'var(--ls-display)' : 'var(--ls-heading)',
           lineHeight: size === 'xl' ? 'var(--lh-tight)' : 'var(--lh-snug)',
           color: fg, margin: 0
-        }}>{title}</h2>
+        }}>{title}</Tag>
         {standfirst && (
           <p style={{
             fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)',

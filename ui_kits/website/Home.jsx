@@ -11,6 +11,7 @@ import { ModelViewer } from './ModelViewer.jsx';
 import { SceneHero } from './SceneHero.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 import { ProjectForm } from './ProjectForm.jsx';
+import { projectHref } from './site.js';
 import { IntegrationCard, FlowDiagram } from '../../components/ui/IntegrationCard.jsx';
 import MACHINES from './content/machines.json';
 
@@ -321,7 +322,7 @@ function ProjectsGrid({ onGo }) {
               <div style={{ marginTop: 'var(--s-3)' }}>
                 <h3 style={{ ...cardTitle, fontSize: 'var(--fs-h4)' }}>{p.name}</h3>
                 <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
-                <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
+                <Link href={projectHref(p)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
               </div>
             </div>
           ))}
@@ -716,14 +717,15 @@ function FAQSection() {
             const isOpen = open === i;
             return (
               <div key={item.q} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}
+                <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen} aria-controls={'faq-a-' + i} id={'faq-q-' + i}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--s-4)', padding: 'var(--space-row-y) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
                   <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)' }}>{item.q}</span>
                   <Icon name={isOpen ? 'minus' : 'plus'} size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                 </button>
-                {isOpen && (
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: '0 0 var(--s-5)', maxWidth: '68ch' }}>{item.a}</p>
-                )}
+                {/* Every answer is in the page (hidden until opened), so the
+                    FAQPage schema only ever states what the page shows. */}
+                <p id={'faq-a-' + i} role="region" aria-labelledby={'faq-q-' + i} hidden={!isOpen}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: '0 0 var(--s-5)', maxWidth: '68ch' }}>{item.a}</p>
               </div>
             );
           })}
