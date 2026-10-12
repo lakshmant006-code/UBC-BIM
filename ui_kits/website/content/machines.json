@@ -1,5 +1,5 @@
 {
-  "_note": "Machine -> software -> files, per the homepage developer handoff (section 6). Marketing can edit this file without touching code. Every row is marked [CONFIRM] in the handoff: the production team must verify each one before launch. Tekla was on the old table but is left out until confirmed.",
+  "_note": "Machine -> software -> files, per the homepage developer handoff (section 6). Marketing can edit this file without touching code. Every row is marked [CONFIRM] in the handoff: the production team must verify each one before launch. Tekla was on the old table but is left out until confirmed. AMS Controls and Beck Automation removed at the director's request (10 Oct changes doc). woodRows added for the wood-machine selector: modelledIn lists the two packages UBC's own wood projects on this site were modelled in (Revit, Vertex BD); the file names are deliberately generic until production confirms each machine's exact format [CONFIRM].",
   "default": "FRAMECAD",
   "rows": [
     {
@@ -63,28 +63,6 @@
       ]
     },
     {
-      "machine": "AMS Controls",
-      "modelledIn": [
-        "Vertex BD"
-      ],
-      "files": [
-        "Machine file",
-        "Shop drawings",
-        "Cut list / BOM"
-      ]
-    },
-    {
-      "machine": "Beck Automation",
-      "modelledIn": [
-        "Vertex BD"
-      ],
-      "files": [
-        "Machine file",
-        "Shop drawings",
-        "Cut list / BOM"
-      ]
-    },
-    {
       "machine": "FrameMac",
       "modelledIn": [
         "Vertex BD"
@@ -102,6 +80,111 @@
       ],
       "files": [
         "Machine file",
+        "Shop drawings",
+        "Cut list / BOM"
+      ]
+    }
+  ],
+  "woodDefault": "Hundegger",
+  "woodRows": [
+    {
+      "machine": "Hundegger",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Hundegger production file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "Weinmann",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Weinmann production file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "Homag",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Homag production file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "Randek",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Randek production file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "Essetre",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Essetre production file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "MiTek",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "MiTek production file",
+        "Shop drawings",
+        "Cut list / BOM",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "LAP",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Laser projection data",
+        "Shop drawings",
+        "Panel assembly sheets"
+      ]
+    },
+    {
+      "machine": "EasyFrame",
+      "modelledIn": [
+        "Autodesk Revit",
+        "Vertex BD"
+      ],
+      "files": [
+        "Marking data",
         "Shop drawings",
         "Cut list / BOM"
       ]

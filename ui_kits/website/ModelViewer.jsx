@@ -46,6 +46,9 @@ import anime from 'animejs';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+// Steel and architectural models ship Meshopt-compressed (6x smaller;
+// gltf-transform meshopt), which needs this decoder on the loader.
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 
 // A handful of the source IFC/BIM exports carry a software-default
 // visualization colour on their structural steel members rather than what
@@ -502,7 +505,7 @@ export function ModelViewer({ src, radius, title, height, compact, bare, initial
         : null;
       if (vio) vio.observe(host); else visibleRef.current = true;
 
-      const loader = new GLTFLoader();
+      const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
       loader.load(src, (gltf) => {
         if (dead) return;
         // The converter already recentred and rotated the model, so it drops

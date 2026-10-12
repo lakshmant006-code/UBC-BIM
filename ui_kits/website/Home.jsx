@@ -11,6 +11,7 @@ import { ModelViewer } from './ModelViewer.jsx';
 import { SceneHero } from './SceneHero.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 import { ProjectForm } from './ProjectForm.jsx';
+import { projectHref } from './site.js';
 import { IntegrationCard, FlowDiagram } from '../../components/ui/IntegrationCard.jsx';
 import MACHINES from './content/machines.json';
 
@@ -31,7 +32,9 @@ const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: '
 // app/layout.jsx) — loops seamlessly for a mixed-width logo row without
 // pre-computing any distance. Pauses on hover/focus (responsive.css) and
 // holds still under prefers-reduced-motion.
-function LogoCarousel({ images, reverse, height = 64 }) {
+// `named` strips (software, machines) put the brand name above a larger
+// logo, per the director's reference; clients stay logo-only.
+function LogoCarousel({ images, reverse, height = 64, named = false }) {
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
     <div className="ubc-logo-track-wrap" style={{ overflow: 'hidden', WebkitMaskImage: 'linear-gradient(90deg, transparent, black 6%, black 94%, transparent)', maskImage: 'linear-gradient(90deg, transparent, black 6%, black 94%, transparent)' }}>
@@ -40,7 +43,12 @@ function LogoCarousel({ images, reverse, height = 64 }) {
         animation: reduceMotion ? 'none' : 'ubcMarqueeH 32s linear infinite',
         animationDirection: reverse ? 'reverse' : 'normal'
       }}>
-        {[...images, ...images].map((img, i) => (
+        {[...images, ...images].map((img, i) => named ? (
+          <div key={i} aria-hidden={i >= images.length || undefined} className="ubc-logo-tile">
+            <span className="ubc-logo-name">{img.name}</span>
+            <img src={img.src} alt={i < images.length ? img.alt : ''} width={img.w} height={img.h} loading="lazy" decoding="async" />
+          </div>
+        ) : (
           <div key={i} aria-hidden={i >= images.length || undefined}
             style={{ flexShrink: 0, height, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 var(--s-4)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
             <img src={img.src} alt={i < images.length ? img.alt : ''} width={img.w} height={img.h} loading="lazy" decoding="async" style={{ height: '66%', width: 'auto', maxWidth: 150, objectFit: 'contain' }} />
@@ -78,10 +86,10 @@ function StatsRow() {
 }
 function LogoWalls() {
   if (!LOGOS) return null;
-  const strip = (label, images, reverse) => images && images.length > 0 && (
+  const strip = (label, images, reverse, named) => images && images.length > 0 && (
     <div style={{ marginTop: 'var(--s-7)' }}>
       <div style={{ ...eyebrow, textAlign: 'center', marginBottom: 'var(--s-4)' }}>{label}</div>
-      <LogoCarousel images={images} reverse={reverse} />
+      <LogoCarousel images={images} reverse={reverse} named={named} />
     </div>
   );
   return (
@@ -93,8 +101,9 @@ function LogoWalls() {
         </Reveal>
         <Reveal delay={80}>
           {strip('Clients', LOGOS.client)}
-          {strip('Software we model in', LOGOS.software, true)}
-          {strip("Machines our files run on", LOGOS.machine)}
+          {strip('Software we model in', LOGOS.software, true, true)}
+          {strip('LGSF machines our files run on', LOGOS.machine, false, true)}
+          {strip('Wood machines our files run on', LOGOS.wood, true, true)}
         </Reveal>
       </Page>
     </Section>
@@ -313,7 +322,7 @@ function ProjectsGrid({ onGo }) {
               <div style={{ marginTop: 'var(--s-3)' }}>
                 <h3 style={{ ...cardTitle, fontSize: 'var(--fs-h4)' }}>{p.name}</h3>
                 <div style={{ ...eyebrow, marginTop: 'var(--s-1)' }}>{p.type} · {p.system}</div>
-                <Link href="/projects" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
+                <Link href={projectHref(p)} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-strong)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>View Project {'\u2192'}</Link>
               </div>
             </div>
           ))}
@@ -580,7 +589,7 @@ function GlobalPresence() {
             {/* WebGL canvas content isn't screen-reader-navigable, so the marked
                 regions are restated here as real text. */}
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)', textAlign: 'center', margin: 'var(--s-4) 0 0' }}>
-              Marked&nbsp;·&nbsp;{MARKERS.map((m) => m.name).join(' · ')}
+              {MARKERS.map((m) => m.name).join(' · ')}
             </p>
           </Reveal>
         </div>
@@ -670,7 +679,9 @@ function WhoWeServe() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>Who we serve</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Built around who's actually asking</h2>
         </Reveal>
-        <div className="ubc-serve-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
+        {/* Flex, not grid: the seventh card (modular / offsite) sits centred
+            on its own row instead of hanging off the left. */}
+        <div className="ubc-serve-grid" style={{ marginTop: 'var(--space-head-content)' }}>
           {WWS.map((r, i) => (
             <Reveal key={r.role} delay={(i % 3) * 70}>
               <div className="ubc-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
@@ -706,14 +717,15 @@ function FAQSection() {
             const isOpen = open === i;
             return (
               <div key={item.q} style={{ borderBottom: 'var(--bw-hair) solid var(--border-subtle)' }}>
-                <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}
+                <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen} aria-controls={'faq-a-' + i} id={'faq-q-' + i}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--s-4)', padding: 'var(--space-row-y) 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
                   <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontWeight: 600, color: 'var(--text-strong)' }}>{item.q}</span>
                   <Icon name={isOpen ? 'minus' : 'plus'} size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                 </button>
-                {isOpen && (
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: '0 0 var(--s-5)', maxWidth: '68ch' }}>{item.a}</p>
-                )}
+                {/* Every answer is in the page (hidden until opened), so the
+                    FAQPage schema only ever states what the page shows. */}
+                <p id={'faq-a-' + i} role="region" aria-labelledby={'faq-q-' + i} hidden={!isOpen}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: '0 0 var(--s-5)', maxWidth: '68ch' }}>{item.a}</p>
               </div>
             );
           })}
@@ -724,35 +736,49 @@ function FAQSection() {
 }
 
 
-// WHAT SETS US APART (handoff section 5): the About-us summary, the About Us
-// video once supplied, and six USP cards.
-function WhatSetsUsApart() {
+// ABOUT UBC: the previous ubcbim.com block the director asked to bring back
+// in place of "What sets us apart" — title, the Our USPs list and two
+// buttons on the left; the About video and the company line on the right.
+function AboutUBC() {
   const a = H.aboutUs;
   return (
     <Section id="about-us">
       <Page>
-        <Reveal style={{ display: 'grid', gridTemplateColumns: a.video ? 'minmax(0,1fr) minmax(0,1fr)' : '1fr', gap: 'var(--space-split)', alignItems: 'center' }} className="ubc-compare-grid">
-          <div style={{ maxWidth: a.video ? 'none' : 760 }}>
-            <div style={eyebrow}>{a.eyebrow}</div>
-            <h2 style={h2Style}>{a.title}</h2>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: 'var(--space-head-text) 0 0' }}>{a.body}</p>
-          </div>
-          {a.video && (
-            <video controls preload="metadata" poster={a.video.poster} playsInline style={{ width: '100%', borderRadius: 'var(--r-3)', background: '#000' }}>
-              <source src={a.video.src} type="video/mp4" />
-              {a.video.captions && <track kind="captions" src={a.video.captions} srcLang="en" label="English" default />}
-            </video>
-          )}
-        </Reveal>
-        <div className="ubc-why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
-          {H.usps.map((u, i) => (
-            <Reveal key={u.title} delay={(i % 3) * 70}>
-              <div className="ubc-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
-                <h3 style={cardTitle}>{u.title}</h3>
-                <p style={cardBody}>{u.body}</p>
-              </div>
-            </Reveal>
-          ))}
+        <div className="ubc-compare-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 'var(--space-split)', alignItems: 'center' }}>
+          <Reveal>
+            <div style={{ borderLeft: '4px solid var(--accent)', paddingLeft: 'var(--s-5)' }}>
+              <div style={eyebrow}>{a.eyebrow}</div>
+              <h2 style={{ ...h2Style, fontSize: 'clamp(26px, 2.7vw, 38px)', lineHeight: 1.2 }}>
+                {a.title} <span style={{ color: 'var(--text-accent)', fontStyle: 'italic' }}>{a.titleAccent}</span>
+              </h2>
+            </div>
+            <h3 style={{ ...cardTitle, margin: 'var(--s-6) 0 0' }}>{a.uspTitle}</h3>
+            <ul style={{ listStyle: 'none', margin: 'var(--s-4) 0 0', padding: 0, display: 'grid', gap: 'var(--s-3)' }}>
+              {a.usps.map((u) => (
+                <li key={u} style={{ display: 'flex', gap: 'var(--s-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)' }}>
+                  <Icon name="circle-arrow-right" size={18} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 3 }} />{u}
+                </li>
+              ))}
+            </ul>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-3)', marginTop: 'var(--s-6)' }}>
+              <Link href="/about" className="ubc-btn-solid">Learn More {'\u2192'}</Link>
+              <Link href="/services" className="ubc-btn-solid">Services {'\u2192'}</Link>
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
+            {a.video && (
+              <video controls preload="metadata" poster={a.video.poster} playsInline style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: 'var(--r-3)', background: '#000' }}>
+                <source src={a.video.src} type="video/mp4" />
+                {a.video.captions && <track kind="captions" src={a.video.captions} srcLang="en" label="English" default />}
+              </video>
+            )}
+            {a.quote && (
+              <blockquote style={{ margin: 'var(--s-4) 0 0', padding: 'var(--s-4) var(--s-5)', background: 'var(--ubc-navy-tint)', borderRadius: 'var(--r-2)', display: 'flex', gap: 'var(--s-3)', alignItems: 'flex-start' }}>
+                <Icon name="quote" size={22} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', fontStyle: 'italic', lineHeight: 'var(--lh-relaxed)', color: 'var(--ubc-navy)' }}>{a.quote}</p>
+              </blockquote>
+            )}
+          </Reveal>
         </div>
       </Page>
     </Section>
@@ -856,10 +882,20 @@ function flowIcon(label) {
 // TECHNOLOGY (handoff section 6): interactive machine selector, inside a
 // blue frame per the client's own mock-up. Rows come from
 // content/machines.json so marketing can edit them without code changes.
+// Two families: LGSF roll-formers and wood machines (director's request),
+// switched with the segmented control above the machine pills.
+const FAMILIES = [
+  { key: 'lgsf', label: 'LGSF roll-formers', rows: MACHINES.rows, first: MACHINES.default },
+  { key: 'wood', label: 'Wood machines', rows: MACHINES.woodRows || [], first: MACHINES.woodDefault }
+];
 function Technology() {
   const T = H.technology;
-  const rows = MACHINES.rows;
-  const [sel, setSel] = React.useState(MACHINES.default || (rows[0] && rows[0].machine));
+  const [fam, setFam] = React.useState('lgsf');
+  const family = FAMILIES.find((f) => f.key === fam) || FAMILIES[0];
+  const rows = family.rows;
+  const [picked, setPicked] = React.useState({ lgsf: FAMILIES[0].first, wood: FAMILIES[1].first });
+  const sel = picked[fam] || (rows[0] && rows[0].machine);
+  const setSel = (m) => setPicked((p) => ({ ...p, [fam]: m }));
   const row = rows.find((r) => r.machine === sel) || rows[0];
   const label = { ...eyebrow, color: 'rgba(255,255,255,.78)' };
   return (
@@ -871,9 +907,22 @@ function Technology() {
             <h2 style={{ ...h2Style, color: 'var(--white)' }}>{T.title}</h2>
             {T.intro && <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'rgba(255,255,255,.88)', margin: 'var(--space-head-text) 0 0' }}>{T.intro}</p>}
           </Reveal>
+          <div role="group" aria-label="Machine type" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--s-2)', marginTop: 'var(--space-head-content)' }}>
+            {FAMILIES.map((f) => {
+              const on = f.key === fam;
+              return (
+                <button key={f.key} aria-pressed={on} onClick={() => setFam(f.key)} style={{
+                  minHeight: 44, padding: '0 18px', borderRadius: 'var(--r-pill)', cursor: 'pointer', whiteSpace: 'nowrap',
+                  fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', fontWeight: 700, letterSpacing: '0.12em',
+                  background: on ? 'var(--accent)' : 'rgba(255,255,255,.08)', color: 'var(--white)',
+                  border: 'var(--bw-1) solid ' + (on ? 'var(--accent)' : 'rgba(255,255,255,.5)')
+                }}>{f.label}</button>
+              );
+            })}
+          </div>
           {/* One line: centred when it fits, scrolls sideways when it doesn't */}
-          <div className="ubc-pill-scroll" style={{ marginTop: 'var(--space-head-content)' }}>
-          <div role="group" aria-label="Choose your roll-former" style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, width: 'max-content', margin: '0 auto' }}>
+          <div className="ubc-pill-scroll" style={{ marginTop: 'var(--s-4)' }}>
+          <div role="group" aria-label={fam === 'wood' ? 'Choose your wood machine' : 'Choose your roll-former'} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, width: 'max-content', margin: '0 auto' }}>
             {rows.map((r) => {
               const on = r.machine === sel;
               return (
@@ -947,7 +996,7 @@ export function Home() {
     <div>
       <SceneHero onQuote={onQuote} onGo={onGo} />
       <LogoWalls />
-      <WhatSetsUsApart />
+      <AboutUBC />
       <WhyUBC />
       <WhoWeServe />
       <BeforeAfterSlider />

@@ -16,7 +16,7 @@ import { Select } from '../../components/forms/Select.jsx';
 import { Textarea } from '../../components/forms/Textarea.jsx';
 import { UBC_DATA } from './data.js';
 
-const BUILDING = ['Residential', 'Commercial', 'Multi-level', 'Other'];
+const BUILDING = ['Residential', 'Commercial', 'Multi-Family', 'Modular', 'Bathroom pods', 'ADU', 'Other'];
 const FRAMING = ['Light-gauge steel (LGSF / CFS)', 'Wood frame', 'Both / not sure'];
 const SERVICES = (UBC_DATA.serviceArticles || []).map((a) => a.title);
 const TIMELINE = ['As soon as possible', 'Within a month', '1–3 months', 'Just pricing for now'];

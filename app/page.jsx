@@ -1,10 +1,12 @@
 import { Home } from '../ui_kits/website/Home.jsx';
 import { UBC_DATA } from '../ui_kits/website/data.js';
+import { pageMeta } from '../ui_kits/website/site.js';
 
-export const metadata = {
+export const metadata = pageMeta({
   title: 'CFS, LGSF & Wood Detailing, Engineered for Construction | UBC BIM',
-  description: 'Estimating, BIM modeling, engineering, permit sets and shop drawings for CFS, LGSF and wood manufacturers, contractors, builders and fabricators. 783 projects, 12 countries.'
-};
+  description: 'BIM modeling, engineering, permit sets, BOM and shop drawings for CFS, LGSF and wood manufacturers, contractors and builders. 783 projects in 12 countries.',
+  path: '/'
+});
 
 // FAQPage schema built from the same list the homepage FAQ accordion renders.
 const FAQ_SCHEMA = {

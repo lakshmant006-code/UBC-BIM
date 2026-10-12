@@ -15,9 +15,33 @@ import React from 'react';
 import { Page, Section, Reveal } from './shared.jsx';
 import { UBC_DATA } from './data.js';
 
+// Full-size view of a sample image, inside the site (director: the sample
+// should not send the visitor off to a bare image in a new tab). A native
+// modal <dialog>: Escape and the backdrop close it, focus returns after.
+function ImageViewer({ image, onClose }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const d = ref.current; if (!d || !image) return undefined;
+    const opener = document.activeElement;
+    if (!d.open) d.showModal();
+    return () => { if (d.open) d.close(); if (opener && opener.isConnected) opener.focus({ preventScroll: true }); };
+  }, [image]);
+  if (!image) return null;
+  return (
+    <dialog ref={ref} className="ubc-img-viewer" aria-label={image.caption || image.alt}
+      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <button type="button" className="ubc-img-viewer-x" aria-label="Close" onClick={onClose}>{'\u00d7'}</button>
+      <img src={image.src} alt={image.alt} />
+      {image.caption && <p>{image.caption}</p>}
+    </dialog>
+  );
+}
+
 // "Sample output": what this service delivers, generated from a real model
 // on the site (UBC_DATA.serviceOutputs, keyed by article id).
 function SampleOutput({ out, title }) {
+  const [view, setView] = React.useState(null);
   return (
     <section className="ubc-svc-output" aria-label={'Sample output: ' + title}>
       <div className="ubc-svc-output-eyebrow">Sample output</div>
@@ -25,10 +49,10 @@ function SampleOutput({ out, title }) {
       <div className={'ubc-svc-output-figs' + (out.images.length > 1 ? ' is-two' : '')}>
         {out.images.map((g) => (
           <figure key={g.src}>
-            <a href={g.src} target="_blank" rel="noopener noreferrer" aria-label={g.caption + ' (opens full size)'}>
+            <button type="button" className="ubc-svc-output-zoom" onClick={() => setView(g)} aria-label={'View full size: ' + (g.caption || g.alt)}>
               <img src={g.src} alt={g.alt} loading="lazy" />
-            </a>
-            <figcaption>{g.caption}</figcaption>
+            </button>
+            {g.caption && <figcaption>{g.caption}</figcaption>}
           </figure>
         ))}
       </div>
@@ -47,12 +71,14 @@ function SampleOutput({ out, title }) {
           </table>
         </div>
       )}
+      <ImageViewer image={view} onClose={() => setView(null)} />
     </section>
   );
 }
 
 export function ServicesDetail({ article, embedded = false, titleId }) {
   const a = article;
+  const [view, setView] = React.useState(null);
   if (!a) return null;
   const hasGallery = Boolean(a.gallery && a.gallery.length);
   const Title = embedded ? 'h2' : 'h1';
@@ -118,9 +144,9 @@ export function ServicesDetail({ article, embedded = false, titleId }) {
           <aside aria-label={a.title + ' images'} className="ubc-svc-gallery">
             {a.gallery.map((g) => (
               <figure key={g.src} style={{ margin: 0 }}>
-                <a href={g.src} target="_blank" rel="noopener noreferrer" aria-label={g.caption + ' (opens full size)'} style={{ display: 'block', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden', background: 'var(--white)' }}>
+                <button type="button" className="ubc-svc-output-zoom" onClick={() => setView(g)} aria-label={'View full size: ' + (g.caption || g.alt)}>
                   <img src={g.src} alt={g.alt} loading="lazy" style={{ display: 'block', width: '100%', height: 'auto' }} />
-                </a>
+                </button>
                 {g.caption && (
                   <figcaption style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', color: 'var(--text-muted)', marginTop: 'var(--s-2)' }}>{g.caption}</figcaption>
                 )}
@@ -128,6 +154,7 @@ export function ServicesDetail({ article, embedded = false, titleId }) {
             ))}
           </aside>
         )}
+        <ImageViewer image={view} onClose={() => setView(null)} />
         </div>
       </Inner>
     </Shell>
