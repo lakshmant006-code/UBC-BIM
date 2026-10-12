@@ -1,0 +1,119 @@
+{
+ "whole": {
+  "center": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "radius": 2.211
+ },
+ "byClass": {
+  "IfcFurnishingElement": {
+   "center": [
+    0.452,
+    -0.708,
+    1.141
+   ],
+   "radius": 0.737,
+   "count": 2
+  },
+  "IfcBuildingElementProxy": {
+   "center": [
+    -0.005,
+    -0.188,
+    0.399
+   ],
+   "radius": 1.478,
+   "count": 7
+  },
+  "IfcOpeningElement": {
+   "center": [
+    0.452,
+    -0.346,
+    1.18
+   ],
+   "radius": 0.341,
+   "count": 1
+  },
+  "IfcFlowTerminal": {
+   "center": [
+    0.084,
+    -0.146,
+    0.006
+   ],
+   "radius": 2.026,
+   "count": 4
+  },
+  "IfcBeam": {
+   "center": [
+    0.006,
+    -0.048,
+    0.0
+   ],
+   "radius": 2.197,
+   "count": 111
+  }
+ },
+ "byType": {
+  "Base Cabinet-Double Door & 2 Drawer": {
+   "center": [
+    0.452,
+    -0.759,
+    1.141
+   ],
+   "radius": 0.704,
+   "count": 1,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "Vanity Counter Top w Round Sink Hole": {
+   "center": [
+    0.452,
+    -0.296,
+    1.192
+   ],
+   "radius": 0.534,
+   "count": 1,
+   "ifcClass": "IfcFurnishingElement"
+  },
+  "Sink Vanity-Round": {
+   "center": [
+    0.452,
+    -0.342,
+    1.189
+   ],
+   "radius": 0.396,
+   "count": 1,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "Tub-Rectangular-3D": {
+   "center": [
+    0.148,
+    -1.0,
+    -1.14
+   ],
+   "radius": 0.873,
+   "count": 1,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "Toilet-Domestic-3D": {
+   "center": [
+    -0.487,
+    -0.838,
+    1.085
+   ],
+   "radius": 0.59,
+   "count": 1,
+   "ifcClass": "IfcFlowTerminal"
+  },
+  "Lighting_Fixture-Track_Mount-ConTech_Lighting-CTL19V": {
+   "center": [
+    0.385,
+    0.867,
+    1.453
+   ],
+   "radius": 0.3,
+   "count": 1,
+   "ifcClass": "IfcFlowTerminal"
+  }
+ }
+}

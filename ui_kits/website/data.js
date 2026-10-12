@@ -207,7 +207,30 @@ export const UBC_DATA = {
     { id: 'truss-model', name: 'Roof truss and wall frame', type: 'Residential', system: 'Wood frame',
       size: '\u2248 132 \u00d7 96 ft overall (from model)', units: 'Trusses and walls \u00b7 one mesh', location: 'Not specified',
       delivered: 'Roof truss and wall framing model', software: ['Autodesk Revit'],
-      model: { src: '/assets/models/truss-model.glb', radius: 23.9 } }
+      model: { src: '/assets/models/truss-model.glb', radius: 23.9 } },
+    // Four LGSF models supplied 12 Oct for the new segments (Bathroom Pods,
+    // Modular, ADUs, plus a residential custom home). All exported from
+    // Revit with MWF (MWF material names, FRAMECAD lipped-cee members, SSMA
+    // trusses). Sizes are the model's own overall extents and member counts
+    // are its IfcBeam framing members; client, company and street-address
+    // fields in the files are deliberately not used (director: no project
+    // names). The garage sits under ADUs as the nearest segment [CONFIRM].
+    { id: 'bathroom-pod', name: 'Bathroom pod', type: 'Bathroom Pods', system: 'Light-gauge steel',
+      size: '\u2248 6.6 \u00d7 10.2 ft overall (from model)', units: '1 pod \u00b7 111 framing members', location: 'Not specified',
+      delivered: 'Pod framing model with fixtures', software: ['Autodesk Revit', 'MWF Pro Metal'],
+      model: { src: '/assets/models/bathroom-pod.glb', radius: 2.2 } },
+    { id: 'modular-unit', name: 'Prefab modular unit', type: 'Modular', system: 'Light-gauge steel',
+      size: '\u2248 23.6 \u00d7 13.8 ft overall (from model)', units: '1 module \u00b7 273 framing members', location: 'Not specified',
+      delivered: 'Module framing model with kitchen and bath fit-out', software: ['Autodesk Revit', 'MWF Pro Metal'],
+      model: { src: '/assets/models/modular-unit.glb', radius: 4.5 } },
+    { id: 'two-car-garage', name: 'Two-car garage', type: 'ADUs', system: 'Light-gauge steel',
+      size: '\u2248 23.3 \u00d7 29.9 ft overall (from model)', units: 'Walls and roof trusses \u00b7 1,364 framing members', location: 'Not specified',
+      delivered: 'Wall panel and truss framing model', software: ['Autodesk Revit', 'MWF Pro Metal'],
+      model: { src: '/assets/models/two-car-garage.glb', radius: 6.2 } },
+    { id: 'custom-home', name: 'Custom home', type: 'Residential', system: 'Light-gauge steel',
+      size: '\u2248 47.9 \u00d7 25.3 ft overall (from model)', units: 'Walls and roof trusses \u00b7 2,031 framing members', location: 'USA',
+      delivered: 'Coordinated framing model', software: ['Autodesk Revit', 'MWF Pro Metal'],
+      model: { src: '/assets/models/custom-home-lgsf.glb', radius: 8.7 } }
   ],
   // Real logo/photo assets the client supplied directly (Client_Logos.zip,
   // Software_logos.zip, Machine_logo.zip, and the 10 Oct changes doc for
