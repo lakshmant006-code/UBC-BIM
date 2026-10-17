@@ -48,11 +48,14 @@
 }
 
 /* ---------- Header ----------
-   Wordmark on the left, the nav pill centred, the standalone "Request
-   Quote" button just right of it. Below 940px the pill is hidden (its links
-   are repeated in the footer) and the button moves to the right edge. */
+   A solid white bar that sticks to the top: wordmark on the left, the nav
+   pill centred, the "Start Your Next Project" button just right of it. A
+   light shadow appears once the page has scrolled 10px. At 1000px and below
+   the pill gives way to a menu button and a full-height panel
+   (components/navigation/Header.jsx MobileMenu). */
+.ubc-header { position: sticky; top: 0; z-index: 40; background: var(--white); transition: box-shadow 200ms var(--ease-out); }
+.ubc-header.is-scrolled { box-shadow: 0 1px 0 #E3E8EE, 0 8px 24px -16px rgba(14,19,24,.35); }
 .ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
-.ubc-header-row > * { pointer-events: auto; }   /* the header itself lets clicks through to the page */
 .ubc-header-row > a { justify-self: start; }
 .ubc-header-logo { display: block; height: 40px; width: auto; }
 @media (max-width: 1100px) { .ubc-header-logo { height: 32px; } }
@@ -74,7 +77,6 @@
   box-shadow: 0 6px 18px -14px rgba(14,19,24,.35);
 }
 .ubc-navpill-end { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-muted); }
-.ubc-navpill-menu svg { fill: currentColor; }
 .ubc-navpill-dot > span { width: 18px; height: 18px; border-radius: 999px; border: 2px solid #C9D1DB; display: grid; place-items: center; }
 .ubc-navpill-dot > span::after { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
 .ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
@@ -100,6 +102,46 @@
   .ubc-navpill { display: none !important; }
   .ubc-header-cta { margin-left: auto; }
 }
+.ubc-navpill-login { color: var(--text-accent); }
+
+/* Menu button and panel, 1000px and below */
+.ubc-menu-btn {
+  display: none; flex: none; width: 44px; height: 44px; place-items: center; padding: 0;
+  border: 1px solid #D9DFE6; border-radius: 12px; background: var(--white); color: var(--text-strong); cursor: pointer;
+}
+.ubc-menu-btn:hover { background: #F3F5F8; }
+.ubc-menu-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ubc-mobile-menu { display: none; }
+@media (max-width: 1000px) {
+  .ubc-menu-btn { display: grid; margin-left: var(--s-3); }
+  .ubc-mobile-menu.is-open {
+    display: flex; flex-direction: column; gap: var(--s-5); position: fixed; left: 0; right: 0; top: 76px; bottom: 0; z-index: 39;
+    overflow-y: auto; overscroll-behavior: contain; padding: var(--s-5) var(--gutter) calc(var(--s-7) + env(safe-area-inset-bottom));
+    background: var(--white); border-top: 1px solid #E3E8EE;
+  }
+  .ubc-mobile-menu ul { list-style: none; margin: 0; padding: 0; }
+  .ubc-mobile-menu li a {
+    display: flex; align-items: center; justify-content: flex-start; text-align: left; min-height: 48px; border-bottom: 1px solid #EEF1F4;
+    color: var(--text-strong); font-size: var(--fs-body); font-weight: var(--fw-medium); line-height: 1.5; letter-spacing: 0.02em; word-spacing: 0.16em;
+  }
+  .ubc-mobile-menu li a[aria-current="page"] { color: var(--text-accent); }
+  .ubc-mm-services li a { font-size: var(--fs-body-sm); font-weight: 400; color: var(--text-body, var(--text-strong)); }
+  .ubc-mm-head {
+    margin-top: var(--s-5); margin-bottom: var(--s-2); font-family: var(--font-mono); font-size: var(--fs-label);
+    letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted);
+  }
+  .ubc-mm-actions { display: flex; flex-direction: column; gap: var(--s-3); }
+  .ubc-mm-actions .ubc-btn-solid { justify-content: center; width: 100%; }
+  .ubc-mm-call {
+    display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px;
+    border: 1px solid #D9DFE6; color: var(--text-strong); font-weight: var(--fw-medium); line-height: 1.5;
+  }
+}
+@media (max-width: 640px) { .ubc-menu-btn { margin-left: auto; } }
+/* The floating Chat / Request Quote bar steps aside while the menu is open. */
+html.ubc-menu-open .ubc-sticky { display: none !important; }
+/* The floating Chat / Request Quote bar steps aside while the menu is open. */
+html.ubc-menu-open .ubc-sticky { display: none !important; }
 
 /* ---------- Phones ---------- */
 @media (max-width: 640px) {
@@ -700,6 +742,11 @@
 @media (max-width: 640px) { .ubc-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-6); } }
 .ubc-footer a { line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; }
 .ubc-footer a:hover { color: var(--white); text-decoration: underline; }
+.ubc-footer-link { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 0; }
+/* Touch screens: every footer link is a 44px tap target. */
+@media (pointer: coarse) { .ubc-footer-link { min-height: 44px; padding: 0; } .ubc-footer-grid ul { gap: 0 !important; } }
+.ubc-footer-contact { display: flex; flex-direction: column; gap: var(--s-1); margin: 0 0 var(--s-5); font-style: normal; font-size: var(--fs-body-sm); line-height: 1.5; color: var(--text-body); }
+.ubc-footer-contact a { color: var(--white); font-weight: var(--fw-medium); word-break: break-word; }
 .ubc-footer-social { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
 /* Six 44px icons don't fit the narrow first column on desktop: wrap them as
    an even 3 + 3 rather than 4 + 2. Below 1100px they sit on one row. */
@@ -708,13 +755,6 @@
 .ubc-footer-social a:hover { background: var(--white); color: var(--frame-blue); text-decoration: none; }
 .ubc-footer-social a:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
 /* Header "⋯" menu (BIM Pulse login). */
-.ubc-navpill-more { position: relative; display: flex; }
-button.ubc-navpill-menu { background: none; border: 0; border-radius: 999px; cursor: pointer; padding: 0; }
-button.ubc-navpill-menu:hover, button.ubc-navpill-menu[aria-expanded="true"] { background: #F3F5F8; color: var(--text-strong); }
-button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.ubc-navpill-pop { position: absolute; top: calc(100% + 10px); left: 0; z-index: 60; list-style: none; margin: 0; padding: 6px; min-width: 200px; background: var(--white); border: 1px solid #D9DFE6; border-radius: 14px; box-shadow: var(--shadow-3); }
-.ubc-navpill-pop a { display: flex; align-items: center; min-height: 44px; padding: 0 var(--s-4); border-radius: 10px; border-bottom: none; color: var(--text-strong); font-size: var(--fs-body-sm); line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; white-space: nowrap; }
-.ubc-navpill-pop a:hover { background: #F3F5F8; color: var(--text-accent); }
 
 /* Legal pages (Privacy policy). Readable measure, generous spacing. */
 .ubc-legal { max-width: 760px; margin: 0 auto; font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.7; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-body); }

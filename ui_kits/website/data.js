@@ -1177,6 +1177,23 @@ UBC_DATA.social = [
   { label: 'X (Twitter)', href: 'https://x.com/UBCBIM' }
 ];
 
+/* US office contact details, from the team's SEO handoff (15 Oct 2026),
+   which asks the director to confirm them before launch. Used by the
+   header's mobile menu, the footer, /contact and the Organization schema.
+   Office hours are not listed until UBC supplies them. */
+UBC_DATA.contact = {
+  phone: '+1-214-444-6150',
+  email: 'marketing@ubcbim.com',
+  whatsapp: 'https://wa.me/12144446150',
+  // The booking page for "Book a 15-minute call" has not been supplied yet;
+  // until it is, that card opens an email asking for a call.
+  booking: '',
+  legalName: 'UBC Technology Services Inc',
+  address: { street: '885 Gold Hill Rd #3083', city: 'Fort Mill', region: 'SC', postalCode: '29708', country: 'US' }
+};
+UBC_DATA.contact.tel = 'tel:' + UBC_DATA.contact.phone.replace(/[^+\d]/g, '');
+UBC_DATA.contact.addressLine = `${UBC_DATA.contact.address.street}, ${UBC_DATA.contact.address.city}, ${UBC_DATA.contact.address.region} ${UBC_DATA.contact.address.postalCode}`;
+
 /* Sample output per service (client feedback: every service page should show
    what you get). Drawings and quantities are generated from a real project
    model on this site (tools/service_outputs.py, tools/model_takeoff.py); per

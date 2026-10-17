@@ -15,50 +15,16 @@ const NAV = [
 // the one exception, for the logo link back to '/'.
 const idToHref = (id) => (id === 'home' ? '/' : '/' + id);
 
-// The nav links sit in a pill with a small mark at each end; it stays the
-// same open pill at any scroll position. The standalone "Start Your Next Project"
-// button sits just right of it (Header below). Styles: .ubc-navpill-* and
-// .ubc-header-cta in ui_kits/website/responsive.css.
-// The "⋯" at the pill's left end is a small menu: the BIM Pulse client
-// platform login (also at ubcbim.../admin and in the footer).
-const MORE = [{ label: 'BIM Pulse login', href: 'https://app.bimpulse.world/login', external: true }];
-
-function MoreMenu() {
-  const [open, setOpen] = React.useState(false);
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    if (!open) return undefined;
-    const away = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('pointerdown', away); document.addEventListener('keydown', esc);
-    return () => { document.removeEventListener('pointerdown', away); document.removeEventListener('keydown', esc); };
-  }, [open]);
-  return (
-    <div ref={ref} className="ubc-navpill-more">
-      <button type="button" className="ubc-navpill-end ubc-navpill-menu" aria-label="More" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((v) => !v)}>
-        <svg width="18" height="18" viewBox="0 0 18 18" focusable="false" aria-hidden="true">
-          <circle cx="4" cy="9" r="1.6" /><circle cx="9" cy="9" r="1.6" /><circle cx="14" cy="9" r="1.6" />
-        </svg>
-      </button>
-      {open && (
-        <ul className="ubc-navpill-pop">
-          {MORE.map((m) => (
-            <li key={m.href}>
-              <a href={m.href} target={m.external ? '_blank' : undefined} rel={m.external ? 'noopener noreferrer' : undefined} onClick={() => setOpen(false)}>
-                {m.label}{m.external ? ' \u2197' : ''}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
+// The nav links sit in a pill with a small mark at the right end; the
+// standalone "Start Your Next Project" button sits just right of it. The
+// BIM Pulse client login is a visible link at the end of the pill (it used
+// to hide under a "..." menu). Styles: .ubc-navpill-* and .ubc-header-cta
+// in ui_kits/website/responsive.css.
+const CLIENT_LOGIN = { label: 'Client login', href: 'https://app.bimpulse.world/login' };
 
 function NavPill({ items, active }) {
   return (
     <nav aria-label="Main" className="ubc-navpill">
-      <MoreMenu />
       <ul className="ubc-navpill-list">
         {items.map((it) => {
           const on = active === it.id;
@@ -69,20 +35,84 @@ function NavPill({ items, active }) {
             </li>
           );
         })}
+        <li>
+          <a href={CLIENT_LOGIN.href} target="_blank" rel="noopener noreferrer" className="ubc-navpill-link ubc-navpill-login">
+            {CLIENT_LOGIN.label}<span aria-hidden="true">{' \u2197'}</span><span className="ubc-visually-hidden"> (BIM Pulse, opens in a new tab)</span>
+          </a>
+        </li>
       </ul>
       <span className="ubc-navpill-end ubc-navpill-dot" aria-hidden="true"><span /></span>
     </nav>
   );
 }
 
-export function Header({ items = NAV, active, scrolled, onQuote, style, ...rest }) {
+// Phones and tablets (1000px and below): a menu button opens a full-height
+// panel with every page, the six services, the project CTA, the client
+// login and a tap-to-call link. Escape, the close button or choosing a link
+// closes it; focus moves into the panel and back to the button.
+function MobileMenu({ items, active, services, phone, onQuote }) {
+  const [open, setOpen] = React.useState(false);
+  const btnRef = React.useRef(null);
+  const panelRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const root = document.documentElement, prev = root.style.overflow;
+    root.style.overflow = 'hidden';
+    root.classList.add('ubc-menu-open');
+    root.classList.add('ubc-menu-open');
+    const first = panelRef.current && panelRef.current.querySelector('a, button');
+    if (first) first.focus();
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', esc);
+    return () => {
+      root.style.overflow = prev;
+      root.classList.remove('ubc-menu-open');
+      root.classList.remove('ubc-menu-open');
+      document.removeEventListener('keydown', esc);
+      if (btnRef.current) btnRef.current.focus({ preventScroll: true });
+    };
+  }, [open]);
+  const close = () => setOpen(false);
   return (
-    <header {...rest} style={{
-      position: 'sticky', top: 0, zIndex: 40,
-      // No bar behind the header: the logo, nav pill and button float.
-      background: 'transparent', pointerEvents: 'none',
-      ...style
-    }}>
+    <>
+      <button ref={btnRef} type="button" className="ubc-menu-btn" aria-expanded={open} aria-controls="ubc-mobile-menu"
+        aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen((v) => !v)}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" focusable="false">
+          {open ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+        </svg>
+      </button>
+      <div id="ubc-mobile-menu" ref={panelRef} className={'ubc-mobile-menu' + (open ? ' is-open' : '')} hidden={!open}>
+        <nav aria-label="Mobile">
+          <ul className="ubc-mm-pages">
+            <li><Link href="/" onClick={close} aria-current={active === 'home' ? 'page' : undefined}>Home</Link></li>
+            {items.map((it) => (
+              <li key={it.id}><Link href={idToHref(it.id)} onClick={close} aria-current={active === it.id ? 'page' : undefined}>{it.label}</Link></li>
+            ))}
+          </ul>
+          {services && services.length > 0 && (
+            <>
+              <div className="ubc-mm-head">Services</div>
+              <ul className="ubc-mm-services">
+                {services.map((sv) => <li key={sv.href}><Link href={sv.href} onClick={close}>{sv.label}</Link></li>)}
+              </ul>
+            </>
+          )}
+        </nav>
+        <div className="ubc-mm-actions">
+          <button type="button" className="ubc-btn-solid" onClick={(e) => { close(); if (onQuote) onQuote(e); }}>Start Your Next Project {'\u2192'}</button>
+          {phone && <a className="ubc-mm-call" href={'tel:' + phone.replace(/[^+\d]/g, '')}>Call {phone}</a>}
+          <a className="ubc-mm-call" href={CLIENT_LOGIN.href} target="_blank" rel="noopener noreferrer" onClick={close}>{CLIENT_LOGIN.label} (BIM Pulse) {'\u2197'}</a>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export function Header({ items = NAV, active, scrolled, onQuote, services, phone, style, ...rest }) {
+  return (
+    // A solid white bar, so the logo never sits over page content; a light
+    // shadow appears once the page scrolls (.ubc-header.is-scrolled).
+    <header {...rest} className={'ubc-header' + (scrolled ? ' is-scrolled' : '')} style={style}>
       <div className="ubc-header-row" style={{
         maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)',
         height: 76
@@ -93,6 +123,7 @@ export function Header({ items = NAV, active, scrolled, onQuote, style, ...rest 
         </Link>
         <NavPill items={items} active={active} />
         <button type="button" className="ubc-header-cta" onClick={onQuote}>Start Your Next Project<span className="ubc-header-cta-arrow" aria-hidden="true">{'\u00a0\u2192'}</span></button>
+        <MobileMenu items={items} active={active} services={services} phone={phone} onQuote={onQuote} />
       </div>
     </header>
   );

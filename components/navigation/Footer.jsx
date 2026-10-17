@@ -12,15 +12,18 @@ import { SocialIcon } from '../core/SocialIcon.jsx';
 const DEFAULT_SOCIAL = [];
 
 function FooterLink({ link }) {
-  const style = { fontSize: 'var(--fs-body-sm)', lineHeight: 1.5, color: 'var(--text-body)', borderBottom: 'none', display: 'inline-block', padding: '2px 0', minHeight: 24 };
+  const style = { fontSize: 'var(--fs-body-sm)', lineHeight: 1.5, color: 'var(--text-body)', borderBottom: 'none' };
+  const cls = 'ubc-footer-link';
   if (link.external) {
-    return <a href={link.href} target="_blank" rel="noopener noreferrer" style={style}>{link.label}<span className="ubc-visually-hidden"> (opens in a new tab)</span></a>;
+    return <a href={link.href} target="_blank" rel="noopener noreferrer" className={cls} style={style}>{link.label}<span className="ubc-visually-hidden"> (opens in a new tab)</span></a>;
   }
-  if (link.href.includes('#')) return <a href={link.href} style={style}>{link.label}</a>;
-  return <Link href={link.href} style={style}>{link.label}</Link>;
+  if (link.href.includes('#') || /^(tel|mailto):/.test(link.href)) return <a href={link.href} className={cls} style={style}>{link.label}</a>;
+  return <Link href={link.href} className={cls} style={style}>{link.label}</Link>;
 }
 
-export function Footer({ columns = [], social = DEFAULT_SOCIAL, legal = [], style, ...rest }) {
+// contact = { phone, tel, email, addressLine } (UBC_DATA.contact): the US
+// office's phone (tap to call), email and street address under the blurb.
+export function Footer({ columns = [], social = DEFAULT_SOCIAL, legal = [], contact, style, ...rest }) {
   return (
     // Blue on every page: .ubc-frame-blue (responsive.css) re-scopes the
     // text and border tokens to their white-on-blue values, so every
@@ -36,6 +39,13 @@ export function Footer({ columns = [], social = DEFAULT_SOCIAL, legal = [], styl
             <p style={{ fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', maxWidth: '30ch', margin: 'var(--s-4) 0 var(--s-5)' }}>
               BIM services for wood-frame and light-gauge-steel construction. Framing models, detailing, permit sets and machine files.
             </p>
+            {contact && (
+              <address className="ubc-footer-contact">
+                <a href={contact.tel} className="ubc-footer-link">{contact.phone}</a>
+                <a href={'mailto:' + contact.email} className="ubc-footer-link">{contact.email}</a>
+                <span>{contact.addressLine}</span>
+              </address>
+            )}
             {social.length > 0 && (
               <ul className="ubc-footer-social" aria-label="UBC BIM on social media">
                 {social.map((s) => (
