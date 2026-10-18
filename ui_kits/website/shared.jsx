@@ -66,31 +66,28 @@ export function Reveal({ children, delay = 0, style }) {
   }, []);
   return <div ref={ref} style={{ opacity: reduceMotion ? 1 : 0, ...style }}>{children}</div>;
 }
-// Counts every number embedded in `value` up from zero once it scrolls into
-// view, keeping any surrounding characters (an en dash in a range like
-// "3–5", a unit) exactly where they are. Zero-pads the "before" state to the
-// same digit width so nothing reflows when the digits fill in.
+// Shows the real number from the first paint (in the server HTML and on
+// screen, even if the animation never runs), then, once it scrolls into
+// view, briefly counts the last stretch up to it: from 80% of the value to
+// the value, keeping any surrounding characters (an en dash in a range like
+// "3–5", a unit) where they are. Reduced-motion visitors just see the number.
 export function AnimatedNumber({ value }) {
   const ref = React.useRef(null);
   const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   React.useEffect(() => {
     const el = ref.current; if (!el) return;
     const nums = String(value).match(/\d+/g);
-    if (reduceMotion || !nums) { el.textContent = value; return; }
-    el.textContent = value.replace(/\d+/g, (m) => '0'.repeat(m.length));
+    if (reduceMotion || !nums) return;
     const io = new IntersectionObserver((e) => {
       if (!e[0].isIntersecting) return;
       io.disconnect();
-      const counters = nums.map(() => ({ v: 0 }));
+      const counters = nums.map((n) => ({ v: Math.floor(Number(n) * 0.8) }));
       anime({
         targets: counters, v: (t, i) => Number(nums[i]), round: 1, duration: 1300, delay: 150,
         easing: 'cubicBezier(.16,1,.3,1)',
         update: () => { let i = 0; el.textContent = value.replace(/\d+/g, () => String(counters[i++].v)); },
-        // A heavy concurrent render (a 3D scene animating in the same
-        // viewport) can starve this tween's own rAF ticks badly enough on a
-        // slow device that update() never gets a chance to run before
-        // complete fires; forcing the real string here guarantees the
-        // count-up never gets stuck on its zero-padded starting state.
+        // A starved tween (a 3D scene animating in the same viewport) still
+        // ends on the real string.
         complete: () => { el.textContent = value; }
       });
     }, { threshold: 0.4 });
@@ -125,4 +122,21 @@ export function FilterPills({ options, value, onChange, label }) {
       ))}
     </div>
   );
+}
+
+// The same hover-pop/press-squash the design system's primary Button variant
+// gets (see components/core/Button.jsx in _ds_bundle.js), for the two
+// hand-rolled hero/Contact-scene CTAs that can't use that component (they're
+// laid out over a 3D canvas, not a normal page flow). Animates the
+// standalone CSS `scale` property rather than `transform`, so it never
+// collides with React's own inline style writes on every re-render.
+export function bounceHandlers(ref) {
+  const play = (keyframes, duration) => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    anime.remove(el);
+    anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)', complete: () => { el.style.scale = ''; } });
+  };
+  return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
 }

@@ -7,7 +7,10 @@ import { Tag } from '../../components/core/Tag.jsx';
 import { Icon } from '../../components/core/Icon.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal, AnimatedNumber } from './shared.jsx';
-import { ModelViewer } from './ModelViewer.jsx';
+import dynamic from 'next/dynamic';
+// The project cards' live models load three.js on demand, so it isn't part
+// of the home page's first JavaScript (phones never show the 3D hero).
+const ModelViewer = dynamic(() => import('./ModelViewer.jsx').then((m) => m.ModelViewer), { ssr: false });
 import { SceneHero } from './SceneHero.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
 import { ProjectForm } from './ProjectForm.jsx';
@@ -46,12 +49,12 @@ function LogoCarousel({ images, reverse, height = 64, named = false }) {
         {[...images, ...images].map((img, i) => named ? (
           <div key={i} aria-hidden={i >= images.length || undefined} className="ubc-logo-tile">
             <span className="ubc-logo-name">{img.name}</span>
-            <img src={img.src} alt={i < images.length ? img.alt : ''} width={img.w} height={img.h} loading="lazy" decoding="async" />
+            <img src={img.src} alt={img.alt || img.name} width={img.w} height={img.h} loading="lazy" decoding="async" />
           </div>
         ) : (
           <div key={i} aria-hidden={i >= images.length || undefined}
             style={{ flexShrink: 0, height, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 var(--s-4)', background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-2)' }}>
-            <img src={img.src} alt={i < images.length ? img.alt : ''} width={img.w} height={img.h} loading="lazy" decoding="async" style={{ height: '66%', width: 'auto', maxWidth: 150, objectFit: 'contain' }} />
+            <img src={img.src} alt={img.alt || img.name} width={img.w} height={img.h} loading="lazy" decoding="async" style={{ height: '66%', width: 'auto', maxWidth: 150, objectFit: 'contain' }} />
           </div>
         ))}
       </div>
@@ -519,6 +522,9 @@ function GlobalPresence() {
             el.style.left = ((c + 1) / 2) * 100 + '%';
             el.style.top = ((-sy + 1) / 2) * 100 + '%';
             el.style.visibility = front ? 'visible' : 'hidden';
+            // Labels near either edge open inwards, so on a phone they stay
+            // inside the globe's box (and the screen) instead of off its edge.
+            el.dataset.edge = c < -0.4 ? 'l' : c > 0.4 ? 'r' : '';
           });
           raf = requestAnimationFrame(tick);
         };
@@ -620,9 +626,10 @@ function VideoCard({ v, index }) {
   return (
     <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{ position: 'relative', borderRadius: 'var(--r-3)', overflow: 'hidden', border: 'var(--bw-hair) solid var(--border-subtle)', background: '#000' }}>
-      <video controls preload="metadata" poster={v.poster} playsInline
+      <video controls preload="none" poster={v.poster} playsInline
         style={{ display: 'block', width: '100%', aspectRatio: '9 / 16', objectFit: 'cover' }}>
         <source src={v.src} type="video/mp4" />
+        {v.captions && <track kind="captions" src={v.captions} srcLang="en" label="English" default />}
       </video>
       {attributed && (
         <div style={{
@@ -644,20 +651,38 @@ function VideoCard({ v, index }) {
     </div>
   );
 }
+// A testimonial marked `featured` (Justin Laitzel's, with the transcript
+// UBC supplied) plays beside its own words as a pull quote, captioned; the
+// other clips follow in a row (a swipeable strip on phones, to keep the
+// home page short).
 function VideoTestimonials() {
   if (!VIDEO_TESTIMONIALS.length) return null;
+  const featured = VIDEO_TESTIMONIALS.find((v) => v.featured);
+  const rest = VIDEO_TESTIMONIALS.filter((v) => v !== featured);
   return (
     <Section>
       <Page>
         <Reveal style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
           <div style={{ ...eyebrow, display: 'inline-block' }}>In their own words</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Clients, on camera</h2>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-muted)', margin: 'var(--s-3) 0 0' }}>Hover a clip for who's speaking.</p>
         </Reveal>
-        <div className="ubc-video-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
-          {VIDEO_TESTIMONIALS.map((v, i) => (
+        {featured && (
+          <Reveal>
+            <figure className="ubc-featured-quote">
+              <div className="ubc-featured-video"><VideoCard v={{ ...featured, quote: null }} index={0} /></div>
+              <div>
+                <Icon name="quote" size={28} style={{ color: 'var(--accent)' }} />
+                <blockquote>{featured.quote}</blockquote>
+                <figcaption><strong>{featured.name}</strong><span>{featured.role}</span></figcaption>
+              </div>
+            </figure>
+          </Reveal>
+        )}
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', color: 'var(--text-muted)', margin: 'var(--s-7) 0 0', textAlign: 'center' }}>More clients: hover a clip for who's speaking.</p>
+        <div className="ubc-video-grid ubc-video-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(' + rest.length + ', 1fr)', gap: 'var(--space-card-gap)', marginTop: 'var(--s-5)' }}>
+          {rest.map((v, i) => (
             <Reveal key={v.id} delay={i * 60}>
-              <VideoCard v={v} index={i} />
+              <VideoCard v={v} index={i + 1} />
             </Reveal>
           ))}
         </div>
@@ -679,20 +704,28 @@ function WhoWeServe() {
           <div style={{ ...eyebrow, display: 'inline-block' }}>Who we serve</div>
           <h2 style={{ ...serifH, fontSize: 'clamp(28px, 3.6vw, 44px)', margin: 'var(--s-3) 0 0' }}>Built around who's actually asking</h2>
         </Reveal>
-        {/* Flex, not grid: the seventh card (modular / offsite) sits centred
-            on its own row instead of hanging off the left. */}
+        {/* Three to a row, cards in a row the same height; a card left
+            alone in the last row (the seventh, modular) spans the full
+            width with its text and tags side by side. */}
         <div className="ubc-serve-grid" style={{ marginTop: 'var(--space-head-content)' }}>
-          {WWS.map((r, i) => (
-            <Reveal key={r.role} delay={(i % 3) * 70}>
-              <div className="ubc-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
-                <h3 style={cardTitle}>{r.role}</h3>
-                <p style={cardBody}>{r.body}</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)', marginTop: 'var(--s-4)' }}>
-                  {r.serviceIndexes.map((si) => D.services[si] && <Tag key={si}>{D.services[si].title}</Tag>)}
-                </div>
+          {WWS.map((r, i) => {
+            const wide = WWS.length % 3 === 1 && i === WWS.length - 1;
+            return (
+              <div key={r.role} className={wide ? 'ubc-serve-wide' : undefined}>
+                <Reveal delay={(i % 3) * 70} style={{ height: '100%' }}>
+                  <div className="ubc-card ubc-serve-card" style={{ padding: 'var(--space-card-pad)', height: '100%' }}>
+                    <div>
+                      <h3 style={cardTitle}>{r.role}</h3>
+                      <p style={cardBody}>{r.body}</p>
+                    </div>
+                    <div className="ubc-serve-tags">
+                      {r.serviceIndexes.map((si) => D.services[si] && <Tag key={si}>{D.services[si].title}</Tag>)}
+                    </div>
+                  </div>
+                </Reveal>
               </div>
-            </Reveal>
-          ))}
+            );
+          })}
         </div>
       </Page>
     </Section>
@@ -767,7 +800,7 @@ function AboutUBC() {
           </Reveal>
           <Reveal delay={80}>
             {a.video && (
-              <video controls preload="metadata" poster={a.video.poster} playsInline style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: 'var(--r-3)', background: '#000' }}>
+              <video controls preload="none" poster={a.video.poster} playsInline style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: 'var(--r-3)', background: '#000' }}>
                 <source src={a.video.src} type="video/mp4" />
                 {a.video.captions && <track kind="captions" src={a.video.captions} srcLang="en" label="English" default />}
               </video>

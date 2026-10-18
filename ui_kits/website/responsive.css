@@ -398,6 +398,10 @@ html.ubc-menu-open .ubc-sticky { display: none !important; }
   transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
 }
 .ubc-globe-pin:hover .ubc-globe-tip, .ubc-globe-pin:focus-visible .ubc-globe-tip { opacity: 1; transform: translate(-50%, 0); }
+.ubc-globe-pin[data-edge="l"] .ubc-globe-tip { left: 0; transform: translate(0, 4px); }
+.ubc-globe-pin[data-edge="r"] .ubc-globe-tip { left: auto; right: 0; transform: translate(0, 4px); }
+.ubc-globe-pin[data-edge="l"]:hover .ubc-globe-tip, .ubc-globe-pin[data-edge="l"]:focus-visible .ubc-globe-tip,
+.ubc-globe-pin[data-edge="r"]:hover .ubc-globe-tip, .ubc-globe-pin[data-edge="r"]:focus-visible .ubc-globe-tip { transform: translate(0, 0); }
 
 @media (max-width: 900px) {
   .ubc-way-panel { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-4) !important; }
@@ -678,7 +682,7 @@ html.ubc-menu-open .ubc-sticky { display: none !important; }
 .ubc-tag-kicker { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; opacity: .75; }
 .ubc-tag-name { font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: .12em; line-height: 1.5; margin-top: 6px; }
 .ubc-tag-rule { width: 100%; height: 1px; background: currentColor; opacity: .3; margin: 12px 0; }
-.ubc-tag-foot { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; opacity: .85; }
+.ubc-tag-foot { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; opacity: .85; }
 @media (prefers-reduced-motion: reduce) { .ubc-tag-depth, .ubc-tag-shadow, .ubc-tag-sheen { transition: none; } }
 
 /* Filter pills with a sliding marker under the pressed one. */
@@ -1008,3 +1012,63 @@ html { scroll-padding-top: 88px; }
 @media (max-width: 860px) { .ubc-svc-quote { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); } }
 .ubc-svc-related { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-3); color: var(--text-accent); font-weight: 600; }
 .ubc-tb-fig.is-wide { width: 100%; float: none; margin: 0 0 var(--s-4); }
+
+/* Form fields at 16px everywhere, so iOS Safari doesn't zoom the page when
+   one is focused. */
+input, select, textarea { font-size: 16px !important; }
+
+/* Phones: no text under 12px (mono eyebrows and captions), and room at the
+   bottom of the page for the fixed Chat / Request Quote bar. */
+@media (max-width: 640px) {
+  :root { --fs-label: 12px; --fs-caption: 13px; }
+  body { padding-bottom: 88px; }
+}
+
+/* Home: who we serve. Three per row, equal heights; a lone last card spans
+   the row with its text and tags side by side. */
+.ubc-serve-grid > * { display: flex; }
+.ubc-serve-grid > * > div { flex: 1; }
+.ubc-serve-card { display: flex; flex-direction: column; justify-content: space-between; gap: var(--s-4); }
+.ubc-serve-tags { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.ubc-serve-grid > .ubc-serve-wide { flex-basis: 100%; }
+@media (min-width: 900px) {
+  .ubc-serve-wide .ubc-serve-card { flex-direction: row; align-items: center; gap: var(--s-7); }
+  .ubc-serve-wide .ubc-serve-card > div:first-child { flex: 1 1 55%; }
+  .ubc-serve-wide .ubc-serve-tags { flex: 1 1 45%; justify-content: flex-end; }
+}
+
+/* Home: featured video testimonial beside its pull quote. */
+.ubc-featured-quote { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: var(--s-8); align-items: center; max-width: 960px; margin: var(--space-head-content) auto 0; }
+.ubc-featured-quote blockquote { margin: var(--s-3) 0 0; font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px); line-height: 1.5; letter-spacing: 0.06em; color: var(--text-strong); }
+.ubc-featured-quote figcaption { display: flex; flex-direction: column; margin-top: var(--s-5); line-height: 1.5; }
+.ubc-featured-quote figcaption strong { color: var(--text-strong); }
+.ubc-featured-quote figcaption span { font-size: var(--fs-body-sm); color: var(--text-muted); }
+@media (max-width: 760px) {
+  .ubc-featured-quote { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+  .ubc-featured-video { max-width: 280px; margin: 0 auto; width: 100%; }
+}
+/* Phones: the other clips swipe sideways instead of stacking four screens. */
+@media (max-width: 640px) {
+  .ubc-video-strip { display: flex !important; overflow-x: auto; scroll-snap-type: x mandatory; max-width: none !important; margin-left: calc(-1 * var(--gutter)) !important; margin-right: calc(-1 * var(--gutter)) !important; padding: 0 var(--gutter) var(--s-2); }
+  .ubc-video-strip > * { flex: 0 0 68%; scroll-snap-align: center; }
+}
+
+/* ---------- Home hero (SceneHero.jsx) ----------
+   Desktop and tablets: a scroll track five screens tall with the scene
+   pinned inside it. Phones and reduced motion: the same markup in normal
+   flow, the 3D layers hidden and the stages as stacked cards. */
+.ubc-hero { position: relative; height: var(--hero-h, 500vh); background: var(--surface-page); }
+.ubc-hero-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.ubc-hero-intro { position: absolute; inset: 0; display: flex; align-items: center; }
+.ubc-hero-cards { display: none; }
+.ubc-hero-card { background: var(--surface-card); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-3); overflow: hidden; }
+.ubc-hero-card img { display: block; width: 100%; height: auto; max-height: 60vh; object-fit: contain; background: var(--white); padding: var(--s-3) var(--s-3) 0; }
+/* Tablets: the 01-04 dots clear the Chat / Request Quote bar. */
+@media (max-width: 1100px) { .ubc-stage-rail { margin-bottom: 80px !important; } }
+@media (max-width: 700px), (prefers-reduced-motion: reduce) {
+  .ubc-hero { height: auto; }
+  .ubc-hero-pin { position: static; height: auto; overflow: visible; }
+  .ubc-hero-desk { display: none !important; }
+  .ubc-hero-intro { position: static; display: block !important; opacity: 1 !important; pointer-events: auto !important; padding-top: var(--section-y); }
+  .ubc-hero-cards { display: block; max-width: var(--page-max); margin: 0 auto; padding: var(--section-y) var(--gutter) 0; }
+}

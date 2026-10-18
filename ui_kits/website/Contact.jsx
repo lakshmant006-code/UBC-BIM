@@ -76,7 +76,7 @@ function WalkIn() {
   return (
     <div className="ubc-walkin">
       <div className="ubc-walkin-frame">
-        <video ref={ref} muted loop playsInline preload="metadata" poster={CS.poster}
+        <video ref={ref} muted loop playsInline preload="none" poster={CS.poster}
           aria-label="Clip: a UBC BIM lead meets two visitors at the studio door and walks them into the office"
           onTimeUpdate={onTime} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
           <source src={CS.video} type="video/mp4" />

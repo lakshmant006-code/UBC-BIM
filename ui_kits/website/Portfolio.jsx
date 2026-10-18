@@ -169,7 +169,7 @@ export function Portfolio() {
   return (
     <Section>
       <Page>
-        <SectionHeading as="h1" eyebrow="3D Project Lab" title="Rotate a project, read its spec, ask for a quote" size="lg"
+        <SectionHeading as="h1" eyebrow="3D Project Lab" title="CFS, LGSF &amp; Wood Framing Projects in 3D" size="lg"
           standfirst="Our wood-frame and light-gauge-steel projects, each with a live model, its specification and the files we delivered." />
         <div style={{ marginTop: 'var(--s-7)' }}>
           <FilterBar options={TYPES} value={type} onChange={pickType} count={ofType.length} />

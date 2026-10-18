@@ -2,7 +2,7 @@ import '../styles.css';
 import '../ui_kits/website/responsive.css';
 import { AppChrome } from './AppChrome.jsx';
 import { UBC_DATA } from '../ui_kits/website/data.js';
-import { SITE_URL, SITE_NAME, SHARE_IMAGE, abs } from '../ui_kits/website/site.js';
+import { SITE_URL, SITE_NAME, SHARE_IMAGE, abs, serviceHref } from '../ui_kits/website/site.js';
 import { Archivo, IBM_Plex_Sans } from 'next/font/google';
 
 // Fonts are downloaded at build time and served from this site (next/font),
@@ -36,20 +36,33 @@ const KEYFRAMES = `@keyframes ubcRing{0%{transform:translateX(-50%) rotate(0)}18
 // Organisation schema on every page. Address is the US office the site
 // already names (About: Fort Mill, South Carolina); sameAs is the company's
 // own social channels. Phone and email are left out until supplied.
+// The one Organization entity every page points at (service pages name it
+// as their provider by @id). Per the team's SEO handoff (15 Oct 2026); the
+// address, phone and email are UBC_DATA.contact, which that handoff asks
+// the director to confirm before launch.
+const C = UBC_DATA.contact;
 const ORG_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
+  '@id': abs('/#organization'),
   name: 'UBC BIM',
   alternateName: 'Unique Building Concepts',
-  description: 'CFS and LGSF (light-gauge steel framing) and wood-frame BIM detailing: wall panels, roof and floor trusses, MEP coordination, permit sets and machine files.',
+  legalName: C.legalName,
+  description: 'BIM, engineering, permit documentation and manufacturing for CFS, LGSF and wood-frame construction: drafting, bills of material and estimation, permit sets, modeling and detailing, structural engineering, and manufacture and supply of building components.',
   url: abs('/'),
   logo: abs('/assets/brand/ubc-logo.png'),
   image: abs(SHARE_IMAGE),
-  address: { '@type': 'PostalAddress', addressLocality: 'Fort Mill', addressRegion: 'SC', addressCountry: 'US' },
-  sameAs: (UBC_DATA.social || []).map((s) => s.href),
-  areaServed: 'Worldwide',
-  knowsAbout: ['Building Information Modelling', 'Cold-formed steel (CFS) framing', 'Light-gauge steel framing (LGSF)', 'Wood frame construction', 'Roof and floor trusses', 'MEP clash detection', 'Permit documentation'],
-  serviceType: ['Wall panel detailing', 'Roof and floor trusses', 'Engineering of walls and trusses', 'MEP detailing and clash detection', 'Permit documents', 'Bill of Materials and machine CSV', 'Architectural drafting']
+  telephone: C.phone,
+  email: C.email,
+  address: { '@type': 'PostalAddress', streetAddress: C.address.street, addressLocality: C.address.city, addressRegion: C.address.region, postalCode: C.address.postalCode, addressCountry: C.address.country },
+  areaServed: ['US', 'CA', 'AU', 'NZ', 'CL', 'IN', 'AE'],
+  knowsAbout: ['Cold-formed steel framing', 'Light-gauge steel framing', 'Wood-frame construction', 'BIM modeling', 'Permit drawings', 'Bill of materials', 'Roll-former machine files'],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Services',
+    itemListElement: (UBC_DATA.serviceArticles || []).map((a) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: a.title, url: abs(serviceHref(a)) } }))
+  },
+  sameAs: (UBC_DATA.social || []).map((s) => s.href)
 };
 
 export default function RootLayout({ children }) {

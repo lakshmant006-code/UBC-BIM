@@ -235,7 +235,7 @@ export function Blogs() {
   return (
     <div>
       <Page style={{ paddingTop: 'var(--s-9)' }}>
-        <SectionHeading as="h1" eyebrow="Blog" title="Notes from the model" size="lg" align="center"
+        <SectionHeading as="h1" eyebrow="Blog &middot; Notes from the model" title="LGSF &amp; Wood Framing Insights" size="lg" align="center"
           standfirst="Updates, technical write-ups and behind-the-scenes from the UBC BIM team." />
       </Page>
       {posts.length === 0 ? (

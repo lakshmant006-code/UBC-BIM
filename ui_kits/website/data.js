@@ -353,7 +353,7 @@ UBC_DATA.blueprint = {
    contact `cards`), not new claims. */
 UBC_DATA.faq = [
   { q: 'What services do you offer?',
-    a: 'Seven, all drawn from one coordinated model: wall panel detailing, roof and floor trusses, engineering, MEP detailing and clash detection, permit documents, Bill of Materials and machine CSV, and architectural drafting.' },
+    a: 'Six, all drawn from one coordinated model: Drafting & Architectural Services, Bill of Material & Estimation, Permit Sets, Modeling & Detailing, Engineering, and Manufacturing (manufacture and supply of building components).' },
   { q: 'Do you work with wood frame or light-gauge steel?',
     a: 'Both, often on the same project. Wall panel detailing, engineering and machine files are covered for wood frame and light-gauge steel alike.' },
   { q: 'Do you detail wood-frame walls, floors and roof trusses?',
@@ -398,7 +398,12 @@ UBC_DATA.videoTestimonials = [
   { id: 'client-2', src: '/assets/testimonials/client-2.mp4', poster: '/assets/testimonials/client-2-poster.jpg',
     name: 'Cameron', role: 'New LGSF framing business owner',
     quote: "UBC has been incredibly supportive — helping me understand the design process and launch my projects smoothly. They're responsive, proactive, and always willing to go the extra mile." },
-  { id: 'client-3', src: '/assets/testimonials/client-3.mp4', poster: '/assets/testimonials/client-3-poster.jpg' },
+  // Justin Laitzel's clip: the transcript UBC supplied (Round 2 changes,
+  // 15 Oct 2026), shown as a pull quote and used as the video's captions.
+  { id: 'client-3', src: '/assets/testimonials/client-3.mp4', poster: '/assets/testimonials/client-3-poster.jpg',
+    captions: '/assets/testimonials/client-3.en.vtt',
+    name: 'Justin Laitzel', role: 'Ideal Building Systems', featured: true,
+    quote: "Hi, I'm Justin Laitzel with Ideal Building Systems. We've been working with UBC for about three months now. I've been very impressed with their service. Their turnaround times are impeccable and their pricing is very competitive. We will continue to use UBC in the future." },
   { id: 'client-4', src: '/assets/testimonials/client-4.mp4', poster: '/assets/testimonials/client-4-poster.jpg',
     name: 'Zach Thompson', role: 'Seattle, WA',
     quote: 'Their coordination, attention to detail, and deliverables are top-tier. They consistently bring creativity to problem-solving and help bring our projects to life.' }
