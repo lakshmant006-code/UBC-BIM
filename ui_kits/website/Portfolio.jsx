@@ -14,10 +14,17 @@ import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal, FilterPills } from './shared.jsx';
 import { ModelViewer } from './ModelViewer.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
-import { projectHref, projectBySlug } from './site.js';
+import Link from 'next/link';
+import { projectHref, projectBySlug, serviceById, serviceHref } from './site.js';
 import { Breadcrumbs } from './ServicePage.jsx';
 
+// Every project delivers a framing model, panel layouts, a BOM and machine
+// files (the list under "What you receive"), so each project page links to
+// those service pages.
+const PROJECT_SERVICES = ['modeling-detailing', 'bom-estimation', 'manufacturing'];
+
 function ProjectDetail({ project, onBack, onQuote }) {
+  const related = PROJECT_SERVICES.map(serviceById).filter(Boolean);
   return (
     <div>
       <Page style={{ paddingTop: 'var(--s-7)' }}>
@@ -56,30 +63,26 @@ function ProjectDetail({ project, onBack, onQuote }) {
               { label: 'Delivered', value: project.delivered }
             ]}
             tags={project.software.map((s) => <Tag key={s}>{s}</Tag>)}
-            actions={<><Button full size="sm" onClick={onQuote}>Start Your Next Project →</Button><Button full size="sm" variant="secondary">Download sample files</Button></>} />
+            actions={<Button full size="sm" onClick={onQuote}>Start Your Next Project →</Button>} />
         </div>
       </div>
       <Section tight>
         <Page>
-          <div className="ubc-proj-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s-8)' }}>
-            <div>
-              <SectionHeading eyebrow="Walkthrough video" title="Model walkthrough" size="sm" />
-              <div style={{ marginTop: 'var(--s-5)', aspectRatio: '16 / 9', background: 'var(--surface-sunken)', border: 'var(--bw-hair) solid var(--border-subtle)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-faint)' }}>
-                Video pending: YouTube walkthrough embeds here
-              </div>
-            </div>
-            <div>
-              <SectionHeading eyebrow="Files" title="What you receive" size="sm" />
-              <div style={{ marginTop: 'var(--s-5)' }}>
-                {['Coordinated framing model · RVT, IFC', 'Wall panel layouts · PDF', 'Bill of Materials · XLSX', 'Machine CSV · line-ready', 'Permit set · PDF'].map((f) => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', padding: 'var(--s-3) 0', borderBottom: 'var(--bw-hair) solid var(--border-subtle)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-body)' }}>
-                    <Icon name="arrow-down" size={16} style={{ color: 'var(--text-faint)' }} />{f}
-                  </div>
-                ))}
-                <Button style={{ marginTop: 'var(--s-5)' }} variant="secondary" icon={<Icon name="download" size={17} />}>Download sample files</Button>
-              </div>
-            </div>
-          </div>
+          {/* The walkthrough-video placeholder and both "Download sample
+              files" buttons are gone (director, 15 Oct): "What you receive"
+              takes the full width, its files in two columns on desktop. */}
+          <SectionHeading eyebrow="Files" title="What you receive" size="sm" />
+          <ul className="ubc-proj-files">
+            {['Coordinated framing model · RVT, IFC', 'Wall panel layouts · PDF', 'Bill of Materials · XLSX', 'Machine CSV · line-ready', 'Permit set · PDF'].map((f) => (
+              <li key={f}><Icon name="arrow-down" size={16} style={{ color: 'var(--text-faint)' }} />{f}</li>
+            ))}
+          </ul>
+          {related.length > 0 && (
+            <nav aria-label="Services on this project" className="ubc-proj-services">
+              <span>Services on this project</span>
+              {related.map((a) => <Link key={a.id} href={serviceHref(a)}>{a.title} {'\u2192'}</Link>)}
+            </nav>
+          )}
         </Page>
       </Section>
     </div>

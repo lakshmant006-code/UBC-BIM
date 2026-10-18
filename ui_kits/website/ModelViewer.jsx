@@ -650,7 +650,9 @@ export function ModelViewer({ src, radius, title, height, compact, bare, initial
               bottom-right at all times, so the right-hand side is never this
               component's to use. A caller wanting nothing but the model
               (MockingBirdModel.jsx) passes `bare` to drop this whole group. */}
-          <div style={{ position: 'absolute', left: 'var(--s-5)', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
+          {/* .ubc-mv-caption lines the group up with the page column (the
+              heading and breadcrumb above) when the viewer spans the window. */}
+          <div className="ubc-mv-caption" style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>
               {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)' }}>{title}</span>}
               {state === 'ready' && (

@@ -25,6 +25,7 @@ import { Icon } from '../../components/core/Icon.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal, AnimatedNumber } from './shared.jsx';
 import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
+import { serviceById, serviceHref } from './site.js';
 
 const D = UBC_DATA;
 const A = D.about;
@@ -163,16 +164,36 @@ function Leadership() {
 // OUR SERVICE ROADMAP: the director's roadmap graphic (from the previous
 // ubcbim.com), in place of the "Five disciplines" cards. The image carries
 // its own title, so the heading is for screen readers and the outline.
+// The six services in the order a project moves through them, as real
+// text (it used to be a pasted image): one row joined by a line on desktop,
+// a vertical list on phones. Each step links to its service page.
+const ROADMAP = [
+  { id: 'drafting-architectural', name: 'Drafting & Architecture', icon: 'drafting-compass' },
+  { id: 'bom-estimation', name: 'Bill of Material & Estimation', icon: 'calculator' },
+  { id: 'engineering', name: 'Engineering', icon: 'ruler' },
+  { id: 'permit-sets', name: 'Permit Sets', icon: 'file-check' },
+  { id: 'modeling-detailing', name: 'Modeling & Detailing', icon: 'box' },
+  { id: 'manufacturing', name: 'Manufacture / Supply of Materials', icon: 'factory' }
+];
 function ServiceRoadmap() {
   return (
     <Section id="team">
       <Page>
-        <h2 className="ubc-visually-hidden">Our Service Roadmap</h2>
-        <Reveal>
-          <img src="/assets/about/service-roadmap.webp" width={1770} height={377} loading="lazy" decoding="async"
-            alt="Our Service Roadmap: Drafting & Architecture, Bill of Material & Estimation, Engineering, Permit Sets, Modeling & Detailing, and Manufacture / Supply of Materials, connected in sequence"
-            style={{ display: 'block', width: '100%', height: 'auto' }} />
-        </Reveal>
+        <SectionHead eyebrow="How a project moves" title="Our service roadmap" center />
+        <ol className="ubc-roadmap">
+          {ROADMAP.map((st, i) => {
+            const a = serviceById(st.id);
+            return (
+              <li key={st.id}>
+                <Link href={a ? serviceHref(a) : '/services'} className="ubc-roadmap-step">
+                  <span className="ubc-roadmap-dot" aria-hidden="true"><Icon name={st.icon} size={24} /></span>
+                  <span className="ubc-roadmap-n">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="ubc-roadmap-name">{st.name}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
       </Page>
     </Section>
   );

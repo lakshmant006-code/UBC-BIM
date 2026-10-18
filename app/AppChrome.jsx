@@ -82,6 +82,18 @@ export function AppChrome({ children }) {
     return () => window.removeEventListener('scroll', on);
   }, []);
 
+  // Any link marked data-open-chat (Contact's "Start a chat") opens the
+  // chat panel instead of following its #chat fallback.
+  React.useEffect(() => {
+    const on = (e) => {
+      const a = e.target.closest && e.target.closest('[data-open-chat]');
+      if (!a) return;
+      e.preventDefault(); setChat(true);
+    };
+    document.addEventListener('click', on);
+    return () => document.removeEventListener('click', on);
+  }, []);
+
   const active = pathToId(pathname);
   // Buttons pass their click event straight through, so only a real
   // { machine } options object pre-selects the form's machine field.
