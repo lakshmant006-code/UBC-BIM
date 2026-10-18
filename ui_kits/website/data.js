@@ -417,7 +417,7 @@ UBC_DATA.videoTestimonials = [
    unset for those rather than guessed. */
 UBC_DATA.blogPosts = [
   {
-    id: 'climbing-wall-lgsf',
+    id: 'climbing-wall-lgsf', seoTitle: 'Engineering a 30-Foot LGSF Climbing Wall',
     shortTitle: 'A 30-foot LGSF climbing wall',
     title: 'Engineering Innovation in Light Gauge Steel: Custom 30-Foot Climbing Wall for a Commercial Building',
     excerpt: 'A client asked for a 30-foot climbing wall panel inside a light-gauge-steel commercial building — three times the height LGSF walls are normally engineered for. Here’s how strap connections made it work.',
@@ -463,7 +463,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: 'lgsf-software-stack-2026',
+    id: 'lgsf-software-stack-2026', seoTitle: 'The LGSF Detailing Software Stack in 2026',
     shortTitle: 'The LGSF detailing software stack',
     title: 'The Complete Software Stack for LGSF Detailing in 2026',
     excerpt: 'A working detailer’s guide to the five platforms that actually ship light-gauge steel framing projects today — Vertex BD, Framecad, Scottsdale Scottsteel, Revit with MWF, and StaadPro.',
@@ -531,7 +531,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: 'steel-framed-modular-homes',
+    id: 'steel-framed-modular-homes', seoTitle: 'Why Steel-Framed Modular Homes Are a Game Changer',
     shortTitle: 'Steel-framed modular homes',
     title: 'Building the Future: Why Steel-Framed Modular Homes are a Game Changer',
     excerpt: 'Splitting a 600 sq ft California home into two 300 sq ft light-gauge-steel modules, engineered to bolt together into one seamless, permanent-feeling house.',
@@ -568,7 +568,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: 'hidden-engineering-challenges-lgsf',
+    id: 'hidden-engineering-challenges-lgsf', seoTitle: 'Hidden Engineering Challenges in LGSF Buildings',
     shortTitle: 'Hidden engineering in LGSF buildings',
     title: 'The Hidden Engineering Challenges Behind Successful LGSF Buildings: Lessons from Real-World Projects',
     excerpt: 'Speed and precision get the credit, but a successful LGSF building is decided earlier — in load paths, environmental design, and constructability worked out long before construction starts.',
@@ -613,7 +613,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: '12-days-of-bim',
+    id: '12-days-of-bim', seoTitle: 'A 12-Day BIM Journey: Concept to Construction',
     shortTitle: 'A 12-day BIM journey',
     title: 'From Concept to Construction: A 12-Day BIM Journey with UBC BIM',
     date: 'Jan 13, 2026',

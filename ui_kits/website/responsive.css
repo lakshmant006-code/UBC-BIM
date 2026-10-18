@@ -1007,3 +1007,4 @@ html { scroll-padding-top: 88px; }
 .ubc-svc-quote p { margin: var(--s-3) 0 0; line-height: var(--lh-relaxed); color: var(--text-body); }
 @media (max-width: 860px) { .ubc-svc-quote { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); } }
 .ubc-svc-related { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-3); color: var(--text-accent); font-weight: 600; }
+.ubc-tb-fig.is-wide { width: 100%; float: none; margin: 0 0 var(--s-4); }

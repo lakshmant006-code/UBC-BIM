@@ -13,7 +13,9 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const p = postBySlug(slug);
   if (!p) return {};
-  return pageMeta({ title: p.title + ' | ' + SITE_NAME, description: p.excerpt || p.title, path: postHref(p), image: p.image, type: 'article' });
+  // The search title is the post's own `seoTitle` (kept under 60 characters
+  // with the site name); the page's H1 stays the full title.
+  return pageMeta({ title: (p.seoTitle || p.title) + ' | ' + SITE_NAME, description: p.excerpt || p.title, path: postHref(p), image: p.image, type: 'article' });
 }
 
 export default async function BlogPostRoute({ params }) {
