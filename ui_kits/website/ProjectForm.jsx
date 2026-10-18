@@ -22,7 +22,17 @@ function trackConversion(machine, source) {
   if (typeof window.gtag === 'function') window.gtag('event', 'send_your_project', { machine: payload.machine, source });
 }
 
-export function ProjectForm({ defaultMachine = '', source = 'website', dark = false }) {
+// GA4's recommended lead event, fired only once the enquiry has actually
+// been accepted (if GA4 is on the page; nothing otherwise).
+function trackLead(source) {
+  if (typeof window === 'undefined') return;
+  if (Array.isArray(window.dataLayer)) window.dataLayer.push({ event: 'generate_lead', source });
+  if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { source });
+}
+
+// `compact` drops the machine field: name, email and drawings only (the
+// inline form at the end of each service page).
+export function ProjectForm({ defaultMachine = '', source = 'website', dark = false, compact = false }) {
   const [status, setStatus] = React.useState('idle'); // idle | sending | sent | error
   const [machine, setMachine] = React.useState(defaultMachine);
   const [files, setFiles] = React.useState([]);
@@ -42,6 +52,7 @@ export function ProjectForm({ defaultMachine = '', source = 'website', dark = fa
     try {
       const res = await fetch('/api/project', { method: 'POST', body });
       setStatus(res.ok ? 'sent' : 'error');
+      if (res.ok) trackLead(source);
     } catch {
       setStatus('error');
     }
@@ -66,9 +77,11 @@ export function ProjectForm({ defaultMachine = '', source = 'website', dark = fa
         <FormField label="Name" required htmlFor={'pf-name-' + source}><Input id={'pf-name-' + source} name="name" autoComplete="name" required /></FormField>
         <FormField label="Work email" required htmlFor={'pf-email-' + source}><Input id={'pf-email-' + source} name="email" type="email" autoComplete="email" required /></FormField>
       </div>
-      <FormField label="Machine or software" htmlFor={'pf-machine-' + source}>
-        <Select id={'pf-machine-' + source} value={machine} onChange={(e) => setMachine(e.target.value)} placeholder="Select your machine or software" options={MACHINES} />
-      </FormField>
+      {!compact && (
+        <FormField label="Machine or software" htmlFor={'pf-machine-' + source}>
+          <Select id={'pf-machine-' + source} value={machine} onChange={(e) => setMachine(e.target.value)} placeholder="Select your machine or software" options={MACHINES} />
+        </FormField>
+      )}
       <FormField label="Drawings and models" htmlFor={'pf-files-' + source} hint="PDF, DWG, RVT or IFC. File names travel with your request; we'll send an upload link for the files themselves.">
         <input id={'pf-files-' + source} type="file" multiple accept={ACCEPT}
           onChange={(e) => setFiles(Array.from(e.target.files || []))}

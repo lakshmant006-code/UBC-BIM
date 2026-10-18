@@ -1,24 +1,27 @@
 /*
-  ServicesDetail: the full write-up for one of the site's 8 service
-  categories (UBC_DATA.serviceArticles). This is the client's own
-  real copy — see the comment above that array in data.js for exactly what
-  editing was and wasn't done to it. An article may also carry a `gallery`
-  of the client's own images ({src, alt, caption}), shown in a column
-  beside the text on wide screens and after it on narrower ones.
+  ServicesDetail: the write-up for one service (UBC_DATA.serviceArticles,
+  the director's own copy) laid out per the Round 2 changes (15 Oct 2026):
 
-  Renders exactly one `article` at a time — it owns no "which one is
-  active" state of its own; MockingBirdModel.jsx owns that and hands this
-  component whichever article was opened. `embedded` renders it bare (no
-  page section, an h2 title carrying `titleId`) for the Services pop-up.
+  - 1100px and wider: two columns. The text on the left; on the right a
+    visual that stays in view while the text scrolls (UBC_DATA.servicePages
+    [id].visual). Narrower screens stack the visual under the intro.
+  - Images sit beside the paragraphs they illustrate, textbook style
+    (servicePages[id].figures, alternating right and left), and every image
+    opens full size on click.
+  - Then the sample output's table, extra sheets, and the page's FAQs
+    (visible here; ServicePage's route adds the FAQPage schema).
+
+  The whole layout is built from TextFigure / Figure, which Blogs.jsx reuses
+  for the same side-by-side look in blog posts.
 */
 import React from 'react';
-import { Page, Section, Reveal } from './shared.jsx';
+import Link from 'next/link';
+import { Page, Section } from './shared.jsx';
 import { UBC_DATA } from './data.js';
 
-// Full-size view of a sample image, inside the site (director: the sample
-// should not send the visitor off to a bare image in a new tab). A native
-// modal <dialog>: Escape and the backdrop close it, focus returns after.
-function ImageViewer({ image, onClose }) {
+// Full-size view of an image, inside the site. A native modal <dialog>:
+// Escape and the backdrop close it, focus returns to the opener after.
+export function ImageViewer({ image, onClose }) {
   const ref = React.useRef(null);
   React.useEffect(() => {
     const d = ref.current; if (!d || !image) return undefined;
@@ -31,132 +34,201 @@ function ImageViewer({ image, onClose }) {
     <dialog ref={ref} className="ubc-img-viewer" aria-label={image.caption || image.alt}
       onCancel={(e) => { e.preventDefault(); onClose(); }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <button type="button" className="ubc-img-viewer-x" aria-label="Close" onClick={onClose}>{'\u00d7'}</button>
+      <button type="button" className="ubc-img-viewer-x" aria-label="Close" onClick={onClose}>{'×'}</button>
       <img src={image.src} alt={image.alt} />
       {image.caption && <p>{image.caption}</p>}
     </dialog>
   );
 }
 
-// "Sample output": what this service delivers, generated from a real model
-// on the site (UBC_DATA.serviceOutputs, keyed by article id).
-function SampleOutput({ out, title }) {
-  const [view, setView] = React.useState(null);
+// One zoomable image with its caption. `onView` opens the viewer.
+export function Figure({ fig, onView, className, eager }) {
   return (
-    <section className="ubc-svc-output" aria-label={'Sample output: ' + title}>
-      <div className="ubc-svc-output-eyebrow">Sample output</div>
-      {out.note && <p className="ubc-svc-output-note">{out.note}</p>}
-      <div className={'ubc-svc-output-figs' + (out.images.length > 1 ? ' is-two' : '')}>
-        {out.images.map((g) => (
-          <figure key={g.src}>
-            <button type="button" className="ubc-svc-output-zoom" onClick={() => setView(g)} aria-label={'View full size: ' + (g.caption || g.alt)}>
-              <img src={g.src} alt={g.alt} loading="lazy" />
-            </button>
-            {g.caption && <figcaption>{g.caption}</figcaption>}
-          </figure>
-        ))}
-      </div>
-      {out.table && (
-        <div className="ubc-svc-output-table" role="region" aria-label={out.table.caption} tabIndex={0}>
-          <table>
-            <caption>{out.table.caption}</caption>
-            <thead><tr>{out.table.columns.map((c) => <th key={c} scope="col">{c}</th>)}</tr></thead>
-            <tbody>
-              {out.table.rows.map((r, i) => (
-                <tr key={i} className={/^Total/.test(r[0]) ? 'is-total' : undefined}>
-                  {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      <ImageViewer image={view} onClose={() => setView(null)} />
-    </section>
+    <figure className={className}>
+      <button type="button" className="ubc-svc-output-zoom" onClick={() => onView(fig)} aria-label={'View full size: ' + (fig.caption || fig.alt)}>
+        <img src={fig.src} alt={fig.alt} width={fig.w} height={fig.h} loading={eager ? undefined : 'lazy'} decoding="async" />
+      </button>
+      {fig.caption && <figcaption>{fig.caption}</figcaption>}
+    </figure>
   );
 }
 
-export function ServicesDetail({ article, embedded = false, titleId }) {
+// A run of paragraphs with images floated beside them, textbook style:
+// figures alternate right / left, the text wraps around them, and on
+// phones each image sits full width after its paragraph's first lines.
+// `figs` maps a paragraph index to its figure.
+export function TextFigure({ paras, figs = {}, side = 0, onView, pStyle }) {
+  return paras.map((p, i) => {
+    const f = figs[i];
+    return (
+      <React.Fragment key={i}>
+        {f && <Figure fig={f} onView={onView} className={'ubc-tb-fig ' + ((side + f.n) % 2 ? 'is-left' : 'is-right')} />}
+        <p className="ubc-tb-p" style={pStyle}>{p}</p>
+      </React.Fragment>
+    );
+  });
+}
+
+const serif = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)' };
+
+const fmtDate = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+// The right-hand visual, by kind.
+function Visual({ v, onView }) {
+  if (!v) return null;
+  if (v.kind === 'set') {
+    return (
+      <div className="ubc-svc-visual-card">
+        <div className="ubc-svc-visual-label">{v.label}</div>
+        <Figure fig={v.model} onView={onView} eager />
+        <div className="ubc-svc-visual-arrow" aria-hidden="true">{'↓'}</div>
+        <div className="ubc-svc-visual-thumbs">
+          {v.sheets.map((s) => <Figure key={s.src} fig={s} onView={onView} />)}
+        </div>
+      </div>
+    );
+  }
+  if (v.kind === 'bom') {
+    return (
+      <div className="ubc-svc-visual-card">
+        <Figure fig={v.image} onView={onView} eager />
+        <dl className="ubc-bom-summary" aria-label="Bill of material summary">
+          {v.summary.map(([k, val]) => <div key={k}><dt>{k}</dt><dd>{val}</dd></div>)}
+        </dl>
+        <ol className="ubc-svc-flow" aria-label="From model to bid">
+          {v.flow.map((f) => <li key={f}>{f}</li>)}
+        </ol>
+      </div>
+    );
+  }
+  if (v.kind === 'labelled') {
+    return (
+      <div className="ubc-svc-visual-card">
+        <figure className="ubc-labelled">
+          <button type="button" className="ubc-svc-output-zoom" onClick={() => onView(v.image)} aria-label={'View full size: ' + v.image.caption}>
+            <img src={v.image.src} alt={v.image.alt} width={v.image.w} height={v.image.h} decoding="async" />
+          </button>
+          {v.labels.map((l) => (
+            <span key={l.text} className="ubc-labelled-tag" style={{ left: l.x + '%', top: l.y + '%' }} aria-hidden="true">{l.text}</span>
+          ))}
+          <figcaption>{v.image.caption}</figcaption>
+        </figure>
+        <div className="ubc-svc-visual-label" style={{ marginTop: 'var(--s-5)' }}>{v.indexTitle}</div>
+        <ol className="ubc-sheet-index">
+          {v.index.map((s) => (
+            <li key={s.n}>
+              <button type="button" onClick={() => onView({ src: s.src, alt: 'Sheet ' + s.n + ', ' + s.name, caption: s.n + ' · ' + s.name })}>
+                <span>{s.n}</span>{s.name}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+    );
+  }
+  return (
+    <div className="ubc-svc-visual-card">
+      <Figure fig={v.image} onView={onView} eager />
+      {v.explore && (
+        <div className="ubc-svc-subviews">
+          <span className="ubc-svc-visual-label">Explore in 3D</span>
+          {[['3d-wall-panels', 'Wall panels'], ['3d-roof-trusses', 'Roof trusses'], ['3d-floor-trusses', 'Floor trusses']].map(([h, l]) => (
+            <Link key={h} href={'/services#' + h} className="ubc-svc-subview">{l} {'→'}</Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OutputTable({ table }) {
+  return (
+    <div className="ubc-svc-output-table" role="region" aria-label={table.caption} tabIndex={0}>
+      <table>
+        <caption>{table.caption}</caption>
+        <thead><tr>{table.columns.map((c) => <th key={c} scope="col">{c}</th>)}</tr></thead>
+        <tbody>
+          {table.rows.map((r, i) => (
+            <tr key={i} className={/^Total/.test(r[0]) ? 'is-total' : undefined}>
+              {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function ServicesDetail({ article }) {
   const a = article;
   const [view, setView] = React.useState(null);
   if (!a) return null;
-  const hasGallery = Boolean(a.gallery && a.gallery.length);
-  const Title = embedded ? 'h2' : 'h1';
-  const Shell = embedded ? React.Fragment : Section;
-  const Inner = embedded ? React.Fragment : Page;
-  const Body = embedded ? 'div' : Reveal;
+  const pg = (UBC_DATA.servicePages || {})[a.id] || {};
+  const out = (UBC_DATA.serviceOutputs || {})[a.id] || {};
+  // Figures by section, then paragraph; `n` counts them so sides alternate.
+  const bySection = {};
+  (pg.figures || []).forEach((f, n) => { (bySection[f.section] = bySection[f.section] || {})[f.para] = { ...f, n }; });
 
   return (
-    <Shell>
-      <Inner>
-        <div className={hasGallery ? 'ubc-svc-layout' : undefined} style={hasGallery ? undefined : { maxWidth: 760 }}>
-        <div style={{ maxWidth: 760, minWidth: 0 }}>
-          <Body key={a.id}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--accent)' }} />
-              {a.label}
-            </div>
-            <Title id={titleId} style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)', fontSize: embedded ? 'clamp(26px, 3vw, 40px)' : 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>
-              {a.title}
-            </Title>
-            {a.summary && (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-lg)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-4) 0 0' }}>
-                {a.summary}
-              </p>
-            )}
-
-            {UBC_DATA.serviceOutputs && UBC_DATA.serviceOutputs[a.id] && (
-              <SampleOutput out={UBC_DATA.serviceOutputs[a.id]} title={a.title} />
-            )}
+    <Section>
+      <Page>
+        <div className="ubc-svc-two">
+          <div className="ubc-svc-intro">
+            <div className="ubc-svc-eyebrow"><span aria-hidden="true" />{a.label}</div>
+            <h1 style={{ ...serif, fontSize: 'clamp(30px, 4vw, 52px)', margin: 'var(--s-3) 0 0' }}>{a.title}</h1>
+            {a.summary && <p className="ubc-svc-lede">{a.summary}</p>}
+            {pg.updated && <p className="ubc-svc-updated">Updated <time dateTime={pg.updated}>{fmtDate(pg.updated)}</time></p>}
+          </div>
+          {/* Beside the text on wide screens (sticky); after the intro on
+              tablets and phones (grid placement in responsive.css). */}
+          <aside className="ubc-svc-visual" aria-label={a.title + ': sample'}>
+            <div className="ubc-svc-visual-sticky"><Visual v={pg.visual} onView={setView} /></div>
+          </aside>
+          <div className="ubc-svc-body">
 
             {a.sections.map((s, i) => (
-              <div key={i} style={{ marginTop: 'var(--s-7)' }}>
-                {s.heading && (
-                  <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--fs-h4)', color: 'var(--text-strong)', margin: '0 0 var(--s-4)' }}>
-                    {s.heading}
-                  </h2>
-                )}
-                {s.body && s.body.map((p, pi) => (
-                  <p key={pi} style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)', margin: pi === 0 ? 0 : 'var(--s-4) 0 0' }}>
-                    {p}
-                  </p>
-                ))}
+              <section key={i} className="ubc-tb-section">
+                {s.heading && <h2 className="ubc-svc-h2">{s.heading}</h2>}
+                {s.body && <TextFigure paras={s.body} figs={bySection[i]} onView={setView} />}
                 {s.list && (
-                  <ul style={{ listStyle: 'none', margin: s.body ? 'var(--s-4) 0 0' : 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--s-3)' }}>
+                  <ul className="ubc-svc-list">
                     {s.list.map((item, li) => (
-                      <li key={li} style={{ display: 'flex', gap: 'var(--s-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-body)' }}>
-                        <span style={{ color: 'var(--accent)', flexShrink: 0 }}>—</span>
-                        <span>
-                          {typeof item === 'string' ? item : (<><strong style={{ color: 'var(--text-strong)' }}>{item.title}.</strong> {item.body}</>)}
-                        </span>
+                      <li key={li}><span aria-hidden="true">{'—'}</span>
+                        <span>{typeof item === 'string' ? item : (<><strong>{item.title}.</strong> {item.body}</>)}</span>
                       </li>
                     ))}
                   </ul>
                 )}
-              </div>
+              </section>
             ))}
 
-          </Body>
-        </div>
-        {hasGallery && (
-          // The article's own images sit beside the text on wide screens,
-          // stacked in one column; below 1000px they follow the text.
-          <aside aria-label={a.title + ' images'} className="ubc-svc-gallery">
-            {a.gallery.map((g) => (
-              <figure key={g.src} style={{ margin: 0 }}>
-                <button type="button" className="ubc-svc-output-zoom" onClick={() => setView(g)} aria-label={'View full size: ' + (g.caption || g.alt)}>
-                  <img src={g.src} alt={g.alt} loading="lazy" style={{ display: 'block', width: '100%', height: 'auto' }} />
-                </button>
-                {g.caption && (
-                  <figcaption style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-caption)', letterSpacing: 'var(--ls-label)', color: 'var(--text-muted)', marginTop: 'var(--s-2)' }}>{g.caption}</figcaption>
+            {(out.note || out.table || pg.sheets) && (
+              <section className="ubc-svc-output" aria-label={'Sample output: ' + a.title}>
+                <div className="ubc-svc-output-eyebrow">Sample output</div>
+                {out.note && <p className="ubc-svc-output-note">{out.note}</p>}
+                {pg.sheets && (
+                  <div className="ubc-svc-output-figs is-two">
+                    {pg.sheets.map((g) => <Figure key={g.src} fig={g} onView={setView} />)}
+                  </div>
                 )}
-              </figure>
-            ))}
-          </aside>
-        )}
-        <ImageViewer image={view} onClose={() => setView(null)} />
+                {out.table && <OutputTable table={out.table} />}
+              </section>
+            )}
+
+            {pg.faqs && pg.faqs.length > 0 && (
+              <section className="ubc-svc-faq" aria-labelledby={'faq-' + a.id}>
+                <h2 id={'faq-' + a.id} className="ubc-svc-h2">Questions about {a.title.replace(/ Services$/, '').toLowerCase()}</h2>
+                <dl>
+                  {pg.faqs.map((f) => (
+                    <div key={f.q}><dt>{f.q}</dt><dd>{f.a}</dd></div>
+                  ))}
+                </dl>
+              </section>
+            )}
+          </div>
         </div>
-      </Inner>
-    </Shell>
+        <ImageViewer image={view} onClose={() => setView(null)} />
+      </Page>
+    </Section>
   );
 }
