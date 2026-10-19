@@ -53,7 +53,7 @@ export function ServicePage({ id }) {
                 <Link href={projectHref(project)} className="ubc-svc-related">See a project in 3D: {project.name} {'\u2192'}</Link>
               )}
             </div>
-            <ProjectForm source={'service-' + a.id} compact />
+            <ProjectForm source={'service-' + a.id} service={a.id} compact />
           </div>
           <nav aria-label="Other services" className="ubc-svc-others">
             <h2>Other services</h2>
