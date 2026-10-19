@@ -1,8 +1,8 @@
 import { zohoConfigured, createZohoLead } from './zoho.js';
 
-// Project intake ("Start Your Next Project →", on Contact and in the slide-in
-// panel) and careers applications (source 'careers', from Careers.jsx).
-// Every submission becomes a Lead in Zoho CRM through its API (zoho.js, set
+// Careers applications (source 'careers', from Careers.jsx). Project
+// enquiries no longer come through here: they post straight to the Zoho CRM
+// Web-to-Lead form (ui_kits/website/ZohoLeadForm.jsx). Every submission becomes a Lead in Zoho CRM through its API (zoho.js, set
 // up with the ZOHO_* variables in Vercel). PROJECT_WEBHOOK_URL is still
 // honoured as an alternative (e.g. a Zoho Flow webhook). With neither set
 // there is nowhere real to send a lead, so this answers 503 and the form says

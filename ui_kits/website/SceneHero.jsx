@@ -17,8 +17,16 @@
   the server-rendered HTML at all times; scroll only changes which is shown.
 
   Phones and prefers-reduced-motion: nothing is pinned or scroll-scrubbed and
-  the 3D model is never fetched. The hero copy sits in normal flow and the
-  stages become four stacked cards, each with a pre-rendered still.
+  neither three.js nor the model is ever fetched. The hero copy sits in
+  normal flow and the stages become four stacked cards, each with a
+  pre-rendered still. Both layouts are the same server-rendered markup,
+  switched by CSS (.ubc-hero-* in responsive.css), so the phone's hero text
+  paints once from the HTML instead of being re-rendered after hydration.
+
+  Desktop loading: three.js and the model are imported only when the scene
+  starts, once the page has loaded and the browser is idle (or sooner, on
+  the first scroll or tap). The stage 01 still stays up until the house's
+  architectural model has rendered, then cross-fades to the live scene.
 
   The model's GLB carries five material groups and no IFC class names, so
   the states work on those groups: steel framing (the material
@@ -26,13 +34,8 @@
 */
 import React from 'react';
 import Link from 'next/link';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// Steel and architectural models ship Meshopt-compressed (6x smaller;
-// gltf-transform meshopt), which needs this decoder on the loader.
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { UBC_DATA } from './data.js';
-import { bounceHandlers, buildStudioEnvironment, makeGroundShadow, applySteelMaterials } from './ModelViewer.jsx';
+import { bounceHandlers } from './shared.jsx';
 
 const HERO = UBC_DATA.hero;
 const STAGES = HERO.stages;
@@ -155,33 +158,34 @@ const seeHow = (
   </a>
 );
 
-// Phones / reduced motion: no pinned scene, no model download.
-function StaticHero({ onQuote, onGo }) {
+// Phones / reduced motion: the four stages as stacked cards (hidden by CSS
+// on the pinned desktop layout). Each still is cropped tight to its model
+// (-m.webp) and capped at 60% of the screen height.
+const mobileStill = (src) => src.replace(/\.(webp|jpg)$/, '-m.webp');
+function StageCards() {
   return (
-    <div style={{ background: 'var(--surface-page)' }}>
-      <div style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: 'var(--section-y) var(--gutter) 0' }}>
-        <HeroCopy onQuote={onQuote} onGo={onGo} />
+    <section aria-labelledby="stages-title-m" className="ubc-hero-cards">
+      <h2 id="stages-title-m" style={eyebrowStyle}>How a project moves through the model</h2>
+      <div style={{ display: 'grid', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
+        {STAGES.map((s) => (
+          <article key={s.n} className="ubc-hero-card">
+            {s.still && <img src={mobileStill(s.still)} width={800} height={440} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" decoding="async" />}
+            <div style={{ padding: 'var(--space-card-pad)' }}>
+              <div style={{ ...eyebrowStyle, color: 'var(--text-accent)' }}>Stage {s.n}</div>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
+              {s.state === 'outputs' && <OutputChain shown animate={false} />}
+              {s.state === 'outputs' && seeHow}
+            </div>
+          </article>
+        ))}
       </div>
-      <section aria-labelledby="stages-title" style={{ maxWidth: 'var(--page-max)', margin: '0 auto', padding: 'var(--section-y) var(--gutter) 0' }}>
-        <h2 id="stages-title" style={eyebrowStyle}>How a project moves through the model</h2>
-        <div style={{ display: 'grid', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
-          {STAGES.map((s) => (
-            <article key={s.n} style={{ background: 'var(--surface-card)', border: 'var(--bw-hair) solid var(--border-subtle)', borderRadius: 'var(--r-3)', overflow: 'hidden' }}>
-              {s.still && <img src={s.still} srcSet={s.still.replace(/\.webp$/, '-640.webp') + ' 640w, ' + s.still + ' 1280w'} sizes="(min-width: 1100px) 33vw, 100vw" width={1280} height={800} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: s.overlay ? 'contain' : 'cover', background: 'var(--white)' }} />}
-              <div style={{ padding: 'var(--space-card-pad)' }}>
-                <div style={{ ...eyebrowStyle, color: 'var(--text-accent)' }}>Stage {s.n}</div>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
-                {s.state === 'outputs' && <OutputChain shown animate={false} />}
-                {s.state === 'outputs' && seeHow}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-    </div>
+    </section>
   );
 }
+
+// 1x1 transparent GIF: phones get this in place of the desktop poster.
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
 export function SceneHero({ onQuote, onGo }) {
   const wrapRef = React.useRef(null);
@@ -195,6 +199,7 @@ export function SceneHero({ onQuote, onGo }) {
   const [loadError, setLoadError] = React.useState(false);
   const [mode, setMode] = React.useState('pinned'); // pinned | static
 
+  // Same breakpoint as the CSS that lays the hero out (responsive.css).
   React.useEffect(() => {
     const narrow = window.matchMedia('(max-width: 700px)').matches;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -224,22 +229,31 @@ export function SceneHero({ onQuote, onGo }) {
     if (mode !== 'pinned' || !HERO.model) return;
     let dead = false;
     let cleanup = () => {};
-    // The model is the page's heaviest asset by far, so nothing is fetched
-    // until the visitor scrolls or interacts (team SEO audit: LCP). The
-    // poster still and the copy are the first paint; the stages only begin
-    // once scrolling starts anyway, by which point the model is on its way.
+    // three.js and the model are the page's heaviest assets, so nothing is
+    // fetched until the page has loaded and painted (team SEO audit: LCP).
+    // Then they preload as soon as the browser is idle, so stage 01 is ready
+    // before the visitor gets there; a scroll or tap starts it sooner.
     const idle = window.requestIdleCallback || ((cb) => window.setTimeout(cb, 200));
     const cancelIdle = window.cancelIdleCallback || window.clearTimeout;
     let idleId = 0;
     const WAKE = ['scroll', 'wheel', 'pointerdown', 'touchstart', 'keydown'];
     const wake = () => {
       WAKE.forEach((ev) => window.removeEventListener(ev, wake));
-      if (!dead && !idleId) idleId = idle(start);
+      window.removeEventListener('load', onLoad);
+      if (!dead && !idleId) idleId = idle(() => { start(); });
     };
-    const start = () => {
+    const start = async () => {
       if (dead) return;
+      const [THREE, { GLTFLoader }, { MeshoptDecoder }, { buildStudioEnvironment, makeGroundShadow, applySteelMaterials }] = await Promise.all([
+        import('three'),
+        import('three/examples/jsm/loaders/GLTFLoader.js'),
+        // Steel and architectural models ship Meshopt-compressed (6x smaller;
+        // gltf-transform meshopt), which needs this decoder on the loader.
+        import('three/examples/jsm/libs/meshopt_decoder.module.js'),
+        import('./ModelViewer.jsx')
+      ]);
       const host = canvasHolderRef.current;
-      if (!host) return;
+      if (dead || !host) return;
       const R = HERO.model.radius || 9.2;
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(PAPER);
@@ -314,6 +328,9 @@ export function SceneHero({ onQuote, onGo }) {
       const clock = new THREE.Clock();
       let elapsed = 0;
       let raf = 0;
+      // Set once everything stage 01 shows (frame and envelope) is in the
+      // scene; the frame after it has rendered, the poster fades out.
+      let readyNext = false;
       const tick = () => {
         const dt = Math.min(0.05, clock.getDelta());
         if (visibleRef.current) {
@@ -338,6 +355,7 @@ export function SceneHero({ onQuote, onGo }) {
             });
           }
           renderer.render(scene, camera);
+          if (readyNext) { readyNext = false; setReady(true); }
         }
         raf = requestAnimationFrame(tick);
       };
@@ -363,7 +381,7 @@ export function SceneHero({ onQuote, onGo }) {
         });
         scene.add(gltf.scene);
         modelGroup = gltf.scene;
-        setReady(true);
+        if (!HERO.envelope) readyNext = true;
         // The same house as an architectural model, in the frame's own
         // coordinates (centred on the frame's raw bounding box, so it sits at
         // that box's centre inside the frame's scene).
@@ -397,7 +415,8 @@ export function SceneHero({ onQuote, onGo }) {
             gltf.scene.updateMatrixWorld(true);
             const eb = new THREE.Box3().setFromObject(eg.scene);
             envTop = eb.max.y; envBottom = eb.min.y + 0.3;   // stop at the slab's top
-          });
+            readyNext = true;
+          }, undefined, () => { readyNext = true; });
         }
       }, undefined, () => { if (!dead) setLoadError(true); });
 
@@ -415,47 +434,54 @@ export function SceneHero({ onQuote, onGo }) {
         if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
       };
     };
-    if (window.scrollY > 0) wake();
-    else WAKE.forEach((ev) => window.addEventListener(ev, wake, { passive: true }));
-    return () => { dead = true; WAKE.forEach((ev) => window.removeEventListener(ev, wake)); if (idleId) cancelIdle(idleId); cleanup(); };
+    const onLoad = () => wake();
+    if (window.scrollY > 0 || document.readyState === 'complete') wake();
+    else {
+      WAKE.forEach((ev) => window.addEventListener(ev, wake, { passive: true }));
+      window.addEventListener('load', onLoad);
+    }
+    return () => { dead = true; WAKE.forEach((ev) => window.removeEventListener(ev, wake)); window.removeEventListener('load', onLoad); if (idleId) cancelIdle(idleId); cleanup(); };
   }, [mode]);
 
-  if (mode === 'static') return <StaticHero onQuote={onQuote} onGo={onGo} />;
-
-  const introOp = Math.max(0, 1 - progress / (INTRO_END * 0.7));
-  const stageOn = stage >= 0;
+  const pinned = mode === 'pinned';
+  const introOp = pinned ? Math.max(0, 1 - progress / (INTRO_END * 0.7)) : 1;
+  const stageOn = pinned && stage >= 0;
   const posterStage = stageOn && !STAGES[stage].overlay ? stage : 0;
   const overlayOn = stageOn && Boolean(STAGES[stage].overlay);
 
   return (
-    <div ref={wrapRef} style={{ height: ((STAGES.length + 1) * 100) + 'vh', position: 'relative', background: 'var(--surface-page)' }}>
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-        {/* Poster until the live model is ready */}
-        <img src={STAGES[posterStage].still} alt="" aria-hidden="true" className="ubc-hero-poster" fetchPriority="high"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: ready ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
-        <div ref={canvasHolderRef} style={{ position: 'absolute', inset: 0, opacity: overlayOn ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
+    <div ref={wrapRef} className="ubc-hero" style={{ '--hero-h': ((STAGES.length + 1) * 100) + 'vh' }}>
+      <div className="ubc-hero-pin">
+        {/* Poster until the live model is ready (desktop only: phones get a
+            1px blank instead, so the still is never downloaded there). */}
+        <picture className="ubc-hero-desk">
+          <source media="(max-width: 700px)" srcSet={BLANK} />
+          <img src={STAGES[posterStage].still} alt="" aria-hidden="true" className="ubc-hero-poster" fetchPriority="high"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: ready ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
+        </picture>
+        <div ref={canvasHolderRef} className="ubc-hero-desk" style={{ position: 'absolute', inset: 0, opacity: overlayOn ? 0 : 1, transition: 'opacity 400ms var(--ease-out)' }} />
         {/* Stages with an `overlay` (02: the engineering analysis model) show
             that image in place of the live model while they are active. */}
         {STAGES.map((s, i) => s.overlay && (
-          <img key={'ov' + s.n} src={s.overlay} alt="" aria-hidden="true" className="ubc-hero-overlay" loading="lazy" decoding="async"
+          <img key={'ov' + s.n} src={s.overlay} alt="" aria-hidden="true" className="ubc-hero-overlay ubc-hero-desk" loading="lazy" decoding="async"
             style={{ opacity: stage === i ? 1 : 0 }} />
         ))}
         {loadError && (
-          <span style={{ ...eyebrowStyle, position: 'absolute', right: 'var(--gutter)', top: 'var(--s-9)', color: 'var(--text-accent)' }}>The live model could not be loaded</span>
+          <span className="ubc-hero-desk" style={{ ...eyebrowStyle, position: 'absolute', right: 'var(--gutter)', top: 'var(--s-9)', color: 'var(--text-accent)' }}>The live model could not be loaded</span>
         )}
 
         {/* Paper scrim behind the copy, lighter once the stages take over */}
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'opacity 300ms', opacity: stageOn ? 0.55 : 1, background: 'linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.82) 38%, rgba(255,255,255,.2) 70%, rgba(255,255,255,0) 100%)' }} />
+        <div className="ubc-hero-desk" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'opacity 300ms', opacity: stageOn ? 0.55 : 1, background: 'linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.82) 38%, rgba(255,255,255,.2) 70%, rgba(255,255,255,0) 100%)' }} />
 
-        {/* Hero */}
-        <div style={{ position: 'absolute', inset: 0, display: introOp <= 0.01 ? 'none' : 'flex', alignItems: 'center', opacity: introOp, pointerEvents: stageOn ? 'none' : 'auto' }}>
-          <div style={{ width: '100%', maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', justifyContent: 'flex-start' }}>
+        {/* Hero copy: no fade-in or JS gate, so it paints with the HTML */}
+        <div className="ubc-hero-intro" style={{ display: introOp <= 0.01 ? 'none' : undefined, opacity: introOp, pointerEvents: stageOn ? 'none' : undefined }}>
+          <div style={{ width: '100%', maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)' }}>
             <HeroCopy onQuote={onQuote} onGo={onGo} ctaRef={ctaRef} />
           </div>
         </div>
 
         {/* Stages 01-04: all present in the markup, one shown at a time */}
-        <section aria-labelledby="stages-title" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: stageOn ? 1 : 0, transition: 'opacity 300ms var(--ease-out)' }}>
+        <section aria-labelledby="stages-title" className="ubc-hero-desk" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: stageOn ? 1 : 0, transition: 'opacity 300ms var(--ease-out)' }}>
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 'var(--s-8)', maxWidth: 'var(--page-max)', margin: '0 auto', padding: '0 var(--gutter)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'var(--s-6)' }}>
             <div style={{ position: 'relative', maxWidth: '46ch', flex: '1 1 auto', pointerEvents: stageOn ? 'auto' : 'none' }}>
               <h2 id="stages-title" style={eyebrowStyle}>How a project moves through the model</h2>
@@ -489,6 +515,7 @@ export function SceneHero({ onQuote, onGo }) {
           </div>
         </section>
       </div>
+      <StageCards />
     </div>
   );
 }

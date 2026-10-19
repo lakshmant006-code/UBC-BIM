@@ -353,7 +353,7 @@ UBC_DATA.blueprint = {
    contact `cards`), not new claims. */
 UBC_DATA.faq = [
   { q: 'What services do you offer?',
-    a: 'Seven, all drawn from one coordinated model: wall panel detailing, roof and floor trusses, engineering, MEP detailing and clash detection, permit documents, Bill of Materials and machine CSV, and architectural drafting.' },
+    a: 'Six, all drawn from one coordinated model: Drafting & Architectural Services, Bill of Material & Estimation, Permit Sets, Modeling & Detailing, Engineering, and Manufacturing (manufacture and supply of building components).' },
   { q: 'Do you work with wood frame or light-gauge steel?',
     a: 'Both, often on the same project. Wall panel detailing, engineering and machine files are covered for wood frame and light-gauge steel alike.' },
   { q: 'Do you detail wood-frame walls, floors and roof trusses?',
@@ -398,7 +398,12 @@ UBC_DATA.videoTestimonials = [
   { id: 'client-2', src: '/assets/testimonials/client-2.mp4', poster: '/assets/testimonials/client-2-poster.jpg',
     name: 'Cameron', role: 'New LGSF framing business owner',
     quote: "UBC has been incredibly supportive — helping me understand the design process and launch my projects smoothly. They're responsive, proactive, and always willing to go the extra mile." },
-  { id: 'client-3', src: '/assets/testimonials/client-3.mp4', poster: '/assets/testimonials/client-3-poster.jpg' },
+  // Justin Laitzel's clip: the transcript UBC supplied (Round 2 changes,
+  // 15 Oct 2026), shown as a pull quote and used as the video's captions.
+  { id: 'client-3', src: '/assets/testimonials/client-3.mp4', poster: '/assets/testimonials/client-3-poster.jpg',
+    captions: '/assets/testimonials/client-3.en.vtt',
+    name: 'Justin Laitzel', role: 'Ideal Building Systems', featured: true,
+    quote: "Hi, I'm Justin Laitzel with Ideal Building Systems. We've been working with UBC for about three months now. I've been very impressed with their service. Their turnaround times are impeccable and their pricing is very competitive. We will continue to use UBC in the future." },
   { id: 'client-4', src: '/assets/testimonials/client-4.mp4', poster: '/assets/testimonials/client-4-poster.jpg',
     name: 'Zach Thompson', role: 'Seattle, WA',
     quote: 'Their coordination, attention to detail, and deliverables are top-tier. They consistently bring creativity to problem-solving and help bring our projects to life.' }
@@ -417,7 +422,7 @@ UBC_DATA.videoTestimonials = [
    unset for those rather than guessed. */
 UBC_DATA.blogPosts = [
   {
-    id: 'climbing-wall-lgsf',
+    id: 'climbing-wall-lgsf', seoTitle: 'Engineering a 30-Foot LGSF Climbing Wall',
     shortTitle: 'A 30-foot LGSF climbing wall',
     title: 'Engineering Innovation in Light Gauge Steel: Custom 30-Foot Climbing Wall for a Commercial Building',
     excerpt: 'A client asked for a 30-foot climbing wall panel inside a light-gauge-steel commercial building — three times the height LGSF walls are normally engineered for. Here’s how strap connections made it work.',
@@ -463,7 +468,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: 'lgsf-software-stack-2026',
+    id: 'lgsf-software-stack-2026', seoTitle: 'The LGSF Detailing Software Stack in 2026',
     shortTitle: 'The LGSF detailing software stack',
     title: 'The Complete Software Stack for LGSF Detailing in 2026',
     excerpt: 'A working detailer’s guide to the five platforms that actually ship light-gauge steel framing projects today — Vertex BD, Framecad, Scottsdale Scottsteel, Revit with MWF, and StaadPro.',
@@ -531,7 +536,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: 'steel-framed-modular-homes',
+    id: 'steel-framed-modular-homes', seoTitle: 'Why Steel-Framed Modular Homes Are a Game Changer',
     shortTitle: 'Steel-framed modular homes',
     title: 'Building the Future: Why Steel-Framed Modular Homes are a Game Changer',
     excerpt: 'Splitting a 600 sq ft California home into two 300 sq ft light-gauge-steel modules, engineered to bolt together into one seamless, permanent-feeling house.',
@@ -568,7 +573,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: 'hidden-engineering-challenges-lgsf',
+    id: 'hidden-engineering-challenges-lgsf', seoTitle: 'Hidden Engineering Challenges in LGSF Buildings',
     shortTitle: 'Hidden engineering in LGSF buildings',
     title: 'The Hidden Engineering Challenges Behind Successful LGSF Buildings: Lessons from Real-World Projects',
     excerpt: 'Speed and precision get the credit, but a successful LGSF building is decided earlier — in load paths, environmental design, and constructability worked out long before construction starts.',
@@ -613,7 +618,7 @@ UBC_DATA.blogPosts = [
   },
 
   {
-    id: '12-days-of-bim',
+    id: '12-days-of-bim', seoTitle: 'A 12-Day BIM Journey: Concept to Construction',
     shortTitle: 'A 12-day BIM journey',
     title: 'From Concept to Construction: A 12-Day BIM Journey with UBC BIM',
     date: 'Jan 13, 2026',
@@ -1139,13 +1144,6 @@ UBC_DATA.serviceArticles = [
   { id: 'engineering', label: 'Engineering', title: 'Engineering',
     summary: 'In-house engineering for wood and light-gauge steel, from concept through permitting — no outside engineers required.',
     regions: CORE_REGIONS,
-    // The client's own engineering model images (supplied directly): the
-    // rendered member model with its supports, and a second view of the
-    // analysis model. The first analysis view is the sample output above.
-    gallery: [
-      { src: '/assets/engineering/eng-rendered-model.jpg', alt: 'Rendered structural model of a light-gauge steel building: wall framing, roof trusses and posts on their supports', caption: 'Structural model: walls, trusses and posts on their supports' },
-      { src: '/assets/engineering/eng-analysis-model-2.jpg', alt: 'Wireframe analysis model of the building from the opposite side, with every node and support point marked', caption: 'Analysis model: opposite view' }
-    ],
     sections: [
       { body: [
         'Our engineering services support both CFS, LGSF and wood projects end to end, so you don’t need to bring on separate engineers or contractors. Our in-house team works with you from concept through execution, delivering engineered solutions that meet local building codes and construction standards. Whether you need engineering for timber framing, light gauge steel, or specialized structural systems, we provide practical, code-compliant solutions tailored to your project.',
@@ -1177,6 +1175,23 @@ UBC_DATA.social = [
   { label: 'X (Twitter)', href: 'https://x.com/UBCBIM' }
 ];
 
+/* US office contact details, from the team's SEO handoff (15 Oct 2026),
+   which asks the director to confirm them before launch. Used by the
+   header's mobile menu, the footer, /contact and the Organization schema.
+   Office hours are not listed until UBC supplies them. */
+UBC_DATA.contact = {
+  phone: '+1-214-444-6150',
+  email: 'marketing@ubcbim.com',
+  whatsapp: 'https://wa.me/12144446150',
+  // The booking page for "Book a 15-minute call" has not been supplied yet;
+  // until it is, that card opens an email asking for a call.
+  booking: '',
+  legalName: 'UBC Technology Services Inc',
+  address: { street: '885 Gold Hill Rd #3083', city: 'Fort Mill', region: 'SC', postalCode: '29708', country: 'US' }
+};
+UBC_DATA.contact.tel = 'tel:' + UBC_DATA.contact.phone.replace(/[^+\d]/g, '');
+UBC_DATA.contact.addressLine = `${UBC_DATA.contact.address.street}, ${UBC_DATA.contact.address.city}, ${UBC_DATA.contact.address.region} ${UBC_DATA.contact.address.postalCode}`;
+
 /* Sample output per service (client feedback: every service page should show
    what you get). Drawings and quantities are generated from a real project
    model on this site (tools/service_outputs.py, tools/model_takeoff.py); per
@@ -1187,31 +1202,12 @@ UBC_DATA.social = [
    model (mocking-bird-lot-2-envelope.glb). */
 UBC_DATA.serviceOutputs = {
   "drafting-architectural": {
-    "note": "Send us a sketch, a PDF or a marked-up print and we build the architectural 3D model, then draw the plans and elevations from it. These come from one of the projects on this site.",
-    "images": [
-      {
-        "src": "/assets/services/output/model-3d.webp",
-        "alt": "3D architectural model of a single-storey home: lap siding, asphalt shingle roofs, sliding glass doors and a brick chimney"
-      },
-      {
-        "src": "/assets/services/output/plan.webp",
-        "alt": "Floor plan drawn from the same model: walls in black, glazing in blue, overall 15.31 by 9.80 metres"
-      },
-      {
-        "src": "/assets/services/output/elevation.webp",
-        "alt": "Elevation drawn from the same model: lap siding, large sliding glass doors, a flat-roofed wing and a shingled gable with a brick chimney"
-      }
-    ]
+    "note": "One architectural 3D model, then the drawings cut from it: a floor plan with every room, interior wall, door and window, the roof plan, and the door, window and area schedules.",
+    "images": []
   },
   "bom-estimation": {
-    "note": "Quantities counted off the framing model of a project on this site: pieces and length per profile, steel weight from each member's modelled volume at 7,850 kg/m³.",
-    "images": [
-      {
-        "src": "/assets/services/output/model-3d.webp",
-        "alt": "3D model of the home the quantities come from: lap siding, asphalt shingle roofs, sliding glass doors and a brick chimney",
-        "caption": "The 3D model the quantities come from"
-      }
-    ],
+    "note": "Quantities counted off the framing model of the same house: pieces and length per profile, steel weight from each member's modelled volume at 7,850 kg/m³.",
+    "images": [],
     "table": {
       "caption": "Steel quantities",
       "columns": [
@@ -1267,50 +1263,173 @@ UBC_DATA.serviceOutputs = {
     }
   },
   "permit-sets": {
-    "note": "A structural sheet from a UBC permit set: the anchor bolt layout, with the hold-down and anchor schedules and the title block.",
-    "images": [
-      {
-        "src": "/assets/services/output/permit-s311.webp",
-        "alt": "Permit sheet S-311, anchor bolt layout: foundation plan with gridlines, hold-down and anchor bolt marks, schedules and the UBC title block",
-        "caption": "Sheet S-311: anchor bolt layout"
-      }
-    ]
+    "note": "Sheets from a UBC permit set for a light-gauge steel garage: foundation anchor bolts, framing, shear bracing and the typical connection details. Select a sheet to see it full size.",
+    "images": []
   },
   "modeling-detailing": {
     "note": "From the framing model of a project on this site: the 3D frame, then pieces of it drawn member by member.",
-    "images": [
-      {
-        "src": "/assets/services/output/frame-3d.jpg",
-        "alt": "3D light-gauge steel framing model: wall panels, scissor roof trusses and floor joists"
-      },
-      {
-        "src": "/assets/services/output/wall-panel.webp",
-        "alt": "Framing elevation of a 5.49 m wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging"
-      },
-      {
-        "src": "/assets/services/output/truss.webp",
-        "alt": "Elevation of a roof truss: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise"
-      }
-    ]
+    "images": []
   },
   "engineering": {
     "note": "The analysis model the engineering is checked in: every member, node and support point of the frame.",
-    "images": [
-      {
-        "src": "/assets/engineering/eng-analysis-model-1.jpg",
-        "alt": "Wireframe structural analysis model of a light-gauge steel house, with every node and support point marked",
-        "caption": "Structural analysis model"
-      }
-    ]
+    "images": []
   },
   "manufacturing": {
     "note": "A machine CSV straight from the model: each COMPONENT line is one member, with its label, length, section (3.625 × 1.625 in, 0.0346 in steel) and the position of every dimple, swage, service hole, lip cut and notch the roll-former makes.",
-    "images": [
-      {
-        "src": "/assets/services/output/machine-csv.webp",
-        "alt": "Spreadsheet view of a roll-former machine CSV: unit, version, profile and frameset header rows, then one COMPONENT row per member with its length, section and tooling operations",
-        "caption": "Machine CSV (excerpt)"
-      }
+    "images": []
+  }
+};
+
+/* Each service page's layout (Round 2 changes, 15 Oct 2026): on screens
+   1100px and wider the text sits on the left and `visual` stays in view on
+   the right; `figures` sit beside the paragraphs they illustrate, textbook
+   style ({ section, para } says which paragraph). `faqs` are the questions
+   buyers ask, answered only from facts already on this site; they render on
+   the page and as FAQPage schema. `meta` is the 140-155 character search
+   description, `updated` the date this page's content last changed (shown
+   on the page and used as dateModified), `project` a matching project page.
+   The Drafting and Permit drawings are UBC's own sets, cropped to the
+   drawing area so no client name or address appears. */
+const ASK_FOR_SCOPE = 'Send your drawings and a detailer replies with a scope, price and timeline within one working day.';
+UBC_DATA.servicePages = {
+  'drafting-architectural': {
+    meta: 'Drafting and architectural services for CFS, LGSF and wood: floor plans, elevations, sections and details drawn from one 3D BIM model by UBC BIM.',
+    updated: '2026-10-18',
+    project: 'four-storey-residence-mixed',
+    visual: {
+      kind: 'set',
+      label: 'One model → full drawing set',
+      model: { src: '/assets/services/drafting/a000-model.webp', w: 1600, h: 678, alt: '3D architectural model of a single-storey home with an attached two-car garage, lap siding and a standing-seam roof', caption: 'A000 · 3D architectural model' },
+      sheets: [
+        { src: '/assets/services/drafting/a100-floor-plan.webp', w: 2000, h: 1599, alt: 'Floor plan A100 drawn from the model: kitchen, dining, great room, three bedrooms, two baths, utility, foyer and garage with room sizes, dimensions, doors and windows, plus area, door and window schedules', caption: 'A100 · Floor plan' },
+        { src: '/assets/services/drafting/a101-roof-plan.webp', w: 2000, h: 1599, alt: 'Roof plan A101 drawn from the same model: hips and gables at 6/12 pitch with overall dimensions', caption: 'A101 · Roof plan' }
+      ]
+    },
+    figures: [
+      { section: 0, para: 0, src: '/assets/services/drafting/a100-floor-plan.webp', w: 2000, h: 1599, alt: 'Floor plan A100: every room named and sized, interior walls, doors and windows tagged against door and window schedules', caption: 'Floor plan: rooms, interior walls, doors, windows and dimensions' },
+      { section: 1, para: 1, src: '/assets/services/drafting/a101-roof-plan.webp', w: 2000, h: 1599, alt: 'Roof plan A101: hips and gables at 6/12 pitch, overhangs and overall dimensions', caption: 'Roof plan from the same model' }
+    ],
+    faqs: [
+      { q: 'What does a drafting set include?', a: 'Floor plans, elevations, building sections, reflected ceiling plans, door and window schedules, site plans, structural, foundation, framing and roof plans, wall sections, construction details and MEP drawings, as the project needs.' },
+      { q: 'What do you need from me to start?', a: 'A sketch, a PDF or a marked-up print is enough. We build the architectural 3D model from it, then draw the plans, elevations and schedules from that one model.' },
+      { q: 'Which software and file formats do you use?', a: 'Revit, Vertex BD, Tekla Structures and Navisworks, producing RVT, IFC, DWG and PDF. Send whatever you have: a Revit model, an IFC, a PDF or photos of a marked-up print.' },
+      { q: 'How long does a drafting set take?', a: 'It depends on the size of the set. ' + ASK_FOR_SCOPE },
+      { q: 'Where do you provide drafting services?', a: 'South Carolina, Florida, Texas and California, plus projects in Australia, New Zealand, Chile, Hyderabad in India and Dubai in the UAE, drawn to local codes and permitting requirements.' }
+    ]
+  },
+  'bom-estimation': {
+    meta: 'Model-based bills of material and estimation for CFS, LGSF and wood: quantities counted off the 3D framing model, bid packages in under a week.',
+    updated: '2026-10-18',
+    project: 'single-family-home-two-storeys-lgsf',
+    visual: {
+      kind: 'bom',
+      image: { src: '/assets/services/output/bom-frame-3d.webp', w: 1266, h: 722, alt: '3D light-gauge steel framing model of a single-storey home: wall panels, roof trusses, floor joists and the chimney chase', caption: 'The framing model the quantities come from' },
+      summary: [ ['Pieces', '2,943'], ['Total length', '3,160 m'], ['Steel weight', '6,062 kg'] ],
+      flow: ['Framing model', 'Quantities', 'Bid package']
+    },
+    figures: [],
+    faqs: [
+      { q: 'How fast can you turn around a bid package?', a: 'In under a week, depending on project complexity. Packages include 3D views, quantity takeoffs and detailed material information.' },
+      { q: 'What does the bill of material include?', a: 'Framing members, studs, tracks, headers, sheathing, drywall, siding, fasteners, hardware, insulation and other project-specific materials, with quantities and relevant specifications.' },
+      { q: 'How are the quantities counted?', a: 'Straight off the 3D framing model: pieces and length per profile, and steel weight from each member’s modelled volume, not re-tallied by hand from drawings.' },
+      { q: 'Do you estimate wood as well as steel?', a: 'Yes. Bills of material cover CFS, LGSF and wood framing.' },
+      { q: 'What do you need from me?', a: 'Drawings or a model: PDF, DWG, RVT or IFC. ' + ASK_FOR_SCOPE }
+    ]
+  },
+  'permit-sets': {
+    meta: 'Permit-ready structural drawings for CFS, LGSF and wood projects in CA, TX, FL and SC: BIM-driven, code-aligned permit sets from the UBC BIM team.',
+    updated: '2026-10-18',
+    project: 'two-car-garage-lgsf',
+    visual: {
+      kind: 'labelled',
+      image: { src: '/assets/services/permit/s000-3d.webp', w: 1300, h: 961, alt: '3D model of a light-gauge steel garage from the permit set: wall panels on the slab, X-strap shear bracing and roof trusses', caption: 'S000 · 3D model of the permitted frame' },
+      labels: [
+        { x: 30, y: 12, text: 'Roof trusses' },
+        { x: 46, y: 52, text: 'Wall panels' },
+        { x: 80, y: 62, text: 'X-brace straps' },
+        { x: 32, y: 82, text: 'Base track on foundation' }
+      ],
+      indexTitle: 'Sheet index',
+      index: [
+        { n: 'S101', name: 'Foundation anchor bolt plan', src: '/assets/services/permit/s101-foundation.webp' },
+        { n: 'S201', name: 'Structural framing plan (wall panels)', src: '/assets/services/permit/s201-framing.webp' },
+        { n: 'S251', name: 'Shear bracing plan', src: '/assets/services/permit/s251-bracing.webp' },
+        { n: 'S620', name: 'Typical details: walls and connections', src: '/assets/services/permit/s620-wall-details.webp' },
+        { n: 'S640', name: 'Typical details: trusses and connections', src: '/assets/services/permit/s640-truss-details.webp' }
+      ]
+    },
+    figures: [
+      { section: 0, para: 0, src: '/assets/services/permit/s101-foundation.webp', w: 2200, h: 1629, alt: 'Sheet S101, foundation anchor bolt plan: gridlines, hold-down and anchor bolt locations, anchor and hold-down schedules and notes', caption: 'S101 · Foundation anchor bolt plan' },
+      { section: 1, para: 0, src: '/assets/services/permit/s201-framing.webp', w: 2200, h: 1629, alt: 'Sheet S201, structural framing plan: bearing walls, roof trusses at 24 inch centres, girder, posts, and the bearing wall, header and post schedules', caption: 'S201 · Framing plan: wall panels and trusses' },
+      { section: 1, para: 1, src: '/assets/services/permit/s251-bracing.webp', w: 2200, h: 1629, alt: 'Sheet S251, shear bracing plan: X-braced shear walls with hold-downs and the shear wall schedule', caption: 'S251 · Shear bracing plan' }
+    ],
+    sheets: [
+      { src: '/assets/services/permit/s620-wall-details.webp', w: 2200, h: 1629, alt: 'Sheet S620, typical wall details: load-bearing and non-load-bearing walls, stud connections, header, hold-down, X-bracing and shear panel connections', caption: 'S620 · Wall connection details' },
+      { src: '/assets/services/permit/s640-truss-details.webp', w: 2200, h: 1629, alt: 'Sheet S640, typical truss details: truss to wall bearing, girder to post, girder to truss, ceiling panel connections, roof overhang and back-to-back header', caption: 'S640 · Truss connection details' }
+    ],
+    faqs: [
+      { q: 'What is in a UBC permit set?', a: 'Structural drawings sized to the project and jurisdiction. The sample on this page runs from a 3D cover sheet and general notes to the foundation anchor bolt plan, framing plan, shear bracing plan and typical wall and truss connection details.' },
+      { q: 'Which states do you prepare permit sets for?', a: 'California, Texas, Florida and South Carolina in the US, as well as Australia, New Zealand, Hyderabad, Chile and Dubai, UAE.' },
+      { q: 'Do you cover CFS, LGSF and wood?', a: 'Yes. Permit documentation covers cold-formed steel, light-gauge steel and wood construction, residential and commercial.' },
+      { q: 'Are the drawings stamped?', a: 'Where the jurisdiction requires it, the permit set is stamped.' },
+      { q: 'What do you need from me?', a: 'Plans purchased online, existing drawings or a project concept. ' + ASK_FOR_SCOPE }
+    ]
+  },
+  'modeling-detailing': {
+    meta: '3D BIM modeling and detailing for CFS, LGSF and wood framing: wall panels, roof and floor trusses and shop drawings, all drawn from one model.',
+    updated: '2026-10-18',
+    project: 'single-family-home-two-storeys-lgsf',
+    visual: {
+      kind: 'image',
+      image: { src: '/assets/services/output/frame-3d.jpg', w: 800, h: 390, alt: '3D light-gauge steel framing model: wall panels, scissor roof trusses and floor joists', caption: 'The 3D framing model' },
+      explore: true
+    },
+    figures: [
+      { section: 0, para: 0, src: '/assets/services/output/wall-panel.webp', alt: 'Framing elevation of a 5.49 m wall panel: 350S162-43 and 550S162-43 studs at 24 inch centres with top and bottom tracks and two rows of bridging', caption: 'Wall panel, drawn member by member' },
+      { section: 1, para: 0, src: '/assets/services/output/truss.webp', alt: 'Elevation of a roof truss: 6:12 top chords, sloped bottom chords and steel webs, 5.13 m span, 1.55 m rise', caption: 'Roof truss from the same model' }
+    ],
+    faqs: [
+      { q: 'What does modeling and detailing include?', a: 'Framing layouts and stud spacing, floor truss alignment, corner blocking, openings and fixture placement, with wall panel, truss and shop drawings drawn from the model.' },
+      { q: 'Which software and file formats do you use?', a: 'Revit, Vertex BD, Tekla Structures and Navisworks on our side, producing RVT, IFC, DWG, NC1, machine CSV and clash reports.' },
+      { q: 'Which machines can your files run on?', a: 'Roll-formers from FRAMECAD, Howick, Scottsdale, Pinnacle, Knudson, FrameMac, Arkitech and Valtek, and wood lines from Hundegger, Weinmann, Homag, Randek, Essetre, MiTek, LAP and EasyFrame. Tell us what you run and we confirm the file format first.' },
+      { q: 'Do you model wood as well as steel?', a: 'Yes. Wood-frame wall panels, floor systems and roof trusses are modelled and detailed the same way as light-gauge steel.' },
+      { q: 'How long does it take?', a: 'It depends on the size of the building. ' + ASK_FOR_SCOPE }
+    ]
+  },
+  'engineering': {
+    meta: 'In-house structural engineering for wood and light-gauge steel framing: design, calculations and documentation from concept through permitting.',
+    updated: '2026-10-18',
+    project: 'commercial-steel-frame-lgsf',
+    visual: {
+      kind: 'image',
+      image: { src: '/assets/engineering/eng-analysis-model-1.jpg', alt: 'Wireframe structural analysis model of a light-gauge steel house, with every node and support point marked', caption: 'Structural analysis model' }
+    },
+    figures: [
+      { section: 0, para: 0, src: '/assets/engineering/eng-rendered-model.jpg', alt: 'Rendered structural model of a light-gauge steel building: wall framing, roof trusses and posts on their supports', caption: 'Structural model: walls, trusses and posts on their supports' },
+      { section: 0, para: 2, src: '/assets/engineering/eng-analysis-model-2.jpg', alt: 'Wireframe analysis model of the building from the opposite side, with every node and support point marked', caption: 'Analysis model: opposite view' }
+    ],
+    faqs: [
+      { q: 'Do I need to hire a separate engineer?', a: 'No. Our in-house team covers structural design, engineering calculations and documentation for wood and steel systems, from concept through execution.' },
+      { q: 'What can I send you to start?', a: 'Plans purchased online, existing drawings or a project concept. Our engineers develop the engineering needed for permitting and construction.' },
+      { q: 'Do you engineer trusses?', a: 'Through our industry affiliations we connect projects with trusted specialists for floor trusses, roof trusses and other specialised components when required.' },
+      { q: 'Is the engineering stamped?', a: 'Yes, where the jurisdiction requires it.' },
+      { q: 'Which regions and codes do you work to?', a: 'Projects across the USA, Australia, New Zealand, South America, India and the Middle East, including seismic and region-specific requirements.' }
+    ]
+  },
+  'manufacturing': {
+    meta: 'Manufacture and supply of structural, exterior, interior and specialty building components, with roll-former machine files straight from the model.',
+    updated: '2026-10-18',
+    project: 'bathroom-pod-lgsf',
+    visual: {
+      kind: 'image',
+      image: { src: '/assets/services/output/machine-csv.webp', alt: 'Spreadsheet view of a roll-former machine CSV: unit, version, profile and frameset header rows, then one COMPONENT row per member with its length, section and tooling operations', caption: 'Machine CSV (excerpt)' }
+    },
+    figures: [],
+    faqs: [
+      { q: 'What do you manufacture and supply?', a: 'Structural elements such as beams, columns and trusses; exterior components such as siding, roofing materials and windows; interior components such as doors, cabinets and hardware; and specialised components to project requirements.' },
+      { q: 'Where do the machine files come from?', a: 'Straight from the model: each COMPONENT line of the CSV is one member, with its label, length, section and the position of every dimple, swage, service hole, lip cut and notch the roll-former makes.' },
+      { q: 'Which roll-formers do your files support?', a: 'FRAMECAD, Howick, Scottsdale, Pinnacle, Knudson, FrameMac, Arkitech and Valtek. Tell us what you run and we confirm compatibility before you commit.' },
+      { q: 'Where do you supply?', a: 'Projects in the USA, Australia, New Zealand, India, South America and the Middle East.' }
     ]
   }
 };

@@ -10,7 +10,6 @@
   ways to reach us sit below as cards with the site's hover glow.
 */
 import React from 'react';
-import { Button } from '../../components/core/Button.jsx';
 import { Icon } from '../../components/core/Icon.jsx';
 import { UBC_DATA } from './data.js';
 import { Page, Section, Reveal } from './shared.jsx';
@@ -22,11 +21,20 @@ const eyebrowStyle = { fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label
 const serifH = { fontFamily: 'var(--font-serif)', fontWeight: 500, lineHeight: 'var(--lh-heading)', letterSpacing: '0.12em', color: 'var(--text-strong)' };
 const reduceMotion = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Each card is a real link (works without JavaScript too). "Start a chat"
+// is caught by AppChrome (data-open-chat) and opens the chat panel. The
+// booking page hasn't been supplied yet, so until UBC_DATA.contact.booking
+// is set that card opens an email asking for a call.
+const C = UBC_DATA.contact || {};
 const ROUTES = [
-  { id: 'chat', icon: 'message-square', head: 'Live chat', body: 'Answered in minutes during working hours.', cta: 'Start a chat' },
-  { id: 'call', icon: 'calendar', head: 'Book a 15-minute call', body: 'Pick a time that suits your zone.', cta: 'Open the scheduler' },
-  { id: 'whatsapp', icon: 'phone', head: 'WhatsApp or call', body: 'For messaging-first clients.', cta: 'Message us' },
-  { id: 'email', icon: 'mail', head: 'Email', body: 'We reply within one working day.', cta: 'Email us' }
+  { id: 'chat', icon: 'message-square', head: 'Live chat', body: 'Answered in minutes during working hours.', links: [{ label: 'Start a chat', href: '#chat', chat: true }] },
+  { id: 'call', icon: 'calendar', head: 'Book a 15-minute call', body: 'Pick a time that suits your zone.',
+    links: [C.booking
+      ? { label: 'Open the scheduler', href: C.booking, external: true }
+      : { label: 'Ask for a call', href: 'mailto:' + C.email + '?subject=' + encodeURIComponent('Book a 15-minute call') }] },
+  { id: 'whatsapp', icon: 'phone', head: 'WhatsApp or call', body: 'For messaging-first clients. ' + C.phone,
+    links: [{ label: 'Message us', href: C.whatsapp, external: true }, { label: 'Call', href: C.tel }] },
+  { id: 'email', icon: 'mail', head: 'Email', body: 'We reply within one working day. ' + C.email, links: [{ label: 'Email us', href: 'mailto:' + C.email }] }
 ];
 
 function WalkIn() {
@@ -68,7 +76,7 @@ function WalkIn() {
   return (
     <div className="ubc-walkin">
       <div className="ubc-walkin-frame">
-        <video ref={ref} muted loop playsInline preload="metadata" poster={CS.poster}
+        <video ref={ref} muted loop playsInline preload="none" poster={CS.poster}
           aria-label="Clip: a UBC BIM lead meets two visitors at the studio door and walks them into the office"
           onTimeUpdate={onTime} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
           <source src={CS.video} type="video/mp4" />
@@ -130,11 +138,23 @@ export function Contact() {
                   <span className="ubc-route-icon" aria-hidden="true"><Icon name={r.icon} size={22} /></span>
                   <h3 className="ubc-route-head">{r.head}</h3>
                   <p className="ubc-route-body">{r.body}</p>
-                  <Button variant="ghost" size="sm">{r.cta}</Button>
+                  <div className="ubc-route-links">
+                    {r.links.map((l) => (
+                      <a key={l.label} href={l.href} className="ubc-route-link" data-open-chat={l.chat ? '' : undefined}
+                        target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener noreferrer' : undefined}>
+                        {l.label} {'\u2192'}{l.external && <span className="ubc-visually-hidden"> (opens in a new tab)</span>}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </Reveal>
             ))}
           </div>
+          <address className="ubc-contact-details">
+            <span><strong>US office</strong> {C.addressLine}</span>
+            <a href={C.tel}>{C.phone}</a>
+            <a href={'mailto:' + C.email}>{C.email}</a>
+          </address>
         </Page>
       </Section>
     </div>

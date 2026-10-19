@@ -15,7 +15,9 @@ export async function generateMetadata({ params }) {
   const p = projectBySlug(slug);
   if (!p) return {};
   const desc = p.name + ': a ' + p.system.toLowerCase() + ' ' + p.type.toLowerCase() + ' project with a live 3D model you can rotate. ' + p.delivered + ' (' + p.software.join(', ') + ').';
-  return pageMeta({ title: p.name + ' \u00b7 ' + p.system + ' | ' + SITE_NAME, description: desc, path: projectHref(p) });
+  // A still of this project's own 3D model (public/og/projects/<slug>.jpg,
+  // rendered from the same .glb the page shows) as its link preview.
+  return pageMeta({ title: p.name + ' \u00b7 ' + p.system + ' | ' + SITE_NAME, description: desc, path: projectHref(p), image: '/og/projects/' + slug + '.jpg', type: 'article' });
 }
 
 export default async function ProjectRoute({ params }) {

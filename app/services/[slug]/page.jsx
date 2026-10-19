@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
   if (!a) return {};
   return pageMeta({
     title: a.title + ' for CFS, LGSF & Wood | ' + SITE_NAME,
-    description: a.summary,
+    description: ((UBC_DATA.servicePages || {})[a.id] || {}).meta || a.summary,
     path: serviceHref(a)
   });
 }
@@ -24,6 +24,7 @@ export default async function ServiceRoute({ params }) {
   const { slug } = await params;
   const a = serviceBySlug(slug);
   if (!a) notFound();
+  const pg = (UBC_DATA.servicePages || {})[a.id] || {};
   const schema = [
     {
       '@context': 'https://schema.org',
@@ -32,9 +33,17 @@ export default async function ServiceRoute({ params }) {
       serviceType: a.title,
       description: a.summary,
       url: abs(serviceHref(a)),
-      provider: { '@type': 'ProfessionalService', name: SITE_NAME, url: abs('/') },
-      areaServed: a.regions || 'Worldwide'
+      // Every page points at the one Organization entity in app/layout.jsx.
+      provider: { '@id': abs('/#organization') },
+      areaServed: a.regions || 'Worldwide',
+      ...(pg.updated ? { dateModified: pg.updated } : {})
     },
+    // The same questions and answers shown on the page.
+    ...(pg.faqs && pg.faqs.length ? [{
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: pg.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } }))
+    }] : []),
     breadcrumbSchema([['Home', '/'], ['Services', '/services'], [a.title, serviceHref(a)]])
   ];
   return (

@@ -59,6 +59,7 @@ const FOOTER_COLUMNS = [
   ] },
   { head: 'From the blog', links: (UBC_DATA.blogPosts || []).map((p) => ({ label: p.shortTitle || p.title, href: postHref(p) })) }
 ];
+const MENU_SERVICES = (UBC_DATA.serviceArticles || []).map((a) => ({ label: a.title, href: serviceHref(a) }));
 const FOOTER_SOCIAL = UBC_DATA.social || [];
 const FOOTER_LEGAL = [{ label: 'Privacy policy', href: '/privacy' }];
 
@@ -76,9 +77,21 @@ export function AppChrome({ children }) {
   const [chat, setChat] = React.useState(false);
 
   React.useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 24);
+    const on = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', on, { passive: true }); on();
     return () => window.removeEventListener('scroll', on);
+  }, []);
+
+  // Any link marked data-open-chat (Contact's "Start a chat") opens the
+  // chat panel instead of following its #chat fallback.
+  React.useEffect(() => {
+    const on = (e) => {
+      const a = e.target.closest && e.target.closest('[data-open-chat]');
+      if (!a) return;
+      e.preventDefault(); setChat(true);
+    };
+    document.addEventListener('click', on);
+    return () => document.removeEventListener('click', on);
   }, []);
 
   const active = pathToId(pathname);
@@ -95,11 +108,11 @@ export function AppChrome({ children }) {
 
   return (
     <>
-      <Header items={NAV} active={active} scrolled={scrolled} onQuote={openQuote} />
+      <Header items={NAV} active={active} scrolled={scrolled} onQuote={openQuote} services={MENU_SERVICES} phone={UBC_DATA.contact.phone} />
       <QuoteDrawerProvider open={openQuote}>
         <main id="main">{children}</main>
       </QuoteDrawerProvider>
-      <Footer columns={FOOTER_COLUMNS} social={FOOTER_SOCIAL} legal={FOOTER_LEGAL} />
+      <Footer columns={FOOTER_COLUMNS} social={FOOTER_SOCIAL} legal={FOOTER_LEGAL} contact={UBC_DATA.contact} />
       <StickyQuote onQuote={openQuoteRequest} label={'Request Quote \u2192'} onChat={() => setChat((v) => !v)} chatOpen={chat} />
       <QuoteDrawer open={quote} mode={quoteMode} machine={quoteMachine} onClose={() => setQuote(false)} />
       <ChatBot open={chat} onClose={() => setChat(false)} onQuote={openQuote} />

@@ -12,17 +12,8 @@ import Link from 'next/link';
 import { UBC_DATA } from './data.js';
 import { Page, Section } from './shared.jsx';
 import { ServicesDetail } from './ServicesDetail.jsx';
-import { serviceById, serviceHref } from './site.js';
-import { useQuoteDrawer } from '../../app/QuoteContext.jsx';
-
-// The guided 3D models on /services, by hash (MockingBirdModel.jsx).
-const EXPLORE = {
-  'modeling-detailing': [
-    { hash: '3d-wall-panels', label: 'Wall panels' },
-    { hash: '3d-roof-trusses', label: 'Roof trusses' },
-    { hash: '3d-floor-trusses', label: 'Floor trusses' }
-  ]
-};
+import { serviceById, serviceHref, projectBySlug, projectHref } from './site.js';
+import { ProjectForm } from './ProjectForm.jsx';
 
 export function Breadcrumbs({ trail }) {
   return (
@@ -40,39 +31,34 @@ export function Breadcrumbs({ trail }) {
 
 export function ServicePage({ id }) {
   const a = serviceById(id);
-  const onQuote = useQuoteDrawer();
   if (!a) return null;
   const others = (UBC_DATA.serviceArticles || []).filter((x) => x.id !== a.id);
-  const explore = EXPLORE[a.id];
+  const pg = (UBC_DATA.servicePages || {})[a.id] || {};
+  const project = pg.project && projectBySlug(pg.project);
   return (
     <>
       <Page style={{ paddingTop: 'var(--s-6)' }}>
         <Breadcrumbs trail={[['Home', '/'], ['Services', '/services'], [a.title, serviceHref(a)]]} />
       </Page>
       <ServicesDetail article={a} />
-      {explore && (
-        <Page>
-          <div className="ubc-svc-subviews" style={{ maxWidth: 760 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Explore in 3D</span>
-            {explore.map((e) => (
-              <Link key={e.hash} href={'/services#' + e.hash} className="ubc-svc-subview">{e.label} {'→'}</Link>
-            ))}
-          </div>
-        </Page>
-      )}
       <Section tight>
         <Page>
-          <div className="ubc-svc-cta">
+          {/* The page ends with the quote form itself (three fields), not a
+              button that opens it: one click fewer for a ready buyer. */}
+          <div className="ubc-svc-quote" id="quote">
             <div>
               <h2>Start your next project</h2>
               <p>Send your drawings, model or scope. A detailer replies with a scope, price and timeline within one working day.</p>
+              {project && (
+                <Link href={projectHref(project)} className="ubc-svc-related">See a project in 3D: {project.name} {'\u2192'}</Link>
+              )}
             </div>
-            <button type="button" className="ubc-btn-solid" onClick={onQuote}>Start Your Next Project {'→'}</button>
+            <ProjectForm source={'service-' + a.id} service={a.id} compact />
           </div>
           <nav aria-label="Other services" className="ubc-svc-others">
             <h2>Other services</h2>
             <ul>
-              {others.map((o) => <li key={o.id}><Link href={serviceHref(o)}>{o.title} {'→'}</Link></li>)}
+              {others.map((o) => <li key={o.id}><Link href={serviceHref(o)}>{o.title} {'\u2192'}</Link></li>)}
             </ul>
           </nav>
         </Page>

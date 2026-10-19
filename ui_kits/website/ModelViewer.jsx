@@ -275,22 +275,8 @@ export function makeGroundShadow(THREE, R) {
   return ground;
 }
 
-// The same hover-pop/press-squash the design system's primary Button variant
-// gets (see components/core/Button.jsx in _ds_bundle.js), for the two
-// hand-rolled hero/Contact-scene CTAs that can't use that component (they're
-// laid out over a 3D canvas, not a normal page flow). Animates the
-// standalone CSS `scale` property rather than `transform`, so it never
-// collides with React's own inline style writes on every re-render.
-export function bounceHandlers(ref) {
-  const play = (keyframes, duration) => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    anime.remove(el);
-    anime({ targets: el, scale: keyframes, duration, easing: 'easeOutElastic(1, .6)', complete: () => { el.style.scale = ''; } });
-  };
-  return { onMouseEnter: () => play([1, 1.06, 1], 520), onMouseDown: () => play([1, 0.92, 1], 420) };
-}
+// bounceHandlers lives in shared.jsx (no three.js needed to use it).
+export { bounceHandlers } from './shared.jsx';
 
 export function ModelViewer({ src, radius, title, height, compact, bare, initialAngle, hotspots, onHotspotClick, locked, onReady, finish }) {
   const wrapRef = React.useRef(null);
@@ -650,7 +636,9 @@ export function ModelViewer({ src, radius, title, height, compact, bare, initial
               bottom-right at all times, so the right-hand side is never this
               component's to use. A caller wanting nothing but the model
               (MockingBirdModel.jsx) passes `bare` to drop this whole group. */}
-          <div style={{ position: 'absolute', left: 'var(--s-5)', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
+          {/* .ubc-mv-caption lines the group up with the page column (the
+              heading and breadcrumb above) when the viewer spans the window. */}
+          <div className="ubc-mv-caption" style={{ position: 'absolute', right: 'var(--s-5)', bottom: 'var(--s-5)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--s-3) var(--s-4)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>
               {title && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-label)', letterSpacing: 'var(--ls-label)', textTransform: 'uppercase', color: 'var(--text-strong)' }}>{title}</span>}
               {state === 'ready' && (

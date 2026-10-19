@@ -1,0 +1,29 @@
+# UBC BIM (Unique Building Concepts)
+
+> BIM, engineering, permit documentation and manufacturing partner for cold-formed steel (CFS), light-gauge steel framing (LGSF) and wood-frame construction. US office in Fort Mill, South Carolina; production team in Hyderabad, India. 783 projects for 224 clients in 12 countries.
+
+## Services
+
+- [Drafting & Architectural Services](https://ubcbim.com/services/drafting-architectural): 2D CAD drafting, 3D BIM models, architectural, structural and MEP drawings.
+- [Bill of Material & Estimation](https://ubcbim.com/services/bill-of-materials-estimation): model-based BOMs and bid packages, typically in under a week.
+- [Permit Sets](https://ubcbim.com/services/permit-sets): permit-ready structural drawings for CFS, LGSF and wood projects.
+- [Modeling & Detailing](https://ubcbim.com/services/modeling-detailing): 3D framing models, wall panels, roof and floor trusses, shop drawings.
+- [Engineering](https://ubcbim.com/services/engineering): in-house structural engineering and calculations for wood and steel framing.
+- [Manufacturing](https://ubcbim.com/services/manufacturing): manufacture and supply of structural, exterior, interior and specialty components.
+
+## Machines and software
+
+- Roll-formers: FRAMECAD, Howick, Scottsdale, Pinnacle, Knudson, FrameMac, Arkitech, Valtek.
+- Wood lines: Hundegger, Weinmann, Homag, Randek, Essetre, MiTek, LAP, EasyFrame.
+- Software: Revit, Vertex BD, Tekla Structures, Navisworks, MWF, FRAMECAD Structure.
+
+## Proof
+
+- [Projects in 3D](https://ubcbim.com/projects): residential, commercial, multi-family, modular, bathroom pods, ADUs.
+- [Blog](https://ubcbim.com/blogs): technical write-ups on LGSF and wood framing.
+
+## Contact
+
+- [Contact / request a quote](https://ubcbim.com/contact): reply within one working day.
+- Phone: +1-214-444-6150 | Email: marketing@ubcbim.com
+- 885 Gold Hill Rd #3083, Fort Mill, SC 29708, USA

@@ -48,11 +48,14 @@
 }
 
 /* ---------- Header ----------
-   Wordmark on the left, the nav pill centred, the standalone "Request
-   Quote" button just right of it. Below 940px the pill is hidden (its links
-   are repeated in the footer) and the button moves to the right edge. */
+   A solid white bar that sticks to the top: wordmark on the left, the nav
+   pill centred, the "Start Your Next Project" button just right of it. A
+   light shadow appears once the page has scrolled 10px. At 1000px and below
+   the pill gives way to a menu button and a full-height panel
+   (components/navigation/Header.jsx MobileMenu). */
+.ubc-header { position: sticky; top: 0; z-index: 40; background: var(--white); transition: box-shadow 200ms var(--ease-out); }
+.ubc-header.is-scrolled { box-shadow: 0 1px 0 #E3E8EE, 0 8px 24px -16px rgba(14,19,24,.35); }
 .ubc-header-row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s-5); }
-.ubc-header-row > * { pointer-events: auto; }   /* the header itself lets clicks through to the page */
 .ubc-header-row > a { justify-self: start; }
 .ubc-header-logo { display: block; height: 40px; width: auto; }
 @media (max-width: 1100px) { .ubc-header-logo { height: 32px; } }
@@ -74,7 +77,6 @@
   box-shadow: 0 6px 18px -14px rgba(14,19,24,.35);
 }
 .ubc-navpill-end { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-muted); }
-.ubc-navpill-menu svg { fill: currentColor; }
 .ubc-navpill-dot > span { width: 18px; height: 18px; border-radius: 999px; border: 2px solid #C9D1DB; display: grid; place-items: center; }
 .ubc-navpill-dot > span::after { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
 .ubc-navpill-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
@@ -100,6 +102,46 @@
   .ubc-navpill { display: none !important; }
   .ubc-header-cta { margin-left: auto; }
 }
+.ubc-navpill-login { color: var(--text-accent); }
+
+/* Menu button and panel, 1000px and below */
+.ubc-menu-btn {
+  display: none; flex: none; width: 44px; height: 44px; place-items: center; padding: 0;
+  border: 1px solid #D9DFE6; border-radius: 12px; background: var(--white); color: var(--text-strong); cursor: pointer;
+}
+.ubc-menu-btn:hover { background: #F3F5F8; }
+.ubc-menu-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ubc-mobile-menu { display: none; }
+@media (max-width: 1000px) {
+  .ubc-menu-btn { display: grid; margin-left: var(--s-3); }
+  .ubc-mobile-menu.is-open {
+    display: flex; flex-direction: column; gap: var(--s-5); position: fixed; left: 0; right: 0; top: 76px; bottom: 0; z-index: 39;
+    overflow-y: auto; overscroll-behavior: contain; padding: var(--s-5) var(--gutter) calc(var(--s-7) + env(safe-area-inset-bottom));
+    background: var(--white); border-top: 1px solid #E3E8EE;
+  }
+  .ubc-mobile-menu ul { list-style: none; margin: 0; padding: 0; }
+  .ubc-mobile-menu li a {
+    display: flex; align-items: center; justify-content: flex-start; text-align: left; min-height: 48px; border-bottom: 1px solid #EEF1F4;
+    color: var(--text-strong); font-size: var(--fs-body); font-weight: var(--fw-medium); line-height: 1.5; letter-spacing: 0.02em; word-spacing: 0.16em;
+  }
+  .ubc-mobile-menu li a[aria-current="page"] { color: var(--text-accent); }
+  .ubc-mm-services li a { font-size: var(--fs-body-sm); font-weight: 400; color: var(--text-body, var(--text-strong)); }
+  .ubc-mm-head {
+    margin-top: var(--s-5); margin-bottom: var(--s-2); font-family: var(--font-mono); font-size: var(--fs-label);
+    letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted);
+  }
+  .ubc-mm-actions { display: flex; flex-direction: column; gap: var(--s-3); }
+  .ubc-mm-actions .ubc-btn-solid { justify-content: center; width: 100%; }
+  .ubc-mm-call {
+    display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px;
+    border: 1px solid #D9DFE6; color: var(--text-strong); font-weight: var(--fw-medium); line-height: 1.5;
+  }
+}
+@media (max-width: 640px) { .ubc-menu-btn { margin-left: auto; } }
+/* The floating Chat / Request Quote bar steps aside while the menu is open. */
+html.ubc-menu-open .ubc-sticky { display: none !important; }
+/* The floating Chat / Request Quote bar steps aside while the menu is open. */
+html.ubc-menu-open .ubc-sticky { display: none !important; }
 
 /* ---------- Phones ---------- */
 @media (max-width: 640px) {
@@ -158,6 +200,11 @@
 .ubc-route { height: 100%; display: grid; align-content: start; justify-items: start; gap: var(--s-2); padding: var(--s-5); }
 .ubc-route-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; background: var(--accent-tint, #FBE9E6); color: var(--accent); }
 .ubc-route-head { margin: var(--s-2) 0 0; font-family: var(--font-display); font-size: var(--fs-h4); font-weight: 600; color: var(--text-strong); }
+.ubc-route-links { display: flex; flex-wrap: wrap; gap: 0 var(--s-5); margin-top: auto; }
+.ubc-route-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-accent); font-weight: 600; font-size: var(--fs-body-sm); }
+.ubc-route-link:hover { text-decoration: underline; }
+.ubc-contact-details { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-2) var(--s-6); margin-top: var(--s-7); font-style: normal; font-size: var(--fs-body-sm); line-height: 1.5; color: var(--text-body); text-align: center; }
+.ubc-contact-details a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-accent); font-weight: 600; }
 .ubc-route-body { margin: 0; font-size: var(--fs-body-sm); line-height: var(--lh-relaxed); color: var(--text-muted); }
 @media (max-width: 1100px) { .ubc-route-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .ubc-contact-main { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); } .ubc-contact-main > :last-child { position: static; } }
@@ -351,6 +398,10 @@
   transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
 }
 .ubc-globe-pin:hover .ubc-globe-tip, .ubc-globe-pin:focus-visible .ubc-globe-tip { opacity: 1; transform: translate(-50%, 0); }
+.ubc-globe-pin[data-edge="l"] .ubc-globe-tip { left: 0; transform: translate(0, 4px); }
+.ubc-globe-pin[data-edge="r"] .ubc-globe-tip { left: auto; right: 0; transform: translate(0, 4px); }
+.ubc-globe-pin[data-edge="l"]:hover .ubc-globe-tip, .ubc-globe-pin[data-edge="l"]:focus-visible .ubc-globe-tip,
+.ubc-globe-pin[data-edge="r"]:hover .ubc-globe-tip, .ubc-globe-pin[data-edge="r"]:focus-visible .ubc-globe-tip { transform: translate(0, 0); }
 
 @media (max-width: 900px) {
   .ubc-way-panel { grid-template-columns: minmax(0, 1fr) !important; gap: var(--s-4) !important; }
@@ -631,7 +682,7 @@
 .ubc-tag-kicker { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; opacity: .75; }
 .ubc-tag-name { font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: .12em; line-height: 1.5; margin-top: 6px; }
 .ubc-tag-rule { width: 100%; height: 1px; background: currentColor; opacity: .3; margin: 12px 0; }
-.ubc-tag-foot { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; opacity: .85; }
+.ubc-tag-foot { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; opacity: .85; }
 @media (prefers-reduced-motion: reduce) { .ubc-tag-depth, .ubc-tag-shadow, .ubc-tag-sheen { transition: none; } }
 
 /* Filter pills with a sliding marker under the pressed one. */
@@ -700,6 +751,11 @@
 @media (max-width: 640px) { .ubc-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-6); } }
 .ubc-footer a { line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; }
 .ubc-footer a:hover { color: var(--white); text-decoration: underline; }
+.ubc-footer-link { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 0; }
+/* Touch screens: every footer link is a 44px tap target. */
+@media (pointer: coarse) { .ubc-footer-link { min-height: 44px; padding: 0; } .ubc-footer-grid ul { gap: 0 !important; } }
+.ubc-footer-contact { display: flex; flex-direction: column; gap: var(--s-1); margin: 0 0 var(--s-5); font-style: normal; font-size: var(--fs-body-sm); line-height: 1.5; color: var(--text-body); }
+.ubc-footer-contact a { color: var(--white); font-weight: var(--fw-medium); word-break: break-word; }
 .ubc-footer-social { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
 /* Six 44px icons don't fit the narrow first column on desktop: wrap them as
    an even 3 + 3 rather than 4 + 2. Below 1100px they sit on one row. */
@@ -708,13 +764,6 @@
 .ubc-footer-social a:hover { background: var(--white); color: var(--frame-blue); text-decoration: none; }
 .ubc-footer-social a:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
 /* Header "⋯" menu (BIM Pulse login). */
-.ubc-navpill-more { position: relative; display: flex; }
-button.ubc-navpill-menu { background: none; border: 0; border-radius: 999px; cursor: pointer; padding: 0; }
-button.ubc-navpill-menu:hover, button.ubc-navpill-menu[aria-expanded="true"] { background: #F3F5F8; color: var(--text-strong); }
-button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.ubc-navpill-pop { position: absolute; top: calc(100% + 10px); left: 0; z-index: 60; list-style: none; margin: 0; padding: 6px; min-width: 200px; background: var(--white); border: 1px solid #D9DFE6; border-radius: 14px; box-shadow: var(--shadow-3); }
-.ubc-navpill-pop a { display: flex; align-items: center; min-height: 44px; padding: 0 var(--s-4); border-radius: 10px; border-bottom: none; color: var(--text-strong); font-size: var(--fs-body-sm); line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; white-space: nowrap; }
-.ubc-navpill-pop a:hover { background: #F3F5F8; color: var(--text-accent); }
 
 /* Legal pages (Privacy policy). Readable measure, generous spacing. */
 .ubc-legal { max-width: 760px; margin: 0 auto; font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.7; letter-spacing: 0.12em; word-spacing: 0.16em; color: var(--text-body); }
@@ -851,3 +900,175 @@ button.ubc-navpill-menu:focus-visible { outline: 2px solid var(--ink); outline-o
 .ubc-svc-others ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--s-3); }
 .ubc-svc-others a { display: flex; align-items: center; min-height: 44px; padding: var(--s-3) var(--s-4); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-2); font-weight: 600; font-size: var(--fs-body-sm); line-height: 1.5; letter-spacing: 0.06em; color: var(--text-strong); }
 .ubc-svc-others a:hover { border-color: var(--text-strong); text-decoration: none; }
+
+/* 3D viewer caption + Reset view: same left edge as the page column
+   (Page: max-width var(--page-max), padding var(--gutter)). */
+.ubc-mv-caption { left: max(var(--gutter), calc((100% - var(--page-max)) / 2 + var(--gutter))); }
+
+/* Project page: "What you receive" at full width, then links to the services behind it. */
+.ubc-proj-files { list-style: none; margin: var(--s-5) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s-8); }
+.ubc-proj-files li { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-3) 0; border-bottom: var(--bw-hair) solid var(--border-subtle); font-size: var(--fs-body-sm); line-height: 1.5; color: var(--text-body); }
+@media (max-width: 640px) { .ubc-proj-files { grid-template-columns: minmax(0, 1fr); } }
+.ubc-proj-services { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-5); margin-top: var(--s-6); }
+.ubc-proj-services span { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted); }
+.ubc-proj-services a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-accent); font-weight: var(--fw-medium); }
+
+/* About: service roadmap. Six numbered steps on one connector line; a
+   vertical list with the line down the left on phones and small tablets. */
+.ubc-roadmap { list-style: none; margin: var(--space-head-content) 0 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); position: relative; }
+.ubc-roadmap::before { content: ""; position: absolute; top: 32px; left: calc(100% / 12); right: calc(100% / 12); height: 2px; background: linear-gradient(90deg, var(--accent), var(--frame-blue, #1F3A68)); }
+.ubc-roadmap-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--s-2); padding: 0 var(--s-2) var(--s-3); text-align: center; color: var(--text-strong); border-bottom: none; }
+.ubc-roadmap-dot { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 999px; background: var(--white); border: 2px solid var(--accent); color: var(--accent); transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out), transform 200ms var(--ease-out); }
+.ubc-roadmap-n { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); color: var(--text-muted); margin-top: var(--s-2); }
+.ubc-roadmap-name { font-size: var(--fs-body-sm); font-weight: 600; line-height: 1.5; max-width: 16ch; }
+.ubc-roadmap-step:hover .ubc-roadmap-dot, .ubc-roadmap-step:focus-visible .ubc-roadmap-dot { background: var(--accent); color: var(--white); transform: translateY(-2px); }
+.ubc-roadmap-step:hover .ubc-roadmap-name { color: var(--text-accent); text-decoration: underline; }
+.ubc-roadmap-step:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 12px; }
+@media (max-width: 860px) {
+  .ubc-roadmap { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); max-width: 480px; margin-left: auto; margin-right: auto; }
+  .ubc-roadmap::before { top: 28px; bottom: 28px; left: 27px; right: auto; width: 2px; height: auto; background: linear-gradient(180deg, var(--accent), var(--frame-blue, #1F3A68)); }
+  .ubc-roadmap-step { flex-direction: row; text-align: left; gap: var(--s-4); padding: 0; min-height: 56px; }
+  .ubc-roadmap-dot { width: 56px; height: 56px; flex: none; }
+  .ubc-roadmap-n { margin-top: 0; }
+  .ubc-roadmap-name { max-width: none; }
+}
+
+/* Anchors and scrolled-to sections clear the sticky header. */
+html { scroll-padding-top: 88px; }
+
+/* ---------- Service pages (ServicesDetail.jsx) ----------
+   One column with the visual after the intro; from 1100px the text on the
+   left and the visual on the right, sticky below the header while the
+   text scrolls. */
+.ubc-svc-two { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "visual" "body"; gap: var(--s-6); }
+.ubc-svc-intro { grid-area: intro; max-width: 760px; }
+.ubc-svc-visual { grid-area: visual; min-width: 0; }
+.ubc-svc-body { grid-area: body; max-width: 760px; min-width: 0; }
+@media (min-width: 1100px) {
+  .ubc-svc-two { grid-template-columns: minmax(0, 1.3fr) minmax(360px, 1fr); grid-template-areas: "intro visual" "body visual"; grid-template-rows: auto 1fr; column-gap: var(--s-8); row-gap: 0; }
+  .ubc-svc-visual-sticky { position: sticky; top: 100px; }
+}
+.ubc-svc-eyebrow { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--accent); }
+.ubc-svc-eyebrow > span { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
+.ubc-svc-lede { margin: var(--s-4) 0 0; font-size: var(--fs-body-lg); line-height: var(--lh-relaxed); color: var(--text-muted); }
+.ubc-svc-updated { margin: var(--s-3) 0 0; font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.12em; line-height: 1.5; color: var(--text-muted); }
+.ubc-svc-h2 { font-family: var(--font-serif); font-weight: 500; font-size: var(--fs-h4); line-height: var(--lh-heading); letter-spacing: 0.12em; color: var(--text-strong); margin: 0 0 var(--s-4); }
+.ubc-svc-list { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-3); }
+.ubc-svc-list li { display: flex; gap: var(--s-3); line-height: var(--lh-relaxed); color: var(--text-body); }
+.ubc-svc-list li > span:first-child { color: var(--accent); flex: none; }
+
+/* Textbook layout: images floated beside the paragraph they illustrate,
+   alternating sides, text wrapping round them; full width on phones.
+   Shared by service pages and blog posts. */
+.ubc-tb-section { margin-top: var(--s-7); display: flow-root; }
+.ubc-tb-p { margin: 0 0 var(--s-4); font-size: var(--fs-body); line-height: var(--lh-relaxed); color: var(--text-body); }
+.ubc-tb-p:last-child { margin-bottom: 0; }
+.ubc-tb-fig { margin: var(--s-1) 0 var(--s-5); }
+.ubc-tb-fig figcaption, .ubc-svc-visual-card figcaption, .ubc-labelled figcaption { margin-top: var(--s-2); font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.12em; line-height: 1.5; color: var(--text-muted); }
+.ubc-tb-fig img, .ubc-svc-visual-card img { display: block; width: 100%; height: auto; }
+.ubc-tb-fig .ubc-svc-output-zoom { box-shadow: 0 10px 28px -20px rgba(14,19,24,.45); transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out); }
+.ubc-tb-fig .ubc-svc-output-zoom:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -20px rgba(14,19,24,.5); }
+@media (min-width: 600px) {
+  .ubc-tb-fig { width: 46%; }
+  .ubc-tb-fig.is-right { float: right; margin-left: var(--s-6); }
+  .ubc-tb-fig.is-left { float: left; margin-right: var(--s-6); }
+}
+
+/* Right-hand visual */
+.ubc-svc-visual-card { padding: var(--s-5); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-4); background: var(--surface-sunken); }
+.ubc-svc-visual-card figure { margin: 0; }
+.ubc-svc-visual-label { margin-bottom: var(--s-3); font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--accent); line-height: 1.5; }
+.ubc-svc-visual-arrow { text-align: center; font-size: 22px; line-height: 1; color: var(--accent); margin: var(--s-3) 0; }
+.ubc-svc-visual-thumbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); }
+.ubc-bom-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-2); margin: var(--s-4) 0 0; }
+.ubc-bom-summary > div { padding: var(--s-3); border-radius: var(--r-3); background: var(--white); border: var(--bw-hair) solid var(--border-subtle); }
+.ubc-bom-summary dt { font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.12em; line-height: 1.5; color: var(--text-muted); }
+.ubc-bom-summary dd { margin: var(--s-1) 0 0; font-family: var(--font-display); font-size: clamp(16px, 4vw, var(--fs-h4)); font-weight: 600; color: var(--text-strong); letter-spacing: 0.04em; }
+@media (max-width: 420px) { .ubc-bom-summary > div { padding: var(--s-2); } }
+.ubc-svc-flow { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+.ubc-svc-flow li { display: inline-flex; align-items: center; gap: var(--s-2); font-size: var(--fs-body-sm); font-weight: 600; color: var(--text-strong); line-height: 1.5; }
+.ubc-svc-flow li:not(:last-child)::after { content: "\2192"; color: var(--accent); }
+.ubc-labelled { position: relative; }
+.ubc-labelled-tag { position: absolute; transform: translate(-50%, -50%); padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--white); font-size: 13px; font-weight: 600; line-height: 1.5; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 12px -6px rgba(0,0,0,.5); }
+.ubc-sheet-index { list-style: none; margin: 0; padding: 0; }
+.ubc-sheet-index button { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 44px; padding: 0; border: 0; border-bottom: var(--bw-hair) solid var(--border-subtle); background: none; cursor: zoom-in; text-align: left; font: inherit; font-size: var(--fs-body-sm); line-height: 1.5; color: var(--text-strong); }
+.ubc-sheet-index button:hover { color: var(--text-accent); }
+.ubc-sheet-index button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ubc-sheet-index button span { flex: none; min-width: 48px; font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.12em; color: var(--accent); }
+.ubc-svc-visual-card .ubc-svc-subviews { padding-top: var(--s-4); }
+.ubc-svc-visual-card .ubc-svc-subviews .ubc-svc-visual-label { margin: 0; flex-basis: 100%; }
+
+/* FAQs: every answer visible (they double as FAQPage schema). */
+.ubc-svc-faq { margin-top: var(--s-8); }
+.ubc-svc-faq dl { margin: 0; }
+.ubc-svc-faq dl > div { padding: var(--s-4) 0; border-top: var(--bw-hair) solid var(--border-subtle); }
+.ubc-svc-faq dt { font-weight: 600; color: var(--text-strong); line-height: 1.5; }
+.ubc-svc-faq dd { margin: var(--s-2) 0 0; line-height: var(--lh-relaxed); color: var(--text-body); }
+
+/* Inline quote form at the end of a service page */
+.ubc-svc-quote { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--s-7); align-items: start; padding: clamp(20px, 3vw, 40px); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-4); background: var(--surface-sunken); }
+.ubc-svc-quote h2 { margin: 0; font-family: var(--font-serif); font-weight: 500; font-size: clamp(24px, 2.6vw, 34px); letter-spacing: 0.12em; line-height: var(--lh-heading); color: var(--text-strong); }
+.ubc-svc-quote p { margin: var(--s-3) 0 0; line-height: var(--lh-relaxed); color: var(--text-body); }
+@media (max-width: 860px) { .ubc-svc-quote { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); } }
+.ubc-svc-related { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s-3); color: var(--text-accent); font-weight: 600; }
+.ubc-tb-fig.is-wide { width: 100%; float: none; margin: 0 0 var(--s-4); }
+
+/* Form fields at 16px everywhere, so iOS Safari doesn't zoom the page when
+   one is focused. */
+input, select, textarea { font-size: 16px !important; }
+
+/* Phones: no text under 12px (mono eyebrows and captions), and room at the
+   bottom of the page for the fixed Chat / Request Quote bar. */
+@media (max-width: 640px) {
+  :root { --fs-label: 12px; --fs-caption: 13px; }
+  body { padding-bottom: 88px; }
+}
+
+/* Home: who we serve. Three per row, equal heights; a lone last card spans
+   the row with its text and tags side by side. */
+.ubc-serve-grid > * { display: flex; }
+.ubc-serve-grid > * > div { flex: 1; }
+.ubc-serve-card { display: flex; flex-direction: column; justify-content: space-between; gap: var(--s-4); }
+.ubc-serve-tags { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.ubc-serve-grid > .ubc-serve-wide { flex-basis: 100%; }
+@media (min-width: 900px) {
+  .ubc-serve-wide .ubc-serve-card { flex-direction: row; align-items: center; gap: var(--s-7); }
+  .ubc-serve-wide .ubc-serve-card > div:first-child { flex: 1 1 55%; }
+  .ubc-serve-wide .ubc-serve-tags { flex: 1 1 45%; justify-content: flex-end; }
+}
+
+/* Home: featured video testimonial beside its pull quote. */
+.ubc-featured-quote { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: var(--s-8); align-items: center; max-width: 960px; margin: var(--space-head-content) auto 0; }
+.ubc-featured-quote blockquote { margin: var(--s-3) 0 0; font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px); line-height: 1.5; letter-spacing: 0.06em; color: var(--text-strong); }
+.ubc-featured-quote figcaption { display: flex; flex-direction: column; margin-top: var(--s-5); line-height: 1.5; }
+.ubc-featured-quote figcaption strong { color: var(--text-strong); }
+.ubc-featured-quote figcaption span { font-size: var(--fs-body-sm); color: var(--text-muted); }
+@media (max-width: 760px) {
+  .ubc-featured-quote { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+  .ubc-featured-video { max-width: 280px; margin: 0 auto; width: 100%; }
+}
+/* Phones: the other clips swipe sideways instead of stacking four screens. */
+@media (max-width: 640px) {
+  .ubc-video-strip { display: flex !important; overflow-x: auto; scroll-snap-type: x mandatory; max-width: none !important; margin-left: calc(-1 * var(--gutter)) !important; margin-right: calc(-1 * var(--gutter)) !important; padding: 0 var(--gutter) var(--s-2); }
+  .ubc-video-strip > * { flex: 0 0 68%; scroll-snap-align: center; }
+}
+
+/* ---------- Home hero (SceneHero.jsx) ----------
+   Desktop and tablets: a scroll track five screens tall with the scene
+   pinned inside it. Phones and reduced motion: the same markup in normal
+   flow, the 3D layers hidden and the stages as stacked cards. */
+.ubc-hero { position: relative; height: var(--hero-h, 500vh); background: var(--surface-page); }
+.ubc-hero-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.ubc-hero-intro { position: absolute; inset: 0; display: flex; align-items: center; }
+.ubc-hero-cards { display: none; }
+.ubc-hero-card { background: var(--surface-card); border: var(--bw-hair) solid var(--border-subtle); border-radius: var(--r-3); overflow: hidden; }
+.ubc-hero-card img { display: block; width: 100%; height: auto; max-height: 60vh; object-fit: contain; background: var(--white); padding: var(--s-3) var(--s-3) 0; }
+/* Tablets: the 01-04 dots clear the Chat / Request Quote bar. */
+@media (max-width: 1100px) { .ubc-stage-rail { margin-bottom: 80px !important; } }
+@media (max-width: 700px), (prefers-reduced-motion: reduce) {
+  .ubc-hero { height: auto; }
+  .ubc-hero-pin { position: static; height: auto; overflow: visible; }
+  .ubc-hero-desk { display: none !important; }
+  .ubc-hero-intro { position: static; display: block !important; opacity: 1 !important; pointer-events: auto !important; padding-top: var(--section-y); }
+  .ubc-hero-cards { display: block; max-width: var(--page-max); margin: 0 auto; padding: var(--section-y) var(--gutter) 0; }
+}

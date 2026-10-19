@@ -58,7 +58,7 @@ export function FramingSchematic({ layer = 0 }) {
         )}
       </div>
       <div style={{
-        position: 'absolute', left: 0, bottom: 0, fontFamily: 'var(--font-mono)', fontSize: 11,
+        position: 'absolute', left: 0, bottom: 0, fontFamily: 'var(--font-mono)', fontSize: 12,
         letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(245,244,241,.34)'
       }}>Schematic line work · real model export pending</div>
     </div>
