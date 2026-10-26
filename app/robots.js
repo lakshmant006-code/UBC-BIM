@@ -5,7 +5,7 @@ import { abs } from '../ui_kits/website/site.js';
 // stay the same for launch.
 export default function robots() {
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/admin'] }],
+    rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/admin', '/site-admin'] }],
     sitemap: abs('/sitemap.xml')
   };
 }
