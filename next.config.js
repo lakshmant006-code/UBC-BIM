@@ -16,6 +16,10 @@ const nextConfig = {
       has: [{ type: 'host', value: '(?<host>.*\\.vercel\\.app)' }],
       headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
     }, {
+      // Admin pages and their API are never cached or indexed.
+      source: '/site-admin/:path*',
+      headers: [{ key: 'Cache-Control', value: 'no-store' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
+    }, {
       source: '/assets/:path*',
       headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }]
     }];

@@ -95,6 +95,9 @@ export function AppChrome({ children }) {
   }, []);
 
   const active = pathToId(pathname);
+  // The admin (/site-admin) has its own bar: no public header, footer, quote
+  // button or chat around it.
+  const inAdmin = Boolean(pathname && pathname.startsWith('/site-admin'));
   // Buttons pass their click event straight through, so only a real
   // { machine } options object pre-selects the form's machine field.
   const openQuote = (opts) => {
@@ -105,6 +108,8 @@ export function AppChrome({ children }) {
   // The floating button is the one place that asks for a quote: same
   // slide-in panel, with the quote request form in it.
   const openQuoteRequest = () => { setQuoteMode('quote'); setQuote(true); };
+
+  if (inAdmin) return <>{children}</>;
 
   return (
     <>
