@@ -165,14 +165,14 @@ const mobileStill = (src) => src.replace(/\.(webp|jpg)$/, '-m.webp');
 function StageCards() {
   return (
     <section aria-labelledby="stages-title-m" className="ubc-hero-cards">
-      <h2 id="stages-title-m" style={eyebrowStyle}>How a project moves through the model</h2>
+      <div id="stages-title-m" role="presentation" style={eyebrowStyle}>How a project moves through the model</div>
       <div style={{ display: 'grid', gap: 'var(--space-card-gap)', marginTop: 'var(--space-head-content)' }}>
         {STAGES.map((s) => (
           <article key={s.n} className="ubc-hero-card">
             {s.still && <img src={mobileStill(s.still)} width={800} height={440} alt={'Stage ' + s.n + ': ' + s.title} loading="lazy" decoding="async" />}
             <div style={{ padding: 'var(--space-card-pad)' }}>
               <div style={{ ...eyebrowStyle, color: 'var(--text-accent)' }}>Stage {s.n}</div>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</h3>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)', margin: 'var(--s-2) 0 0' }}>{s.title}</div>
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-muted)', margin: 'var(--space-title-text) 0 0' }}>{s.body}</p>
               {s.state === 'outputs' && <OutputChain shown animate={false} />}
               {s.state === 'outputs' && seeHow}

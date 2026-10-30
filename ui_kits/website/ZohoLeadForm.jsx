@@ -20,6 +20,7 @@
 */
 import React from 'react';
 import Script from 'next/script';
+import { useRouter } from 'next/navigation';
 
 const FORM_ID = '701373000010666398';
 export const ZOHO = {
@@ -64,17 +65,16 @@ const fileProblem = (input) => {
   return '';
 };
 
-function track(source) {
-  if (typeof window === 'undefined') return;
-  if (Array.isArray(window.dataLayer)) window.dataLayer.push({ event: 'generate_lead', source });
-  if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { source });
-}
+// The GA4 conversion fires once on /thank-you/ (app/thank-you/LeadConversion.jsx),
+// which reads this flag; reloading that page does not count a second lead.
+export const LEAD_FLAG = 'ubc-lead-source';
 
 export function ZohoLeadForm({ source, className, style, extraFields, sent, children }) {
   const [status, setStatus] = React.useState('idle'); // idle | sending | sent
   const [problem, setProblem] = React.useState('');
   const sink = 'zoho-lead-' + source;
   const sending = React.useRef(false);
+  const router = useRouter();
 
   const onSubmit = (e) => {
     const form = e.currentTarget;
@@ -94,8 +94,9 @@ export function ZohoLeadForm({ source, className, style, extraFields, sent, chil
   const onSinkLoad = () => {
     if (!sending.current) return;
     sending.current = false;
+    try { window.sessionStorage.setItem(LEAD_FLAG, source); } catch (e) { /* storage blocked: lead still recorded */ }
     setStatus('sent');
-    track(source);
+    router.push('/thank-you/');
   };
 
   return (
