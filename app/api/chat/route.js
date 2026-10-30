@@ -1,14 +1,14 @@
 // Website chat assistant. The visitor's conversation (plain text turns) is
 // answered by Claude from the site's own content (knowledge.js), streamed
 // back as plain text. One tool, request_follow_up, turns a visitor who asks
-// for a person into a Zoho CRM lead (the same path as the project form).
+// for a person into a Zoho CRM lead (the same Web-to-Lead form as the site's forms).
 //
 // Configure in Vercel: ANTHROPIC_API_KEY (required); CHAT_MODEL optional
 // (defaults to Claude Opus 5.5). Without a key this answers 503 and the chat
 // panel falls back to its built-in quick answers.
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT } from './knowledge.js';
-import { zohoConfigured, createZohoLead } from '../project/zoho.js';
+import { sendWebLead } from './weblead.js';
 
 export const runtime = 'nodejs';
 
@@ -62,14 +62,10 @@ async function followUp(input) {
   if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { ok: false, text: 'A name and a valid email address are needed before the team can follow up.' };
   }
-  if (!zohoConfigured()) {
-    return { ok: false, text: 'The follow-up system is not connected yet. Ask the visitor to use the "Start Your Next Project" form.' };
-  }
   try {
-    await createZohoLead({
-      name, email, machine: '', files: [], source: 'chat', role: '',
-      message: String(input.summary || '').slice(0, 2000),
-      submittedAt: new Date().toISOString()
+    await sendWebLead({
+      name, email,
+      description: ['Sent from: website chat assistant', String(input.summary || '').slice(0, 2000)].filter(Boolean).join('\n\n')
     });
     return { ok: true, text: 'Sent. The team has the visitor\'s details and will reply by email.' };
   } catch (e) {

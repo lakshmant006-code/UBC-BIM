@@ -1,5 +1,5 @@
 // Privacy policy. Written from what the site actually does (see the comments
-// in app/api/project and app/api/chat for the data paths): forms go to Zoho
+// in ui_kits/website/ZohoLeadForm.jsx and app/api/chat for the data paths): forms go to Zoho
 // CRM, the chat assistant's messages go to Anthropic to generate replies,
 // Vercel hosts the site, fonts come from Google Fonts and icons from unpkg.
 // No analytics, advertising cookies or browser storage are used.

@@ -22,25 +22,8 @@ import React from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 
-const FORM_ID = '701373000010666398';
-export const ZOHO = {
-  action: 'https://crm.zoho.in/crm/WebToLeadForm',
-  hidden: {
-    xnQsjsdp: 'd724f37e1cd153679acebb4ee967c6d16b0042055f380cf8632ea6dd3f52033c',
-    zc_gad: '',
-    xmIwtLD: '339462cb837a08e8900c2ead0cbd34ae053457d10c1af3aeba5f0f4b7b30a415c3c6a46078b9a5e5bf2d7e889680c4e1',
-    actionType: 'TGVhZHM=',
-    returnURL: 'null',
-    // Zoho's form code marks these "Do not remove" (visitor tracking ids).
-    ldeskuid: '',
-    LDTuvid: ''
-  },
-  honeypot: 'aG9uZXlwb3Q',
-  // Zoho's own web form analytics (views and submissions per form).
-  analytics: 'https://crm.zohopublic.in/crm/WebFormAnalyticsServeServlet?rid=853477faa869018734016b0ce3c9fdd4a6a0db95bc4e9083332dc3f8341f22123560e7a125d393bb7113c55893f19759gid961aa72a5dbca93ea872ac565e2f42578747261cc8ab872189d935e9ada91181gida10286e04e29071b31fc3e988701842cf57cc051fc2f7aacdc1e693d2ba844b4gid129559e858da30b391574a7c36e9bb9028638740e0974946917dda10b9bde521&tw=549be92407d3193fbcdc1de021ed70f043ac9511f5a2d56672d9de1b87097b97&version=v2',
-  maxFiles: 3,
-  maxBytes: 20 * 1024 * 1024
-};
+import { ZOHO, FORM_ID } from './zoho-config.js';
+export { ZOHO };
 
 // The CRM's picklist values, with the labels the site shows for them.
 export const PROJECT_TYPES = [
@@ -69,7 +52,10 @@ const fileProblem = (input) => {
 // which reads this flag; reloading that page does not count a second lead.
 export const LEAD_FLAG = 'ubc-lead-source';
 
-export function ZohoLeadForm({ source, className, style, extraFields, sent, children }) {
+// `conversion` (default true): a sales enquiry goes on to /thank-you and counts
+// as a lead in analytics. A careers application passes false: it stays on the
+// page, shows its own `sent` message, and is not counted as a sales lead.
+export function ZohoLeadForm({ source, className, style, extraFields, sent, conversion = true, children }) {
   const [status, setStatus] = React.useState('idle'); // idle | sending | sent
   const [problem, setProblem] = React.useState('');
   const sink = 'zoho-lead-' + source;
@@ -94,8 +80,9 @@ export function ZohoLeadForm({ source, className, style, extraFields, sent, chil
   const onSinkLoad = () => {
     if (!sending.current) return;
     sending.current = false;
-    try { window.sessionStorage.setItem(LEAD_FLAG, source); } catch (e) { /* storage blocked: lead still recorded */ }
     setStatus('sent');
+    if (!conversion) return;
+    try { window.sessionStorage.setItem(LEAD_FLAG, source); } catch (e) { /* storage blocked: lead still recorded */ }
     router.push('/thank-you/');
   };
 

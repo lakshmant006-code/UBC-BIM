@@ -2,8 +2,9 @@
 /*
   QuoteDrawer: the slide-in panel every "Start Your Next Project →" button opens.
   It renders the same ProjectForm as the homepage's final CTA, so both
-  submit to the same place (app/api/project/route.js) and neither claims an
-  enquiry was received unless that request actually succeeded. `machine`
+  submit to the same place (UBC's Zoho CRM Web-to-Lead form,
+  ui_kits/website/ZohoLeadForm.jsx) and neither claims an enquiry was
+  received unless Zoho actually answered. `machine`
   pre-selects the form's machine field (the Technology selector passes it).
   `mode="quote"` (the floating "Request Quote" button) shows the quote
   request form instead: contact details plus the scope, sent to Zoho CRM.

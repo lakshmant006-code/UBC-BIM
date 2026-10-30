@@ -14,7 +14,7 @@
     Roles that don't match dim in place (inert) instead of reflowing.
   - Apply opens the role's own pop-up with the application form already
     set to that role.
-  - CareerForm posts to app/api/project/route.js tagged source 'careers'.
+  - CareerForm posts to the Zoho CRM Web-to-Lead form (ZohoLeadForm.jsx).
     It becomes a Zoho CRM Lead; until Zoho is configured that answers 503 and the form says
     it could not send, rather than claiming the application was received.
 
@@ -28,6 +28,7 @@ import { Button } from '../../components/core/Button.jsx';
 import { Tag } from '../../components/core/Tag.jsx';
 import { FormField } from '../../components/forms/FormField.jsx';
 import { Input } from '../../components/forms/Input.jsx';
+import { ZohoLeadForm } from './ZohoLeadForm.jsx';
 import { Select } from '../../components/forms/Select.jsx';
 import { Textarea } from '../../components/forms/Textarea.jsx';
 import { UBC_DATA } from './data.js';
@@ -160,66 +161,62 @@ function CareersHero({ onQuote }) {
 }
 
 // ---------- Application form ----------
+// Applications go to the same Zoho CRM Web-to-Lead form as the project
+// enquiries (ZohoLeadForm.jsx), so no server route or API keys are involved.
+// The role, what the applicant has modelled and their work-sample link go
+// into the lead's Description, headed "Careers application" so the team can
+// tell them from sales enquiries.
 function CareerForm({ role = '', idPrefix }) {
-  const [status, setStatus] = React.useState('idle'); // idle | sending | sent | error
   const [picked, setPicked] = React.useState(role);
   React.useEffect(() => { setPicked(role); }, [role]);
   const options = [...ROLES.map((r) => r.title), 'Speculative application'];
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const link = String(fd.get('link') || '').trim();
-    const note = String(fd.get('message') || '').trim();
-    const body = new FormData();
-    body.set('name', fd.get('name') || '');
-    body.set('email', fd.get('email') || '');
-    body.set('source', 'careers');
-    body.set('role', picked || 'Speculative application');
-    body.set('message', [note, link && 'Work sample: ' + link].filter(Boolean).join('\n\n'));
-    setStatus('sending');
-    try {
-      const res = await fetch('/api/project', { method: 'POST', body });
-      setStatus(res.ok ? 'sent' : 'error');
-    } catch {
-      setStatus('error');
-    }
+  const sent = (
+    <div role="status" className="ubc-career-sent">
+      <span className="ubc-career-tick" aria-hidden="true"><Icon name="check" size={22} /></span>
+      <div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)' }}>Application sent</div>
+        <p style={{ fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-2) 0 0' }}>Thanks. The team will read it and reply by email.</p>
+      </div>
+    </div>
+  );
+
+  const extraFields = (form) => {
+    const v = (id) => String((form.querySelector('#' + idPrefix + '-' + id) || {}).value || '').trim();
+    const link = v('link');
+    return {
+      Description: [
+        'Careers application',
+        'Role: ' + (picked || 'Speculative application'),
+        v('msg') && 'What they have modelled: ' + v('msg'),
+        link && 'Work sample: ' + link,
+        'Sent from: careers'
+      ].filter(Boolean).join('\n')
+    };
   };
 
-  if (status === 'sent') {
-    return (
-      <div role="status" className="ubc-career-sent">
-        <span className="ubc-career-tick" aria-hidden="true"><Icon name="check" size={22} /></span>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h3)', fontWeight: 600, color: 'var(--text-strong)' }}>Application sent</div>
-          <p style={{ fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--lh-relaxed)', color: 'var(--text-muted)', margin: 'var(--s-2) 0 0' }}>Thanks. The team will read it and reply by email.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={onSubmit} style={{ display: 'grid', gap: 'var(--s-4)' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 'var(--s-4)' }}>
-        <FormField label="Name" required htmlFor={idPrefix + '-name'}><Input id={idPrefix + '-name'} name="name" autoComplete="name" required placeholder="Your name" /></FormField>
-        <FormField label="Email" required htmlFor={idPrefix + '-email'}><Input id={idPrefix + '-email'} name="email" type="email" autoComplete="email" required placeholder="you@email.com" /></FormField>
-      </div>
-      <FormField label="Role" htmlFor={idPrefix + '-role'}>
-        <Select id={idPrefix + '-role'} value={picked} onChange={(e) => setPicked(e.target.value)} placeholder="Choose a role" options={options} />
-      </FormField>
-      <FormField label="What you have modelled" htmlFor={idPrefix + '-msg'}>
-        <Textarea id={idPrefix + '-msg'} name="message" rows={3} placeholder="Framing systems, software, project types." />
-      </FormField>
-      <FormField label="Link to a work sample" htmlFor={idPrefix + '-link'} hint="Portfolio, drive folder or LinkedIn.">
-        <Input id={idPrefix + '-link'} name="link" type="url" inputMode="url" placeholder="https://" />
-      </FormField>
-      {status === 'error' && (
-        <p role="alert" style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--danger)', margin: 0 }}>
-          We couldn't send this just now. Please try again later, or reach us through the <Link href="/contact" style={{ color: 'inherit' }}>Contact page</Link>.
-        </p>
+    <ZohoLeadForm source={'careers-' + idPrefix} sent={sent} extraFields={extraFields} conversion={false} style={{ display: 'grid', gap: 'var(--s-4)' }}>
+      {({ sending, problem }) => (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 'var(--s-4)' }}>
+            <FormField label="Name" required htmlFor={idPrefix + '-name'}><Input id={idPrefix + '-name'} name="Last Name" autoComplete="name" maxLength={80} required placeholder="Your name" /></FormField>
+            <FormField label="Email" required htmlFor={idPrefix + '-email'}><Input id={idPrefix + '-email'} name="Email" type="email" autoComplete="email" maxLength={100} required placeholder="you@email.com" /></FormField>
+          </div>
+          <FormField label="Role" htmlFor={idPrefix + '-role'}>
+            <Select id={idPrefix + '-role'} value={picked} onChange={(e) => setPicked(e.target.value)} placeholder="Choose a role" options={options} />
+          </FormField>
+          <FormField label="What you have modelled" htmlFor={idPrefix + '-msg'}>
+            <Textarea id={idPrefix + '-msg'} rows={3} placeholder="Framing systems, software, project types." />
+          </FormField>
+          <FormField label="Link to a work sample" htmlFor={idPrefix + '-link'} hint="Portfolio, drive folder or LinkedIn.">
+            <Input id={idPrefix + '-link'} type="url" inputMode="url" placeholder="https://" />
+          </FormField>
+          {problem && <p role="alert" style={{ fontSize: 'var(--fs-body-sm)', color: 'var(--danger)', margin: 0 }}>{problem}</p>}
+          <div><Button type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send application →'}</Button></div>
+        </>
       )}
-      <div><Button type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send application →'}</Button></div>
-    </form>
+    </ZohoLeadForm>
   );
 }
 
